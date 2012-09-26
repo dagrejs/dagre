@@ -6,6 +6,7 @@ all: dagre.js package.json
 .INTERMEDIATE dagre.js: \
 	src/pre.js \
 	src/version.js \
+	src/graph.js \
 	src/post.js
 
 dagre.js: Makefile node_modules
