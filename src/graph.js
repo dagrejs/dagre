@@ -33,7 +33,7 @@ dagre.graph.create = function() {
    * new attribute will replace the current attribute.
    *
    * If a new node was added to the graph this function returns `true`. If the
-   * node updated in the graph then this function returns `false`.
+   * node was updated in the graph then this function returns `false`.
    */
   function addNode(id, attrs) {
     var created = false;
@@ -41,13 +41,21 @@ dagre.graph.create = function() {
       created = true;
       _nodes[id] = {
         id: id,
-        attrs: {}
+        attrs: {},
+        successors: [],
+        predecessors: []
       };
     }
     if (arguments.length > 1) {
-      _mergeAttrs(attrs, _nodes[id].attrs);
+      _mergeAttributes(attrs, _nodes[id].attrs);
     }
     return created;
+  }
+
+  function addNodes() {
+    for (var i = 0; i < arguments.length; ++i) {
+      addNode(arguments[i]);
+    }
   }
 
   /*
@@ -60,27 +68,128 @@ dagre.graph.create = function() {
       throw new Error("Node is not in graph: " + id);
     }
 
-    return {
-      id: id,
-      attrs: u.attrs
+    function addSuccessor(sucId, attrs) {
+      _addEdge(id, sucId, attrs);
     }
+
+    function addPredecessor(predId, attrs) {
+      _addEdge(predId, id, attrs);
+    }
+
+    function successors() {
+      return u.successors.map(function(sucId) { return node(sucId); });
+    }
+
+    function predecessors() {
+      return u.predecessors.map(function(predId) { return node(predId); });
+    }
+
+    function neighbors() {
+      return successors().concat(predecessors());
+    }
+
+    function outEdges() {
+      return u.successors.map(function(sucId) { return _edge(id, sucId); });
+    }
+
+    function inEdges() {
+      return u.predecessors.map(function(predId) { return _edge(predId, id); });
+    }
+
+    function edges() {
+      return inEdges().concat(outEdges());
+    }
+
+    return {
+      id: function() { return id; },
+      attrs: u.attrs,
+      addSuccessor: addSuccessor,
+      addPredecessor: addPredecessor,
+      successors: successors,
+      predecessors: predecessors,
+      neighbors: neighbors,
+      outEdges: outEdges,
+      inEdges: inEdges,
+      edges: edges
+    }
+  }
+
+  function nodes() {
+    return Object.keys(_nodes).map(function(id) { return node(id); });
+  }
+
+  function edges() {
+    return Object.keys(_edges).map(function(id) { return _edgeById(id); });
+  }
+
+  /*
+   * Adds a new edge to the graph. Nodes for `tailId` and `headId` must already
+   * exist in the graph or an error will be thrown. Optionally attributes can be
+   * added to the edge.
+   *
+   * If a new edge was added to the graph this function returns `true`. If the
+   * edge was updated then this function returns `false`.
+   */
+  function _addEdge(tailId, headId, attrs) {
+    var created = false;
+    var id = _edgeId(tailId, headId);
+    if (!(id in _edges)) {
+      created = true;
+      _edges[id] = {
+        tailId: tailId,
+        headId: headId,
+        attrs: {}
+      };
+      _nodes[tailId].successors.push(headId);
+      _nodes[headId].predecessors.push(tailId);
+    }
+    if (attrs) {
+      _mergeAttributes(attrs, _edges[id].attrs);
+    }
+    return created;
+  }
+
+  function _edge(tailId, headId) {
+    return _edgeById(_edgeId(tailId, headId));
+  }
+
+  function _edgeById(id) {
+    var e = _edges[id];
+ 
+    return {
+      id:    function() { return id; },
+      tail:  function() { return node(e.tailId); },
+      head:  function() { return node(e.headId); },
+      attrs: e.attrs
+    };
+  }
+
+  /*
+   * Creates a unique primitive identifier from the given `tailId` and `headId`.
+   */
+  function _edgeId(tailId, headId) {
+    return (tailId.toString().length) + ":" + tailId + '->' + headId;
   }
 
   /*
    * Copies attributes from `src` to `dst`. If an attribute name is in both
    * `src` and `dst` then the attribute value from `src` takes precedence.
    */
-  function _mergeAttrs(src, dst) {
+  function _mergeAttributes(src, dst) {
     Object.keys(src).forEach(function(k) { dst[k] = src[k]; });
   }
 
   _attrs = {};
   _nodes = {};
+  _edges = {};
 
   // Public API is defined here
   return {
     attrs: attrs,
     addNode: addNode,
-    node: node
+    addNodes: addNodes,
+    node: node,
+    nodes: nodes,
+    edges: edges
   };
 }
