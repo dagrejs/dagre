@@ -9,6 +9,7 @@ all: dagre.js package.json
 	src/version.js \
 	src/graph.js \
 	src/pre-layout.js \
+	src/render.js \
 	src/dot-grammar.js \
 	src/post.js
 

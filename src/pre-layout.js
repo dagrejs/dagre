@@ -12,6 +12,9 @@ dagre.preLayout = function(g, svg) {
     attrs.label = "label" in attrs ? attrs.label.toString() : u.id().toString();
     attrs.width = "width" in attrs ? parseInt(attrs.width) : 0;
     attrs.height = "height" in attrs ? parseInt(attrs.height) : 0;
+    if (!("color" in attrs)) {
+      attrs.color = "#FFF";
+    }
 
     var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     text.textContent = u.attrs.label;
