@@ -1,5 +1,6 @@
 NODE?=node
 NPM?=npm
+PEGJS?=node_modules/pegjs/bin/pegjs
 
 all: dagre.js package.json
 
@@ -7,12 +8,16 @@ all: dagre.js package.json
 	src/pre.js \
 	src/version.js \
 	src/graph.js \
+	src/dot-grammar.js \
 	src/post.js
 
 dagre.js: Makefile node_modules
 	@rm -f $@
 	cat $(filter %.js, $^) > $@
 	@chmod a-w $@
+
+src/dot-grammar.js: node_modules
+	$(PEGJS) -e dot_parser src/dot-grammar.pegjs $@
 
 node_modules: package.json
 	$(NPM) install

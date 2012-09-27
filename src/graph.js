@@ -68,11 +68,13 @@ dagre.graph.create = function() {
       throw new Error("Node is not in graph: " + id);
     }
 
-    function addSuccessor(sucId, attrs) {
+    function addSuccessor(suc, attrs) {
+      var sucId = suc.id ? suc.id() : suc;
       _addEdge(id, sucId, attrs);
     }
 
-    function addPredecessor(predId, attrs) {
+    function addPredecessor(pred, attrs) {
+      var predId = pred.id ? pred.id() : pred;
       _addEdge(predId, id, attrs);
     }
 
@@ -193,3 +195,56 @@ dagre.graph.create = function() {
     edges: edges
   };
 }
+
+/*
+ * Dot-like language parser.
+ */
+dagre.graph.read = function(str) {
+  var parseTree = dot_parser.parse(str);
+  var graph = dagre.graph.create();
+  var undir = parseTree.type === "graph";
+
+  function handleStmt(stmt) {
+    switch (stmt.type) {
+      case "node":
+        var id = stmt.id;
+        graph.addNode(id, stmt.attrs);
+        break;
+      case "edge":
+        var prev;
+        stmt.elems.forEach(function(elem) {
+          handleStmt(elem);
+
+          switch(elem.type) {
+            case "node":
+              graph.addNode(elem.id);
+              var curr = graph.node(elem.id);
+              if (prev) {
+                prev.addSuccessor(curr, stmt.attrs);
+                if (undir) {
+                  prev.addPredecessor(curr);
+                }
+              }
+              prev = curr;
+              break;
+            default:
+              // We don't currently support subgraphs incident on an edge
+              throw new Error("Unsupported type incident on edge: " + elem.type);
+          }
+        });
+        break;
+      case "attr":
+        // Ignore attrs
+        break;
+      default:
+        throw new Error("Unsupported statement type: " + stmt.type);
+    }
+  }
+
+  if (parseTree.stmts) {
+    parseTree.stmts.forEach(function(stmt) {
+      handleStmt(stmt);
+    });
+  }
+  return graph;
+}   
