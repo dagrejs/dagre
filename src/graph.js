@@ -222,7 +222,7 @@ dagre.graph.read = function(str) {
               if (prev) {
                 prev.addSuccessor(curr, stmt.attrs);
                 if (undir) {
-                  prev.addPredecessor(curr);
+                  prev.addPredecessor(curr, stmt.attrs);
                 }
               }
               prev = curr;
@@ -248,3 +248,69 @@ dagre.graph.read = function(str) {
   }
   return graph;
 }   
+
+/*
+ * Dot-like serializer.
+ */
+dagre.graph.write = function(g) {
+  function _id(obj) { return '"' + obj.toString().replace(/"/g, '\\"') + '"'; }
+
+  function _idVal(obj) {
+    if (Object.prototype.toString.call(obj) === "[object Object]" ||
+        Object.prototype.toString.call(obj) === "[object Array]") {
+      return _id(JSON.stringify(obj));
+    }
+    return _id(obj);
+  }
+
+  function _writeNode(u) {
+    var str = "    " + _id(u.id());
+    var hasAttrs = false;
+    Object.keys(u.attrs).forEach(function(k) {
+      if (!hasAttrs) {
+        str += ' [';
+        hasAttrs = true;
+      } else {
+        str += ',';
+      }
+      str += _id(k) + "=" + _idVal(u.attrs[k]);
+    });
+    if (hasAttrs) {
+      str += "]";
+    }
+    str += "\n";
+    return str;
+  }
+
+  function _writeEdge(e) {
+    var str = "    " + _id(e.tail().id()) + " -> " + _id(e.head().id());
+    var hasAttrs = false;
+    Object.keys(e.attrs).forEach(function(k) {
+      if (!hasAttrs) {
+        str += ' [';
+        hasAttrs = true;
+      } else {
+        str += ',';
+      }
+      str += _id(k) + "=" + _idVal(e.attrs[k]);
+    });
+    if (hasAttrs) {
+      str += "]";
+    }
+    str += "\n";
+    return str;
+  }
+
+  var str = "digraph {\n";
+
+  g.nodes().forEach(function(u) {
+    str += _writeNode(u);
+  });
+
+  g.edges().forEach(function(e) {
+    str += _writeEdge(e);
+  });
+
+  str += "}\n";
+  return str;
+}
