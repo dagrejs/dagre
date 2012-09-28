@@ -10,6 +10,7 @@ all: dagre.js package.json
 	src/graph.js \
 	src/pre-layout.js \
 	src/render.js \
+	src/util.js \
 	src/dot-grammar.js \
 	src/post.js
 
