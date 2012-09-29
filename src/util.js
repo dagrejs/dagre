@@ -34,3 +34,29 @@ function createTextNode(node, x) {
 
   return text;
 }
+
+/*
+ * If `obj` does not have a property `prop` then it is added to `obj` with the
+ * default value (`def`).
+ */
+function defaultVal(obj, prop, def) {
+  if (!(prop in obj)) {
+    obj[prop] = def;
+  }
+}
+
+/*
+ * If `obj` has `prop` then it is coerced to a string. Otherwise it's value is
+ * set to `def`.
+ */
+function defaultStr(obj, prop, def) {
+  obj[prop] = prop in obj ? obj[prop].toString() : def;
+}
+
+/*
+ * If `obj` has `prop` then it is coerced to an int. Otherwise it's value is
+ * set to `def`.
+ */
+function defaultInt(obj, prop, def) {
+  obj[prop] = prop in obj ? parseInt(obj[prop]) : def;
+}

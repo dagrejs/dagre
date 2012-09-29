@@ -9,13 +9,15 @@ dagre.preLayout = function(g) {
   g.nodes().forEach(function(u) {
     var attrs = u.attrs;
 
-    attrs.label = "label" in attrs ? attrs.label.toString() : u.id().toString();
-    attrs.width = "width" in attrs ? parseInt(attrs.width) : 0;
-    attrs.height = "height" in attrs ? parseInt(attrs.height) : 0;
+    defaultStr(attrs, "label", u.id().toString());
+    defaultInt(attrs, "width", 0);
+    defaultInt(attrs, "height", 0);
 
-    if (!("color" in attrs)) { attrs.color = "#FFF"; }
-    if (!("fontname" in attrs)) { attrs.fontname = "Times New Roman"; }
-    attrs.fontsize = "fontsize" in attrs ? parseInt(attrs.fontsize) : 14;
+    defaultInt(attrs, "weight", 1);
+
+    defaultVal(attrs, "color", "#FFF");
+    defaultVal(attrs, "fontname", "Times New Roman");
+    defaultInt(attrs, "fontsize", 14);
 
     var text = createTextNode(u);
     svg.appendChild(text);
