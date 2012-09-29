@@ -112,7 +112,6 @@ describe("graph", function() {
 
     describe("addPredecessor", function() {
       it("adds a predecessor for the node", function() {
-        var v = g.addNode(2);
         u.addPredecessor(v);
 
         assert.deepEqual(ids(u.successors()), []);
@@ -137,7 +136,6 @@ describe("graph", function() {
       });
 
       it("can add an initial set of attributes", function() {
-        var v = g.addNode(2);
         var e = u.addPredecessor(v, {a: 1, b: 2});
         assert.deepEqual(e.attrs, {a: 1, b: 2});
       });
@@ -146,6 +144,32 @@ describe("graph", function() {
         u.addPredecessor(v, {a: 1, b: 2});
         var e = u.addPredecessor(v, {b: 3, c: 4});
         assert.deepEqual(e.attrs, {a: 1, b: 3, c: 4});
+      });
+    });
+
+    describe("removeSuccessor", function() {
+      it("removes the edge", function() {
+        u.addSuccessor(v);
+        u.removeSuccessor(v);
+
+        assert.deepEqual(ids(u.successors()), []);
+        assert.deepEqual(ids(u.neighbors()), []);
+
+        assert.deepEqual(ids(v.predecessors()), []);
+        assert.deepEqual(ids(u.neighbors()), []);
+      });
+    });
+
+    describe("removePredecessor", function() {
+      it("removes the edge", function() {
+        u.addPredecessor(v);
+        u.removePredecessor(v);
+
+        assert.deepEqual(ids(u.predecessors()), []);
+        assert.deepEqual(ids(u.neighbors()), []);
+
+        assert.deepEqual(ids(v.successors()), []);
+        assert.deepEqual(ids(v.neighbors()), []);
       });
     });
   });

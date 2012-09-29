@@ -60,7 +60,7 @@ dagre.graph.create = function() {
   function node(id) {
     var u = _nodes[id];
     if (u === undefined) {
-      throw new Error("Node is not in graph: " + id);
+      return null;
     }
 
     function addSuccessor(suc, attrs) {
@@ -71,6 +71,14 @@ dagre.graph.create = function() {
     function addPredecessor(pred, attrs) {
       var predId = pred.id ? pred.id() : pred;
       return _addEdge(predId, id, attrs);
+    }
+
+    function removeSuccessor(suc) {
+      return _removeEdge(id, suc.id ? suc.id() : suc);
+    }
+
+    function removePredecessor(pred) {
+      return _removeEdge(pred.id ? pred.id() : pred, id);
     }
 
     function successors() {
@@ -102,6 +110,8 @@ dagre.graph.create = function() {
       attrs: u.attrs,
       addSuccessor: addSuccessor,
       addPredecessor: addPredecessor,
+      removeSuccessor: removeSuccessor,
+      removePredecessor: removePredecessor,
       successors: successors,
       predecessors: predecessors,
       neighbors: neighbors,
@@ -142,6 +152,18 @@ dagre.graph.create = function() {
       _mergeAttributes(attrs, _edges[id].attrs);
     }
     return _edgeById(id);
+  }
+
+  function _removeEdge(tailId, headId) {
+    var id = _edgeId(tailId, headId);
+    var edge = _edges[id];
+    if (edge) {
+      delete _edges[id];
+      delete _nodes[tailId].successors[headId];
+      delete _nodes[headId].predecessors[tailId];
+      return true;
+    }
+    return false;
   }
 
   function _edge(tailId, headId) {
