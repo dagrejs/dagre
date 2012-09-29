@@ -28,8 +28,8 @@ dagre.graph.create = function() {
    * sense to use primitive values as ids. This function also optionally takes
    * an object that will be used as attributes for the node.
    *
-   * If the node already exists in the graph then the supplied attributes will
-   * merged with the nodes attributes. Where there are overlapping keys, the
+   * If the node already exists in the graph the supplied attributes will
+   * merged with the node's attributes. Where there are overlapping keys, the
    * new attribute will replace the current attribute.
    */
   function addNode(id, attrs) {
@@ -65,20 +65,20 @@ dagre.graph.create = function() {
 
     function addSuccessor(suc, attrs) {
       var sucId = suc.id ? suc.id() : suc;
-      return _addEdge(id, sucId, attrs);
+      return addEdge(id, sucId, attrs);
     }
 
     function addPredecessor(pred, attrs) {
       var predId = pred.id ? pred.id() : pred;
-      return _addEdge(predId, id, attrs);
+      return addEdge(predId, id, attrs);
     }
 
     function removeSuccessor(suc) {
-      return _removeEdge(id, suc.id ? suc.id() : suc);
+      return removeEdge(id, suc.id ? suc.id() : suc);
     }
 
     function removePredecessor(pred) {
-      return _removeEdge(pred.id ? pred.id() : pred, id);
+      return removeEdge(pred.id ? pred.id() : pred, id);
     }
 
     function successors() {
@@ -121,23 +121,16 @@ dagre.graph.create = function() {
     }
   }
 
-  function nodes() {
-    return Object.keys(_nodes).map(function(id) { return node(id); });
-  }
-
-  function edges() {
-    return Object.keys(_edges).map(function(id) { return _edgeById(id); });
-  }
-
   /*
-   * Adds a new edge to the graph. Nodes for `tailId` and `headId` must already
-   * exist in the graph or an error will be thrown. Optionally attributes can be
-   * added to the edge.
+   * Adds or updates an erde in the graph with the given head and tail node
+   * ids. This function optionally taks an object that will be used as
+   * attributes for the edge.
    *
-   * If a new edge was added to the graph this function returns `true`. If the
-   * edge was updated then this function returns `false`.
+   * If the edge already exists in the graph the supplied attributes will be
+   * merged with the edge's attributes. Where there are overlapping keys, the
+   * new attribute will replace the current attribute.
    */
-  function _addEdge(tailId, headId, attrs) {
+  function addEdge(tailId, headId, attrs) {
     var id = _edgeId(tailId, headId);
     if (!(id in _edges)) {
       _edges[id] = {
@@ -154,7 +147,7 @@ dagre.graph.create = function() {
     return _edgeById(id);
   }
 
-  function _removeEdge(tailId, headId) {
+  function removeEdge(tailId, headId) {
     var id = _edgeId(tailId, headId);
     var edge = _edges[id];
     if (edge) {
@@ -164,6 +157,25 @@ dagre.graph.create = function() {
       return true;
     }
     return false;
+  }
+
+  function nodes() {
+    return Object.keys(_nodes).map(function(id) { return node(id); });
+  }
+
+  function edges() {
+    return Object.keys(_edges).map(function(id) { return _edgeById(id); });
+  }
+
+  function copy() {
+    var g = dagre.graph.create();
+    nodes().forEach(function(u) {
+      g.addNode(u.id(), u.attrs);
+    });
+    edges().forEach(function(e) {
+      g.addEdge(e.tail().id(), e.head().id(), e.attrs);
+    });
+    return g;
   }
 
   function _edge(tailId, headId) {
@@ -205,9 +217,11 @@ dagre.graph.create = function() {
     attrs: attrs,
     addNode: addNode,
     addNodes: addNodes,
+    addEdge: addEdge,
     node: node,
     nodes: nodes,
-    edges: edges
+    edges: edges,
+    copy: copy
   };
 }
 

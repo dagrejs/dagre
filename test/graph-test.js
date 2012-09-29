@@ -147,30 +147,40 @@ describe("graph", function() {
       });
     });
 
-    describe("removeSuccessor", function() {
-      it("removes the edge", function() {
-        u.addSuccessor(v);
-        u.removeSuccessor(v);
+    it("removeSuccessor removes the appropriate edge", function() {
+      u.addSuccessor(v);
+      u.removeSuccessor(v);
 
-        assert.deepEqual(ids(u.successors()), []);
-        assert.deepEqual(ids(u.neighbors()), []);
+      assert.deepEqual(ids(u.successors()), []);
+      assert.deepEqual(ids(u.neighbors()), []);
 
-        assert.deepEqual(ids(v.predecessors()), []);
-        assert.deepEqual(ids(u.neighbors()), []);
-      });
+      assert.deepEqual(ids(v.predecessors()), []);
+      assert.deepEqual(ids(u.neighbors()), []);
     });
 
-    describe("removePredecessor", function() {
-      it("removes the edge", function() {
-        u.addPredecessor(v);
-        u.removePredecessor(v);
+    it("removePredecessor removes the appropriate edge", function() {
+      u.addPredecessor(v);
+      u.removePredecessor(v);
 
-        assert.deepEqual(ids(u.predecessors()), []);
-        assert.deepEqual(ids(u.neighbors()), []);
+      assert.deepEqual(ids(u.predecessors()), []);
+      assert.deepEqual(ids(u.neighbors()), []);
 
-        assert.deepEqual(ids(v.successors()), []);
-        assert.deepEqual(ids(v.neighbors()), []);
-      });
+      assert.deepEqual(ids(v.successors()), []);
+      assert.deepEqual(ids(v.neighbors()), []);
+    });
+
+    it("copy creates a copy of the graph", function() {
+      var src = dagre.graph.read("digraph { A -> B [weight = 5]; A [label=abc]; B [label=xyz] }");
+      var copy = src.copy();
+      assert.equal(dagre.graph.write(src), dagre.graph.write(copy));
+
+      // Changes in `src` should not be reflected in `copy`
+      src.node("A").attrs.label = "bcd";
+      assert.notEqual("bcd", copy.node("A").attrs.label, "changes to `src` should not reflected in `copy`");
+
+      // Changes in `copy` should not be reflected in `src`
+      copy.node("B").attrs.label = "wxy";
+      assert.notEqual("wxy", src.node("B").attrs.label, "changes to `copy` should not be reflected in `src`");
     });
   });
 });
