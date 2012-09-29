@@ -2,6 +2,7 @@ NODE?=node
 NPM?=npm
 PEGJS?=node_modules/pegjs/bin/pegjs
 MOCHA?=node_modules/mocha/bin/mocha
+MOCHA_OPTS?=
 
 all: dagre.js package.json
 
@@ -32,7 +33,7 @@ package.json: src/version.js package.js
 
 .PHONY: test
 test: dagre.js
-	$(MOCHA)
+	$(MOCHA) $(MOCHA_OPTS)
 
 clean:
 	rm -f dagre.js package.json

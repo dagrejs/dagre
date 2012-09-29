@@ -31,25 +31,20 @@ dagre.graph.create = function() {
    * If the node already exists in the graph then the supplied attributes will
    * merged with the nodes attributes. Where there are overlapping keys, the
    * new attribute will replace the current attribute.
-   *
-   * If a new node was added to the graph this function returns `true`. If the
-   * node was updated in the graph then this function returns `false`.
    */
   function addNode(id, attrs) {
-    var created = false;
     if (!(id in _nodes)) {
-      created = true;
       _nodes[id] = {
         id: id,
         attrs: {},
-        successors: [],
-        predecessors: []
+        successors: {},
+        predecessors: {}
       };
     }
     if (arguments.length > 1) {
       _mergeAttributes(attrs, _nodes[id].attrs);
     }
-    return created;
+    return node(id);
   }
 
   function addNodes() {
@@ -70,20 +65,20 @@ dagre.graph.create = function() {
 
     function addSuccessor(suc, attrs) {
       var sucId = suc.id ? suc.id() : suc;
-      _addEdge(id, sucId, attrs);
+      return _addEdge(id, sucId, attrs);
     }
 
     function addPredecessor(pred, attrs) {
       var predId = pred.id ? pred.id() : pred;
-      _addEdge(predId, id, attrs);
+      return _addEdge(predId, id, attrs);
     }
 
     function successors() {
-      return u.successors.map(function(sucId) { return node(sucId); });
+      return Object.keys(u.successors).map(function(sucId) { return node(sucId); });
     }
 
     function predecessors() {
-      return u.predecessors.map(function(predId) { return node(predId); });
+      return Object.keys(u.predecessors).map(function(predId) { return node(predId); });
     }
 
     function neighbors() {
@@ -91,11 +86,11 @@ dagre.graph.create = function() {
     }
 
     function outEdges() {
-      return u.successors.map(function(sucId) { return _edge(id, sucId); });
+      return Object.keys(u.successors).map(function(sucId) { return _edge(id, sucId); });
     }
 
     function inEdges() {
-      return u.predecessors.map(function(predId) { return _edge(predId, id); });
+      return Object.keys(u.predecessors).map(function(predId) { return _edge(predId, id); });
     }
 
     function edges() {
@@ -103,7 +98,7 @@ dagre.graph.create = function() {
     }
 
     return {
-      id: function() { return id; },
+      id: function() { return u.id; },
       attrs: u.attrs,
       addSuccessor: addSuccessor,
       addPredecessor: addPredecessor,
@@ -133,22 +128,20 @@ dagre.graph.create = function() {
    * edge was updated then this function returns `false`.
    */
   function _addEdge(tailId, headId, attrs) {
-    var created = false;
     var id = _edgeId(tailId, headId);
     if (!(id in _edges)) {
-      created = true;
       _edges[id] = {
         tailId: tailId,
         headId: headId,
         attrs: {}
       };
-      _nodes[tailId].successors.push(headId);
-      _nodes[headId].predecessors.push(tailId);
+      _nodes[tailId].successors[headId] = true;
+      _nodes[headId].predecessors[tailId] = true;
     }
     if (attrs) {
       _mergeAttributes(attrs, _edges[id].attrs);
     }
-    return created;
+    return _edgeById(id);
   }
 
   function _edge(tailId, headId) {
@@ -181,9 +174,9 @@ dagre.graph.create = function() {
     Object.keys(src).forEach(function(k) { dst[k] = src[k]; });
   }
 
-  _attrs = {};
-  _nodes = {};
-  _edges = {};
+  var _attrs = {};
+  var _nodes = {};
+  var _edges = {};
 
   // Public API is defined here
   return {
