@@ -11,6 +11,7 @@ all: dagre.js package.json
 	src/version.js \
 	src/graph.js \
 	src/pre-layout.js \
+	src/layout.js \
 	src/render.js \
 	src/util.js \
 	src/dot-grammar.js \

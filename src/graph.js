@@ -94,15 +94,23 @@ dagre.graph.create = function() {
     }
 
     function outEdges() {
-      return Object.keys(u.successors).map(function(sucId) { return _edge(id, sucId); });
+      return Object.keys(u.successors).map(function(sucId) { return edge(id, sucId); });
     }
 
     function inEdges() {
-      return Object.keys(u.predecessors).map(function(predId) { return _edge(predId, id); });
+      return Object.keys(u.predecessors).map(function(predId) { return edge(predId, id); });
     }
 
     function edges() {
       return inEdges().concat(outEdges());
+    }
+
+    function outEdge(suc) {
+      return edge(id, suc.id ? suc.id() : suc);
+    }
+
+    function inEdge(pred) {
+      return edge(pred.id ? pred.id() : pred, id);
     }
 
     return {
@@ -117,7 +125,9 @@ dagre.graph.create = function() {
       neighbors: neighbors,
       outEdges: outEdges,
       inEdges: inEdges,
-      edges: edges
+      edges: edges,
+      outEdge: outEdge,
+      inEdge: inEdge
     }
   }
 
@@ -159,6 +169,13 @@ dagre.graph.create = function() {
     return false;
   }
 
+  function edge(tail, head) {
+    var tailId = tail.id ? tail.id() : tail;
+    var headId = head.id ? head.id() : head;
+    var id = _edgeId(tailId, headId);
+    return _edgeById(id);
+  }
+
   function nodes() {
     return Object.keys(_nodes).map(function(id) { return node(id); });
   }
@@ -178,19 +195,19 @@ dagre.graph.create = function() {
     return g;
   }
 
-  function _edge(tailId, headId) {
-    return _edgeById(_edgeId(tailId, headId));
-  }
-
   function _edgeById(id) {
     var e = _edges[id];
  
-    return {
-      id:    function() { return id; },
-      tail:  function() { return node(e.tailId); },
-      head:  function() { return node(e.headId); },
-      attrs: e.attrs
-    };
+    if (e) {
+      return {
+        id:    function() { return id; },
+        tail:  function() { return node(e.tailId); },
+        head:  function() { return node(e.headId); },
+        attrs: e.attrs
+      };
+    } else {
+      return null;
+    }
   }
 
   /*
@@ -219,6 +236,7 @@ dagre.graph.create = function() {
     addNodes: addNodes,
     addEdge: addEdge,
     node: node,
+    edge: edge,
     nodes: nodes,
     edges: edges,
     copy: copy
