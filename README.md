@@ -6,6 +6,8 @@ Use dagre to layout and render directed graphs on the client side.
 Building
 ========
 
+[![Build Status](https://secure.travis-ci.org/cpettitt/dagre.png)](http://travis-ci.org/cpettitt/dagre)
+
 Before building this library you need to install the npm node package manager
 [1].
 
