@@ -5,26 +5,29 @@ require('./src/version.js');
 var sys = require('sys');
 
 sys.puts(JSON.stringify({
-  "name": "dagre",
-  "version": dagre.version,
-  "description": "Directed graph rendering",
-  "main": "index.js",
-  "directories": {
-    "src": "src",
-    "test": "test"
+  name: "dagre",
+  version: dagre.version,
+  description: "Directed graph rendering",
+  main: "index.js",
+  directories: {
+    src: "src",
+    test: "test"
   },
-  "scripts": {
-    "test": "mocha -R spec"
+  scripts: {
+    test: "make test"
   },
-  "keywords": [
+  keywords: [
     "graph"
   ],
-  "devDependencies": {
+  devDependencies: {
+    pegjs: "0.7.x",
+    mocha: "1.5.x",
+    chai: "1.2.x"
   },
-  "author": "Chris Pettitt <chris@samsarin.com>",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cpettitt/dagre.git"
+  author: "Chris Pettitt <chris@samsarin.com>",
+  repository: {
+    type: "git",
+    url: "https://github.com/cpettitt/dagre.git"
   },
-  "license": "MIT"
+  license: "MIT"
 }, null, 2));

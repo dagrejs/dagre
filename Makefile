@@ -1,6 +1,7 @@
 NODE?=node
 NPM?=npm
 PEGJS?=node_modules/pegjs/bin/pegjs
+MOCHA?=node_modules/mocha/bin/mocha
 
 all: dagre.js package.json
 
@@ -28,6 +29,10 @@ node_modules: package.json
 package.json: src/version.js package.js
 	@rm -f $@
 	$(NODE) package.js > $@
+
+.PHONY: test
+test: dagre.js
+	$(MOCHA)
 
 clean:
 	rm -f dagre.js package.json
