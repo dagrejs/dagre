@@ -42,7 +42,7 @@ dagre.graph.create = function() {
       };
     }
     if (arguments.length > 1) {
-      _mergeAttributes(attrs, _nodes[id].attrs);
+      mergeAttributes(attrs, _nodes[id].attrs);
     }
     return node(id);
   }
@@ -164,7 +164,7 @@ dagre.graph.create = function() {
       _nodes[headId].predecessors[tailId] = true;
     }
     if (attrs) {
-      _mergeAttributes(attrs, _edges[id].attrs);
+      mergeAttributes(attrs, _edges[id].attrs);
     }
     return _edgeById(id);
   }
@@ -227,14 +227,6 @@ dagre.graph.create = function() {
    */
   function _edgeId(tailId, headId) {
     return (tailId.toString().length) + ":" + tailId + '->' + headId;
-  }
-
-  /*
-   * Copies attributes from `src` to `dst`. If an attribute name is in both
-   * `src` and `dst` then the attribute value from `src` takes precedence.
-   */
-  function _mergeAttributes(src, dst) {
-    Object.keys(src).forEach(function(k) { dst[k] = src[k]; });
   }
 
   var _attrs = {};

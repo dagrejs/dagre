@@ -64,3 +64,11 @@ function defaultInt(obj, prop, def) {
 function defaultFloat(obj, prop, def) {
   obj[prop] = prop in obj ? parseFloat(obj[prop]) : def;
 }
+
+/*
+ * Copies attributes from `src` to `dst`. If an attribute name is in both
+ * `src` and `dst` then the attribute value from `src` takes precedence.
+ */
+function mergeAttributes(src, dst) {
+  Object.keys(src).forEach(function(k) { dst[k] = src[k]; });
+}

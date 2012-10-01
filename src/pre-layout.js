@@ -18,7 +18,8 @@ dagre.preLayout = function(g) {
 
     defaultInt(attrs, "weight", 1);
 
-    defaultVal(attrs, "color", "#FFF");
+    defaultVal(attrs, "color", "#333");
+    defaultVal(attrs, "fill", "#fff");
     defaultVal(attrs, "fontname", "Times New Roman");
     defaultInt(attrs, "fontsize", 14);
 
@@ -29,6 +30,14 @@ dagre.preLayout = function(g) {
     attrs.width = Math.max(attrs.width, bbox.width);
     attrs.height = Math.max(attrs.height, bbox.height);
     svg.removeChild(text);
+  });
+
+  g.edges().forEach(function(e) {
+    var attrs = e.attrs;
+
+    defaultStr(attrs, "color", "#333");
+
+    defaultFloat(attrs, "strokewidth", 1.5);
   });
 
   document.documentElement.removeChild(svg);

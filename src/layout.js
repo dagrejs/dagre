@@ -151,3 +151,16 @@ dagre.layout.edges = function(g) {
     }
   });
 }
+
+/*
+ * Copies attributes from the source graph to the destination graph. All nodes
+ * and edges in the source graph must all be present in the destination graph.
+ */
+dagre.layout.update = function(src, dst) {
+  src.nodes().forEach(function(u) {
+    mergeAttributes(u.attrs, dst.node(u.id()).attrs);
+  });
+  src.edges().forEach(function(e) {
+    mergeAttributes(e.attrs, dst.edge(e.tail(), e.head()).attrs);
+  });
+}
