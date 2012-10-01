@@ -2,8 +2,6 @@
  * Renders the given graph to the given svg node.
  */
 dagre.render = function(g, svg) {
-  var _padding = 5;
-
   function _appendMarkers() {
     var svgDefs = createSVGElement("defs");
     svg.appendChild(svgDefs);
@@ -39,13 +37,12 @@ dagre.render = function(g, svg) {
       group.setAttribute("transform", "translate(" + x + "," + y + ")");
 
       var rect = createSVGElement("rect");
-      rect.setAttribute("x", -(_padding + u.attrs.width / 2));
-      rect.setAttribute("y",  -(_padding + u.attrs.height / 2));
-      rect.setAttribute("width", u.attrs.width + 2 * _padding);
-      rect.setAttribute("height", u.attrs.height + 2 * _padding);
-      rect.setAttribute("rx", "5");
+      rect.setAttribute("x", -(u.attrs.marginX + u.attrs.width / 2 + u.attrs.strokewidth / 2));
+      rect.setAttribute("y",  -(u.attrs.marginY + u.attrs.height / 2 + u.attrs.strokewidth / 2));
+      rect.setAttribute("width", u.attrs.width + 2 * u.attrs.marginX + u.attrs.strokewidth);
+      rect.setAttribute("height", u.attrs.height + 2 * u.attrs.marginY + u.attrs.strokewidth);
       rect.setAttribute("style", ["fill: " + u.attrs.color,
-                                  "stroke-width: 1.5px",
+                                  "stroke-width: " + u.attrs.strokewidth,
                                   "stroke: black"].join("; "));
       group.appendChild(rect);
 

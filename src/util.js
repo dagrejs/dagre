@@ -60,3 +60,7 @@ function defaultStr(obj, prop, def) {
 function defaultInt(obj, prop, def) {
   obj[prop] = prop in obj ? parseInt(obj[prop]) : def;
 }
+
+function defaultFloat(obj, prop, def) {
+  obj[prop] = prop in obj ? parseFloat(obj[prop]) : def;
+}

@@ -12,6 +12,9 @@ dagre.preLayout = function(g) {
     defaultStr(attrs, "label", u.id().toString());
     defaultInt(attrs, "width", 0);
     defaultInt(attrs, "height", 0);
+    defaultInt(attrs, "marginX", 10);
+    defaultInt(attrs, "marginY", 10);
+    defaultFloat(attrs, "strokewidth", 1.5);
 
     defaultInt(attrs, "weight", 1);
 
