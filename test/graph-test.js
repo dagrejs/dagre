@@ -60,6 +60,31 @@ describe("graph", function() {
     });
   });
 
+  describe("removeNode", function() {
+    it("removes the node from the graph", function() {
+      var u = g.addNode(1);
+      g.addNode(2);
+      g.removeNode(1);
+      assert.deepEqual(ids(g.nodes()), [2]);
+    });
+
+    it("removes out edges", function() {
+      var u = g.addNode(1);
+      var v = g.addNode(2);
+      u.addSuccessor(v);
+      g.removeNode(u);
+      assert.deepEqual(v.predecessors(), []);
+    });
+
+    it("removes in edges", function() {
+      var u = g.addNode(1);
+      var v = g.addNode(2);
+      u.addPredecessor(v);
+      g.removeNode(u);
+      assert.deepEqual(v.successors(), []);
+    });
+  });
+
   describe("node", function() {
     var g, u, v;
 

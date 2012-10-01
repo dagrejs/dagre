@@ -53,6 +53,18 @@ dagre.graph.create = function() {
     }
   }
 
+  function removeNode(n) {
+    var id = n.id ? n.id() : n;
+    var u = node(id);
+    if (u) {
+      u.successors().forEach(function(v) { u.removeSuccessor(v); });
+      u.predecessors().forEach(function(v) { u.removePredecessor(v); });
+      delete _nodes[id];
+      return true;
+    }
+    return false;
+  }
+
   /*
    * Returns a node view for the given node id. If the node is not in the graph
    * this function will raise an error.
@@ -234,6 +246,7 @@ dagre.graph.create = function() {
     attrs: attrs,
     addNode: addNode,
     addNodes: addNodes,
+    removeNode: removeNode,
     addEdge: addEdge,
     node: node,
     edge: edge,
