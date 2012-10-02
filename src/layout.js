@@ -141,7 +141,19 @@ dagre.layout.edges = function(g) {
     }
   });
 
-  // TODO handle self loops
+  g.edges().forEach(function(e) {
+    if (e.head().id() === e.tail().id()) {
+      var attrs = e.head().attrs;
+      var right = attrs.x + attrs.width / 2 + attrs.marginX + attrs.strokewidth;
+      var h = attrs.height / 2 + attrs.marginY + attrs.strokewidth;
+      var points = [[right,                       attrs.y - h / 3],
+                    [right + g.attrs.nodesep / 2, attrs.y - h],
+                    [right + g.attrs.nodesep / 2, attrs.y + h],
+                    [right,                       attrs.y + h / 3]]
+      points = points.map(function(pt) { return pt.join(","); });
+      e.attrs.path = "M " + points[0] + " C " + points.slice(1).join(" ");
+    }
+  });
 
   collapseDummyNodes(g);
 

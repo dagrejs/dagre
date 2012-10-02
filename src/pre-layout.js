@@ -6,6 +6,8 @@ dagre.preLayout = function(g) {
   var svg = createSVGElement("svg");
   document.documentElement.appendChild(svg);
 
+  defaultInt(g.attrs, "nodesep", 50);
+
   g.nodes().forEach(function(u) {
     var attrs = u.attrs;
 
