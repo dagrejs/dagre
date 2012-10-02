@@ -17,13 +17,6 @@ dagre.graph = {};
  */
 dagre.graph.create = function() {
   /*
-   * Returns graph level attributes.
-   */
-  function attrs() {
-    return _attrs;
-  }
-
-  /*
    * Adds a or updates a node in the graph with the given id. It only makes
    * sense to use primitive values as ids. This function also optionally takes
    * an object that will be used as attributes for the node.
@@ -235,7 +228,7 @@ dagre.graph.create = function() {
 
   // Public API is defined here
   return {
-    attrs: attrs,
+    attrs: _attrs,
     addNode: addNode,
     addNodes: addNodes,
     removeNode: removeNode,
