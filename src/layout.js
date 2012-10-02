@@ -53,9 +53,6 @@ function intersect(u, v) {
   var vAttrs = v.attrs;
   var x = uAttrs.x;
   var y = uAttrs.y;
-  if (uAttrs.dummy) {
-    return { x: x, y: y };
-  }
 
   // For now we only support rectangles
 
@@ -98,7 +95,7 @@ function collapseDummyNodes(g) {
     var path = "M " + e.attrs.tailPoint.x + "," + e.attrs.tailPoint.y + " L";
     do
     {
-      path += " " + e.attrs.headPoint.x + "," + e.attrs.headPoint.y;
+      path += " " + e.head().attrs.x + "," + e.head().attrs.y;
       e = e.head().outEdges()[0];
       g.removeNode(e.tail());
     }
@@ -136,8 +133,12 @@ function collapseDummyNodes(g) {
  */
 dagre.layout.edges = function(g) {
   g.edges().forEach(function(e) {
-    e.attrs.tailPoint = intersect(e.tail(), e.head());
-    e.attrs.headPoint = intersect(e.head(), e.tail());
+    if (!e.tail().attrs.dummy) {
+      e.attrs.tailPoint = intersect(e.tail(), e.head());
+    }
+    if (!e.head().attrs.dummy) {
+      e.attrs.headPoint = intersect(e.head(), e.tail());
+    }
   });
 
   // TODO handle self loops
