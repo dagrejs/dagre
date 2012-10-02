@@ -192,6 +192,7 @@ describe("graph", function() {
 
     it("copy creates a copy of the graph", function() {
       var src = dagre.graph.read("digraph { A -> B [weight = 5]; A [label=abc]; B [label=xyz] }");
+      src.attrs.graphAttr = 123;
       var copy = src.copy();
       assert.equal(dagre.graph.write(src), dagre.graph.write(copy));
 

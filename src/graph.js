@@ -191,6 +191,7 @@ dagre.graph.create = function() {
 
   function copy() {
     var g = dagre.graph.create();
+    mergeAttributes(_attrs, g.attrs);
     nodes().forEach(function(u) {
       g.addNode(u.id(), u.attrs);
     });
@@ -347,6 +348,10 @@ dagre.graph.write = function(g) {
   }
 
   var str = "digraph {\n";
+
+  Object.keys(g.attrs).forEach(function(k) {
+    str += _id(k) + "=" + _idVal(g.attrs[k]) + "\n";
+  });
 
   g.nodes().forEach(function(u) {
     str += _writeNode(u);
