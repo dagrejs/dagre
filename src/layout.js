@@ -80,7 +80,7 @@ function intersect(u, v) {
     sy = dx === 0 ? 0 : w * dy / dx;
   }
 
-  return { x: x + sx, y: y + sy };
+  return (x + sx) + "," + (y + sy);
 }
 
 function collapseDummyNodes(g) {
@@ -92,16 +92,16 @@ function collapseDummyNodes(g) {
 
   function collapseChain(e) {
     var root = e.tail();
-    var path = "M " + e.attrs.tailPoint.x + "," + e.attrs.tailPoint.y + " L";
+    var points = e.attrs.tailPoint;
     do
     {
-      path += " " + e.head().attrs.x + "," + e.head().attrs.y;
+      points += " " + e.head().attrs.x + "," + e.head().attrs.y;
       e = e.head().outEdges()[0];
       g.removeNode(e.tail());
     }
     while (e.head().attrs.dummy);
-    path += " " + e.attrs.headPoint.x + "," + e.attrs.headPoint.y;
-    root.addSuccessor(e.head(), {path: path});
+    points += " " + e.attrs.headPoint;
+    root.addSuccessor(e.head(), {points: points, type: "line"});
   }
 
   function dfs(u) {
@@ -133,11 +133,13 @@ function collapseDummyNodes(g) {
  */
 dagre.layout.edges = function(g) {
   g.edges().forEach(function(e) {
-    if (!e.tail().attrs.dummy) {
-      e.attrs.tailPoint = intersect(e.tail(), e.head());
-    }
-    if (!e.head().attrs.dummy) {
-      e.attrs.headPoint = intersect(e.head(), e.tail());
+    if (e.head().id() !== e.tail().id()) {
+      if (!e.tail().attrs.dummy) {
+        e.attrs.tailPoint = intersect(e.tail(), e.head());
+      }
+      if (!e.head().attrs.dummy) {
+        e.attrs.headPoint = intersect(e.head(), e.tail());
+      }
     }
   });
 
@@ -151,7 +153,8 @@ dagre.layout.edges = function(g) {
                     [right + g.attrs.nodesep / 2, attrs.y + h],
                     [right,                       attrs.y + h / 3]]
       points = points.map(function(pt) { return pt.join(","); });
-      e.attrs.path = "M " + points[0] + " C " + points.slice(1).join(" ");
+      e.attrs.points = points.join(" ");
+      e.attrs.type = "curve";
     }
   });
 
@@ -159,8 +162,9 @@ dagre.layout.edges = function(g) {
 
   g.edges().forEach(function(e) {
     var attrs = e.attrs;
-    if (!attrs.path) {
-      attrs.path = "M " + attrs.tailPoint.x + "," + attrs.tailPoint.y + " L " + attrs.headPoint.x + "," + attrs.headPoint.y;
+    if (!attrs.points) {
+      attrs.points = attrs.tailPoint + " " + attrs.headPoint;
+      attrs.type = "line";
     }
   });
 }

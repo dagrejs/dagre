@@ -63,7 +63,13 @@ dagre.render = function(g, svg) {
     g.edges().forEach(function(e) {
       var path = createSVGElement("path");
       var arrowhead = _createArrowhead(e.attrs.color);
-      path.setAttribute("d", e.attrs.path);
+
+      var points = e.attrs.points.split(" ");
+      if (e.attrs.type === "line") {
+        path.setAttribute("d", "M " + points[0] + " L " + points.slice(1).join(" "));
+      } else if (e.attrs.type === "curve") {
+        path.setAttribute("d", "M " + points[0] + " C " + points.slice(1).join(" "));
+      }
       path.setAttribute("style", ["fill: none",
                                   "stroke-width: " + e.attrs.strokewidth,
                                   "stroke: " + e.attrs.color,
