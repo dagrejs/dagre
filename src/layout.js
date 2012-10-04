@@ -2,9 +2,10 @@ dagre.layout = function() {
 }
 
 /*
- * Makes the input graph acyclic by reversing edges as needed. This algorithm
- * does not attempt to reverse the minimal set of edges (feedback arc set
- * problem) because an exact algorithm is NP-complete.
+ * Reverses back edges and removes self-loops. Reversed edges are marked with a
+ * reverse attribute.
+ *
+ * This process is reversed at a later stage.
  */
 dagre.layout.acyclic = function(g) {
   var onStack = {};
@@ -19,17 +20,12 @@ dagre.layout.acyclic = function(g) {
     u.outEdges().forEach(function(e) {
       var v = e.head();
       if (v in onStack) {
-        u.removeSuccessor(v);
+        g.removeEdge(e);
+        e.attrs.reverse = true;
 
-        // If u === v then this edge was a self loop in which case it should be
-        // removed altogether. Otherwise, we need to reverse the edge.
+        // If this is not a self-loop add the reverse edge to the graph
         if (u !== v) {
-          var e2 = u.inEdge(v);
-          if (e2) {
-            e2.attrs.weight = parseInt(e2.attrs.weight) + parseInt(e.attrs.weight);
-          } else {
-            u.addPredecessor(v, { weight: parseInt(e.attrs.weight) });
-          }
+          u.addPredecessor(v, e.attrs);
         }
       } else {
         dfs(v);
@@ -42,6 +38,22 @@ dagre.layout.acyclic = function(g) {
   g.nodes().forEach(function(u) {
     dfs(u);
   });
+}
+
+/*
+ * Copies the graph such that it can later be updated with `update`.
+ */
+dagre.layout.copy = function(src) {
+  var dst = dagre.graph.create();
+  mergeAttributes(src.attrs, dst.attrs);
+  src.nodes().forEach(function(u) {
+    dst.addNode(u.id(), u.attrs);
+  });
+  src.edges().forEach(function(e) {
+    var e2 = dst.addEdge(e.tail(), e.head(), e.attrs);
+    e2.attrs.originalId = e.id();
+  });
+  return dst;
 }
 
 /*
@@ -101,7 +113,9 @@ function collapseDummyNodes(g) {
     }
     while (e.head().attrs.dummy);
     points += " " + e.attrs.headPoint;
-    root.addSuccessor(e.head(), {points: points, type: "line"});
+    var e2 = root.addSuccessor(e.head(), e.attrs);
+    e2.attrs.points = points;
+    e2.attrs.type = "line";
   }
 
   function dfs(u) {
@@ -178,6 +192,6 @@ dagre.layout.update = function(src, dst) {
     mergeAttributes(u.attrs, dst.node(u.id()).attrs);
   });
   src.edges().forEach(function(e) {
-    mergeAttributes(e.attrs, dst.edge(e.tail(), e.head()).attrs);
+    mergeAttributes(e.attrs, dst.edge(e.attrs.originalId).attrs);
   });
 }

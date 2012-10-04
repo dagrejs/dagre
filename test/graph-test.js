@@ -124,10 +124,10 @@ describe("graph", function() {
         assert.deepEqual(e.attrs, {a: 1, b: 2});
       });
 
-      it("merges properties if the edge already exists", function() {
-        u.addSuccessor(v, {a: 1, b: 2});
-        var e = u.addSuccessor(v, {b: 3, c: 4});
-        assert.deepEqual(e.attrs, {a: 1, b: 3, c: 4});
+      it("creates multiple edges when called with the same successor", function() {
+        var e1 = u.addSuccessor(v, {a: 1, b: 2});
+        var e2 = u.addSuccessor(v, {b: 3, c: 4});
+        assert.deepEqual(ids(u.outEdges()).sort(), [e1.id(), e2.id()].sort());
       });
     });
 
@@ -161,33 +161,22 @@ describe("graph", function() {
         assert.deepEqual(e.attrs, {a: 1, b: 2});
       });
 
-      it("merges properties if the edge already exists", function() {
-        u.addPredecessor(v, {a: 1, b: 2});
-        var e = u.addPredecessor(v, {b: 3, c: 4});
-        assert.deepEqual(e.attrs, {a: 1, b: 3, c: 4});
+      it("creates multiple edges when called with the same successor", function() {
+        var e1 = u.addPredecessor(v, {a: 1, b: 2});
+        var e2 = u.addPredecessor(v, {b: 3, c: 4});
+        assert.deepEqual(ids(u.inEdges()).sort(), [e1.id(), e2.id()].sort());
       });
     });
 
-    it("removeSuccessor removes the appropriate edge", function() {
-      u.addSuccessor(v);
-      u.removeSuccessor(v);
+    it("removeEdge removes the appropriate edge", function() {
+      var e = u.addSuccessor(v);
+      g.removeEdge(e);
 
       assert.deepEqual(ids(u.successors()), []);
       assert.deepEqual(ids(u.neighbors()), []);
 
       assert.deepEqual(ids(v.predecessors()), []);
       assert.deepEqual(ids(u.neighbors()), []);
-    });
-
-    it("removePredecessor removes the appropriate edge", function() {
-      u.addPredecessor(v);
-      u.removePredecessor(v);
-
-      assert.deepEqual(ids(u.predecessors()), []);
-      assert.deepEqual(ids(u.neighbors()), []);
-
-      assert.deepEqual(ids(v.successors()), []);
-      assert.deepEqual(ids(v.neighbors()), []);
     });
 
     it("copy creates a copy of the graph", function() {

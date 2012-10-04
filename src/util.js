@@ -72,3 +72,23 @@ function defaultFloat(obj, prop, def) {
 function mergeAttributes(src, dst) {
   Object.keys(src).forEach(function(k) { dst[k] = src[k]; });
 }
+
+/*
+ * Maps a function `f` over array `arr` and then concatenates all of the
+ * lists produced by `f`.
+ */
+function concatMap(arr, f) {
+  var lists = arr.map(f);
+  return Array.prototype.concat.apply([], lists);
+}
+
+function concat(arrays) {
+  return Array.prototype.concat.apply([], arrays);
+}
+
+/*
+ * Returns an array of all values in the given object.
+ */
+function values(obj) {
+  return Object.keys(obj).map(function(k) { return obj[k]; });
+}

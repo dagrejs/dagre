@@ -18,42 +18,39 @@ describe("layout", function() {
     it("reverses edges that cause cycles", function() {
       var g = dagre.graph.read("digraph { A -> B; B -> A }");
       dagre.layout.acyclic(g);
-      if (g.edge("A", "B")) {
-        assert.lengthOf(g.node("B").successors, 0, "If A -> B then not B -> A");
-      } else if (g.edge("B", "A")) {
-        assert.lengthOf(g.node("A").successors, 0, "If B -> A then not A -> B");
+
+      if (g.node("A").outEdges("B").length > 0) {
+        assert.lengthOf(g.node("A").outEdges("B"), 2, "Should have two edges A -> B");
+        assert.lengthOf(g.node("A").outEdges(),    2, "Should have no out edges but A -> B");
+        assert.lengthOf(g.node("B").outEdges("A"), 0, "If A -> B then not B -> A");
+      } else if (g.node("B").outEdges("A").length > 0) {
+        assert.lengthOf(g.node("B").outEdges("A"), 2, "Should have two edges B -> A");
+        assert.lengthOf(g.node("B").outEdges(),    2, "Should have no out edges but B -> A");
+        assert.lengthOf(g.node("A").outEdges("B"), 0, "If B -> A then not A -> B");
       } else {
-        assert(false, "Graph does not have A -> B or B -> A:\n" + graph.graph.write(g));
+        assert(false, "Graph does not have A -> B or B -> A:\n" + dagre.graph.write(g));
       }
     });
 
     it("assigns the weight of the original edge to the reversed edge", function() {
-      var g = dagre.graph.read("digraph { A -> B [weight=2]; B -> C [weight=3]; C -> A [weight=4] }");
-      dagre.layout.acyclic(g);
-
-      if (g.edge("B", "A")) {
-        assert.strictEqual(g.edge("B", "A").attrs.weight, 2);
-      } else if (g.edge("C", "B")) {
-        assert.strictEqual(g.edge("C", "B").attrs.weight, 3);
-      } else if (g.edge("A", "C")) {
-        assert.strictEqual(g.edge("A", "C").attrs.weight, 4);
-      } else {
-        assert(false, "Graph does not have B -> A, C -> B, or A -> C:\n" + dagre.graph.write(g));
-      }
-    });
-
-    it("sums weights of reversed edges", function() {
-      // Note that weights will be strings in `g` - this also ensures that
-      // `acyclic` is doing proper int coercion.
       var g = dagre.graph.read("digraph { A -> B [weight=2]; B -> A [weight=3] }");
       dagre.layout.acyclic(g);
-      if (g.edge("A", "B")) {
-        assert.equal(g.edge("A", "B").attrs.weight, 5);
-      } else if (g.edge("B", "A")) {
-        assert.equal(g.edge("B", "A").attrs.weight, 5);
+
+      function weightSort(x, y) { return parseInt(x.attrs.weight) - parseInt(y.attrs.weight); }
+
+      var edges;
+      if (g.node("A").outEdges().length > 0) {
+        edges = g.node("A").outEdges().sort(weightSort);
+      } else if (g.node("B").outEdges().length > 0) {
+        edges = g.node("B").outEdges().sort(weightSort);
       } else {
         assert(false, "Graph does not have A -> B or B -> A:\n" + dagre.graph.write(g));
       }
+
+      assert.equal(edges[0].attrs.weight, 2);
+      assert.equal(edges[1].attrs.weight, 3);
+      assert.isTrue(edges[0].attrs.reverse || edges[1].attrs.reverse, "One of the edges should have the 'reverse' attribute");
+      assert.isUndefined(edges[0].attrs.reverse && edges[1].attrs.reverse, "Only one of the edges should have the 'reverse' attribute");
     });
   });
 });
