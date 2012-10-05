@@ -91,10 +91,30 @@ dagre.layout.rank = (function() {
     }
   }
 
+  // Assumes input graph has no self-loops and is otherwise acyclic.
+  function addDummyNodes(g) {
+    g.edges().forEach(function(e) {
+      var prefix = "_dummy-" + e.id() + "-";
+      var u = e.tail();
+      var sinkRank = e.head().attrs.rank;
+      if (u.attrs.rank + 1 < sinkRank) {
+        g.removeEdge(e);
+        for (var rank = u.attrs.rank + 1; rank < sinkRank; ++rank) {
+          var vId = prefix + rank;
+          var v = g.addNode(vId, { rank: rank, dummy: true, height: 1, width: 1 });
+          g.addEdge(u, v);
+          u = v;
+        }
+        g.addEdge(u, e.head(), e.attrs);
+      }
+    });
+  }
+
   return function(g) {
     var selfLoops = removeSelfLoops(g);
     acyclic(g);
     initRank(g);
+    addDummyNodes(g);
     reverseAcyclic(g);
     addSelfLoops(g, selfLoops);
 
@@ -103,6 +123,7 @@ dagre.layout.rank = (function() {
       var rank = u.attrs.rank;
       layering[rank] = layering[rank] || [];
       layering[rank].push(u);
+      delete u.attrs.rank;
     });
     return layering;
   }
