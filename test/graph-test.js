@@ -177,6 +177,36 @@ describe("graph", function() {
       });
     });
 
+    describe("outDegree", function() {
+      it("returns the number of edges that point out from the node", function() {
+        var w = g.addNode(3);
+        v.addSuccessor(u);
+
+        // Two edges incident on the same nodes to test multi-edges.
+        w.addSuccessor(u);
+        w.addSuccessor(u);
+
+        assert.equal(u.outDegree(), 0);
+        assert.equal(v.outDegree(), 1);
+        assert.equal(w.outDegree(), 2);
+      });
+    });
+
+    describe("inDegree", function() {
+      it("returns the number of edges that point to the node", function() {
+        var w = g.addNode(3);
+        v.addPredecessor(u);
+
+        // Two edges incident on the same nodes to test multi-edges.
+        w.addPredecessor(u);
+        w.addPredecessor(u);
+
+        assert.equal(u.inDegree(), 0);
+        assert.equal(v.inDegree(), 1);
+        assert.equal(w.inDegree(), 2);
+      });
+    });
+
     it("removeEdge removes the appropriate edge", function() {
       var e = u.addSuccessor(v);
       g.removeEdge(e);

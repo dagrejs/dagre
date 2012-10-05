@@ -124,9 +124,11 @@ dagre.graph.create = function() {
       return _mapEdges(concat(edgeId));
     }
 
-    function edges() {
-      return inEdges().concat(outEdges());
-    }
+    function inDegree() { return inEdges().length; }
+
+    function outDegree() { return outEdges().length; }
+
+    function edges() { return inEdges().concat(outEdges()); }
 
     return {
       id: function() { return u.id; },
@@ -138,6 +140,8 @@ dagre.graph.create = function() {
       neighbors: neighbors,
       outEdges: outEdges,
       inEdges: inEdges,
+      inDegree: inDegree,
+      outDegree: outDegree,
       edges: edges,
     }
   }
