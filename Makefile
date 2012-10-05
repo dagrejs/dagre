@@ -12,8 +12,10 @@ all: dagre.js package.json
 	src/graph.js \
 	src/pre-layout.js \
 	src/layout.js \
+	src/layout-rank.js \
 	src/render.js \
 	src/util.js \
+	src/priority-queue.js \
 	src/dot-grammar.js \
 	src/post.js
 
