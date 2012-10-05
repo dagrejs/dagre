@@ -1,23 +1,6 @@
 dagre.layout = function() {
 }
 
-
-/*
- * Copies the graph such that it can later be updated with `update`.
- */
-dagre.layout.copy = function(src) {
-  var dst = dagre.graph.create();
-  mergeAttributes(src.attrs, dst.attrs);
-  src.nodes().forEach(function(u) {
-    dst.addNode(u.id(), u.attrs);
-  });
-  src.edges().forEach(function(e) {
-    var e2 = dst.addEdge(e.tail(), e.head(), e.attrs);
-    e2.attrs.originalId = e.id();
-  });
-  return dst;
-}
-
 /*
  * Finds the point at which a line from v intersects with the border of the
  * shape of u.
@@ -142,18 +125,5 @@ dagre.layout.edges = function(g) {
       attrs.points = attrs.tailPoint + " " + attrs.headPoint;
       attrs.type = "line";
     }
-  });
-}
-
-/*
- * Copies attributes from the source graph to the destination graph. All nodes
- * and edges in the source graph must all be present in the destination graph.
- */
-dagre.layout.update = function(src, dst) {
-  src.nodes().forEach(function(u) {
-    mergeAttributes(u.attrs, dst.node(u.id()).attrs);
-  });
-  src.edges().forEach(function(e) {
-    mergeAttributes(e.attrs, dst.edge(e.attrs.originalId).attrs);
   });
 }
