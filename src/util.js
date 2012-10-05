@@ -12,6 +12,7 @@ function createTextNode(node, x) {
   text.setAttribute("font-family", node.attrs.fontname);
   text.setAttribute("font-size", fontSize);
   text.setAttribute("text-anchor", "middle");
+  text.setAttribute("fill", node.attrs.fontcolor);
 
   var firstLine = true;
   var lines = node.attrs.label.split("\n");

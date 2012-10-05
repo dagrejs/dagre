@@ -21,6 +21,7 @@ dagre.preLayout = function(g) {
     defaultInt(attrs, "weight", 1);
 
     defaultVal(attrs, "color", "#333");
+    defaultVal(attrs, "fontcolor", "#333");
     defaultVal(attrs, "fill", "#fff");
     defaultVal(attrs, "fontname", "Times New Roman");
     defaultInt(attrs, "fontsize", 14);
