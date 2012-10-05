@@ -1,44 +1,6 @@
 dagre.layout = function() {
 }
 
-/*
- * Reverses back edges and removes self-loops. Reversed edges are marked with a
- * reverse attribute.
- *
- * This process is reversed at a later stage.
- */
-dagre.layout.acyclic = function(g) {
-  var onStack = {};
-  var visited = {};
-
-  function dfs(u) {
-    if (u in visited)
-      return;
-
-    visited[u] = true;
-    onStack[u] = true;
-    u.outEdges().forEach(function(e) {
-      var v = e.head();
-      if (v in onStack) {
-        g.removeEdge(e);
-        e.attrs.reverse = true;
-
-        // If this is not a self-loop add the reverse edge to the graph
-        if (u !== v) {
-          u.addPredecessor(v, e.attrs);
-        }
-      } else {
-        dfs(v);
-      }
-    });
-
-    delete onStack[u];
-  }
-
-  g.nodes().forEach(function(u) {
-    dfs(u);
-  });
-}
 
 /*
  * Copies the graph such that it can later be updated with `update`.

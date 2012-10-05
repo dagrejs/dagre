@@ -1,4 +1,47 @@
 dagre.layout.rank = (function() {
+  function acyclic(g) {
+    var onStack = {};
+    var visited = {};
+
+    function dfs(u) {
+      if (u in visited)
+        return;
+
+      visited[u] = true;
+      onStack[u] = true;
+      u.outEdges().forEach(function(e) {
+        var v = e.head();
+        if (v in onStack) {
+          g.removeEdge(e);
+          e.attrs.reverse = true;
+
+          // If this is not a self-loop add the reverse edge to the graph
+          if (u !== v) {
+            u.addPredecessor(v, e.attrs);
+          }
+        } else {
+          dfs(v);
+        }
+      });
+
+      delete onStack[u];
+    }
+
+    g.nodes().forEach(function(u) {
+      dfs(u);
+    });
+  }
+
+  function reverseAcyclic(g) {
+    g.edges().forEach(function(e) {
+      if (e.attrs.reverse) {
+        g.removeEdge(e);
+        g.addEdge(e.head(), e.tail(), e.attrs);
+        delete e.attrs.reverse;
+      }
+    });
+  }
+
   function removeSelfLoops(g) {
     var selfLoops = [];
     g.nodes().forEach(function(u) {
@@ -49,8 +92,10 @@ dagre.layout.rank = (function() {
   }
 
   return function(g) {
+    acyclic(g);
     var selfLoops = removeSelfLoops(g);
     initRank(g);
     addSelfLoops(g, selfLoops);
+    reverseAcyclic(g);
   }
 })();
