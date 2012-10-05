@@ -90,7 +90,14 @@ dagre.graph.create = function() {
     }
 
     function neighbors() {
-      return successors().concat(predecessors());
+      var neighbors = {};
+      Object.keys(u.successors).forEach(function(v) {
+        neighbors[v] = true;
+      });
+      Object.keys(u.predecessors).forEach(function(v) {
+        neighbors[v] = true;
+      });
+      return _mapNodes(Object.keys(neighbors));
     }
 
     /*

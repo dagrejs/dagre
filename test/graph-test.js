@@ -168,6 +168,15 @@ describe("graph", function() {
       });
     });
 
+    describe("neighbors", function() {
+      it("only includes neighbor nodes once", function() {
+        u.addSuccessor(v);
+        u.addPredecessor(v);
+
+        assert.deepEqual(ids(u.neighbors()), [v.id()]);
+      });
+    });
+
     it("removeEdge removes the appropriate edge", function() {
       var e = u.addSuccessor(v);
       g.removeEdge(e);
