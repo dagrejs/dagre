@@ -73,6 +73,10 @@ function mergeAttributes(src, dst) {
   Object.keys(src).forEach(function(k) { dst[k] = src[k]; });
 }
 
+function max(values) {
+  return Math.max.apply(null, values);
+}
+
 function concat(arrays) {
   return Array.prototype.concat.apply([], arrays);
 }

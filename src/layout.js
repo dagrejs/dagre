@@ -1,4 +1,22 @@
-dagre.layout = function() {
+dagre.layout = function(g) {
+  var layering = dagre.layout.rank(g);
+
+  // Psuedo positioning
+  var posY = 0;
+  for (var i = 0; i < layering.length; ++i) {
+    var layer = layering[i];
+    var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.nodesep;
+    var posX = 0;
+    for (var j = 0; j < layer.length; ++j) {
+      var uAttrs = layer[j].attrs;
+      uAttrs.x = posX;
+      uAttrs.y = posY;
+      posX += uAttrs.width + g.attrs.nodesep;
+    }
+    posY += height;
+  }
+
+  dagre.layout.edges(g);
 }
 
 /*

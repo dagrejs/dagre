@@ -7,16 +7,16 @@ dagre.layout.rank = (function() {
       if (u in visited)
         return;
 
-      visited[u] = true;
-      onStack[u] = true;
+      visited[u.id()] = true;
+      onStack[u.id()] = true;
       u.outEdges().forEach(function(e) {
         var v = e.head();
-        if (v in onStack) {
+        if (v.id() in onStack) {
           g.removeEdge(e);
           e.attrs.reverse = true;
 
           // If this is not a self-loop add the reverse edge to the graph
-          if (u !== v) {
+          if (u.id() !== v.id()) {
             u.addPredecessor(v, e.attrs);
           }
         } else {
@@ -24,7 +24,7 @@ dagre.layout.rank = (function() {
         }
       });
 
-      delete onStack[u];
+      delete onStack[u.id()];
     }
 
     g.nodes().forEach(function(u) {
@@ -92,10 +92,18 @@ dagre.layout.rank = (function() {
   }
 
   return function(g) {
-    acyclic(g);
     var selfLoops = removeSelfLoops(g);
+    acyclic(g);
     initRank(g);
-    addSelfLoops(g, selfLoops);
     reverseAcyclic(g);
+    addSelfLoops(g, selfLoops);
+
+    var layering = [];
+    g.nodes().forEach(function(u) {
+      var rank = u.attrs.rank;
+      layering[rank] = layering[rank] || [];
+      layering[rank].push(u);
+    });
+    return layering;
   }
 })();
