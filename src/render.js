@@ -7,10 +7,10 @@ dagre.render = function(g, svg) {
   svg.appendChild(svgDefs);
 
   function _createArrowhead(color) {
-    color = color.replace(/#/, "");
-    if (!(color in arrowheads)) {
-      var name = "arrowhead-" + color;
-      arrowheads[color] = name;
+    colorId = color.replace(/#/, "");
+    if (!(colorId in arrowheads)) {
+      var name = "arrowhead-" + colorId;
+      arrowheads[colorId] = name;
       var arrowMarker = createSVGElement("marker");
       var arrowAttrs = {
         id: name,
@@ -32,7 +32,7 @@ dagre.render = function(g, svg) {
       path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
       arrowMarker.appendChild(path);
     }
-    return arrowheads[color];
+    return arrowheads[colorId];
   }
 
   function _renderNodes() {
