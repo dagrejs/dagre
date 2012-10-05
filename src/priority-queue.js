@@ -1,4 +1,4 @@
-dagre.priorityQueue = function() {
+function priorityQueue() {
   var _arr = [];
   var _keyIndices = {};
 

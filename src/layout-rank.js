@@ -61,7 +61,7 @@ dagre.layout.rank = (function() {
   }
 
   function initRank(g) {
-    var pq = dagre.priorityQueue();
+    var pq = priorityQueue();
     g.nodes().forEach(function(u) {
       pq.add(u.id(), u.inDegree());
     });
