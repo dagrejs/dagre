@@ -7,6 +7,8 @@ dagre.preLayout = function(g) {
   document.documentElement.appendChild(svg);
 
   defaultInt(g.attrs, "nodeSep", 50);
+  defaultInt(g.attrs, "edgeSep", 5);
+  defaultInt(g.attrs, "rankSep", 50);
 
   g.nodes().forEach(function(u) {
     var attrs = u.attrs;

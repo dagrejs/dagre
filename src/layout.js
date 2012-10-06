@@ -5,13 +5,19 @@ dagre.layout = function(g) {
   var posY = 0;
   for (var i = 0; i < layering.length; ++i) {
     var layer = layering[i];
-    var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.nodeSep;
+    var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.rankSep;
     var posX = 0;
     for (var j = 0; j < layer.length; ++j) {
       var uAttrs = layer[j].attrs;
+      var sep = uAttrs.dummy ? g.attrs.edgeSep : g.attrs.nodeSep / 2;
+      if (j != 0) {
+        posX += sep;
+      }
       uAttrs.x = posX;
       uAttrs.y = posY;
-      posX += uAttrs.width + g.attrs.nodeSep;
+      if (j + 1 < layer.length) {
+        posX += uAttrs.width + sep;
+      }
     }
     posY += height;
   }
