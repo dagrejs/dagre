@@ -122,6 +122,7 @@ dagre.layout = (function() {
     var layering = rankToLayering(g);
 
     pseudoPositioning(g, layering);
+    dagre.layout.position(g, layering);
 
     reverseAcyclic(g);
     addSelfLoops(g, selfLoops);
