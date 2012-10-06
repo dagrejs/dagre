@@ -1,153 +1,131 @@
-dagre.layout = function(g) {
-  var layering = dagre.layout.rank(g);
+dagre.layout = (function() {
+  function acyclic(g) {
+    var onStack = {};
+    var visited = {};
 
-  // Psuedo positioning
-  var posY = 0;
-  for (var i = 0; i < layering.length; ++i) {
-    var layer = layering[i];
-    var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.rankSep;
-    var posX = 0;
-    for (var j = 0; j < layer.length; ++j) {
-      var uAttrs = layer[j].attrs;
-      var sep = uAttrs.dummy ? g.attrs.edgeSep : g.attrs.nodeSep / 2;
-      if (j != 0) {
-        posX += sep;
-      }
-      uAttrs.x = posX;
-      uAttrs.y = posY;
-      if (j + 1 < layer.length) {
-        posX += uAttrs.width + sep;
-      }
-    }
-    posY += height;
-  }
+    function dfs(u) {
+      if (u in visited)
+        return;
 
-  dagre.layout.edges(g);
-}
-
-/*
- * Finds the point at which a line from v intersects with the border of the
- * shape of u.
- */
-function intersect(u, v) {
-  var uAttrs = u.attrs;
-  var vAttrs = v.attrs;
-  var x = uAttrs.x;
-  var y = uAttrs.y;
-
-  // For now we only support rectangles
-
-  // Rectangle intersection algorithm from:
-  // http://math.stackexchange.com/questions/108113/find-edge-between-two-boxes
-  var dx = vAttrs.x - x;
-  var dy = vAttrs.y - y;
-  var w = uAttrs.width / 2 + uAttrs.marginX  + uAttrs.strokeWidth;
-  var h = uAttrs.height / 2 + uAttrs.marginY + uAttrs.strokeWidth;
-
-  var sx, sy;
-  if (Math.abs(dy) * w > Math.abs(dx) * h) {
-    // Intersection is top or bottom of rect.
-    if (dy < 0) {
-      h = -h;
-    }
-    sx = dy === 0 ? 0 : h * dx / dy;
-    sy = h;
-  } else {
-    // Intersection is left or right of rect.
-    if (dx < 0) {
-      w = -w;
-    }
-    sx = w;
-    sy = dx === 0 ? 0 : w * dy / dx;
-  }
-
-  return (x + sx) + "," + (y + sy);
-}
-
-function collapseDummyNodes(g) {
-  var visited = {};
-
-  // Use dfs from all non-dummy nodes to find the roots of dummy chains. Then
-  // walk the dummy chain until a non-dummy node is found. Collapse all edges
-  // traversed into a single edge.
-
-  function collapseChain(e) {
-    var root = e.tail();
-    var points = e.attrs.tailPoint;
-    do
-    {
-      points += " " + e.head().attrs.x + "," + e.head().attrs.y;
-      e = e.head().outEdges()[0];
-      g.removeNode(e.tail());
-    }
-    while (e.head().attrs.dummy);
-    points += " " + e.attrs.headPoint;
-    var e2 = root.addSuccessor(e.head(), e.attrs);
-    e2.attrs.points = points;
-    e2.attrs.type = "line";
-  }
-
-  function dfs(u) {
-    if (!(u.id() in visited)) {
       visited[u.id()] = true;
+      onStack[u.id()] = true;
       u.outEdges().forEach(function(e) {
         var v = e.head();
-        if (v.attrs.dummy) {
-          collapseChain(e);
+        if (v.id() in onStack) {
+          g.removeEdge(e);
+          e.attrs.reverse = true;
+
+          // If this is not a self-loop add the reverse edge to the graph
+          if (u.id() !== v.id()) {
+            u.addPredecessor(v, e.attrs);
+          }
         } else {
           dfs(v);
         }
       });
+
+      delete onStack[u.id()];
+    }
+
+    g.nodes().forEach(function(u) {
+      dfs(u);
+    });
+  }
+
+  function reverseAcyclic(g) {
+    g.edges().forEach(function(e) {
+      if (e.attrs.reverse) {
+        g.removeEdge(e);
+        g.addEdge(e.head(), e.tail(), e.attrs);
+        delete e.attrs.reverse;
+      }
+    });
+  }
+
+  function removeSelfLoops(g) {
+    var selfLoops = [];
+    g.nodes().forEach(function(u) {
+      var es = u.outEdges(u);
+      es.forEach(function(e) {
+        selfLoops.push(e);
+        g.removeEdge(e);
+      });
+    });
+    return selfLoops;
+  }
+
+  function addSelfLoops(g, selfLoops) {
+    selfLoops.forEach(function(e) {
+      g.addEdge(e.head(), e.tail(), e.attrs);
+    });
+  }
+
+  // Assumes input graph has no self-loops and is otherwise acyclic.
+  function addDummyNodes(g) {
+    g.edges().forEach(function(e) {
+      var prefix = "_dummy-" + e.id() + "-";
+      var u = e.tail();
+      var sinkRank = e.head().attrs.rank;
+      if (u.attrs.rank + 1 < sinkRank) {
+        g.removeEdge(e);
+        for (var rank = u.attrs.rank + 1; rank < sinkRank; ++rank) {
+          var vId = prefix + rank;
+          var v = g.addNode(vId, { rank: rank, dummy: true, height: 1, width: 1 });
+          g.addEdge(u, v);
+          u = v;
+        }
+        g.addEdge(u, e.head(), e.attrs);
+      }
+    });
+  }
+
+  function rankToLayering(g) {
+    var layering = [];
+    g.nodes().forEach(function(u) {
+      var rank = u.attrs.rank;
+      layering[rank] = layering[rank] || [];
+      layering[rank].push(u);
+      delete u.attrs.rank;
+    });
+    return layering;
+  }
+
+  function pseudoPositioning(g, layering) {
+    var posY = 0;
+    for (var i = 0; i < layering.length; ++i) {
+      var layer = layering[i];
+      var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.rankSep;
+      var posX = 0;
+      for (var j = 0; j < layer.length; ++j) {
+        var uAttrs = layer[j].attrs;
+        var sep = uAttrs.dummy ? g.attrs.edgeSep : g.attrs.nodeSep / 2;
+        if (j != 0) {
+          posX += sep;
+        }
+        uAttrs.x = posX;
+        uAttrs.y = posY;
+        if (j + 1 < layer.length) {
+          posX += uAttrs.width + sep;
+        }
+      }
+      posY += height;
     }
   }
 
-  g.nodes().forEach(function(u) {
-    if (!u.attrs.dummy) {
-      dfs(u);
-    }
-  });
-}
+  return function(g) {
+    var selfLoops = removeSelfLoops(g);
+    acyclic(g);
 
-/*
- * For each edge in the graph, this function assigns one or more points to the
- * points attribute. This function requires that the nodes in the graph have
- * their x and y attributes assigned. Dummy nodes should be marked with the
- * dummy attribute.
- */
-dagre.layout.edges = function(g) {
-  g.edges().forEach(function(e) {
-    if (e.head().id() !== e.tail().id()) {
-      if (!e.tail().attrs.dummy) {
-        e.attrs.tailPoint = intersect(e.tail(), e.head());
-      }
-      if (!e.head().attrs.dummy) {
-        e.attrs.headPoint = intersect(e.head(), e.tail());
-      }
-    }
-  });
+    dagre.layout.rank(g);
 
-  g.edges().forEach(function(e) {
-    if (e.head().id() === e.tail().id()) {
-      var attrs = e.head().attrs;
-      var right = attrs.x + attrs.width / 2 + attrs.marginX + attrs.strokeWidth;
-      var h = attrs.height / 2 + attrs.marginY + attrs.strokeWidth;
-      var points = [[right,                       attrs.y - h / 3],
-                    [right + g.attrs.nodeSep / 2, attrs.y - h],
-                    [right + g.attrs.nodeSep / 2, attrs.y + h],
-                    [right,                       attrs.y + h / 3]]
-      points = points.map(function(pt) { return pt.join(","); });
-      e.attrs.points = points.join(" ");
-      e.attrs.type = "curve";
-    }
-  });
+    addDummyNodes(g);
+    var layering = rankToLayering(g);
 
-  collapseDummyNodes(g);
+    pseudoPositioning(g, layering);
 
-  g.edges().forEach(function(e) {
-    var attrs = e.attrs;
-    if (!attrs.points) {
-      attrs.points = attrs.tailPoint + " " + attrs.headPoint;
-      attrs.type = "line";
-    }
-  });
-}
+    reverseAcyclic(g);
+    addSelfLoops(g, selfLoops);
+
+    dagre.layout.edges(g);
+  };
+})();
