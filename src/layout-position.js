@@ -53,7 +53,63 @@ dagre.layout.position = (function() {
     }
   }
 
+  function verticalAlignment(layering, relationship) {
+    var pos = {};
+    var root = {};
+    var align = {};
+
+    concat(layering).forEach(function(u, i) {
+      root[u.id()] = u;
+      align[u.id()] = u;
+      pos[u.id()] = i;
+    });
+
+    layering.forEach(function(layer) {
+      var prevIdx = -1;
+      layer.forEach(function(v) {
+        var related = v[relationship]();
+        if (related.length > 0) {
+          // TODO could find medians with linear algorithm if performance warrants it.
+          related.sort(function(x, y) { return pos[x] - pos[y]; });
+          var mid = (related.length - 1) / 2;
+          related.slice(Math.floor(mid), Math.ceil(mid) + 1).forEach(function(u) {
+            if (align[v.id()].id() === v.id()) {
+              // TODO should we collapse multi-edges for vertical alignment?
+              
+              // Only need to check first returned edge for a type 1 conflict
+              if (!u.edges(v)[0].attrs.type1Conflict && prevIdx < pos[u.id()]) {
+                align[u.id()] = v;
+                align[v.id()] = root[v.id()] = root[u.id()];
+                prevIdx = pos[u.id()];
+              }
+            }
+          });
+        }
+      });
+    });
+
+    return { pos: pos, root: root, align: align };
+  }
+
+  function reverseInnerOrder(layering) {
+    layering.forEach(function(layer) {
+      layer.reverse();
+    });
+  }
+
   return function(g, layering) {
     markType1Conflicts(layering);
+
+    ["up", "down"].forEach(function(vertDir) {
+      if (vertDir === "down") { layering.reverse(); }
+
+      ["left", "right"].forEach(function(horizDir) {
+        if (horizDir === "right") { reverseInnerOrder(layering); }
+
+        var alignment = verticalAlignment(layering, vertDir === "up" ? "predecessors" : "successors");
+
+        if (horizDir === "right") { reverseInnerOrder(layering); }
+      });
+    });
   };
 })();
