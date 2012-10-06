@@ -7,12 +7,12 @@ function createSVGElement(tag) {
  * render.
  */
 function createTextNode(node, x) {
-  var fontSize = node.attrs.fontsize;
+  var fontSize = node.attrs.fontSize;
   var text = createSVGElement("text");
-  text.setAttribute("font-family", node.attrs.fontname);
+  text.setAttribute("font-family", node.attrs.fontName);
   text.setAttribute("font-size", fontSize);
   text.setAttribute("text-anchor", "middle");
-  text.setAttribute("fill", node.attrs.fontcolor);
+  text.setAttribute("fill", node.attrs.fontColor);
 
   var firstLine = true;
   var lines = node.attrs.label.split("\n");

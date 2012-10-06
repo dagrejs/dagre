@@ -45,12 +45,12 @@ dagre.render = function(g, svg) {
       group.setAttribute("transform", "translate(" + x + "," + y + ")");
 
       var rect = createSVGElement("rect");
-      rect.setAttribute("x", -(u.attrs.marginX + u.attrs.width / 2 + u.attrs.strokewidth / 2));
-      rect.setAttribute("y",  -(u.attrs.marginY + u.attrs.height / 2 + u.attrs.strokewidth / 2));
-      rect.setAttribute("width", u.attrs.width + 2 * u.attrs.marginX + u.attrs.strokewidth);
-      rect.setAttribute("height", u.attrs.height + 2 * u.attrs.marginY + u.attrs.strokewidth);
+      rect.setAttribute("x", -(u.attrs.marginX + u.attrs.width / 2 + u.attrs.strokeWidth / 2));
+      rect.setAttribute("y",  -(u.attrs.marginY + u.attrs.height / 2 + u.attrs.strokeWidth / 2));
+      rect.setAttribute("width", u.attrs.width + 2 * u.attrs.marginX + u.attrs.strokeWidth);
+      rect.setAttribute("height", u.attrs.height + 2 * u.attrs.marginY + u.attrs.strokeWidth);
       rect.setAttribute("style", ["fill: " + u.attrs.fill,
-                                  "stroke-width: " + u.attrs.strokewidth,
+                                  "stroke-width: " + u.attrs.strokeWidth,
                                   "stroke: " + u.attrs.color].join("; "));
       group.appendChild(rect);
 
@@ -71,7 +71,7 @@ dagre.render = function(g, svg) {
         path.setAttribute("d", "M " + points[0] + " C " + points.slice(1).join(" "));
       }
       path.setAttribute("style", ["fill: none",
-                                  "stroke-width: " + e.attrs.strokewidth,
+                                  "stroke-width: " + e.attrs.strokeWidth,
                                   "stroke: " + e.attrs.color,
                                   "marker-end: url(#" + arrowhead + ")"].join("; "));
       svg.appendChild(path);

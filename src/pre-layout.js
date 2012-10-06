@@ -6,7 +6,7 @@ dagre.preLayout = function(g) {
   var svg = createSVGElement("svg");
   document.documentElement.appendChild(svg);
 
-  defaultInt(g.attrs, "nodesep", 50);
+  defaultInt(g.attrs, "nodeSep", 50);
 
   g.nodes().forEach(function(u) {
     var attrs = u.attrs;
@@ -16,15 +16,15 @@ dagre.preLayout = function(g) {
     defaultInt(attrs, "height", 0);
     defaultInt(attrs, "marginX", 10);
     defaultInt(attrs, "marginY", 10);
-    defaultFloat(attrs, "strokewidth", 1.5);
+    defaultFloat(attrs, "strokeWidth", 1.5);
 
     defaultInt(attrs, "weight", 1);
 
     defaultVal(attrs, "color", "#333");
-    defaultVal(attrs, "fontcolor", "#333");
+    defaultVal(attrs, "fontColor", "#333");
     defaultVal(attrs, "fill", "#fff");
-    defaultVal(attrs, "fontname", "Times New Roman");
-    defaultInt(attrs, "fontsize", 14);
+    defaultVal(attrs, "fontName", "Times New Roman");
+    defaultInt(attrs, "fontSize", 14);
 
     var text = createTextNode(u);
     svg.appendChild(text);
@@ -40,7 +40,7 @@ dagre.preLayout = function(g) {
 
     defaultStr(attrs, "color", "#333");
 
-    defaultFloat(attrs, "strokewidth", 1.5);
+    defaultFloat(attrs, "strokeWidth", 1.5);
   });
 
   document.documentElement.removeChild(svg);

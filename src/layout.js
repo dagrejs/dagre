@@ -5,13 +5,13 @@ dagre.layout = function(g) {
   var posY = 0;
   for (var i = 0; i < layering.length; ++i) {
     var layer = layering[i];
-    var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.nodesep;
+    var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.nodeSep;
     var posX = 0;
     for (var j = 0; j < layer.length; ++j) {
       var uAttrs = layer[j].attrs;
       uAttrs.x = posX;
       uAttrs.y = posY;
-      posX += uAttrs.width + g.attrs.nodesep;
+      posX += uAttrs.width + g.attrs.nodeSep;
     }
     posY += height;
   }
@@ -35,8 +35,8 @@ function intersect(u, v) {
   // http://math.stackexchange.com/questions/108113/find-edge-between-two-boxes
   var dx = vAttrs.x - x;
   var dy = vAttrs.y - y;
-  var w = uAttrs.width / 2 + uAttrs.marginX  + uAttrs.strokewidth;
-  var h = uAttrs.height / 2 + uAttrs.marginY + uAttrs.strokewidth;
+  var w = uAttrs.width / 2 + uAttrs.marginX  + uAttrs.strokeWidth;
+  var h = uAttrs.height / 2 + uAttrs.marginY + uAttrs.strokeWidth;
 
   var sx, sy;
   if (Math.abs(dy) * w > Math.abs(dx) * h) {
@@ -123,11 +123,11 @@ dagre.layout.edges = function(g) {
   g.edges().forEach(function(e) {
     if (e.head().id() === e.tail().id()) {
       var attrs = e.head().attrs;
-      var right = attrs.x + attrs.width / 2 + attrs.marginX + attrs.strokewidth;
-      var h = attrs.height / 2 + attrs.marginY + attrs.strokewidth;
+      var right = attrs.x + attrs.width / 2 + attrs.marginX + attrs.strokeWidth;
+      var h = attrs.height / 2 + attrs.marginY + attrs.strokeWidth;
       var points = [[right,                       attrs.y - h / 3],
-                    [right + g.attrs.nodesep / 2, attrs.y - h],
-                    [right + g.attrs.nodesep / 2, attrs.y + h],
+                    [right + g.attrs.nodeSep / 2, attrs.y - h],
+                    [right + g.attrs.nodeSep / 2, attrs.y + h],
                     [right,                       attrs.y + h / 3]]
       points = points.map(function(pt) { return pt.join(","); });
       e.attrs.points = points.join(" ");
