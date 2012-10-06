@@ -177,6 +177,13 @@ describe("graph", function() {
       });
     });
 
+    describe("edges", function() {
+      it("only includes each edge once", function() {
+        var e = u.addSuccessor(u);
+        assert.deepEqual(ids(u.edges()), [e.id()]);
+      });
+    });
+
     describe("outDegree", function() {
       it("returns the number of edges that point out from the node", function() {
         var w = g.addNode(3);

@@ -106,7 +106,7 @@ dagre.graph.create = function() {
      * function returns all edges from this node.
      */
     function outEdges(suc) {
-      var edgeIds = arguments.length
+      var edgeIds = suc !== undefined
         ? u.successors[_nodeId(suc)]
         : values(u.successors);
       return _mapEdges(concat(edgeIds));
@@ -118,17 +118,32 @@ dagre.graph.create = function() {
      * this function returns all edges to this node.
      */
     function inEdges(pred) {
-      var edgeId = arguments.length
+      var edgeId = pred !== undefined
         ? u.predecessors[_nodeId(pred)]
         : values(u.predecessors);
       return _mapEdges(concat(edgeId));
     }
 
+    /*
+     * Returns out edges for this node. If an optional adjacent node is
+     * supplied this function will only return edges between this node
+     * and the adjacent node. Otherwise this function returns all edges
+     * incident on this node.
+     */
+    function edges(adj) {
+      var edges = {};
+      inEdges(adj).forEach(function(e) {
+        edges[e.id()] = e;
+      });
+      outEdges(adj).forEach(function(e) {
+        edges[e.id()] = e;
+      });
+      return values(edges);
+    }
+
     function inDegree() { return inEdges().length; }
 
     function outDegree() { return outEdges().length; }
-
-    function edges() { return inEdges().concat(outEdges()); }
 
     return {
       id: function() { return u.id; },
