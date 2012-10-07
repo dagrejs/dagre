@@ -7,7 +7,7 @@ dagre.preLayout = function(g) {
   document.documentElement.appendChild(svg);
 
   defaultInt(g.attrs, "nodeSep", 50);
-  defaultInt(g.attrs, "edgeSep", 5);
+  defaultInt(g.attrs, "edgeSep", 10);
   defaultInt(g.attrs, "rankSep", 50);
 
   g.nodes().forEach(function(u) {
@@ -16,8 +16,8 @@ dagre.preLayout = function(g) {
     defaultStr(attrs, "label", u.id().toString());
     defaultInt(attrs, "width", 0);
     defaultInt(attrs, "height", 0);
-    defaultInt(attrs, "marginX", 10);
-    defaultInt(attrs, "marginY", 10);
+    defaultInt(attrs, "marginX", 5);
+    defaultInt(attrs, "marginY", 5);
     defaultFloat(attrs, "strokeWidth", 1.5);
 
     defaultInt(attrs, "weight", 1);

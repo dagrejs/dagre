@@ -70,7 +70,12 @@ dagre.layout = (function() {
         g.removeEdge(e);
         for (var rank = u.attrs.rank + 1; rank < sinkRank; ++rank) {
           var vId = prefix + rank;
-          var v = g.addNode(vId, { rank: rank, dummy: true, height: 1, width: 1 });
+          var v = g.addNode(vId, { rank: rank,
+                                   dummy: true,
+                                   height: 1,
+                                   width: 0,
+                                   strokeWidth: e.attrs.strokeWidth,
+                                   marginX: 0 });
           g.addEdge(u, v);
           u = v;
         }
@@ -95,18 +100,9 @@ dagre.layout = (function() {
     for (var i = 0; i < layering.length; ++i) {
       var layer = layering[i];
       var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.rankSep;
-      var posX = 0;
       for (var j = 0; j < layer.length; ++j) {
         var uAttrs = layer[j].attrs;
-        var sep = uAttrs.dummy ? g.attrs.edgeSep : g.attrs.nodeSep / 2;
-        if (j != 0) {
-          posX += sep;
-        }
-        uAttrs.x = posX;
         uAttrs.y = posY;
-        if (j + 1 < layer.length) {
-          posX += uAttrs.width + sep;
-        }
       }
       posY += height;
     }
