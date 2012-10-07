@@ -255,19 +255,35 @@ dagre.layout.position = (function() {
 
         if (horizDir === "right") { reverseInnerOrder(layering); }
       });
+
+      if (vertDir === "down") { layering.reverse(); }
     });
 
     alignToSmallest(layering, xss);
 
+    // Find average of medians for xss array
     g.nodes().forEach(function(u) {
       var xs = values(xss).map(function(xs) { return xs[u.id()]; }).sort();
       u.attrs.x = (xs[1] + xs[2]) / 2;
     });
 
+    // Align min center point with 0
     var minX = min(g.nodes().map(function(u) { return u.attrs.x; }));
     g.nodes().forEach(function(u) {
       u.attrs.x -= minX;
     });
+
+    // Align y coordinates with ranks
+    var posY = 0;
+    for (var i = 0; i < layering.length; ++i) {
+      var layer = layering[i];
+      var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.rankSep;
+      for (var j = 0; j < layer.length; ++j) {
+        var uAttrs = layer[j].attrs;
+        uAttrs.y = posY;
+      }
+      posY += height;
+    }
 
     /*
     g.nodes().forEach(function(u) {

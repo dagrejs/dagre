@@ -95,19 +95,6 @@ dagre.layout = (function() {
     return layering;
   }
 
-  function pseudoPositioning(g, layering) {
-    var posY = 0;
-    for (var i = 0; i < layering.length; ++i) {
-      var layer = layering[i];
-      var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.rankSep;
-      for (var j = 0; j < layer.length; ++j) {
-        var uAttrs = layer[j].attrs;
-        uAttrs.y = posY;
-      }
-      posY += height;
-    }
-  }
-
   return function(g) {
     var selfLoops = removeSelfLoops(g);
     acyclic(g);
@@ -117,7 +104,6 @@ dagre.layout = (function() {
     addDummyNodes(g);
     var layering = rankToLayering(g);
 
-    pseudoPositioning(g, layering);
     dagre.layout.position(g, layering);
 
     reverseAcyclic(g);
