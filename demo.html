@@ -1,0 +1,65 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Dagre Test Page</title>
+
+<style>
+h2 {
+  color: #333;
+}
+
+.error {
+  color: red;
+}
+</style>
+
+<h2>Graph Definition</h2>
+
+<textarea id="input" rows="5" cols="80" style="display: block" onKeyUp="tryDraw();">
+/* Example */
+digraph {
+    A [label="A Big Source!", fontSize=25];
+    C [fontColor=red];
+    E [label="A blue sink!", fontName=arial, fill="#aaccff"];
+    A -&gt; B -&gt; C [color=green, strokeWidth=3];
+    B -&gt; D -&gt; E;
+    C -&gt; E;
+    A -&gt; D;
+}
+</textarea>
+
+<h2>Graph Visualization</h2>
+
+<svg width=1000 height=600></svg>
+
+<script src="dagre.js"></script>
+
+<script>
+  var svgRoot = document.querySelector("svg");
+
+  tryDraw();
+
+  function tryDraw() {
+    var input = document.querySelector("#input");
+    var g;
+    try {
+      g = dagre.graph.read(input.value);
+    } catch (e) {
+      input.setAttribute("class", "error");
+    }
+
+    if (g) {
+      while (svgRoot.hasChildNodes()) {
+        svgRoot.removeChild(svgRoot.lastChild);
+      }
+
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      svg.setAttribute("transform", "translate(5, 5)");
+      svgRoot.appendChild(svg);
+
+      input.setAttribute("class", "");
+      dagre.preLayout(g);
+      dagre.layout(g);
+      dagre.render(g, svg);
+    }
+  }
+</script>
