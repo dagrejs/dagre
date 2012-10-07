@@ -74,6 +74,10 @@ function mergeAttributes(src, dst) {
   Object.keys(src).forEach(function(k) { dst[k] = src[k]; });
 }
 
+function min(values) {
+  return Math.min.apply(null, values);
+}
+
 function max(values) {
   return Math.max.apply(null, values);
 }
