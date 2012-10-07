@@ -8,6 +8,11 @@ dagre.layout.position = (function() {
     return uAttrs.width + uAttrs.marginX * 2 + uAttrs.strokeWidth;
   }
 
+  function actualNodeHeight(u) {
+    var uAttrs = u.attrs;
+    return uAttrs.height + uAttrs.marginY * 2 + uAttrs.strokeWidth;
+  }
+
   function markType1Conflicts(layering) {
     var pos = {};
     layering[0].forEach(function(u, i) {
@@ -268,7 +273,7 @@ dagre.layout.position = (function() {
     });
 
     // Align min center point with 0
-    var minX = min(g.nodes().map(function(u) { return u.attrs.x; }));
+    var minX = min(g.nodes().map(function(u) { return u.attrs.x - actualNodeWidth(u) / 2; }));
     g.nodes().forEach(function(u) {
       u.attrs.x -= minX;
     });
@@ -277,12 +282,13 @@ dagre.layout.position = (function() {
     var posY = 0;
     for (var i = 0; i < layering.length; ++i) {
       var layer = layering[i];
-      var height = max(layer.map(function(u) { return u.attrs.height; })) + g.attrs.rankSep;
+      var height = max(layer.map(actualNodeHeight));
+      posY += height / 2;
       for (var j = 0; j < layer.length; ++j) {
         var uAttrs = layer[j].attrs;
         uAttrs.y = posY;
       }
-      posY += height;
+      posY += height / 2 + g.attrs.rankSep;
     }
 
     /*

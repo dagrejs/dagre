@@ -72,10 +72,11 @@ dagre.layout = (function() {
           var vId = prefix + rank;
           var v = g.addNode(vId, { rank: rank,
                                    dummy: true,
-                                   height: 1,
+                                   height: 0,
                                    width: 0,
                                    strokeWidth: e.attrs.strokeWidth,
-                                   marginX: 0 });
+                                   marginX: 0,
+                                   marginY: 0 });
           g.addEdge(u, v);
           u = v;
         }
