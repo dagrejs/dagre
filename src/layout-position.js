@@ -82,7 +82,7 @@ dagre.layout.position = (function() {
         var related = v[relationship]();
         if (related.length > 0) {
           // TODO could find medians with linear algorithm if performance warrants it.
-          related.sort(function(x, y) { return pos[x] - pos[y]; });
+          related.sort(function(x, y) { return pos[x.id()] - pos[y.id()]; });
           var mid = (related.length - 1) / 2;
           related.slice(Math.floor(mid), Math.ceil(mid) + 1).forEach(function(u) {
             if (align[v.id()].id() === v.id()) {
