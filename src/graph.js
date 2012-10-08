@@ -353,7 +353,10 @@ dagre.graph.read = function(str) {
         });
         break;
       case "attr":
-        // Ignore attrs
+        if (stmt.attrType === "graph") {
+          mergeAttributes(stmt.attrs, graph.attrs);
+        }
+        // Otherwise ignore for now
         break;
       default:
         throw new Error("Unsupported statement type: " + stmt.type);
@@ -423,7 +426,7 @@ dagre.graph.write = function(g) {
   var str = "digraph {\n";
 
   Object.keys(g.attrs).forEach(function(k) {
-    str += _id(k) + "=" + _idVal(g.attrs[k]) + "\n";
+    str += "    graph [" + _id(k) + "=" + _idVal(g.attrs[k]) + "]\n";
   });
 
   g.nodes().forEach(function(u) {
