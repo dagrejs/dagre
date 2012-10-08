@@ -253,10 +253,12 @@ dagre.layout.position = (function() {
       ["left", "right"].forEach(function(horizDir) {
         if (horizDir === "right") { reverseInnerOrder(layering); }
 
-        var align = verticalAlignment(layering, vertDir === "up" ? "predecessors" : "successors");
         var dir = vertDir + "-" + horizDir;
-        xss[dir]= horizontalCompaction(layering, align.pos, align.root, align.align, g.attrs.nodeSep, g.attrs.edgeSep);
-        if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
+        if (!("debugPosDir" in g.attrs) || g.attrs.debugPosDir === dir) {
+          var align = verticalAlignment(layering, vertDir === "up" ? "predecessors" : "successors");
+          xss[dir]= horizontalCompaction(layering, align.pos, align.root, align.align, g.attrs.nodeSep, g.attrs.edgeSep);
+          if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
+        }
 
         if (horizDir === "right") { reverseInnerOrder(layering); }
       });
@@ -264,13 +266,20 @@ dagre.layout.position = (function() {
       if (vertDir === "down") { layering.reverse(); }
     });
 
-    alignToSmallest(layering, xss);
+    if (g.attrs.debugPosDir) {
+      // In debug mode we allow forcing layout to a particular alignment.
+      g.nodes().forEach(function(u) {
+        u.attrs.x = xss[g.attrs.debugPosDir][u.id()];
+      });
+    } else {
+      alignToSmallest(layering, xss);
 
-    // Find average of medians for xss array
-    g.nodes().forEach(function(u) {
-      var xs = values(xss).map(function(xs) { return xs[u.id()]; }).sort();
-      u.attrs.x = (xs[1] + xs[2]) / 2;
-    });
+      // Find average of medians for xss array
+      g.nodes().forEach(function(u) {
+        var xs = values(xss).map(function(xs) { return xs[u.id()]; }).sort();
+        u.attrs.x = (xs[1] + xs[2]) / 2;
+      });
+    }
 
     // Align min center point with 0
     var minX = min(g.nodes().map(function(u) { return u.attrs.x - actualNodeWidth(u) / 2; }));
@@ -290,11 +299,5 @@ dagre.layout.position = (function() {
       }
       posY += height / 2 + g.attrs.rankSep;
     }
-
-    /*
-    g.nodes().forEach(function(u) {
-      u.attrs.x = xss["up-right"][u.id()];
-    });
-    */
   };
 })();
