@@ -1,3 +1,5 @@
+dagre.util = {};
+
 function createSVGElement(tag) {
   return document.createElementNS("http://www.w3.org/2000/svg", tag);
 }
@@ -92,3 +94,31 @@ function concat(arrays) {
 function values(obj) {
   return Object.keys(obj).map(function(k) { return obj[k]; });
 }
+
+/*
+ * Returns all components in the graph using undirected navigation.
+ */
+var components = dagre.util.components = function(g) {
+  var results = [];
+  var visited = {};
+
+  function dfs(u, component) {
+    if (!(u.id() in visited)) {
+      visited[u.id()] = true;
+      component.push(u);
+      u.neighbors().forEach(function(v) {
+        dfs(v, component);
+      });
+    }
+  };
+
+  g.nodes().forEach(function(u) {
+    var component = [];
+    dfs(u, component);
+    if (component.length > 0) {
+      results.push(component);
+    }
+  });
+
+  return results;
+};

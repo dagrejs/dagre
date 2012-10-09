@@ -1,4 +1,4 @@
-require("./common.js");
+require("./common");
 
 describe("graph", function() {
   var g;
@@ -6,18 +6,6 @@ describe("graph", function() {
   beforeEach(function() {
     g = dagre.graph.create();
   });
-
-  function ids(objs) {
-    return objs.map(function(obj) { return obj.id(); });
-  }
-
-  function tails(es) {
-    return es.map(function(e) { return e.tail(); });
-  }
-
-  function heads(es) {
-    return es.map(function(e) { return e.head(); });
-  }
 
   describe("empty graph", function() {
     it("has no nodes", function() {
