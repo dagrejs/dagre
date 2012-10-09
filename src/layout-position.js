@@ -122,12 +122,15 @@ dagre.layout.position = (function() {
     // Mapping of node id -> predecessor node id (or null)
     var pred = {};
 
+    // Mapping of root node id -> width
+    var width = {};
+
     // Calculated X positions
     var xs = {};
 
     layering.forEach(function(layer) {
       layer.forEach(function(u, i) {
-        sink[u.id()] = u;
+        sink[u.id()] = u.id();
         shift[u.id()] = Number.POSITIVE_INFINITY;
         pred[u.id()] = i > 0 ? layer[i - 1].id() : null;
       });
@@ -135,25 +138,27 @@ dagre.layout.position = (function() {
 
     function placeBlock(v) {
       var vId = v.id();
-      if (xs[vId] === undefined) {
+      if (!(vId in xs)) {
         xs[vId] = 0;
-        var wId = vId;
+        var w = v;
         do {
+          var wId = w.id();
+          width[root[w.id()].id()] = Math.max(deltaX(w, nodeSep, edgeSep), width[root[w.id()].id()] || 0);
           if (pos[wId] > 0) {
             var u = root[pred[wId]];
             placeBlock(u);
-            if (sink[vId].id() === vId) {
+            if (sink[vId] === vId) {
               sink[vId] = sink[u.id()];
             }
-            var delta = deltaX(u, nodeSep, edgeSep) + deltaX(v, nodeSep, edgeSep);
+            var delta = width[u.id()] + width[v.id()];
             if (sink[vId] !== sink[u.id()]) {
               shift[sink[u.id()]] = Math.min(shift[sink[u.id()]], v.attrs.x - u.attrs.x - delta);
             } else {
               xs[vId] = Math.max(xs[vId], xs[u.id()] + delta);
             }
           }
-          wId = align[wId].id();
-        } while (wId !== vId);
+          w = align[wId];
+        } while (w.id() !== vId);
       }
     }
 
@@ -167,7 +172,7 @@ dagre.layout.position = (function() {
     // Absolute coordinates
     concat(layering).forEach(function(u) {
       xs[u.id()] = xs[root[u.id()].id()];
-      var xDelta = shift[sink[root[u.id()].id()]];
+      var xDelta = shift[sink[root[u.id()]]];
       if (xDelta < Number.POSITIVE_INFINITY) {
         xs[u.id()] += xDelta;
       }
