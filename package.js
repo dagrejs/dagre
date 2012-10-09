@@ -22,7 +22,7 @@ sys.puts(JSON.stringify({
   devDependencies: {
     pegjs: "0.7.x",
     mocha: "1.5.x",
-    chai: "1.2.x"
+    chai: "1.3.x"
   },
   author: "Chris Pettitt <chris@samsarin.com>",
   repository: {
