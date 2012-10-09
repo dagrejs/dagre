@@ -258,6 +258,32 @@ dagre.graph.create = function() {
     return g;
   }
 
+  /*
+   * Creates a new graph that only includes the specified nodes. Edges that are
+   * only incident on the specified nodes are included in the new graph. While
+   * node ids will be the same in the new graph, edge ids are not guaranteed to
+   * be the same.
+   */
+  function subgraph(nodes) {
+    var g = dagre.graph.create();
+    mergeAttributes(_attrs, g.attrs);
+    var nodeIds = nodes.map(_nodeId);
+    nodeIds.forEach(function(uId) {
+      g.addNode(uId, node(uId).attrs);
+    });
+    nodeIds.forEach(function(uId) {
+      var u = node(uId);
+      u.successors().forEach(function(v) {
+        if (g.node(v.id())) {
+          u.outEdges(v).forEach(function(e) {
+            g.addEdge(e.tail().id(), e.head().id(), e.attrs);
+          })
+        }
+      });
+    });
+    return g;
+  }
+
   function _nodeId(node) {
     return node.id ? node.id() : node;
   }
@@ -311,6 +337,7 @@ dagre.graph.create = function() {
     edge: edge,
     nodes: nodes,
     edges: edges,
+    subgraph: subgraph,
     copy: copy
   };
 }

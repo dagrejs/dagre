@@ -213,6 +213,24 @@ describe("graph", function() {
       assert.deepEqual(ids(u.neighbors()), []);
     });
 
+    describe("subgraph", function() {
+      it("returns a graph containing a subset of nodes", function() {
+        var g = dagre.graph.read("digraph { A -> B -> C }");
+        var subgraph = g.subgraph(["A", "B"]);
+        assert.deepEqual(ids(subgraph.nodes()).sort(), ["A", "B"]);
+        assert.deepEqual(ids(tails(subgraph.edges())).sort(), ["A"]);
+        assert.deepEqual(ids(heads(subgraph.edges())).sort(), ["B"]);
+      });
+
+      it("copies attributes from the old graph to the new graph", function() {
+        var g = dagre.graph.read("digraph { graph [graphAttr=1]; A -> B -> C [edgeAttr=2]; A [nodeAttr=3] }");
+        var subgraph = g.subgraph(["A", "B"]);
+        assert.deepEqual(subgraph.attrs, {graphAttr: '1'});
+        assert.deepEqual(subgraph.edges("A", "B")[0].attrs, {edgeAttr: '2'});
+        assert.deepEqual(subgraph.node("A").attrs, {nodeAttr: '3'});
+      });
+    });
+
     it("copy creates a copy of the graph", function() {
       var src = dagre.graph.read("digraph { A -> B [weight = 5]; A [label=abc]; B [label=xyz] }");
       src.attrs.graphAttr = 123;
