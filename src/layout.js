@@ -97,6 +97,11 @@ dagre.layout = (function() {
   }
 
   return function(g) {
+    if (g.nodes().length === 0) {
+      // Nothing to do!
+      return;
+    }
+
     var selfLoops = removeSelfLoops(g);
     acyclic(g);
 
