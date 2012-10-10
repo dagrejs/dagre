@@ -131,7 +131,7 @@ var components = dagre.util.components = function(g) {
  */
 var prim = dagre.util.prim = function(g, weight) {
   var result = {};
-  var parents = {};
+  var parent = {};
   var q = priorityQueue();
 
   if (g.nodes().length === 0) {
@@ -140,25 +140,19 @@ var prim = dagre.util.prim = function(g, weight) {
 
   g.nodes().forEach(function(u) {
     q.add(u.id(), Number.POSITIVE_INFINITY);
+    result[u.id()] = [];
   });
 
   // Start from arbitrary node
   q.decrease(g.nodes()[0].id(), 0);
 
-  function addEdge(uId, vId) {
-    if (!(uId in result)) {
-      result[uId] = [];
-    }
-    result[uId].push(vId);
-  }
-
   var uId;
   var init = false;
   while (q.size() > 0) {
     uId = q.removeMin();
-    if (uId in parents) {
-      addEdge(uId, parents[uId]);
-      addEdge(parents[uId], uId);
+    if (uId in parent) {
+      result[uId].push(parent[uId]);
+      result[parent[uId]].push(uId);
     } else if (init) {
       throw new Error("Input graph is not connected:\n" + dagre.graph.write(g));
     } else {
@@ -171,7 +165,7 @@ var prim = dagre.util.prim = function(g, weight) {
       if (pri !== undefined) {
         var edgeWeight = weight(u, v);
         if (edgeWeight < pri) {
-          parents[v.id()] = uId;
+          parent[v.id()] = uId;
           q.decrease(v.id(), edgeWeight);
         }
       }

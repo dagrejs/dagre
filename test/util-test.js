@@ -25,4 +25,9 @@ describe("dagre.util.prim", function() {
     Object.keys(st).forEach(function(x) { st[x].sort(); });
     assert.deepEqual({A: ["B", "C"], B: ["A", "D"], C: ["A"], D: ["B"]}, st);
   });
+
+  it("returns a single field for a single node graph", function() {
+    var g = dagre.graph.read("graph { A }");
+    assert.deepEqual({A: []}, dagre.util.prim(g));
+  });
 });
