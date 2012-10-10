@@ -17,3 +17,12 @@ describe("dagre.util.components", function() {
                      [["A", "B", "C"], ["D", "E"], ["F"]]);
   });
 });
+
+describe("dagre.util.prim", function() {
+  it("returns a deterministic minimal spanning tree", function() {
+    var g = dagre.graph.read("graph { A -- B [weight=1]; A -- C [weight=2]; B -- D [weight=3]; C -- D [weight=4]; }");
+    var st = dagre.util.prim(g, function(u, v) { return u.edges(v)[0].attrs.weight; });
+    Object.keys(st).forEach(function(x) { st[x].sort(); });
+    assert.deepEqual({A: ["B", "C"], B: ["A", "D"], C: ["A"], D: ["B"]}, st);
+  });
+});

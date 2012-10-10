@@ -122,3 +122,61 @@ var components = dagre.util.components = function(g) {
 
   return results;
 };
+
+/*
+ * This algorithm uses undirected traversal to find a miminum spanning tree
+ * using the supplied weight function. The algorithm is described in
+ * Cormen, et al., "Introduction to Algorithms". The returned structure
+ * is an array of node id to an array of adjacent nodes.
+ */
+var prim = dagre.util.prim = function(g, weight) {
+  var result = {};
+  var parents = {};
+  var q = priorityQueue();
+
+  if (g.nodes().length === 0) {
+    return result;
+  }
+
+  g.nodes().forEach(function(u) {
+    q.add(u.id(), Number.POSITIVE_INFINITY);
+  });
+
+  // Start from arbitrary node
+  q.decrease(g.nodes()[0].id(), 0);
+
+  function addEdge(uId, vId) {
+    if (!(uId in result)) {
+      result[uId] = [];
+    }
+    result[uId].push(vId);
+  }
+
+  var uId;
+  var init = false;
+  while (q.size() > 0) {
+    uId = q.removeMin();
+    if (uId in parents) {
+      addEdge(uId, parents[uId]);
+      addEdge(parents[uId], uId);
+    } else if (init) {
+      throw new Error("Input graph is not connected:\n" + dagre.graph.write(g));
+    } else {
+      init = true;
+    }
+
+    var u = g.node(uId);
+    u.neighbors().forEach(function(v) {
+      var pri = q.priority(v.id());
+      if (pri !== undefined) {
+        var edgeWeight = weight(u, v);
+        if (edgeWeight < pri) {
+          parents[v.id()] = uId;
+          q.decrease(v.id(), edgeWeight);
+        }
+      }
+    });
+  }
+
+  return result;
+};
