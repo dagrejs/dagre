@@ -43,7 +43,6 @@ dagre.layout.rank = (function() {
       u.attrs.rank = rank;
 
       tree[u.id()].forEach(function(vId) {
-        console.log(tree);
         if (!(vId in visited)) {
           var v = g.node(vId);
           dfs(v, rank + (g.hasEdge(u, v) ? minLength : -minLength));
@@ -52,8 +51,6 @@ dagre.layout.rank = (function() {
     }
 
     dfs(g.nodes()[0], 0);
-
-    console.log(dagre.graph.write(g));
 
     return tree;
   }
