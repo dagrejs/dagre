@@ -13,6 +13,7 @@ all: dagre.js package.json
 	src/pre-layout.js \
 	src/layout.js \
 	src/layout-rank.js \
+	src/layout-order.js \
 	src/layout-position.js \
 	src/layout-edges.js \
 	src/render.js \

@@ -85,17 +85,6 @@ dagre.layout = (function() {
     });
   }
 
-  function rankToLayering(g) {
-    var layering = [];
-    g.nodes().forEach(function(u) {
-      var rank = u.attrs.rank;
-      layering[rank] = layering[rank] || [];
-      layering[rank].push(u);
-      delete u.attrs.rank;
-    });
-    return layering;
-  }
-
   return function(g) {
     if (g.nodes().length === 0) {
       // Nothing to do!
@@ -108,7 +97,7 @@ dagre.layout = (function() {
     dagre.layout.rank(g);
 
     addDummyNodes(g);
-    var layering = rankToLayering(g);
+    var layering = dagre.layout.order(g);
 
     dagre.layout.position(g, layering);
 
