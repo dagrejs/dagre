@@ -30,7 +30,50 @@ dagre.layout.rank = (function() {
     }
   }
 
+  function feasibleTree(g) {
+    // TODO make minLength configurable per edge
+    var minLength = 1;
+    var tree = dagre.util.prim(g, function(u, v) {
+      return Math.abs(u.attrs.rank - v.attrs.rank) - minLength;
+    });
+
+    var visited = {};
+    function dfs(u, rank) {
+      visited[u.id()] = true;
+      u.attrs.rank = rank;
+
+      tree[u.id()].forEach(function(vId) {
+        console.log(tree);
+        if (!(vId in visited)) {
+          var v = g.node(vId);
+          dfs(v, rank + (g.hasEdge(u, v) ? minLength : -minLength));
+        }
+      });
+    }
+
+    dfs(g.nodes()[0], 0);
+
+    console.log(dagre.graph.write(g));
+
+    return tree;
+  }
+
+  function normalize(g) {
+    var m = min(g.nodes().map(function(u) { return u.attrs.rank; }));
+    g.nodes().forEach(function(u) {
+      u.attrs.rank -= m;
+    });
+  }
+
   return function(g) {
-    initRank(g);
+    components(g).forEach(function(cmpt) {
+      var subgraph = g.subgraph(cmpt);
+      initRank(subgraph);
+      var tree = feasibleTree(subgraph);
+      normalize(subgraph);
+      subgraph.nodes().forEach(function(u) {
+        g.node(u.id()).attrs.rank = u.attrs.rank;
+      });
+    });
   };
 })();

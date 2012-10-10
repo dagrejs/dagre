@@ -238,6 +238,10 @@ dagre.graph.create = function() {
     }
   }
 
+  function hasEdge(u, v) {
+    return _nodeId(v) in _nodes[_nodeId(u)].successors;
+  }
+
   function nodes() {
     return _mapNodes(Object.keys(_nodes));
   }
@@ -335,6 +339,7 @@ dagre.graph.create = function() {
     removeEdge: removeEdge,
     node: node,
     edge: edge,
+    hasEdge: hasEdge,
     nodes: nodes,
     edges: edges,
     subgraph: subgraph,
