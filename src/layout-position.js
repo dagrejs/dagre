@@ -44,7 +44,7 @@ dagre.layout.position = (function() {
         // If no inner segment but at the end of the list we still
         // need to check for type 1 conflicts with earlier segments
         if (innerRight === null && j === layer.length - 1) {
-          innerRight = layer.length;
+          innerRight = layering[i-1].length - 1;
         }
 
         if (innerRight !== null) {
