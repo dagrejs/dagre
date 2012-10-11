@@ -34,12 +34,26 @@ digraph {
 <script src="dagre.js"></script>
 
 <script>
+  var input = document.querySelector("#input");
+
   var svgRoot = document.querySelector("svg");
+
+  var graphRE = /[?&]graph=([^&]+)/;
+  var graphMatch = window.location.search.match(graphRE);
+  if (graphMatch) {
+    input.value = decodeURIComponent(graphMatch[1]);
+  }
 
   tryDraw();
 
+  function graphToURL() {
+    return [window.location.protocol, '//',
+            window.location.host,
+            window.location.pathname,
+            '?graph=', encodeURIComponent(input.value)].join('');
+  }
+
   function tryDraw() {
-    var input = document.querySelector("#input");
     var g;
     try {
       g = dagre.graph.read(input.value);
