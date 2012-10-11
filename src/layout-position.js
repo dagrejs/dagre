@@ -152,7 +152,7 @@ dagre.layout.position = (function() {
             }
             var delta = width[u.id()] + width[v.id()];
             if (sink[vId] !== sink[u.id()]) {
-              shift[sink[u.id()]] = Math.min(shift[sink[u.id()]], v.attrs.x - u.attrs.x - delta);
+              shift[sink[u.id()]] = Math.min(shift[sink[u.id()]], xs[vId] - xs[u.id()] - delta);
             } else {
               xs[vId] = Math.max(xs[vId], xs[u.id()] + delta);
             }
@@ -172,7 +172,7 @@ dagre.layout.position = (function() {
     // Absolute coordinates
     concat(layering).forEach(function(u) {
       xs[u.id()] = xs[root[u.id()].id()];
-      var xDelta = shift[sink[root[u.id()]]];
+      var xDelta = shift[sink[root[u.id()].id()]];
       if (xDelta < Number.POSITIVE_INFINITY) {
         xs[u.id()] += xDelta;
       }
