@@ -281,7 +281,7 @@ dagre.layout.position = (function() {
 
       // Find average of medians for xss array
       g.nodes().forEach(function(u) {
-        var xs = values(xss).map(function(xs) { return xs[u.id()]; }).sort();
+        var xs = values(xss).map(function(xs) { return xs[u.id()]; }).sort(function(x, y) { return x - y; });
         u.attrs.x = (xs[1] + xs[2]) / 2;
       });
     }
