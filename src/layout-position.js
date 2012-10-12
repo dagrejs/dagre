@@ -130,9 +130,10 @@ dagre.layout.position = (function() {
 
     layering.forEach(function(layer) {
       layer.forEach(function(u, i) {
-        sink[u.id()] = u.id();
-        shift[u.id()] = Number.POSITIVE_INFINITY;
-        pred[u.id()] = i > 0 ? layer[i - 1].id() : null;
+        var uId = u.id();
+        sink[uId] = uId;
+        pred[uId] = i > 0 ? layer[i - 1].id() : null;
+        width[root[uId].id()] = Math.max(width[root[uId].id()] || 0, deltaX(u, nodeSep, edgeSep));
       });
     });
 
@@ -143,18 +144,18 @@ dagre.layout.position = (function() {
         var w = v;
         do {
           var wId = w.id();
-          width[root[w.id()].id()] = Math.max(deltaX(w, nodeSep, edgeSep), width[root[w.id()].id()] || 0);
           if (pos[wId] > 0) {
             var u = root[pred[wId]];
+            var uId = u.id();
             placeBlock(u);
             if (sink[vId] === vId) {
-              sink[vId] = sink[u.id()];
+              sink[vId] = sink[uId];
             }
-            var delta = width[u.id()] + width[v.id()];
-            if (sink[vId] !== sink[u.id()]) {
-              shift[sink[u.id()]] = Math.min(shift[sink[u.id()]], xs[vId] - xs[u.id()] - delta);
+            var delta = width[uId] + width[vId];
+            if (sink[vId] !== sink[uId]) {
+              shift[sink[uId]] = Math.min(shift[sink[uId]] || Number.POSITIVE_INFINITY, xs[vId] - xs[uId] - delta);
             } else {
-              xs[vId] = Math.max(xs[vId], xs[u.id()] + delta);
+              xs[vId] = Math.max(xs[vId], xs[uId] + delta);
             }
           }
           w = align[wId];
@@ -163,18 +164,30 @@ dagre.layout.position = (function() {
     }
 
     // Root coordinates relative to sink
-    Object.keys(root).forEach(function(uId) {
-      if (root[uId].id() === uId) {
-        placeBlock(root[uId]);
+    values(root).forEach(function(v) {
+      placeBlock(v);
+    });
+
+    concat(layering).forEach(function(v) {
+      var vId = v.id();
+      xs[vId] = xs[root[vId].id()];
+    });
+
+    var prevShift = 0;
+    layering.forEach(function(layer) {
+      var s = shift[layer[0].id()];
+      if (s === undefined) {
+        s = 0;
       }
+      prevShift = shift[layer[0].id()] = s + prevShift;
     });
 
     // Absolute coordinates
-    concat(layering).forEach(function(u) {
-      xs[u.id()] = xs[root[u.id()].id()];
-      var xDelta = shift[sink[root[u.id()].id()]];
+    concat(layering).forEach(function(v) {
+      var vId = v.id();
+      var xDelta = shift[sink[root[vId].id()]];
       if (xDelta < Number.POSITIVE_INFINITY) {
-        xs[u.id()] += xDelta;
+        xs[vId] += xDelta;
       }
     });
 
