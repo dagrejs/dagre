@@ -29,7 +29,7 @@ digraph {
 
 <h2>Graph Visualization</h2>
 
-<svg width=1000 height=600></svg>
+<svg width=0 height=0></svg>
 
 <script src="dagre.js"></script>
 
@@ -74,6 +74,10 @@ digraph {
       dagre.preLayout(g);
       dagre.layout(g);
       dagre.render(g, svg);
+
+      var wh = g.attrs.bbox.split(" ")[1].split(",");
+      svgRoot.setAttribute("width", parseInt(wh[0]) + 10);
+      svgRoot.setAttribute("height", parseInt(wh[1]) + 10);
     }
   }
 </script>

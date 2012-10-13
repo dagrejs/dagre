@@ -317,5 +317,10 @@ dagre.layout.position = (function() {
       }
       posY += height / 2 + g.attrs.rankSep;
     }
+
+    // Save bounding box info
+    var maxX = max(g.nodes().map(function(u) { return u.attrs.x + actualNodeWidth(u) / 2; }));
+    var maxY = posY;
+    g.attrs.bbox = "0,0 " + maxX + "," + maxY;
   };
 })();
