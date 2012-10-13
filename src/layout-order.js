@@ -90,17 +90,15 @@ dagre.layout.order = (function() {
   }
 
   function improveOrdering(i, layering) {
-    layering = layering.slice(0);
     if (i % 2 === 0) {
       for (var j = 1; j < layering.length; ++j) {
-        improveRank(layering[j - 1], layering[j], "inEdges");
+        improveLayer(i, layering[j - 1], layering[j], "inEdges");
       }
     } else {
       for (var j = layering.length - 2; j >= 0; --j) {
-        improveRank(layering[j + 1], layering[j], "outEdges");
+        improveLayer(i, layering[j + 1], layering[j], "outEdges");
       }
     }
-    return layering;
   }
 
   /*
@@ -110,7 +108,7 @@ dagre.layout.order = (function() {
    *
    * This algorithm is based on the barycenter method.
    */
-  function improveRank(fixed, movable, neighbors) {
+  function improveLayer(i, fixed, movable, neighbors) {
     var weights = rankWeights(fixed, movable, neighbors);
 
     var toSort = [];
@@ -161,20 +159,24 @@ dagre.layout.order = (function() {
     return weights;
   }
 
+  function copyLayering(layering) {
+    return layering.map(function(l) { return l.slice(0); });
+  }
+
   return function(g) {
     // TODO make this configurable
     var MAX_ITERATIONS = 24;
-    
+
     var layering = initOrder(g);
-    var bestLayering = layering;
+    var bestLayering = copyLayering(layering);
     var bestCC = crossCount(layering);
 
     var cc;
     for (var i = 0; i < MAX_ITERATIONS; ++i) {
-      layering = improveOrdering(i, layering);
+      improveOrdering(i, layering);
       cc = crossCount(layering);
       if (cc < bestCC) {
-        bestLayering = layering;
+        bestLayering = copyLayering(layering);
         bestCC = cc;
       }
     }
