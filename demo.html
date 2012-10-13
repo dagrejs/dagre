@@ -53,12 +53,17 @@ digraph {
             '?graph=', encodeURIComponent(input.value)].join('');
   }
 
+  var oldInputValue;
   function tryDraw() {
     var g;
-    try {
-      g = dagre.graph.read(input.value);
-    } catch (e) {
-      input.setAttribute("class", "error");
+
+    if (oldInputValue !== input.value) {
+      oldInputValue = input.value;
+      try {
+        g = dagre.graph.read(input.value);
+      } catch (e) {
+        input.setAttribute("class", "error");
+      }
     }
 
     if (g) {
