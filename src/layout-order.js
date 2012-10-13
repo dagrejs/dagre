@@ -164,15 +164,14 @@ dagre.layout.order = (function() {
   }
 
   return function(g) {
-    // TODO make this configurable
-    var MAX_ITERATIONS = 24;
+    var iters = g.attrs.orderIters;
 
     var layering = initOrder(g);
     var bestLayering = copyLayering(layering);
     var bestCC = crossCount(layering);
 
     var cc;
-    for (var i = 0; i < MAX_ITERATIONS; ++i) {
+    for (var i = 0; i < iters; ++i) {
       improveOrdering(i, layering);
       cc = crossCount(layering);
       if (cc < bestCC) {

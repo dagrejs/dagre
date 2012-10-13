@@ -10,6 +10,8 @@ dagre.preLayout = function(g) {
   defaultInt(g.attrs, "edgeSep", 10);
   defaultInt(g.attrs, "rankSep", 30);
 
+  defaultInt(g.attrs, "orderIters", 24);
+
   g.nodes().forEach(function(u) {
     var attrs = u.attrs;
 
