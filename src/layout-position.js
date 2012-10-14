@@ -164,11 +164,6 @@ dagre.layout.position = (function() {
       placeBlock(v);
     });
 
-    concat(layering).forEach(function(v) {
-      var vId = v.id();
-      xs[vId] = xs[root[vId].id()];
-    });
-
     var prevShift = 0;
     layering.forEach(function(layer) {
       var s = shift[layer[0].id()];
@@ -179,12 +174,16 @@ dagre.layout.position = (function() {
     });
 
     // Absolute coordinates
-    concat(layering).forEach(function(v) {
-      var vId = v.id();
-      var xDelta = shift[sink[root[vId].id()]];
-      if (xDelta < Number.POSITIVE_INFINITY) {
-        xs[vId] += xDelta;
-      }
+    layering.forEach(function(layer) {
+      layer.forEach(function(v) {
+        xs[v.id()] = xs[root[v.id()].id()];
+        if (root[v.id()].id() === v.id()) {
+          var xDelta = shift[sink[v.id()]];
+          if (xDelta < Number.POSITIVE_INFINITY) {
+            xs[v.id()] += xDelta;
+          }
+        }
+      });
     });
 
     return xs;
@@ -303,16 +302,14 @@ dagre.layout.position = (function() {
 
     // Align y coordinates with ranks
     var posY = 0;
-    for (var i = 0; i < layering.length; ++i) {
-      var layer = layering[i];
+    layering.forEach(function(layer) {
       var height = max(layer.map(actualNodeHeight));
       posY += height / 2;
-      for (var j = 0; j < layer.length; ++j) {
-        var uAttrs = layer[j].attrs;
-        uAttrs.y = posY;
-      }
+      layer.forEach(function(u) {
+        u.attrs.y = posY;
+      });
       posY += height / 2 + g.attrs.rankSep;
-    }
+    });
 
     // Save bounding box info
     var maxX = max(g.nodes().map(function(u) { return u.attrs.x + actualNodeWidth(u) / 2; }));
