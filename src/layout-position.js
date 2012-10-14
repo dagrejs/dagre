@@ -119,11 +119,8 @@ dagre.layout.position = (function() {
     // Mapping of sink node id -> x delta
     var shift = {};
 
-    // Mapping of node id -> predecessor node id (or null)
+    // Mapping of node id -> predecessor node (or null)
     var pred = {};
-
-    // Mapping of root node id -> width
-    var width = {};
 
     // Calculated X positions
     var xs = {};
@@ -132,8 +129,7 @@ dagre.layout.position = (function() {
       layer.forEach(function(u, i) {
         var uId = u.id();
         sink[uId] = uId;
-        pred[uId] = i > 0 ? layer[i - 1].id() : null;
-        width[root[uId].id()] = Math.max(width[root[uId].id()] || 0, deltaX(u, nodeSep, edgeSep));
+        pred[uId] = i > 0 ? layer[i - 1] : null;
       });
     });
 
@@ -145,13 +141,13 @@ dagre.layout.position = (function() {
         do {
           var wId = w.id();
           if (pos[wId] > 0) {
-            var u = root[pred[wId]];
+            var u = root[pred[wId].id()];
             var uId = u.id();
             placeBlock(u);
             if (sink[vId] === vId) {
               sink[vId] = sink[uId];
             }
-            var delta = width[uId] + width[vId];
+            var delta = deltaX(pred[wId], nodeSep, edgeSep) + deltaX(w, nodeSep, edgeSep);
             if (sink[vId] !== sink[uId]) {
               shift[sink[uId]] = Math.min(shift[sink[uId]] || Number.POSITIVE_INFINITY, xs[vId] - xs[uId] - delta);
             } else {
