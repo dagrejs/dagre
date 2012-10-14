@@ -1,1 +1,1 @@
-dagre.version = "0.0.1";
+dagre.version = "0.0.2";
