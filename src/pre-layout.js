@@ -56,13 +56,13 @@ dagre.preLayout = function(g) {
     // The font size to use for the node's label
     defaultInt(attrs, "fontSize", 14);
 
-    var text = createTextNode(u);
-    svg.appendChild(text);
+    var svgNode = createSVGNode(u);
+    svg.appendChild(svgNode);
 
-    var bbox = text.getBBox();
+    var bbox = svgNode.getBBox();
     attrs.width = Math.max(attrs.width, bbox.width);
     attrs.height = Math.max(attrs.height, bbox.height);
-    svg.removeChild(text);
+    svg.removeChild(svgNode);
   });
 
   g.edges().forEach(function(e) {

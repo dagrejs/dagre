@@ -54,8 +54,14 @@ dagre.render = function(g, svg) {
                                   "stroke: " + u.attrs.color].join("; "));
       group.appendChild(rect);
 
-      var text = createTextNode(u);
-      group.appendChild(text);
+      var svgNode = createSVGNode(u);
+      if(svgNode.nodeName == "foreignObject"){
+        svgNode.setAttribute("x", -(u.attrs.marginX + u.attrs.width / 2 + u.attrs.strokeWidth / 2));
+        svgNode.setAttribute("y",  -(u.attrs.marginY + u.attrs.height / 2 + u.attrs.strokeWidth / 2));
+        svgNode.setAttribute("width", u.attrs.width + 2 * u.attrs.marginX + u.attrs.strokeWidth);
+        svgNode.setAttribute("height", u.attrs.height + 2 * u.attrs.marginY + u.attrs.strokeWidth);
+      }
+      group.appendChild(svgNode);
     });
   }
 

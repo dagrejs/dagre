@@ -8,6 +8,32 @@ function createSVGElement(tag) {
  * Performs some of the common rendering that is used by both preLayout and
  * render.
  */
+function createSVGNode(node, x){
+  if(node.attrs.label[0] == '<'){
+    return createHTMLNode(node, x);
+  }else{
+    return createTextNode(node, x);
+  }
+}
+
+function createHTMLNode(node, x){
+  var fo = createSVGElement("foreignObject");
+  var div = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
+  div.innerHTML = node.attrs.label;
+  div.setAttribute("id", "temporaryDiv");
+  var body = document.getElementsByTagName('body')[0];
+  body.appendChild(div);
+  var td = document.getElementById("temporaryDiv");
+  td.setAttribute("style", "width:10;float:left;");
+  fo.setAttribute("width", td.clientWidth);
+  fo.setAttribute("height", td.clientHeight);
+  body.removeChild(td);
+  div.setAttribute("id", "");
+  
+  fo.appendChild(div);
+  return fo;
+}
+
 function createTextNode(node, x) {
   var fontSize = node.attrs.fontSize;
   var text = createSVGElement("text");
