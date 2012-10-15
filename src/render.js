@@ -55,11 +55,11 @@ dagre.render = function(g, svg) {
       group.appendChild(rect);
 
       var svgNode = createSVGNode(u);
-      if(svgNode.nodeName == "foreignObject"){
-        svgNode.setAttribute("x", -(u.attrs.marginX + u.attrs.width / 2 + u.attrs.strokeWidth / 2));
-        svgNode.setAttribute("y",  -(u.attrs.marginY + u.attrs.height / 2 + u.attrs.strokeWidth / 2));
-        svgNode.setAttribute("width", u.attrs.width + 2 * u.attrs.marginX + u.attrs.strokeWidth);
-        svgNode.setAttribute("height", u.attrs.height + 2 * u.attrs.marginY + u.attrs.strokeWidth);
+      if(svgNode.nodeName === "foreignObject") {
+        svgNode.setAttribute("x", -(u.attrs.width / 2 + u.attrs.strokeWidth / 2));
+        svgNode.setAttribute("y",  -(u.attrs.height / 2 + u.attrs.strokeWidth / 2));
+        svgNode.setAttribute("width", u.attrs.width);
+        svgNode.setAttribute("height", u.attrs.height);
       }
       group.appendChild(svgNode);
     });

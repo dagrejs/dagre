@@ -9,14 +9,14 @@ function createSVGElement(tag) {
  * render.
  */
 function createSVGNode(node, x){
-  if(node.attrs.label[0] == '<'){
-    return createHTMLNode(node, x);
-  }else{
+  if(node.attrs.label[0] === '<') {
+    return createHTMLNode(node);
+  } else {
     return createTextNode(node, x);
   }
 }
 
-function createHTMLNode(node, x){
+function createHTMLNode(node){
   var fo = createSVGElement("foreignObject");
   var div = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
   div.innerHTML = node.attrs.label;
@@ -29,7 +29,7 @@ function createHTMLNode(node, x){
   fo.setAttribute("height", td.clientHeight);
   body.removeChild(td);
   div.setAttribute("id", "");
-  
+
   fo.appendChild(div);
   return fo;
 }
