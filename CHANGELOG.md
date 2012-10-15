@@ -1,3 +1,8 @@
+# v0.0.3
+
+* Support for HTML node labels. To use an HTML node label, start the label with
+  the `<` character.
+
 # v0.0.2
 
 * Documentation for configuration options added to `src/pre-layout.js`.
