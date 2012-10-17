@@ -36,7 +36,7 @@ dagre.layout.position = (function() {
         var innerRight = null;
         u.predecessors().forEach(function(v) {
           // TODO could abort as soon as we find a dummy
-          if (u.attrs.dummy || v.attrs.dummy) {
+          if (u.attrs.dummy && v.attrs.dummy) {
             innerRight = pos[v.id()];
           }
         });
