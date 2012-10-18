@@ -17,7 +17,7 @@ dagre.layout = (function() {
 
           // If this is not a self-loop add the reverse edge to the graph
           if (u.id() !== v.id()) {
-            u.addPredecessor(v, e.attrs);
+            g.addEdge(e.id(), v, u, e.attrs);
           }
         } else {
           dfs(v);
@@ -36,7 +36,7 @@ dagre.layout = (function() {
     g.edges().forEach(function(e) {
       if (e.attrs.reverse) {
         g.removeEdge(e);
-        g.addEdge(e.head(), e.tail(), e.attrs);
+        g.addEdge(e.id(), e.head(), e.tail(), e.attrs);
         delete e.attrs.reverse;
       }
     });
@@ -56,7 +56,7 @@ dagre.layout = (function() {
 
   function addSelfLoops(g, selfLoops) {
     selfLoops.forEach(function(e) {
-      g.addEdge(e.head(), e.tail(), e.attrs);
+      g.addEdge(e.id(), e.head(), e.tail(), e.attrs);
     });
   }
 
@@ -68,7 +68,8 @@ dagre.layout = (function() {
       var sinkRank = e.head().attrs.rank;
       if (u.attrs.rank + 1 < sinkRank) {
         g.removeEdge(e);
-        for (var rank = u.attrs.rank + 1; rank < sinkRank; ++rank) {
+        var firstRank = u.attrs.rank + 1;
+        for (var rank = firstRank; rank < sinkRank; ++rank) {
           var vId = prefix + rank;
           var v = g.addNode(vId, { rank: rank,
                                    dummy: true,
@@ -77,10 +78,10 @@ dagre.layout = (function() {
                                    strokeWidth: e.attrs.strokeWidth,
                                    marginX: 0,
                                    marginY: 0 });
-          g.addEdge(u, v, e.attrs);
+          g.addEdge(rank === firstRank ? e.id() : null, u, v, e.attrs);
           u = v;
         }
-        g.addEdge(u, e.head(), e.attrs);
+        g.addEdge(null, u, e.head(), e.attrs);
       }
     });
   }

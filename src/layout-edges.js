@@ -53,6 +53,7 @@ dagre.layout.edges = (function() {
 
     function collapseChain(e) {
       var root = e.tail();
+      var rootEdge = e;
       var points = e.attrs.tailPoint;
       do
       {
@@ -62,7 +63,7 @@ dagre.layout.edges = (function() {
       }
       while (e.head().attrs.dummy);
       points += " " + e.attrs.headPoint;
-      var e2 = root.addSuccessor(e.head(), e.attrs);
+      var e2 = g.addEdge(rootEdge.id(), root, e.head(), e.attrs);
       e2.attrs.points = points;
       e2.attrs.type = "line";
     }

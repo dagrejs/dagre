@@ -17,15 +17,18 @@ dagre.graph = {};
  */
 dagre.graph.create = function() {
   /*
-   * Adds a or updates a node in the graph with the given id. It only makes
-   * sense to use primitive values as ids. This function also optionally takes
-   * an object that will be used as attributes for the node.
+   * Adds a or updates a node in the graph with the given id. If the value of
+   * id is `null` then an id will automatically be assigned.
+   *
+   * It only makes sense to use primitive values as ids. This function also
+   * optionally takes an object that will be used as attributes for the node.
    *
    * If the node already exists in the graph the supplied attributes will
    * merged with the node's attributes. Where there are overlapping keys, the
    * new attribute will replace the current attribute.
    */
   function addNode(id, attrs) {
+    id = _maybeGenId(id);
     if (!(id in _nodes)) {
       _nodes[id] = {
         /* Unique id for this node, should match the id used to look this node in `_nodes`. */
@@ -44,12 +47,6 @@ dagre.graph.create = function() {
       mergeAttributes(attrs, _nodes[id].attrs);
     }
     return node(id);
-  }
-
-  function addNodes() {
-    for (var i = 0; i < arguments.length; ++i) {
-      addNode(arguments[i]);
-    }
   }
 
   function removeNode(n) {
@@ -71,14 +68,6 @@ dagre.graph.create = function() {
     var u = _nodes[id];
     if (u === undefined) {
       return null;
-    }
-
-    function addSuccessor(suc, attrs) {
-      return addEdge(id, _nodeId(suc), attrs);
-    }
-
-    function addPredecessor(pred, attrs) {
-      return addEdge(_nodeId(pred), id, attrs);
     }
 
     function successors() {
@@ -148,8 +137,6 @@ dagre.graph.create = function() {
     return {
       id: function() { return u.id; },
       attrs: u.attrs,
-      addSuccessor: addSuccessor,
-      addPredecessor: addPredecessor,
       successors: successors,
       predecessors: predecessors,
       neighbors: neighbors,
@@ -162,42 +149,49 @@ dagre.graph.create = function() {
   }
 
   /*
-   * Always adds a new edge in the graph with the given head and tail node ids.
-   * This function optionally taks an object that will be used as attributes
+   * Adds a or updates an edge in the graph with the given id. If the value of
+   * id is `null` then an id will automatically be assigned.
+   *
+   * This function optionally takes an object that will be used as attributes
    * for the edge.
    *
-   * Using add edge multiple times with the same tail and head nodes will
-   * result in multiple edges between those nodes.
+   * Multiple edges between the same tail and head nodes can be added by either
+   * using `null` or a unique edge id for each call. If the same id is used
+   * with a different tail or head node this function will raise an error.
    *
-   * This function returns the edge that was created.
+   * This function returns the edge that was created or updated.
    */
-  function addEdge(tail, head, attrs) {
+  function addEdge(id, tail, head, attrs) {
+    var id = _maybeGenId(id);
     var tailId = _nodeId(tail);
     var headId = _nodeId(head);
 
-    var idPrefix = (tailId.toString().length) + ":" + tailId + "->" + headId;
-    _nextEdgeId[idPrefix] = _nextEdgeId[idPrefix] || 0;
-    var id = idPrefix + ":" + _nextEdgeId[idPrefix]++;
+    var e = _edges[id];
+    if (!e) {
+      e = _edges[id] = {
+        /*
+         * Unique id for this edge (combination of both incident node ids and a
+         * counter to ensure uniqueness for multiple edges between the same nodes.
+         */
+        id: id,
 
-    var e = _edges[id] = {
-      /*
-       * Unique id for this edge (combination of both incident node ids and a
-       * counter to ensure uniqueness for multiple edges between the same nodes.
-       */
-      id: id,
+        tailId: tailId,
+        headId: headId,
+        attrs: {}
+      };
 
-      tailId: tailId,
-      headId: headId,
-      attrs: {}
-    };
+      var tailSucs = _nodes[tailId].successors;
+      tailSucs[headId] = tailSucs[headId] || [];
+      tailSucs[headId].push(e.id);
 
-    var tailSucs = _nodes[tailId].successors;
-    tailSucs[headId] = tailSucs[headId] || [];
-    tailSucs[headId].push(e.id);
-
-    var headPreds = _nodes[headId].predecessors;
-    headPreds[tailId] = headPreds[tailId] || [];
-    headPreds[tailId].push(e.id);
+      var headPreds = _nodes[headId].predecessors;
+      headPreds[tailId] = headPreds[tailId] || [];
+      headPreds[tailId].push(e.id);
+    } else if (e.tail().id() !== tailId || e.head().id() !== headId) {
+      throw new Error("addEdge called with different tail or head node. " +
+                      "Old: (" + e.tail().id() + "," + e.head().id() + " " +
+                      "New: (" + tailId + "," + headId + ")");
+    }
 
     if (attrs) {
       mergeAttributes(attrs, e.attrs);
@@ -257,7 +251,7 @@ dagre.graph.create = function() {
       g.addNode(u.id(), u.attrs);
     });
     edges().forEach(function(e) {
-      g.addEdge(e.tail(), e.head(), e.attrs);
+      g.addEdge(e.id(), e.tail(), e.head(), e.attrs);
     });
     return g;
   }
@@ -268,6 +262,7 @@ dagre.graph.create = function() {
    * node ids will be the same in the new graph, edge ids are not guaranteed to
    * be the same.
    */
+  // TODO: this will probably need to be renamed when we start handling clusters
   function subgraph(nodes) {
     var g = dagre.graph.create();
     mergeAttributes(_attrs, g.attrs);
@@ -280,7 +275,7 @@ dagre.graph.create = function() {
       u.successors().forEach(function(v) {
         if (g.node(v.id())) {
           u.outEdges(v).forEach(function(e) {
-            g.addEdge(e.tail().id(), e.head().id(), e.attrs);
+            g.addEdge(e.id(), e.tail().id(), e.head().id(), e.attrs);
           })
         }
       });
@@ -304,10 +299,11 @@ dagre.graph.create = function() {
     return edgeIds.map(function(id) { return edge(id); });
   }
 
-  function _genNextEdgeId(tailId, headId) {
-    var idPrefix = (tailId.toString().length) + ":" + tailId + "->" + headId;
-    _nextEdgeId[idPrefix] = _nextEdgeId[idPrefix] || 0;
-    return idPrefix + ":" + _nextEdgeId[idPrefix]++;
+  function _maybeGenId(id) {
+    if (id === null) {
+      return "_dagre-" + _nextId++;
+    }
+    return id;
   }
 
   function _removeEdgeFromMap(key, id, map) {
@@ -327,13 +323,12 @@ dagre.graph.create = function() {
   var _attrs = {};
   var _nodes = {};
   var _edges = {};
-  var _nextEdgeId = {};
+  var _nextId = 0;
 
   // Public API is defined here
   return {
     attrs: _attrs,
     addNode: addNode,
-    addNodes: addNodes,
     removeNode: removeNode,
     addEdge: addEdge,
     removeEdge: removeEdge,
@@ -371,9 +366,9 @@ dagre.graph.read = function(str) {
               graph.addNode(elem.id);
               var curr = graph.node(elem.id);
               if (prev) {
-                prev.addSuccessor(curr, stmt.attrs);
+                graph.addEdge(null, prev, curr, stmt.attrs);
                 if (undir) {
-                  prev.addPredecessor(curr, stmt.attrs);
+                  graph.addEdge(null, curr, prev, stmt.attrs);
                 }
               }
               prev = curr;

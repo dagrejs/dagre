@@ -59,7 +59,7 @@ describe("graph", function() {
     it("removes out edges", function() {
       var u = g.addNode(1);
       var v = g.addNode(2);
-      u.addSuccessor(v);
+      g.addEdge(null, u, v);
       g.removeNode(u);
       assert.deepEqual(v.predecessors(), []);
     });
@@ -67,7 +67,7 @@ describe("graph", function() {
     it("removes in edges", function() {
       var u = g.addNode(1);
       var v = g.addNode(2);
-      u.addPredecessor(v);
+      g.addEdge(null, v, u);
       g.removeNode(u);
       assert.deepEqual(v.successors(), []);
     });
@@ -82,84 +82,10 @@ describe("graph", function() {
       v = g.addNode(2);
     });
 
-    describe("addSuccessor", function() {
-      it("adds a successor for the node", function() {
-        u.addSuccessor(v);
-
-        assert.deepEqual(ids(u.successors()), [2]);
-        assert.deepEqual(ids(u.predecessors()), []);
-        assert.deepEqual(ids(u.neighbors()), [2]);
-        assert.deepEqual(ids(tails(u.outEdges())), [1]);
-        assert.deepEqual(ids(heads(u.outEdges())), [2]);
-        assert.deepEqual(ids(tails(u.inEdges())), []);
-        assert.deepEqual(ids(heads(u.inEdges())), []);
-        assert.deepEqual(ids(tails(u.edges())).sort(), [1]);
-        assert.deepEqual(ids(heads(u.edges())).sort(), [2]);
-
-        assert.deepEqual(ids(v.successors()), []);
-        assert.deepEqual(ids(v.predecessors()), [1]);
-        assert.deepEqual(ids(v.neighbors()), [1]);
-        assert.deepEqual(ids(tails(v.outEdges())), []);
-        assert.deepEqual(ids(heads(v.outEdges())), []);
-        assert.deepEqual(ids(tails(v.inEdges())), [1]);
-        assert.deepEqual(ids(heads(v.inEdges())), [2]);
-        assert.deepEqual(ids(tails(v.edges())).sort(), [1]);
-        assert.deepEqual(ids(heads(v.edges())).sort(), [2]);
-      });
-
-      it("can add an initial set of attributes", function() {
-        var e = u.addSuccessor(v, {a: 1, b: 2});
-        assert.deepEqual(e.attrs, {a: 1, b: 2});
-      });
-
-      it("creates multiple edges when called with the same successor", function() {
-        var e1 = u.addSuccessor(v, {a: 1, b: 2});
-        var e2 = u.addSuccessor(v, {b: 3, c: 4});
-        assert.deepEqual(ids(u.outEdges()).sort(), [e1.id(), e2.id()].sort());
-      });
-    });
-
-    describe("addPredecessor", function() {
-      it("adds a predecessor for the node", function() {
-        u.addPredecessor(v);
-
-        assert.deepEqual(ids(u.successors()), []);
-        assert.deepEqual(ids(u.predecessors()), [2]);
-        assert.deepEqual(ids(u.neighbors()), [2]);
-        assert.deepEqual(ids(tails(u.outEdges())), []);
-        assert.deepEqual(ids(heads(u.outEdges())), []);
-        assert.deepEqual(ids(tails(u.inEdges())), [2]);
-        assert.deepEqual(ids(heads(u.inEdges())), [1]);
-        assert.deepEqual(ids(tails(u.edges())).sort(), [2]);
-        assert.deepEqual(ids(heads(u.edges())).sort(), [1]);
-
-        assert.deepEqual(ids(v.successors()), [1]);
-        assert.deepEqual(ids(v.predecessors()), []);
-        assert.deepEqual(ids(v.neighbors()), [1]);
-        assert.deepEqual(ids(tails(v.outEdges())), [2]);
-        assert.deepEqual(ids(heads(v.outEdges())), [1]);
-        assert.deepEqual(ids(tails(v.inEdges())), []);
-        assert.deepEqual(ids(heads(v.inEdges())), []);
-        assert.deepEqual(ids(tails(v.edges())).sort(), [2]);
-        assert.deepEqual(ids(heads(v.edges())).sort(), [1]);
-      });
-
-      it("can add an initial set of attributes", function() {
-        var e = u.addPredecessor(v, {a: 1, b: 2});
-        assert.deepEqual(e.attrs, {a: 1, b: 2});
-      });
-
-      it("creates multiple edges when called with the same successor", function() {
-        var e1 = u.addPredecessor(v, {a: 1, b: 2});
-        var e2 = u.addPredecessor(v, {b: 3, c: 4});
-        assert.deepEqual(ids(u.inEdges()).sort(), [e1.id(), e2.id()].sort());
-      });
-    });
-
     describe("neighbors", function() {
       it("only includes neighbor nodes once", function() {
-        u.addSuccessor(v);
-        u.addPredecessor(v);
+        g.addEdge(null, u, v);
+        g.addEdge(null, v, u);
 
         assert.deepEqual(ids(u.neighbors()), [v.id()]);
       });
@@ -167,7 +93,7 @@ describe("graph", function() {
 
     describe("edges", function() {
       it("only includes each edge once", function() {
-        var e = u.addSuccessor(u);
+        var e = g.addEdge(null, u, u);
         assert.deepEqual(ids(u.edges()), [e.id()]);
       });
     });
@@ -175,11 +101,11 @@ describe("graph", function() {
     describe("outDegree", function() {
       it("returns the number of edges that point out from the node", function() {
         var w = g.addNode(3);
-        v.addSuccessor(u);
+        g.addEdge(null, v, u);
 
         // Two edges incident on the same nodes to test multi-edges.
-        w.addSuccessor(u);
-        w.addSuccessor(u);
+        g.addEdge(null, w, u);
+        g.addEdge(null, w, u);
 
         assert.equal(u.outDegree(), 0);
         assert.equal(v.outDegree(), 1);
@@ -190,11 +116,11 @@ describe("graph", function() {
     describe("inDegree", function() {
       it("returns the number of edges that point to the node", function() {
         var w = g.addNode(3);
-        v.addPredecessor(u);
+        g.addEdge(null, u, v);
 
         // Two edges incident on the same nodes to test multi-edges.
-        w.addPredecessor(u);
-        w.addPredecessor(u);
+        g.addEdge(null, u, w);
+        g.addEdge(null, u, w);
 
         assert.equal(u.inDegree(), 0);
         assert.equal(v.inDegree(), 1);
@@ -203,7 +129,7 @@ describe("graph", function() {
     });
 
     it("removeEdge removes the appropriate edge", function() {
-      var e = u.addSuccessor(v);
+      var e = g.addEdge(null, u, v);
       g.removeEdge(e);
 
       assert.deepEqual(ids(u.successors()), []);
