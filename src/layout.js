@@ -68,8 +68,8 @@ dagre.layout = (function() {
       var sinkRank = e.head().attrs.rank;
       if (u.attrs.rank + 1 < sinkRank) {
         g.removeEdge(e);
-        var firstRank = u.attrs.rank + 1;
-        for (var rank = firstRank; rank < sinkRank; ++rank) {
+        e.attrs.edgeId = e.id();
+        for (var rank = u.attrs.rank + 1; rank < sinkRank; ++rank) {
           var vId = prefix + rank;
           var v = g.addNode(vId, { rank: rank,
                                    dummy: true,
@@ -78,7 +78,7 @@ dagre.layout = (function() {
                                    strokeWidth: e.attrs.strokeWidth,
                                    marginX: 0,
                                    marginY: 0 });
-          g.addEdge(rank === firstRank ? e.id() : null, u, v, e.attrs);
+          g.addEdge(null, u, v, e.attrs);
           u = v;
         }
         g.addEdge(null, u, e.head(), e.attrs);

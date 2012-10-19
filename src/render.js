@@ -6,7 +6,7 @@ dagre.render = function(g, svg) {
   var svgDefs = createSVGElement("defs");
   svg.appendChild(svgDefs);
 
-  function _createArrowhead(color) {
+  function createArrowhead(color) {
     colorId = color.replace(/#/, "");
     if (!(colorId in arrowheads)) {
       var name = "arrowhead-" + colorId;
@@ -35,14 +35,10 @@ dagre.render = function(g, svg) {
     return arrowheads[colorId];
   }
 
-  function _renderNodes() {
+  function drawNodes() {
     g.nodes().forEach(function(u) {
       var group = createSVGElement("g");
-      svg.appendChild(group);
-
-      var x = u.attrs.x;
-      var y = u.attrs.y;
-      group.setAttribute("transform", "translate(" + x + "," + y + ")");
+      group.setAttribute("id", "node-" + u.id());
 
       var rect = createSVGElement("rect");
       rect.setAttribute("x", -(u.attrs.marginX + u.attrs.width / 2 + u.attrs.strokeWidth / 2));
@@ -62,20 +58,17 @@ dagre.render = function(g, svg) {
         svgNode.setAttribute("height", u.attrs.height);
       }
       group.appendChild(svgNode);
+      svg.appendChild(group);
     });
   }
 
-  function _renderEdges() {
+  function drawEdges() {
     g.edges().forEach(function(e) {
       var path = createSVGElement("path");
-      var arrowhead = _createArrowhead(e.attrs.color);
+      path.setAttribute("id", "edge-" + e.id());
 
-      var points = e.attrs.points.split(" ");
-      if (e.attrs.type === "line") {
-        path.setAttribute("d", "M " + points[0] + " L " + points.slice(1).join(" "));
-      } else if (e.attrs.type === "curve") {
-        path.setAttribute("d", "M " + points[0] + " C " + points.slice(1).join(" "));
-      }
+      var arrowhead = createArrowhead(e.attrs.color);
+
       path.setAttribute("style", ["fill: none",
                                   "stroke-width: " + e.attrs.strokeWidth,
                                   "stroke: " + e.attrs.color,
@@ -84,6 +77,29 @@ dagre.render = function(g, svg) {
     });
   }
 
-  _renderNodes();
-  _renderEdges();
+  function positionNodes() {
+    g.nodes().forEach(function(u) {
+      var group = svg.querySelector("#node-" + u.id());
+      group.setAttribute("transform", "translate(" + u.attrs.x + "," + u.attrs.y + ")");
+    });
+  }
+
+  function layoutEdges() {
+    g.edges().forEach(function(e) {
+      var path = svg.querySelector("#edge-" + e.id());
+      var points = e.attrs.points.split(" ");
+      if (e.attrs.type === "line") {
+        path.setAttribute("d", "M " + points[0] + " L " + points.slice(1).join(" "));
+      } else if (e.attrs.type === "curve") {
+        path.setAttribute("d", "M " + points[0] + " C " + points.slice(1).join(" "));
+      }
+    });
+  }
+
+  dagre.preLayout(g);
+  drawNodes();
+  drawEdges();
+  dagre.layout(g);
+  positionNodes();
+  layoutEdges();
 }

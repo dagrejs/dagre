@@ -76,8 +76,6 @@ digraph {
       svgRoot.appendChild(svg);
 
       input.setAttribute("class", "");
-      dagre.preLayout(g);
-      dagre.layout(g);
       dagre.render(g, svg);
 
       var wh = g.attrs.bbox.split(" ")[1].split(",");
