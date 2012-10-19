@@ -337,6 +337,17 @@ dagre.graph.read = function(str) {
   var graph = dagre.graph.create();
   var undir = parseTree.type === "graph";
 
+  var edgeCount = {};
+  function createEdge(tail, head, attrs) {
+    var edgeKey = tail.id() + "-" + head.id();
+    var count = edgeCount[edgeKey];
+    if (!count) {
+      count = edgeCount[edgeKey] = 0;
+    }
+    edgeCount[edgeKey]++;
+    graph.addEdge(edgeKey + "-" + count, tail, head, attrs);
+  }
+
   function handleStmt(stmt) {
     switch (stmt.type) {
       case "node":
@@ -353,9 +364,9 @@ dagre.graph.read = function(str) {
               graph.addNode(elem.id);
               var curr = graph.node(elem.id);
               if (prev) {
-                graph.addEdge(null, prev, curr, stmt.attrs);
+                createEdge(prev, curr, stmt.attrs);
                 if (undir) {
-                  graph.addEdge(null, curr, prev, stmt.attrs);
+                  createEdge(curr, prev, stmt.attrs);
                 }
               }
               prev = curr;

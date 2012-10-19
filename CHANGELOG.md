@@ -1,3 +1,8 @@
+# v0.0.4
+
+* We have significantly reduced the amount of graph based customization. Most
+  customization now comes through standard CSS.
+
 # v0.0.3
 
 * Support for HTML node labels. To use an HTML node label, start the label with

@@ -75,7 +75,6 @@ dagre.layout = (function() {
                                    dummy: true,
                                    height: 0,
                                    width: 0,
-                                   strokeWidth: e.attrs.strokeWidth,
                                    marginX: 0,
                                    marginY: 0 });
           g.addEdge(null, u, v, e.attrs);

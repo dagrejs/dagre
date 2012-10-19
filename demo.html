@@ -10,6 +10,46 @@ h2 {
 .error {
   color: red;
 }
+
+.node rect {
+  stroke-width: 1.5px;
+  stroke: #333;
+  fill: #fff;
+}
+
+.node text {
+  font-size: 18px;
+}
+
+#node-A {
+  font-size: 32px;
+}
+
+#node-A .big {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+#node-C {
+  color: red;
+}
+
+
+#node-E rect {
+  fontName: arial;
+  fill: #acf;
+}
+
+.edge {
+  fill: none;
+  stroke-width: 1.5px;
+  stroke: #333;
+}
+
+#edge-A-B-0 {
+  stroke: green;
+  stroke-width: 3px;
+}
 </style>
 
 <h2>Graph Definition</h2>
@@ -17,10 +57,10 @@ h2 {
 <textarea id="input" rows="5" cols="80" style="display: block" onKeyUp="tryDraw();">
 /* Example */
 digraph {
-    A [label="<div>A Big <span style='color:red;'>HTML</span> Source!</div>", fontSize=25];
-    C [fontColor=red];
-    E [label="A blue sink!", fontName=arial, fill="#aaccff"];
-    A -&gt; B -&gt; C [color=green, strokeWidth=3];
+    A [label="<div>A <span class='big'>Big</span> <span style='color:red;'>HTML</span> Source!</div>"];
+    C;
+    E [label="A blue sink!"];
+    A -&gt; B -&gt; C;
     B -&gt; D -&gt; E;
     C -&gt; E;
     A -&gt; D;

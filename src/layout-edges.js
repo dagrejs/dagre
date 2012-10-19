@@ -21,8 +21,8 @@ dagre.layout.edges = (function() {
     // http://math.stackexchange.com/questions/108113/find-edge-between-two-boxes
     var dx = vAttrs.x - x;
     var dy = vAttrs.y - y;
-    var w = uAttrs.width / 2 + uAttrs.marginX  + uAttrs.strokeWidth;
-    var h = uAttrs.height / 2 + uAttrs.marginY + uAttrs.strokeWidth;
+    var w = uAttrs.width / 2;
+    var h = uAttrs.height / 2;
 
     var sx, sy;
     if (Math.abs(dy) * w > Math.abs(dx) * h) {
@@ -104,8 +104,8 @@ dagre.layout.edges = (function() {
     g.edges().forEach(function(e) {
       if (e.head().id() === e.tail().id()) {
         var attrs = e.head().attrs;
-        var right = attrs.x + attrs.width / 2 + attrs.marginX + attrs.strokeWidth;
-        var h = attrs.height / 2 + attrs.marginY + attrs.strokeWidth;
+        var right = attrs.x + attrs.width / 2 + attrs.marginX;
+        var h = attrs.height / 2 + attrs.marginY;
         var points = [[right,                       attrs.y - h / 3],
                       [right + g.attrs.nodeSep / 2, attrs.y - h],
                       [right + g.attrs.nodeSep / 2, attrs.y + h],

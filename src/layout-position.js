@@ -3,16 +3,6 @@
  * Horizontal Coordinate Assignment".
  */
 dagre.layout.position = (function() {
-  function actualNodeWidth(u) {
-    var uAttrs = u.attrs;
-    return uAttrs.width + uAttrs.marginX * 2 + uAttrs.strokeWidth;
-  }
-
-  function actualNodeHeight(u) {
-    var uAttrs = u.attrs;
-    return uAttrs.height + uAttrs.marginY * 2 + uAttrs.strokeWidth;
-  }
-
   function markType1Conflicts(layering) {
     var pos = {};
     layering[0].forEach(function(u, i) {
@@ -105,11 +95,11 @@ dagre.layout.position = (function() {
 
   /*
    * Determines how much spacing u needs from its origin (center) to satisfy
-   * width, margin, stroke, and node separation.
+   * width and node separation.
    */
   function deltaX(u, nodeSep, edgeSep) {
     var sep = u.attrs.dummy ? edgeSep : nodeSep;
-    return actualNodeWidth(u) / 2 + sep / 2;
+    return u.attrs.width / 2 + sep / 2;
   }
 
   function horizontalCompaction(layering, pos, root, align, nodeSep, edgeSep) {
@@ -192,14 +182,14 @@ dagre.layout.position = (function() {
   function findMinCoord(layering, xs) {
     return min(layering.map(function(layer) {
       var u = layer[0];
-      return xs[u.id()] - actualNodeWidth(u) / 2;
+      return xs[u.id()] - u.attrs.width / 2;
     }));
   }
 
   function findMaxCoord(layering, xs) {
     return max(layering.map(function(layer) {
       var u = layer[layer.length - 1];
-      return xs[u.id()] - actualNodeWidth(u) / 2;
+      return xs[u.id()] - u.attrs.width / 2;
     }));
   }
 
@@ -295,7 +285,7 @@ dagre.layout.position = (function() {
     }
 
     // Align min center point with 0
-    var minX = min(g.nodes().map(function(u) { return u.attrs.x - actualNodeWidth(u) / 2; }));
+    var minX = min(g.nodes().map(function(u) { return u.attrs.x - u.attrs.width / 2; }));
     g.nodes().forEach(function(u) {
       u.attrs.x -= minX;
     });
@@ -303,7 +293,7 @@ dagre.layout.position = (function() {
     // Align y coordinates with ranks
     var posY = 0;
     layering.forEach(function(layer) {
-      var height = max(layer.map(actualNodeHeight));
+      var height = max(layer.map(function(u) { return u.attrs.height; }));
       posY += height / 2;
       layer.forEach(function(u) {
         u.attrs.y = posY;
@@ -312,7 +302,7 @@ dagre.layout.position = (function() {
     });
 
     // Save bounding box info
-    var maxX = max(g.nodes().map(function(u) { return u.attrs.x + actualNodeWidth(u) / 2; }));
+    var maxX = max(g.nodes().map(function(u) { return u.attrs.x + u.attrs.width / 2; }));
     var maxY = posY;
     g.attrs.bbox = "0,0 " + maxX + "," + maxY;
   };
