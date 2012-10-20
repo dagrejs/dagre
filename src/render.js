@@ -6,6 +6,40 @@ dagre.render = function(g, svg) {
   var svgDefs = createSVGElement("defs");
   svg.appendChild(svgDefs);
 
+  function intersect(u, point) {
+    var uAttrs = u.attrs;
+    var x = uAttrs.x;
+    var y = uAttrs.y;
+
+    // For now we only support rectangles
+
+    // Rectangle intersection algorithm from:
+    // http://math.stackexchange.com/questions/108113/find-edge-between-two-boxes
+    var dx = point.x - x;
+    var dy = point.y - y;
+    var w = uAttrs.width / 2;
+    var h = uAttrs.height / 2;
+
+    var sx, sy;
+    if (Math.abs(dy) * w > Math.abs(dx) * h) {
+      // Intersection is top or bottom of rect.
+      if (dy < 0) {
+        h = -h;
+      }
+      sx = dy === 0 ? 0 : h * dx / dy;
+      sy = h;
+    } else {
+      // Intersection is left or right of rect.
+      if (dx < 0) {
+        w = -w;
+      }
+      sx = w;
+      sy = dx === 0 ? 0 : w * dy / dx;
+    }
+
+    return {x: x + sx, y: y + sy};
+  }
+
   function createSVGElement(tag) {
     return document.createElementNS("http://www.w3.org/2000/svg", tag);
   }
@@ -61,7 +95,7 @@ dagre.render = function(g, svg) {
   }
 
   function createArrowhead(color) {
-    colorId = color.replace(/#/, "");
+    colorId = color.replace(/[#() ,]/g, "_");
     if (!(colorId in arrowheads)) {
       var name = "arrowhead-" + colorId;
       arrowheads[colorId] = name;
@@ -143,15 +177,21 @@ dagre.render = function(g, svg) {
     });
   }
 
+  function pointStr(point) {
+    return point.x + "," + point.y;
+  }
+
   function layoutEdges() {
     g.edges().forEach(function(e) {
       var path = svg.querySelector("#edge-" + e.id());
-      var points = e.attrs.points.split(" ");
-      if (e.attrs.type === "line") {
-        path.setAttribute("d", "M " + points[0] + " L " + points.slice(1).join(" "));
-      } else if (e.attrs.type === "curve") {
-        path.setAttribute("d", "M " + points[0] + " C " + points.slice(1).join(" "));
-      }
+      var points = e.attrs.points || [];
+
+      // TODO handle self loops
+
+      points.push(intersect(e.head(), points.length > 0 ? points[points.length - 1] : e.tail().attrs));
+      var origin = intersect(e.tail(), points[0]);
+
+      path.setAttribute("d", "M " + pointStr(origin) + " L " + points.map(pointStr).join(" "));
     });
   }
 
