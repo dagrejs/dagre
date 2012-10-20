@@ -244,18 +244,6 @@ dagre.graph.create = function() {
     return _mapEdges(Object.keys(_edges));
   }
 
-  function copy() {
-    var g = dagre.graph.create();
-    mergeAttributes(_attrs, g.attrs);
-    nodes().forEach(function(u) {
-      g.addNode(u.id(), u.attrs);
-    });
-    edges().forEach(function(e) {
-      g.addEdge(e.id(), e.tail(), e.head(), e.attrs);
-    });
-    return g;
-  }
-
   /*
    * Creates a new graph that only includes the specified nodes. Edges that are
    * only incident on the specified nodes are included in the new graph. While
@@ -338,7 +326,6 @@ dagre.graph.create = function() {
     nodes: nodes,
     edges: edges,
     subgraph: subgraph,
-    copy: copy
   };
 }
 

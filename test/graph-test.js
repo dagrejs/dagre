@@ -156,21 +156,6 @@ describe("graph", function() {
         assert.deepEqual(subgraph.node("A").attrs, {nodeAttr: '3'});
       });
     });
-
-    it("copy creates a copy of the graph", function() {
-      var src = dagre.graph.read("digraph { A -> B [weight = 5]; A [label=abc]; B [label=xyz] }");
-      src.attrs.graphAttr = 123;
-      var copy = src.copy();
-      assert.equal(dagre.graph.write(src), dagre.graph.write(copy));
-
-      // Changes in `src` should not be reflected in `copy`
-      src.node("A").attrs.label = "bcd";
-      assert.notEqual("bcd", copy.node("A").attrs.label, "changes to `src` should not reflected in `copy`");
-
-      // Changes in `copy` should not be reflected in `src`
-      copy.node("B").attrs.label = "wxy";
-      assert.notEqual("wxy", src.node("B").attrs.label, "changes to `copy` should not be reflected in `src`");
-    });
   });
 });
 
