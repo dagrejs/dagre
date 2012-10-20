@@ -6,39 +6,6 @@ dagre.render = function(nodes, edges, svg) {
   var svgDefs = createSVGElement("defs");
   svg.appendChild(svgDefs);
 
-  function intersect(rect, point) {
-    var x = rect.x;
-    var y = rect.y;
-
-    // For now we only support rectangles
-
-    // Rectangle intersection algorithm from:
-    // http://math.stackexchange.com/questions/108113/find-edge-between-two-boxes
-    var dx = point.x - x;
-    var dy = point.y - y;
-    var w = rect.width / 2;
-    var h = rect.height / 2;
-
-    var sx, sy;
-    if (Math.abs(dy) * w > Math.abs(dx) * h) {
-      // Intersection is top or bottom of rect.
-      if (dy < 0) {
-        h = -h;
-      }
-      sx = dy === 0 ? 0 : h * dx / dy;
-      sy = h;
-    } else {
-      // Intersection is left or right of rect.
-      if (dx < 0) {
-        w = -w;
-      }
-      sx = w;
-      sy = dx === 0 ? 0 : w * dy / dx;
-    }
-
-    return {x: x + sx, y: y + sy};
-  }
-
   function createSVGElement(tag) {
     return document.createElementNS("http://www.w3.org/2000/svg", tag);
   }
@@ -172,10 +139,6 @@ dagre.render = function(nodes, edges, svg) {
     });
   }
 
-  function pointStr(point) {
-    return point.x + "," + point.y;
-  }
-
   function layoutEdges() {
     edges.forEach(function(e) {
       var path = svg.querySelector("#edge-" + e.id);
@@ -184,8 +147,8 @@ dagre.render = function(nodes, edges, svg) {
       if (e.source !== e.target) {
         var points = e.points;
 
-        points.push(intersect(e.target, points.length > 0 ? points[points.length - 1] : e.source));
-        var origin = intersect(e.source, points[0]);
+        points.push(intersectRect(e.target, points.length > 0 ? points[points.length - 1] : e.source));
+        var origin = intersectRect(e.source, points[0]);
 
         path.setAttribute("d", "M " + pointStr(origin) + " L " + points.map(pointStr).join(" "));
       }
