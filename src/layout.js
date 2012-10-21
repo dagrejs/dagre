@@ -62,6 +62,8 @@ dagre.layout = (function() {
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
   function addDummyNodes(g, ranks) {
+    var dummyNodes = {};
+
     g.edges().forEach(function(e) {
       var prefix = "_dummy-" + e.id() + "-";
       var u = e.tail();
@@ -71,11 +73,11 @@ dagre.layout = (function() {
         e.attrs.edgeId = e.id();
         for (var rank = ranks[u.id()] + 1; rank < sinkRank; ++rank) {
           var vId = prefix + rank;
-          var v = g.addNode(vId, { dummy: true,
-                                   height: 0,
+          var v = g.addNode(vId, { height: 0,
                                    width: 0,
                                    marginX: 0,
                                    marginY: 0 });
+          dummyNodes[vId] = true;
           ranks[vId] = rank;
           g.addEdge(null, u, v, e.attrs);
           u = v;
@@ -83,9 +85,11 @@ dagre.layout = (function() {
         g.addEdge(null, u, e.head(), e.attrs);
       }
     });
+
+    return dummyNodes;
   }
 
-  function collapseDummyNodes(g) {
+  function collapseDummyNodes(g, dummyNodes, coords) {
     var visited = {};
 
     // Use dfs from all non-dummy nodes to find the roots of dummy chains. Then
@@ -98,11 +102,11 @@ dagre.layout = (function() {
       var points = [];
       do
       {
-        points.push({x: e.head().attrs.x, y: e.head().attrs.y});
+        points.push({x: coords[e.head().id()].x, y: coords[e.head().id()].y});
         e = e.head().outEdges()[0];
         g.removeNode(e.tail());
       }
-      while (e.head().attrs.dummy);
+      while (dummyNodes[e.head().id()]);
       var e2 = g.addEdge(rootEdge.attrs.edgeId, root, e.head(), e.attrs);
       e2.attrs.points = points;
     }
@@ -112,7 +116,7 @@ dagre.layout = (function() {
         visited[u.id()] = true;
         u.outEdges().forEach(function(e) {
           var v = e.head();
-          if (v.attrs.dummy) {
+          if (dummyNodes[v.id()]) {
             collapseChain(e);
           } else {
             dfs(v);
@@ -122,7 +126,7 @@ dagre.layout = (function() {
     }
 
     g.nodes().forEach(function(u) {
-      if (!u.attrs.dummy) {
+      if (!dummyNodes[u.id()]) {
         dfs(u);
       }
     });
@@ -138,12 +142,17 @@ dagre.layout = (function() {
     var reversed = acyclic(g);
 
     var ranks = dagre.layout.rank(g);
-    addDummyNodes(g, ranks);
+    var dummyNodes = addDummyNodes(g, ranks);
     var layering = dagre.layout.order(g, g.attrs.orderIters, ranks);
-    dagre.layout.position(g, layering);
+    var coords = dagre.layout.position(g, layering, dummyNodes, g.attrs.rankSep, g.attrs.nodeSep, g.attrs.edgeSep, g.attrs.debugPosDir);
 
-    collapseDummyNodes(g);
+    collapseDummyNodes(g, dummyNodes, coords);
     undoAcyclic(g, reversed);
     addSelfLoops(g, selfLoops);
+
+    g.nodes().forEach(function(u) {
+      u.attrs.x = coords[u.id()].x;
+      u.attrs.y = coords[u.id()].y;
+    });
   };
 })();

@@ -3,7 +3,9 @@
  * Horizontal Coordinate Assignment".
  */
 dagre.layout.position = (function() {
-  function markType1Conflicts(layering) {
+  function findType1Conflicts(layering, dummyNodes) {
+    var type1Conflicts = {};
+
     var pos = {};
     layering[0].forEach(function(u, i) {
       pos[u.id()] = i;
@@ -26,7 +28,7 @@ dagre.layout.position = (function() {
         var innerRight = null;
         u.predecessors().forEach(function(v) {
           // TODO could abort as soon as we find a dummy
-          if (u.attrs.dummy && v.attrs.dummy) {
+          if (dummyNodes[u.id()] && dummyNodes[v.id()]) {
             innerRight = pos[v.id()];
           }
         });
@@ -43,7 +45,7 @@ dagre.layout.position = (function() {
             v.inEdges().forEach(function(e) {
               var tailPos = pos[e.tail().id()];
               if (tailPos < innerLeft || tailPos > innerRight) {
-                e.attrs.type1Conflict = true;
+                type1Conflicts[e.id()] = true;
               }
             });
           }
@@ -51,9 +53,11 @@ dagre.layout.position = (function() {
         }
       }
     }
+
+    return type1Conflicts;
   }
 
-  function verticalAlignment(layering, relationship) {
+  function verticalAlignment(layering, type1Conflicts, relationship) {
     var pos = {};
     var root = {};
     var align = {};
@@ -79,7 +83,7 @@ dagre.layout.position = (function() {
               // TODO should we collapse multi-edges for vertical alignment?
               
               // Only need to check first returned edge for a type 1 conflict
-              if (!u.edges(v)[0].attrs.type1Conflict && prevIdx < pos[u.id()]) {
+              if (!type1Conflicts[u.edges(v)[0].id()] && prevIdx < pos[u.id()]) {
                 align[u.id()] = v;
                 align[v.id()] = root[v.id()] = root[u.id()];
                 prevIdx = pos[u.id()];
@@ -97,12 +101,12 @@ dagre.layout.position = (function() {
    * Determines how much spacing u needs from its origin (center) to satisfy
    * width and node separation.
    */
-  function deltaX(u, nodeSep, edgeSep) {
-    var sep = u.attrs.dummy ? edgeSep : nodeSep;
+  function deltaX(u, dummyNodes, nodeSep, edgeSep) {
+    var sep = dummyNodes[u.id()] ? edgeSep : nodeSep;
     return u.attrs.width / 2 + sep / 2;
   }
 
-  function horizontalCompaction(layering, pos, root, align, nodeSep, edgeSep) {
+  function horizontalCompaction(layering, pos, root, align, dummyNodes, nodeSep, edgeSep) {
     // Mapping of node id -> sink node id for class
     var sink = {};
 
@@ -137,7 +141,7 @@ dagre.layout.position = (function() {
             if (sink[vId] === vId) {
               sink[vId] = sink[uId];
             }
-            var delta = deltaX(pred[wId], nodeSep, edgeSep) + deltaX(w, nodeSep, edgeSep);
+            var delta = deltaX(pred[wId], dummyNodes, nodeSep, edgeSep) + deltaX(w, dummyNodes, nodeSep, edgeSep);
             if (sink[vId] !== sink[uId]) {
               shift[sink[uId]] = Math.min(shift[sink[uId]] || Number.POSITIVE_INFINITY, xs[vId] - xs[uId] - delta);
             } else {
@@ -246,8 +250,13 @@ dagre.layout.position = (function() {
     });
   }
 
-  return function(g, layering) {
-    markType1Conflicts(layering);
+  return function(g, layering, dummyNodes, rankSep, nodeSep, edgeSep, debugPosDir) {
+    var coords = {};
+    g.nodes().forEach(function(u) {
+      coords[u.id()] = {};
+    });
+
+    var type1Conflicts = findType1Conflicts(layering, dummyNodes);
 
     var xss = {};
     ["up", "down"].forEach(function(vertDir) {
@@ -257,9 +266,9 @@ dagre.layout.position = (function() {
         if (horizDir === "right") { reverseInnerOrder(layering); }
 
         var dir = vertDir + "-" + horizDir;
-        if (!("debugPosDir" in g.attrs) || g.attrs.debugPosDir === dir) {
-          var align = verticalAlignment(layering, vertDir === "up" ? "predecessors" : "successors");
-          xss[dir]= horizontalCompaction(layering, align.pos, align.root, align.align, g.attrs.nodeSep, g.attrs.edgeSep);
+        if (!debugPosDir || debugPosDir === dir) {
+          var align = verticalAlignment(layering, type1Conflicts, vertDir === "up" ? "predecessors" : "successors");
+          xss[dir]= horizontalCompaction(layering, align.pos, align.root, align.align, dummyNodes, nodeSep, edgeSep);
           if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
         }
 
@@ -269,10 +278,10 @@ dagre.layout.position = (function() {
       if (vertDir === "down") { layering.reverse(); }
     });
 
-    if (g.attrs.debugPosDir) {
+    if (debugPosDir) {
       // In debug mode we allow forcing layout to a particular alignment.
       g.nodes().forEach(function(u) {
-        u.attrs.x = xss[g.attrs.debugPosDir][u.id()];
+        coords[u.id()].x = xss[debugPosDir][u.id()];
       });
     } else {
       alignToSmallest(layering, xss);
@@ -280,14 +289,14 @@ dagre.layout.position = (function() {
       // Find average of medians for xss array
       g.nodes().forEach(function(u) {
         var xs = values(xss).map(function(xs) { return xs[u.id()]; }).sort(function(x, y) { return x - y; });
-        u.attrs.x = (xs[1] + xs[2]) / 2;
+        coords[u.id()].x = (xs[1] + xs[2]) / 2;
       });
     }
 
     // Align min center point with 0
-    var minX = min(g.nodes().map(function(u) { return u.attrs.x - u.attrs.width / 2; }));
+    var minX = min(g.nodes().map(function(u) { return coords[u.id()].x - u.attrs.width / 2; }));
     g.nodes().forEach(function(u) {
-      u.attrs.x -= minX;
+      coords[u.id()].x -= minX;
     });
 
     // Align y coordinates with ranks
@@ -296,14 +305,11 @@ dagre.layout.position = (function() {
       var height = max(layer.map(function(u) { return u.attrs.height; }));
       posY += height / 2;
       layer.forEach(function(u) {
-        u.attrs.y = posY;
+        coords[u.id()].y = posY;
       });
-      posY += height / 2 + g.attrs.rankSep;
+      posY += height / 2 + rankSep;
     });
 
-    // Save bounding box info
-    var maxX = max(g.nodes().map(function(u) { return u.attrs.x + u.attrs.width / 2; }));
-    var maxY = posY;
-    g.attrs.bbox = "0,0 " + maxX + "," + maxY;
+    return coords;
   };
 })();

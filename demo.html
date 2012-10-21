@@ -117,9 +117,9 @@ digraph {
       input.setAttribute("class", "");
       dagre.render(g, svg);
 
-      var wh = g.attrs.bbox.split(" ")[1].split(",");
-      svgRoot.setAttribute("width", parseInt(wh[0]) + 10);
-      svgRoot.setAttribute("height", parseInt(wh[1]) + 10);
+      var bbox = svgRoot.getBBox();
+      svgRoot.setAttribute("width", bbox.width + 10);
+      svgRoot.setAttribute("height", bbox.height + 10);
     }
   }
 </script>
