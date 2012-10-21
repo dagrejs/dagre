@@ -163,15 +163,13 @@ dagre.layout.order = (function() {
     return layering.map(function(l) { return l.slice(0); });
   }
 
-  return function(g, ranks) {
-    var iters = g.attrs.orderIters;
-
+  return function(g, orderIters, ranks) {
     var layering = initOrder(g, ranks);
     var bestLayering = copyLayering(layering);
     var bestCC = crossCount(layering);
 
     var cc;
-    for (var i = 0; i < iters; ++i) {
+    for (var i = 0; i < orderIters; ++i) {
       improveOrdering(i, layering);
       cc = crossCount(layering);
       if (cc < bestCC) {

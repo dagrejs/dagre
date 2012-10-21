@@ -139,7 +139,7 @@ dagre.layout = (function() {
 
     var ranks = dagre.layout.rank(g);
     addDummyNodes(g, ranks);
-    var layering = dagre.layout.order(g, ranks);
+    var layering = dagre.layout.order(g, g.attrs.orderIters, ranks);
     dagre.layout.position(g, layering);
 
     collapseDummyNodes(g);
