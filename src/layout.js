@@ -47,21 +47,30 @@ dagre.layout = function() {
       return;
     }
 
+    var dimensions = {};
+    g.nodes().forEach(function(u) {
+      dimensions[u.id()] = { width: u.attrs.width, height: u.attrs.height };
+    });
+
     var selfLoops = removeSelfLoops(g);
     var reversed = acyclic(g);
 
     var ranks = dagre.layout.rank(g);
-    var dummyNodes = addDummyNodes(g, ranks);
+    var dummyNodes = addDummyNodes(g, ranks, dimensions);
     var layering = dagre.layout.order(g, orderIters, ranks);
-    var coords = dagre.layout.position(g, layering, dummyNodes, rankSep, nodeSep, edgeSep, posDir);
+    var coords = dagre.layout.position(g, layering, dummyNodes, dimensions, rankSep, nodeSep, edgeSep, posDir);
 
-    collapseDummyNodes(g, dummyNodes, coords);
-    undoAcyclic(g, reversed);
+    var points = collapseDummyNodes(g, dummyNodes, coords);
+    undoAcyclic(g, reversed, points);
     addSelfLoops(g, selfLoops);
 
     g.nodes().forEach(function(u) {
       u.attrs.x = coords[u.id()].x;
       u.attrs.y = coords[u.id()].y;
+    });
+
+    g.edges().forEach(function(e) {
+      e.attrs.points = points[e.id()];
     });
   };
 
@@ -81,7 +90,7 @@ dagre.layout = function() {
         if (v.id() in onStack) {
           g.removeEdge(e);
           reversed.push(e.id());
-          g.addEdge(e.id(), v, u, e.attrs);
+          g.addEdge(e.id(), v, u);
         } else {
           dfs(v);
         }
@@ -97,14 +106,15 @@ dagre.layout = function() {
     return reversed;
   }
 
-  function undoAcyclic(g, reversed) {
+  function undoAcyclic(g, reversed, points) {
     reversed.forEach(function(eId) {
       var e = g.edge(eId);
       g.removeEdge(e);
-      if (e.attrs.points) {
-        e.attrs.points.reverse();
+      var ps = points[e.id()];
+      if (ps) {
+        ps.reverse();
       }
-      g.addEdge(e.id(), e.head(), e.tail(), e.attrs);
+      g.addEdge(e.id(), e.head(), e.tail());
     });
   }
 
@@ -122,12 +132,12 @@ dagre.layout = function() {
 
   function addSelfLoops(g, selfLoops) {
     selfLoops.forEach(function(e) {
-      g.addEdge(e.id(), e.head(), e.tail(), e.attrs);
+      g.addEdge(e.id(), e.head(), e.tail());
     });
   }
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
-  function addDummyNodes(g, ranks) {
+  function addDummyNodes(g, ranks, dimensions) {
     var dummyNodes = {};
 
     g.edges().forEach(function(e) {
@@ -136,17 +146,16 @@ dagre.layout = function() {
       var sinkRank = ranks[e.head().id()];
       if (ranks[u.id()] + 1 < sinkRank) {
         g.removeEdge(e);
-        e.attrs.edgeId = e.id();
         for (var rank = ranks[u.id()] + 1; rank < sinkRank; ++rank) {
           var vId = prefix + rank;
-          var v = g.addNode(vId, { height: 0,
-                                   width: 0 });
-          dummyNodes[vId] = true;
+          var v = g.addNode(vId);
+          dimensions[vId] = { width: 0, height: 0 };
+          dummyNodes[vId] = e.id();
           ranks[vId] = rank;
-          g.addEdge(null, u, v, e.attrs);
+          g.addEdge(null, u, v);
           u = v;
         }
-        g.addEdge(null, u, e.head(), e.attrs);
+        g.addEdge(null, u, e.head());
       }
     });
 
@@ -154,6 +163,7 @@ dagre.layout = function() {
   }
 
   function collapseDummyNodes(g, dummyNodes, coords) {
+    var points = {};
     var visited = {};
 
     // Use dfs from all non-dummy nodes to find the roots of dummy chains. Then
@@ -162,17 +172,17 @@ dagre.layout = function() {
 
     function collapseChain(e) {
       var root = e.tail();
-      var rootEdge = e;
-      var points = [];
+      var firstDummy = e.head().id();
+      var ps = [];
       do
       {
-        points.push({x: coords[e.head().id()].x, y: coords[e.head().id()].y});
+        ps.push({x: coords[e.head().id()].x, y: coords[e.head().id()].y});
         e = e.head().outEdges()[0];
         g.removeNode(e.tail());
       }
       while (dummyNodes[e.head().id()]);
-      var e2 = g.addEdge(rootEdge.attrs.edgeId, root, e.head(), e.attrs);
-      e2.attrs.points = points;
+      var e2 = g.addEdge(dummyNodes[firstDummy], root, e.head());
+      points[e2.id()] = ps;
     }
 
     function dfs(u) {
@@ -194,6 +204,8 @@ dagre.layout = function() {
         dfs(u);
       }
     });
+
+    return points;
   }
 
   return layout;

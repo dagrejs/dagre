@@ -66,10 +66,9 @@ dagre.layout.rank = (function() {
   }
 
   return function(g) {
-    var ranks = {};
+    var ranks = initRank(g);
     components(g).forEach(function(cmpt) {
       var subgraph = g.subgraph(cmpt);
-      ranks = initRank(subgraph);
       var tree = feasibleTree(subgraph, ranks);
       normalize(subgraph, ranks);
     });
