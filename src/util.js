@@ -1,36 +1,6 @@
 dagre.util = {};
 
 /*
- * If `obj` does not have a property `prop` then it is added to `obj` with the
- * default value (`def`).
- */
-function defaultVal(obj, prop, def) {
-  if (!(prop in obj)) {
-    obj[prop] = def;
-  }
-}
-
-/*
- * If `obj` has `prop` then it is coerced to a string. Otherwise it's value is
- * set to `def`.
- */
-function defaultStr(obj, prop, def) {
-  obj[prop] = prop in obj ? obj[prop].toString() : def;
-}
-
-/*
- * If `obj` has `prop` then it is coerced to an int. Otherwise it's value is
- * set to `def`.
- */
-function defaultInt(obj, prop, def) {
-  obj[prop] = prop in obj ? parseInt(obj[prop]) : def;
-}
-
-function defaultFloat(obj, prop, def) {
-  obj[prop] = prop in obj ? parseFloat(obj[prop]) : def;
-}
-
-/*
  * Copies attributes from `src` to `dst`. If an attribute name is in both
  * `src` and `dst` then the attribute value from `src` takes precedence.
  */
@@ -50,6 +20,8 @@ function concat(arrays) {
   return Array.prototype.concat.apply([], arrays);
 }
 
+keys = Object.keys;
+
 /*
  * Returns an array of all values in the given object.
  */
@@ -65,10 +37,10 @@ var components = dagre.util.components = function(g) {
   var visited = {};
 
   function dfs(u, component) {
-    if (!(u.id() in visited)) {
-      visited[u.id()] = true;
+    if (!(u in visited)) {
+      visited[u] = true;
       component.push(u);
-      u.neighbors().forEach(function(v) {
+      g.neighbors(u).forEach(function(v) {
         dfs(v, component);
       });
     }
@@ -101,34 +73,33 @@ var prim = dagre.util.prim = function(g, weight) {
   }
 
   g.nodes().forEach(function(u) {
-    q.add(u.id(), Number.POSITIVE_INFINITY);
-    result[u.id()] = [];
+    q.add(u, Number.POSITIVE_INFINITY);
+    result[u] = [];
   });
 
   // Start from arbitrary node
-  q.decrease(g.nodes()[0].id(), 0);
+  q.decrease(g.nodes()[0], 0);
 
-  var uId;
+  var u;
   var init = false;
   while (q.size() > 0) {
-    uId = q.removeMin();
-    if (uId in parent) {
-      result[uId].push(parent[uId]);
-      result[parent[uId]].push(uId);
+    u = q.removeMin();
+    if (u in parent) {
+      result[u].push(parent[u]);
+      result[parent[u]].push(u);
     } else if (init) {
-      throw new Error("Input graph is not connected:\n" + dagre.graph.write(g));
+      throw new Error("Input graph is not connected:\n" + g.toString());
     } else {
       init = true;
     }
 
-    var u = g.node(uId);
-    u.neighbors().forEach(function(v) {
-      var pri = q.priority(v.id());
+    g.neighbors(u).forEach(function(v) {
+      var pri = q.priority(v);
       if (pri !== undefined) {
         var edgeWeight = weight(u, v);
         if (edgeWeight < pri) {
-          parent[v.id()] = uId;
-          q.decrease(v.id(), edgeWeight);
+          parent[v] = u;
+          q.decrease(v, edgeWeight);
         }
       }
     });

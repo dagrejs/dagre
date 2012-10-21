@@ -94,18 +94,18 @@ digraph {
 
   var oldInputValue;
   function tryDraw() {
-    var g;
+    var result;
 
     if (oldInputValue !== input.value) {
       oldInputValue = input.value;
       try {
-        g = dagre.graph.read(input.value);
+        result = dagre.graph.read(input.value);
       } catch (e) {
         input.setAttribute("class", "error");
       }
     }
 
-    if (g) {
+    if (result) {
       while (svgRoot.hasChildNodes()) {
         svgRoot.removeChild(svgRoot.lastChild);
       }
@@ -115,7 +115,7 @@ digraph {
       svgRoot.appendChild(svg);
 
       input.setAttribute("class", "");
-      dagre.render(g, svg);
+      dagre.render(result.graph, result.graphAttrs, result.nodeAttrs, svg);
 
       var bbox = svgRoot.getBBox();
       svgRoot.setAttribute("width", bbox.width + 10);

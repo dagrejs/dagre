@@ -1,10 +1,10 @@
 dagre.layout.order = (function() {
-  function crossCount(layering) {
+  function crossCount(g, layering) {
     var cc = 0;
     var prevLayer;
     layering.forEach(function(layer) {
       if (prevLayer) {
-        cc += bilayerCrossCount(prevLayer, layer);
+        cc += bilayerCrossCount(g, prevLayer, layer);
       }
       prevLayer = layer;
     });
@@ -17,15 +17,16 @@ dagre.layout.order = (function() {
    *
    *    W. Barth et al., Bilayer Cross Counting, JGAA, 8(2) 179–194 (2004)
    */
-  function bilayerCrossCount(layer1, layer2) {
+  function bilayerCrossCount(g, layer1, layer2) {
     var layer2Pos = {};
-    layer2.forEach(function(u, i) { layer2Pos[u.id()] = i; });
+    layer2.forEach(function(u, i) { layer2Pos[u] = i; });
 
     var edgeIndices = [];
     layer1.forEach(function(u) {
       var nodeEdges = [];
-      u.outEdges().forEach(function(e) {
-        nodeEdges.push(layer2Pos[e.head().id()]);
+      g.edges(u, null).forEach(function(e) {
+        var edge = g.edge(e);
+        nodeEdges.push(layer2Pos[edge.target]);
       });
       // TODO consider radix sort
       nodeEdges.sort(function(x, y) { return x - y; });
@@ -64,24 +65,24 @@ dagre.layout.order = (function() {
     var visited = {};
 
     function dfs(u) {
-      if (u.id() in visited) {
+      if (u in visited) {
         return;
       }
-      visited[u.id()] = true;
+      visited[u] = true;
 
-      var rank = ranks[u.id()];
+      var rank = ranks[u];
       for (var i = layering.length; i <= rank; ++i) {
         layering[i] = [];
       }
       layering[rank].push(u);
 
-      u.neighbors().forEach(function(v) {
+      g.neighbors(u).forEach(function(v) {
         dfs(v);
       });
     }
 
     g.nodes().forEach(function(u) {
-      if (ranks[u.id()] === 0) {
+      if (ranks[u] === 0) {
         dfs(u);
       }
     });
@@ -89,14 +90,14 @@ dagre.layout.order = (function() {
     return layering;
   }
 
-  function improveOrdering(i, layering) {
+  function improveOrdering(g, i, layering) {
     if (i % 2 === 0) {
       for (var j = 1; j < layering.length; ++j) {
-        improveLayer(i, layering[j - 1], layering[j], "inEdges");
+        improveLayer(g, i, layering[j - 1], layering[j], "inEdges");
       }
     } else {
       for (var j = layering.length - 2; j >= 0; --j) {
-        improveLayer(i, layering[j + 1], layering[j], "outEdges");
+        improveLayer(g, i, layering[j + 1], layering[j], "outEdges");
       }
     }
   }
@@ -108,13 +109,13 @@ dagre.layout.order = (function() {
    *
    * This algorithm is based on the barycenter method.
    */
-  function improveLayer(i, fixed, movable, neighbors) {
-    var weights = rankWeights(fixed, movable, neighbors);
+  function improveLayer(g, i, fixed, movable, neighbors) {
+    var weights = rankWeights(g, fixed, movable, neighbors);
 
     var toSort = [];
 
     movable.forEach(function(u) {
-      var weight = weights[u.id()];
+      var weight = weights[u];
       if (weight !== -1) {
         toSort.push({node: u, weight: weight});
       }
@@ -125,7 +126,7 @@ dagre.layout.order = (function() {
     var toSortIndex = 0;
     for (var i = 0; i < movable.length; ++i) {
       var u = movable[i];
-      var weight = weights[u.id()];
+      var weight = weights[u];
       if (weight !== -1) {
         movable[i] = toSort[toSortIndex++].node;
       }
@@ -137,23 +138,24 @@ dagre.layout.order = (function() {
    * return weights for the movable layer that can be used to reorder the layer
    * for potentially reduced edge crossings.
    */
-  function rankWeights(fixed, movable, neighbors) {
+  function rankWeights(g, fixed, movable, neighbors) {
     var fixedPos = {};
-    fixed.forEach(function(u, i) { fixedPos[u.id()] = i; });
+    fixed.forEach(function(u, i) { fixedPos[u] = i; });
 
     var weights = {};
     movable.forEach(function(u) {
       var weight = -1;
-      var edges = u[neighbors]();
+      var edges = g[neighbors](u);
       if (edges.length > 0) {
         weight = 0;
         edges.forEach(function(e) {
-          var neighborId = e.tail().id() === u.id() ? e.head().id() : e.tail().id();
+          var edge = g.edge(e);
+          var neighborId = edge.source === u ? edge.target : edge.source;
           weight += fixedPos[neighborId];
         });
         weight = weight / edges.length;
       }
-      weights[u.id()] = weight;
+      weights[u] = weight;
     });
 
     return weights;
@@ -166,12 +168,12 @@ dagre.layout.order = (function() {
   return function(g, orderIters, ranks) {
     var layering = initOrder(g, ranks);
     var bestLayering = copyLayering(layering);
-    var bestCC = crossCount(layering);
+    var bestCC = crossCount(g, layering);
 
     var cc;
     for (var i = 0; i < orderIters; ++i) {
-      improveOrdering(i, layering);
-      cc = crossCount(layering);
+      improveOrdering(g, i, layering);
+      cc = crossCount(g, layering);
       if (cc < bestCC) {
         bestLayering = copyLayering(layering);
         bestCC = cc;

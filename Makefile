@@ -10,7 +10,6 @@ all: dagre.js package.json
 	src/pre.js \
 	src/version.js \
 	src/graph.js \
-	src/pre-layout.js \
 	src/layout.js \
 	src/layout-rank.js \
 	src/layout-order.js \

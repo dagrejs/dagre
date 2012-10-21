@@ -41,16 +41,11 @@ dagre.layout = function() {
     return layout;
   }
 
-  layout.apply = function(g) {
+  layout.apply = function(g, dimensions) {
     if (g.nodes().length === 0) {
       // Nothing to do!
       return;
     }
-
-    var dimensions = {};
-    g.nodes().forEach(function(u) {
-      dimensions[u.id()] = { width: u.attrs.width, height: u.attrs.height };
-    });
 
     var selfLoops = removeSelfLoops(g);
     var reversed = acyclic(g);
@@ -59,19 +54,18 @@ dagre.layout = function() {
     var dummyNodes = addDummyNodes(g, ranks, dimensions);
     var layering = dagre.layout.order(g, orderIters, ranks);
     var coords = dagre.layout.position(g, layering, dummyNodes, dimensions, rankSep, nodeSep, edgeSep, posDir);
-
     var points = collapseDummyNodes(g, dummyNodes, coords);
+
+    keys(coords).forEach(function(u) {
+      if (u in dummyNodes) {
+        delete coords[u];
+      }
+    });
+
     undoAcyclic(g, reversed, points);
     addSelfLoops(g, selfLoops);
 
-    g.nodes().forEach(function(u) {
-      u.attrs.x = coords[u.id()].x;
-      u.attrs.y = coords[u.id()].y;
-    });
-
-    g.edges().forEach(function(e) {
-      e.attrs.points = points[e.id()];
-    });
+    return { coords: coords, points: points };
   };
 
   function acyclic(g) {
@@ -83,20 +77,21 @@ dagre.layout = function() {
       if (u in visited)
         return;
 
-      visited[u.id()] = true;
-      onStack[u.id()] = true;
-      u.outEdges().forEach(function(e) {
-        var v = e.head();
-        if (v.id() in onStack) {
-          g.removeEdge(e);
-          reversed.push(e.id());
-          g.addEdge(e.id(), v, u);
+      visited[u] = true;
+      onStack[u] = true;
+      g.edges(u, null).forEach(function(e) {
+        var edge = g.edge(e);
+        var v = edge.target;
+        if (v in onStack) {
+          g.delEdge(e);
+          reversed.push(e);
+          g.addEdge(e, v, u);
         } else {
           dfs(v);
         }
       });
 
-      delete onStack[u.id()];
+      delete onStack[u];
     }
 
     g.nodes().forEach(function(u) {
@@ -107,24 +102,25 @@ dagre.layout = function() {
   }
 
   function undoAcyclic(g, reversed, points) {
-    reversed.forEach(function(eId) {
-      var e = g.edge(eId);
-      g.removeEdge(e);
-      var ps = points[e.id()];
+    reversed.forEach(function(e) {
+      var edge = g.edge(e);
+      g.delEdge(e);
+      var ps = points[e];
       if (ps) {
         ps.reverse();
       }
-      g.addEdge(e.id(), e.head(), e.tail());
+      g.addEdge(e, edge.target, edge.source);
     });
   }
 
   function removeSelfLoops(g) {
     var selfLoops = [];
     g.nodes().forEach(function(u) {
-      var es = u.outEdges(u);
+      var es = g.edges(u, u);
       es.forEach(function(e) {
-        selfLoops.push(e);
-        g.removeEdge(e);
+        var edge = g.edge(e);
+        selfLoops.push({key: e, source: edge.source, target: edge.target});
+        g.delEdge(e);
       });
     });
     return selfLoops;
@@ -132,7 +128,7 @@ dagre.layout = function() {
 
   function addSelfLoops(g, selfLoops) {
     selfLoops.forEach(function(e) {
-      g.addEdge(e.id(), e.head(), e.tail());
+      g.addEdge(e.key, e.source, e.target);
     });
   }
 
@@ -141,21 +137,22 @@ dagre.layout = function() {
     var dummyNodes = {};
 
     g.edges().forEach(function(e) {
-      var prefix = "_dummy-" + e.id() + "-";
-      var u = e.tail();
-      var sinkRank = ranks[e.head().id()];
-      if (ranks[u.id()] + 1 < sinkRank) {
-        g.removeEdge(e);
-        for (var rank = ranks[u.id()] + 1; rank < sinkRank; ++rank) {
-          var vId = prefix + rank;
-          var v = g.addNode(vId);
-          dimensions[vId] = { width: 0, height: 0 };
-          dummyNodes[vId] = e.id();
-          ranks[vId] = rank;
-          g.addEdge(null, u, v);
+      var prefix = "_dummy-" + e + "-";
+      var edge = g.edge(e);
+      var u = edge.source;
+      var sinkRank = ranks[edge.target];
+      if (ranks[u] + 1 < sinkRank) {
+        g.delEdge(e);
+        for (var rank = ranks[u] + 1; rank < sinkRank; ++rank) {
+          var v = prefix + rank;
+          g.addNode(v);
+          dimensions[v] = { width: 0, height: 0 };
+          dummyNodes[v] = e;
+          ranks[v] = rank;
+          g.addEdge(u + " -> " + v, u, v);
           u = v;
         }
-        g.addEdge(null, u, e.head());
+        g.addEdge(u + " -> " + edge.target, u, edge.target);
       }
     });
 
@@ -171,26 +168,31 @@ dagre.layout = function() {
     // traversed into a single edge.
 
     function collapseChain(e) {
-      var root = e.tail();
-      var firstDummy = e.head().id();
+      var edge = g.edge(e);
+      var root = edge.source;
+      var newE = dummyNodes[edge.target];
       var ps = [];
+      var prev = edge.source;
+      var curr = edge.target;
       do
       {
-        ps.push({x: coords[e.head().id()].x, y: coords[e.head().id()].y});
-        e = e.head().outEdges()[0];
-        g.removeNode(e.tail());
+        ps.push({x: coords[curr].x, y: coords[curr].y});
+        prev = curr;
+        curr = g.edge(g.edges(curr, null)[0]).target;
+        g.delNode(prev);
       }
-      while (dummyNodes[e.head().id()]);
-      var e2 = g.addEdge(dummyNodes[firstDummy], root, e.head());
-      points[e2.id()] = ps;
+      while (dummyNodes[curr]);
+      g.addEdge(newE, root, curr);
+      points[newE] = ps;
     }
 
     function dfs(u) {
-      if (!(u.id() in visited)) {
-        visited[u.id()] = true;
-        u.outEdges().forEach(function(e) {
-          var v = e.head();
-          if (dummyNodes[v.id()]) {
+      if (!(u in visited)) {
+        visited[u] = true;
+        g.edges(u, null).forEach(function(e) {
+          var edge = g.edge(e);
+          var v = edge.target;
+          if (dummyNodes[v]) {
             collapseChain(e);
           } else {
             dfs(v);
@@ -200,7 +202,7 @@ dagre.layout = function() {
     }
 
     g.nodes().forEach(function(u) {
-      if (!dummyNodes[u.id()]) {
+      if (!dummyNodes[u]) {
         dfs(u);
       }
     });

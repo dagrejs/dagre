@@ -2,7 +2,7 @@ dagre.layout.rank = (function() {
   function initRank(g) {
     var pq = priorityQueue();
     g.nodes().forEach(function(u) {
-      pq.add(u.id(), u.inDegree());
+      pq.add(u, g.edges(null, u).length);
     });
 
     var ranks = {};
@@ -16,13 +16,14 @@ dagre.layout.rank = (function() {
       }
 
       if (current.length === 0) {
-        throw new Error("Input graph is not acyclic: " + dagre.graph.write(g));
+        throw new Error("Input graph is not acyclic: " + g.toString());
       }
 
-      current.forEach(function(uId) {
-        g.node(uId).outEdges().forEach(function(e) {
-          var headId = e.head().id();
-          pq.decrease(headId, pq.priority(headId) - 1);
+      current.forEach(function(u) {
+        g.edges(u, null).forEach(function(e) {
+          var edge = g.edge(e);
+          var target = edge.target;
+          pq.decrease(target, pq.priority(target) - 1);
         });
       });
 
@@ -37,18 +38,17 @@ dagre.layout.rank = (function() {
     // TODO make minLength configurable per edge
     var minLength = 1;
     var tree = dagre.util.prim(g, function(u, v) {
-      return Math.abs(ranks[u.id()] - ranks[v.id()]) - minLength;
+      return Math.abs(ranks[u] - ranks[v]) - minLength;
     });
 
     var visited = {};
     function dfs(u, rank) {
-      visited[u.id()] = true;
-      ranks[u.id()] = rank;
+      visited[u] = true;
+      ranks[u] = rank;
 
-      tree[u.id()].forEach(function(vId) {
-        if (!(vId in visited)) {
-          var v = g.node(vId);
-          dfs(v, rank + (g.hasEdge(u, v) ? minLength : -minLength));
+      tree[u].forEach(function(v) {
+        if (!(v in visited)) {
+          dfs(v, rank + (g.edges(u, v).length ? minLength : -minLength));
         }
       });
     }
@@ -61,7 +61,7 @@ dagre.layout.rank = (function() {
   function normalize(g, ranks) {
     var m = min(values(ranks));
     g.nodes().forEach(function(u) {
-      ranks[u.id()] -= m;
+      ranks[u] -= m;
     });
   }
 

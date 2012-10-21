@@ -1,15 +1,14 @@
 /*
  * Renders the given graph to the given svg node.
  */
-dagre.render = function(g, svg) {
+dagre.render = function(g, graphAttrs, nodeAttrs, svg) {
   var arrowheads = {};
   var svgDefs = createSVGElement("defs");
   svg.appendChild(svgDefs);
 
-  function intersect(u, point) {
-    var uAttrs = u.attrs;
-    var x = uAttrs.x;
-    var y = uAttrs.y;
+  function intersect(rect, point) {
+    var x = rect.x;
+    var y = rect.y;
 
     // For now we only support rectangles
 
@@ -17,8 +16,8 @@ dagre.render = function(g, svg) {
     // http://math.stackexchange.com/questions/108113/find-edge-between-two-boxes
     var dx = point.x - x;
     var dy = point.y - y;
-    var w = uAttrs.width / 2;
-    var h = uAttrs.height / 2;
+    var w = rect.width / 2;
+    var h = rect.height / 2;
 
     var sx, sy;
     if (Math.abs(dy) * w > Math.abs(dx) * h) {
@@ -44,23 +43,23 @@ dagre.render = function(g, svg) {
     return document.createElementNS("http://www.w3.org/2000/svg", tag);
   }
 
-  function createLabel(node, x) {
-    if(node.attrs.label[0] === '<') {
-      return createHTMLLabel(node);
+  function createLabel(id, label) {
+    if (label[0] === '<') {
+      return createHTMLLabel(id, label);
     } else {
-      return createTextLabel(node, 0);
+      return createTextLabel(label);
     }
   }
 
-  function createHTMLLabel(node){
+  function createHTMLLabel(id, label) {
     var fo = createSVGElement("foreignObject");
     var div = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-    div.innerHTML = node.attrs.label;
+    div.innerHTML = label;
     var body = document.querySelector('body');
 
     // We use temp div to try to apply most styling before placing the HTML block
     var tempDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-    tempDiv.setAttribute("id", "node-" + node.id());
+    tempDiv.setAttribute("id", "node-" + id);
     tempDiv.setAttribute("class", "node");
     tempDiv.appendChild(div);
     body.appendChild(tempDiv);
@@ -77,12 +76,12 @@ dagre.render = function(g, svg) {
     return fo;
   }
 
-  function createTextLabel(node, x) {
+  function createTextLabel(label) {
     var text = createSVGElement("text");
     text.setAttribute("x", 0);
     text.setAttribute("text-anchor", "middle");
 
-    var lines = node.attrs.label.split("\\n");
+    var lines = label.split("\\n");
     lines.forEach(function(line) {
       var tspan = createSVGElement("tspan");
       tspan.textContent = line;
@@ -124,42 +123,39 @@ dagre.render = function(g, svg) {
   }
 
   function drawNodes() {
+    var dimensions = {};
     g.nodes().forEach(function(u) {
       var group = createSVGElement("g");
-      group.setAttribute("id", "node-" + u.id());
+      group.setAttribute("id", "node-" + u);
       group.setAttribute("class", "node");
       svg.appendChild(group);
 
       var rect = createSVGElement("rect");
-      var label = createLabel(u);
+      var label = createLabel(u, nodeAttrs[u].label);
 
       group.appendChild(rect);
       group.appendChild(label);
 
       var labelBBox = label.getBBox();
 
-      rect.setAttribute("x", -(labelBBox.width / 2 + (u.attrs.marginX || 5)));
-      rect.setAttribute("y", -(labelBBox.height / 2 + (u.attrs.marginY || 5)));
-      rect.setAttribute("width", labelBBox.width + (u.attrs.marginX || 5) * 2);
-      rect.setAttribute("height", labelBBox.height + (u.attrs.marginY || 5) * 2);
+      rect.setAttribute("x", -(labelBBox.width / 2 + 5));
+      rect.setAttribute("y", -(labelBBox.height / 2 + 5));
+      rect.setAttribute("width", labelBBox.width + 5 * 2);
+      rect.setAttribute("height", labelBBox.height + 5 * 2);
 
       label.setAttribute("x", -(labelBBox.width / 2));
       label.setAttribute("y", -(labelBBox.height / 2));
 
       var rectBBox = rect.getBBox();
-      if (!("width" in u.attrs)) {
-        u.attrs.width = rectBBox.width;
-      }
-      if (!("height" in u.attrs)) {
-        u.attrs.height = rectBBox.height;
-      }
+      dimensions[u] = { width: rectBBox.width, height: rectBBox.height };
     });
+    return dimensions;
   }
 
   function drawEdges() {
     g.edges().forEach(function(e) {
       var path = createSVGElement("path");
-      path.setAttribute("id", "edge-" + e.id());
+      path.setAttribute("id", "edge-" + e);
       path.setAttribute("class", "edge");
       svg.appendChild(path);
 
@@ -170,10 +166,10 @@ dagre.render = function(g, svg) {
     });
   }
 
-  function positionNodes() {
-    g.nodes().forEach(function(u) {
-      var group = svg.querySelector("#node-" + u.id());
-      group.setAttribute("transform", "translate(" + u.attrs.x + "," + u.attrs.y + ")");
+  function positionNodes(coords) {
+    keys(coords).forEach(function(u) {
+      var group = svg.querySelector("#node-" + u);
+      group.setAttribute("transform", "translate(" + coords[u].x + "," + coords[u].y + ")");
     });
   }
 
@@ -181,32 +177,37 @@ dagre.render = function(g, svg) {
     return point.x + "," + point.y;
   }
 
-  function layoutEdges() {
+  function layoutEdges(g, coords, dimensions, points) {
     g.edges().forEach(function(e) {
-      var path = svg.querySelector("#edge-" + e.id());
-      var points = e.attrs.points || [];
+      var path = svg.querySelector("#edge-" + e);
+      var ps = points[e] || [];
 
       // TODO handle self loops
 
-      points.push(intersect(e.head(), points.length > 0 ? points[points.length - 1] : e.tail().attrs));
-      var origin = intersect(e.tail(), points[0]);
+      var edge = g.edge(e);
 
-      path.setAttribute("d", "M " + pointStr(origin) + " L " + points.map(pointStr).join(" "));
+      ps.push(intersect(toRect(edge.target, coords, dimensions), ps.length > 0 ? ps[ps.length - 1] : coords[edge.source]));
+      var origin = intersect(toRect(edge.source, coords, dimensions), ps[0]);
+
+      path.setAttribute("d", "M " + pointStr(origin) + " L " + ps.map(pointStr).join(" "));
     });
   }
 
-  dagre.preLayout(g);
-  drawNodes();
+  function toRect(u, coords, dimensions) {
+    return {
+      x: coords[u].x,
+      y: coords[u].y,
+      width: dimensions[u].width,
+      height: dimensions[u].height
+    };
+  }
+
+  var dimensions = drawNodes();
   drawEdges();
 
-  var layout = dagre.layout();
-  if (g.attrs.nodeSep) layout.nodeSep(g.attrs.nodeSep);
-  if (g.attrs.edgeSep) layout.edgeSep(g.attrs.edgeSep);
-  if (g.attrs.rankSep) layout.rankSep(g.attrs.rankSep);
-  if (g.attrs.orderIters) layout.orderIters(g.attrs.orderIters);
-  if (g.attrs.debugPosDir) layout.positionDirection(g.attrs.debugPosDir);
-  layout.apply(g);
+  var result = dagre.layout()
+                    .apply(g, dimensions);
 
-  positionNodes();
-  layoutEdges();
+  positionNodes(result.coords);
+  layoutEdges(g, result.coords, dimensions, result.points);
 }
