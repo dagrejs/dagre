@@ -1,4 +1,70 @@
-dagre.layout = (function() {
+dagre.layout = function() {
+      // Min separation between adjacent nodes in the same rank
+  var nodeSep = 50,
+      // Min separation between adjacent edges in the same rank
+      edgeSep = 10,
+      // Min separation between ranks
+      rankSep = 30,
+      // Number of passes to take during the ordering phase
+      orderIters = 24,
+      // Debug positioning with a particular direction (up-left, up-right, down-left, down-right)
+      posDir = null,
+      layout = {};
+
+  layout.nodeSep = function(x) {
+    if (!arguments.length) return nodeSep;
+    nodeSep = x;
+    return layout;
+  }
+
+  layout.edgeSep = function(x) {
+    if (!arguments.length) return edgeSep;
+    edgeSep = x;
+    return layout;
+  }
+
+  layout.rankSep = function(x) {
+    if (!arguments.length) return rankSep;
+    rankSep = x;
+    return layout;
+  }
+
+  layout.orderIters = function(x) {
+    if (!arguments.length) return orderIters;
+    orderIters = x;
+    return layout;
+  }
+
+  layout.posDir = function(x) {
+    if (!arguments.length) return posDir;
+    posDir = x;
+    return layout;
+  }
+
+  layout.apply = function(g) {
+    if (g.nodes().length === 0) {
+      // Nothing to do!
+      return;
+    }
+
+    var selfLoops = removeSelfLoops(g);
+    var reversed = acyclic(g);
+
+    var ranks = dagre.layout.rank(g);
+    var dummyNodes = addDummyNodes(g, ranks);
+    var layering = dagre.layout.order(g, orderIters, ranks);
+    var coords = dagre.layout.position(g, layering, dummyNodes, rankSep, nodeSep, edgeSep, posDir);
+
+    collapseDummyNodes(g, dummyNodes, coords);
+    undoAcyclic(g, reversed);
+    addSelfLoops(g, selfLoops);
+
+    g.nodes().forEach(function(u) {
+      u.attrs.x = coords[u.id()].x;
+      u.attrs.y = coords[u.id()].y;
+    });
+  };
+
   function acyclic(g) {
     var onStack = {};
     var visited = {};
@@ -130,27 +196,5 @@ dagre.layout = (function() {
     });
   }
 
-  return function(g) {
-    if (g.nodes().length === 0) {
-      // Nothing to do!
-      return;
-    }
-
-    var selfLoops = removeSelfLoops(g);
-    var reversed = acyclic(g);
-
-    var ranks = dagre.layout.rank(g);
-    var dummyNodes = addDummyNodes(g, ranks);
-    var layering = dagre.layout.order(g, g.attrs.orderIters, ranks);
-    var coords = dagre.layout.position(g, layering, dummyNodes, g.attrs.rankSep, g.attrs.nodeSep, g.attrs.edgeSep, g.attrs.debugPosDir);
-
-    collapseDummyNodes(g, dummyNodes, coords);
-    undoAcyclic(g, reversed);
-    addSelfLoops(g, selfLoops);
-
-    g.nodes().forEach(function(u) {
-      u.attrs.x = coords[u.id()].x;
-      u.attrs.y = coords[u.id()].y;
-    });
-  };
-})();
+  return layout;
+}

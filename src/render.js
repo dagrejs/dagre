@@ -198,7 +198,15 @@ dagre.render = function(g, svg) {
   dagre.preLayout(g);
   drawNodes();
   drawEdges();
-  dagre.layout(g);
+
+  var layout = dagre.layout();
+  if (g.attrs.nodeSep) layout.nodeSep(g.attrs.nodeSep);
+  if (g.attrs.edgeSep) layout.edgeSep(g.attrs.edgeSep);
+  if (g.attrs.rankSep) layout.rankSep(g.attrs.rankSep);
+  if (g.attrs.orderIters) layout.orderIters(g.attrs.orderIters);
+  if (g.attrs.debugPosDir) layout.positionDirection(g.attrs.debugPosDir);
+  layout.apply(g);
+
   positionNodes();
   layoutEdges();
 }

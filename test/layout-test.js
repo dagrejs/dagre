@@ -9,7 +9,7 @@ describe("dagre.layout", function() {
     g.addEdge("1->2", 1, 2);
     g.addEdge("2->3", 2, 3);
     g.addEdge("1->3", 1, 3);
-    dagre.layout(g);
+    dagre.layout.apply(g);
     assert.include(ids(g.edges()), "1->3");
   });
 });
