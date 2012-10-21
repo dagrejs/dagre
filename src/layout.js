@@ -61,22 +61,22 @@ dagre.layout = (function() {
   }
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
-  function addDummyNodes(g) {
+  function addDummyNodes(g, ranks) {
     g.edges().forEach(function(e) {
       var prefix = "_dummy-" + e.id() + "-";
       var u = e.tail();
-      var sinkRank = e.head().attrs.rank;
-      if (u.attrs.rank + 1 < sinkRank) {
+      var sinkRank = ranks[e.head().id()];
+      if (ranks[u.id()] + 1 < sinkRank) {
         g.removeEdge(e);
         e.attrs.edgeId = e.id();
-        for (var rank = u.attrs.rank + 1; rank < sinkRank; ++rank) {
+        for (var rank = ranks[u.id()] + 1; rank < sinkRank; ++rank) {
           var vId = prefix + rank;
-          var v = g.addNode(vId, { rank: rank,
-                                   dummy: true,
+          var v = g.addNode(vId, { dummy: true,
                                    height: 0,
                                    width: 0,
                                    marginX: 0,
                                    marginY: 0 });
+          ranks[vId] = rank;
           g.addEdge(null, u, v, e.attrs);
           u = v;
         }
@@ -137,9 +137,9 @@ dagre.layout = (function() {
     var selfLoops = removeSelfLoops(g);
     var reversed = acyclic(g);
 
-    dagre.layout.rank(g);
-    addDummyNodes(g);
-    var layering = dagre.layout.order(g);
+    var ranks = dagre.layout.rank(g);
+    addDummyNodes(g, ranks);
+    var layering = dagre.layout.order(g, ranks);
     dagre.layout.position(g, layering);
 
     collapseDummyNodes(g);

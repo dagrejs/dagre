@@ -59,7 +59,7 @@ dagre.layout.order = (function() {
     return cc;
   }
 
-  function initOrder(g) {
+  function initOrder(g, ranks) {
     var layering = [];
     var visited = {};
 
@@ -69,7 +69,7 @@ dagre.layout.order = (function() {
       }
       visited[u.id()] = true;
 
-      var rank = u.attrs.rank;
+      var rank = ranks[u.id()];
       for (var i = layering.length; i <= rank; ++i) {
         layering[i] = [];
       }
@@ -81,7 +81,7 @@ dagre.layout.order = (function() {
     }
 
     g.nodes().forEach(function(u) {
-      if (u.attrs.rank === 0) {
+      if (ranks[u.id()] === 0) {
         dfs(u);
       }
     });
@@ -163,10 +163,10 @@ dagre.layout.order = (function() {
     return layering.map(function(l) { return l.slice(0); });
   }
 
-  return function(g) {
+  return function(g, ranks) {
     var iters = g.attrs.orderIters;
 
-    var layering = initOrder(g);
+    var layering = initOrder(g, ranks);
     var bestLayering = copyLayering(layering);
     var bestCC = crossCount(layering);
 
