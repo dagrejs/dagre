@@ -74,9 +74,7 @@ dagre.layout = (function() {
         for (var rank = ranks[u.id()] + 1; rank < sinkRank; ++rank) {
           var vId = prefix + rank;
           var v = g.addNode(vId, { height: 0,
-                                   width: 0,
-                                   marginX: 0,
-                                   marginY: 0 });
+                                   width: 0 });
           dummyNodes[vId] = true;
           ranks[vId] = rank;
           g.addEdge(null, u, v, e.attrs);

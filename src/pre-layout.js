@@ -20,11 +20,5 @@ dagre.preLayout = function(g) {
 
     // Text label to display for the node
     defaultStr(attrs, "label", u.id().toString());
-
-    // The amount of padding to add to the label when sizing the node
-    defaultInt(attrs, "marginX", 5);
-
-    // The amount of padding to add to the label when sizing the node
-    defaultInt(attrs, "marginY", 5);
   });
 }

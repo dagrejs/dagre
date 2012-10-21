@@ -138,10 +138,10 @@ dagre.render = function(g, svg) {
 
       var labelBBox = label.getBBox();
 
-      rect.setAttribute("x", -(labelBBox.width / 2 + u.attrs.marginX));
-      rect.setAttribute("y", -(labelBBox.height / 2 + u.attrs.marginY));
-      rect.setAttribute("width", labelBBox.width + u.attrs.marginX * 2);
-      rect.setAttribute("height", labelBBox.height + u.attrs.marginY * 2);
+      rect.setAttribute("x", -(labelBBox.width / 2 + (u.attrs.marginX || 5)));
+      rect.setAttribute("y", -(labelBBox.height / 2 + (u.attrs.marginY || 5)));
+      rect.setAttribute("width", labelBBox.width + (u.attrs.marginX || 5) * 2);
+      rect.setAttribute("height", labelBBox.height + (u.attrs.marginY || 5) * 2);
 
       label.setAttribute("x", -(labelBBox.width / 2));
       label.setAttribute("y", -(labelBBox.height / 2));
