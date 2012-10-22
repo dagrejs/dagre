@@ -1,7 +1,7 @@
 /*
  * Renders the given graph to the given svg node.
  */
-dagre.render = function(g, graphAttrs, nodeAttrs, svg) {
+dagre.render = function(nodes, edges, svg) {
   var arrowheads = {};
   var svgDefs = createSVGElement("defs");
   svg.appendChild(svgDefs);
@@ -43,23 +43,23 @@ dagre.render = function(g, graphAttrs, nodeAttrs, svg) {
     return document.createElementNS("http://www.w3.org/2000/svg", tag);
   }
 
-  function createLabel(id, label) {
-    if (label[0] === '<') {
-      return createHTMLLabel(id, label);
+  function createLabel(u) {
+    if (u.label[0] === '<') {
+      return createHTMLLabel(u);
     } else {
-      return createTextLabel(label);
+      return createTextLabel(u);
     }
   }
 
-  function createHTMLLabel(id, label) {
+  function createHTMLLabel(u) {
     var fo = createSVGElement("foreignObject");
     var div = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-    div.innerHTML = label;
+    div.innerHTML = u.label;
     var body = document.querySelector('body');
 
     // We use temp div to try to apply most styling before placing the HTML block
     var tempDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div");
-    tempDiv.setAttribute("id", "node-" + id);
+    tempDiv.setAttribute("id", "node-" + u.id);
     tempDiv.setAttribute("class", "node");
     tempDiv.appendChild(div);
     body.appendChild(tempDiv);
@@ -76,12 +76,12 @@ dagre.render = function(g, graphAttrs, nodeAttrs, svg) {
     return fo;
   }
 
-  function createTextLabel(label) {
+  function createTextLabel(u) {
     var text = createSVGElement("text");
     text.setAttribute("x", 0);
     text.setAttribute("text-anchor", "middle");
 
-    var lines = label.split("\\n");
+    var lines = u.label.split("\\n");
     lines.forEach(function(line) {
       var tspan = createSVGElement("tspan");
       tspan.textContent = line;
@@ -123,15 +123,14 @@ dagre.render = function(g, graphAttrs, nodeAttrs, svg) {
   }
 
   function drawNodes() {
-    var dimensions = {};
-    g.nodes().forEach(function(u) {
+    nodes.forEach(function(u) {
       var group = createSVGElement("g");
-      group.setAttribute("id", "node-" + u);
+      group.setAttribute("id", "node-" + u.id);
       group.setAttribute("class", "node");
       svg.appendChild(group);
 
       var rect = createSVGElement("rect");
-      var label = createLabel(u, nodeAttrs[u].label);
+      var label = createLabel(u);
 
       group.appendChild(rect);
       group.appendChild(label);
@@ -147,15 +146,15 @@ dagre.render = function(g, graphAttrs, nodeAttrs, svg) {
       label.setAttribute("y", -(labelBBox.height / 2));
 
       var rectBBox = rect.getBBox();
-      dimensions[u] = { width: rectBBox.width, height: rectBBox.height };
+      u.width = rectBBox.width;
+      u.height = rectBBox.height;
     });
-    return dimensions;
   }
 
   function drawEdges() {
-    g.edges().forEach(function(e) {
+    edges.forEach(function(e) {
       var path = createSVGElement("path");
-      path.setAttribute("id", "edge-" + e);
+      path.setAttribute("id", "edge-" + e.id);
       path.setAttribute("class", "edge");
       svg.appendChild(path);
 
@@ -166,10 +165,10 @@ dagre.render = function(g, graphAttrs, nodeAttrs, svg) {
     });
   }
 
-  function positionNodes(coords) {
-    keys(coords).forEach(function(u) {
-      var group = svg.querySelector("#node-" + u);
-      group.setAttribute("transform", "translate(" + coords[u].x + "," + coords[u].y + ")");
+  function positionNodes() {
+    nodes.forEach(function(u) {
+      var group = svg.querySelector("#node-" + u.id);
+      group.setAttribute("transform", "translate(" + u.x + "," + u.y + ")");
     });
   }
 
@@ -177,37 +176,30 @@ dagre.render = function(g, graphAttrs, nodeAttrs, svg) {
     return point.x + "," + point.y;
   }
 
-  function layoutEdges(g, coords, dimensions, points) {
-    g.edges().forEach(function(e) {
-      var path = svg.querySelector("#edge-" + e);
-      var ps = points[e] || [];
+  function layoutEdges() {
+    edges.forEach(function(e) {
+      var path = svg.querySelector("#edge-" + e.id);
 
       // TODO handle self loops
+      if (e.source !== e.target) {
+        var points = e.points;
 
-      var edge = g.edge(e);
+        points.push(intersect(e.target, points.length > 0 ? points[points.length - 1] : e.source));
+        var origin = intersect(e.source, points[0]);
 
-      ps.push(intersect(toRect(edge.target, coords, dimensions), ps.length > 0 ? ps[ps.length - 1] : coords[edge.source]));
-      var origin = intersect(toRect(edge.source, coords, dimensions), ps[0]);
-
-      path.setAttribute("d", "M " + pointStr(origin) + " L " + ps.map(pointStr).join(" "));
+        path.setAttribute("d", "M " + pointStr(origin) + " L " + points.map(pointStr).join(" "));
+      }
     });
   }
 
-  function toRect(u, coords, dimensions) {
-    return {
-      x: coords[u].x,
-      y: coords[u].y,
-      width: dimensions[u].width,
-      height: dimensions[u].height
-    };
-  }
-
-  var dimensions = drawNodes();
+  drawNodes();
   drawEdges();
 
-  var result = dagre.layout()
-                    .apply(g, dimensions);
+  dagre.layout()
+    .nodes(nodes)
+    .edges(edges)
+    .run();
 
-  positionNodes(result.coords);
-  layoutEdges(g, result.coords, dimensions, result.points);
+  positionNodes();
+  layoutEdges();
 }

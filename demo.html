@@ -99,7 +99,7 @@ digraph {
     if (oldInputValue !== input.value) {
       oldInputValue = input.value;
       try {
-        result = dagre.graph.read(input.value);
+        result = dagre.parseDot(input.value);
       } catch (e) {
         input.setAttribute("class", "error");
       }
@@ -115,7 +115,7 @@ digraph {
       svgRoot.appendChild(svg);
 
       input.setAttribute("class", "");
-      dagre.render(result.graph, result.graphAttrs, result.nodeAttrs, svg);
+      dagre.render(result.nodes, result.edges, svg);
 
       var bbox = svgRoot.getBBox();
       svgRoot.setAttribute("width", bbox.width + 10);

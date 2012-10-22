@@ -1,15 +1,46 @@
 dagre.layout = function() {
-      // Min separation between adjacent nodes in the same rank
-  var nodeSep = 50,
-      // Min separation between adjacent edges in the same rank
+  // External configuration
+  var
+      // Nodes to lay out. At minimum must have `width` and `height` attributes.
+      nodes = [],
+      // Edges to lay out. At mimimum must have `source` and `target` attributes.
+      edges = [],
+      // Min separation between adjacent nodes in the same rank.
+      nodeSep = 50,
+      // Min separation between adjacent edges in the same rank.
       edgeSep = 10,
-      // Min separation between ranks
+      // Min separation between ranks.
       rankSep = 30,
-      // Number of passes to take during the ordering phase
+      // Number of passes to take during the ordering phase.
       orderIters = 24,
-      // Debug positioning with a particular direction (up-left, up-right, down-left, down-right)
-      posDir = null,
-      layout = {};
+      // Debug positioning with a particular direction (up-left, up-right, down-left, down-right).
+      posDir = null;
+
+  // Internal state
+  var
+      // Graph used to determine relationships quickly
+      g,
+      // Dimensions for nodes in the graph
+      dims,
+      // Map to original nodes using graph ids
+      nodeMap,
+      // Map to original edges using graph ids
+      edgeMap;
+
+  // This layout object
+  var layout = {};
+
+  layout.nodes = function(x) {
+    if (!arguments.length) return nodes;
+    nodes = x;
+    return layout;
+  }
+
+  layout.edges = function(x) {
+    if (!arguments.length) return edges;
+    edges = x;
+    return layout;
+  }
 
   layout.nodeSep = function(x) {
     if (!arguments.length) return nodeSep;
@@ -41,32 +72,80 @@ dagre.layout = function() {
     return layout;
   }
 
-  layout.apply = function(g, dimensions) {
+  layout.run = function() {
+    // Build internal graph
+    init();
+
     if (g.nodes().length === 0) {
       // Nothing to do!
       return;
     }
 
-    var selfLoops = removeSelfLoops(g);
     var reversed = acyclic(g);
 
-    var ranks = dagre.layout.rank(g);
-    var dummyNodes = addDummyNodes(g, ranks, dimensions);
-    var layering = dagre.layout.order(g, orderIters, ranks);
-    var coords = dagre.layout.position(g, layering, dummyNodes, dimensions, rankSep, nodeSep, edgeSep, posDir);
-    var points = collapseDummyNodes(g, dummyNodes, coords);
+    dagre.layout.rank(g, nodeMap);
+    var dummyMap = addDummyNodes();
+    var layering = dagre.layout.order(g, orderIters, nodeMap, dummyMap);
+    dagre.layout.position(g, layering, nodeMap, dummyMap, rankSep, nodeSep, edgeSep, posDir);
+    collapseDummyNodes(dummyMap);
 
-    keys(coords).forEach(function(u) {
-      if (u in dummyNodes) {
-        delete coords[u];
+    undoAcyclic(reversed);
+
+    resetInternalState();
+  };
+
+  function resetInternalState() {
+    g = dagre.graph();
+    nodeMap = {};
+    edgeMap = {};
+  }
+
+  // Build graph and save mapping of generated ids to original nodes and edges
+  function init() {
+    resetInternalState();
+
+    var nextId = 0;
+
+    // Tag each node so that we can properly represent relationships when
+    // we add edges. Also copy relevant dimension information.
+    nodes.forEach(function(u) {
+      var id = nextId++;
+      nodeMap[id] = u;
+      g.addNode(id);
+
+      // Temporary id that we'll remove once we've built the graph
+      u._dagreId = id;
+    });
+
+    edges.forEach(function(e) {
+      var source = e.source._dagreId;
+      if (!(source in nodeMap)) {
+        throw new Error("Source node for '" + e + "' not in node list");
+      }
+
+      var target = e.target._dagreId;
+      if (!(target in nodeMap)) {
+        throw new Error("Target node for '" + e + "' not in node list");
+      }
+
+      // Track edges that aren't self loops - layout does nothing for self
+      // loops, so they can be skipped.
+      if (source !== target) {
+        var id = nextId++;
+        var edge = edgeMap[id] = e;
+        g.addEdge(id, source, target);
+
+        // We initialize a points array which will be filled later for improper
+        // edges.
+        edge.points = [];
       }
     });
 
-    undoAcyclic(g, reversed, points);
-    addSelfLoops(g, selfLoops);
-
-    return { coords: coords, points: points };
-  };
+    // Cleanup
+    nodes.forEach(function(u) {
+      delete u._dagreId;
+    });
+  }
 
   function acyclic(g) {
     var onStack = {};
@@ -101,54 +180,31 @@ dagre.layout = function() {
     return reversed;
   }
 
-  function undoAcyclic(g, reversed, points) {
+  function undoAcyclic(reversed) {
     reversed.forEach(function(e) {
-      var edge = g.edge(e);
-      g.delEdge(e);
-      var ps = points[e];
-      if (ps) {
-        ps.reverse();
-      }
-      g.addEdge(e, edge.target, edge.source);
-    });
-  }
-
-  function removeSelfLoops(g) {
-    var selfLoops = [];
-    g.nodes().forEach(function(u) {
-      var es = g.edges(u, u);
-      es.forEach(function(e) {
-        var edge = g.edge(e);
-        selfLoops.push({key: e, source: edge.source, target: edge.target});
-        g.delEdge(e);
-      });
-    });
-    return selfLoops;
-  }
-
-  function addSelfLoops(g, selfLoops) {
-    selfLoops.forEach(function(e) {
-      g.addEdge(e.key, e.source, e.target);
+      edgeMap[e].points.reverse();
     });
   }
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
-  function addDummyNodes(g, ranks, dimensions) {
-    var dummyNodes = {};
+  function addDummyNodes() {
+    var dummyMap = {};
 
     g.edges().forEach(function(e) {
-      var prefix = "_dummy-" + e + "-";
       var edge = g.edge(e);
-      var u = edge.source;
-      var sinkRank = ranks[edge.target];
-      if (ranks[u] + 1 < sinkRank) {
+      var sourceRank = nodeMap[edge.source].rank;
+      var targetRank = nodeMap[edge.target].rank;
+      if (sourceRank + 1 < targetRank) {
+        var prefix = "D-" + e + "-";
         g.delEdge(e);
-        for (var rank = ranks[u] + 1; rank < sinkRank; ++rank) {
+        for (var u = edge.source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
           var v = prefix + rank;
           g.addNode(v);
-          dimensions[v] = { width: 0, height: 0 };
-          dummyNodes[v] = e;
-          ranks[v] = rank;
+          dummyMap[v] = { width: 0,
+                         height: 0,
+                         edge: e,
+                         index: i,
+                         rank: rank };
           g.addEdge(u + " -> " + v, u, v);
           u = v;
         }
@@ -156,58 +212,17 @@ dagre.layout = function() {
       }
     });
 
-    return dummyNodes;
+    return dummyMap;
   }
 
-  function collapseDummyNodes(g, dummyNodes, coords) {
-    var points = {};
+  function collapseDummyNodes(dummyMap) {
     var visited = {};
 
-    // Use dfs from all non-dummy nodes to find the roots of dummy chains. Then
-    // walk the dummy chain until a non-dummy node is found. Collapse all edges
-    // traversed into a single edge.
-
-    function collapseChain(e) {
-      var edge = g.edge(e);
-      var root = edge.source;
-      var newE = dummyNodes[edge.target];
-      var ps = [];
-      var prev = edge.source;
-      var curr = edge.target;
-      do
-      {
-        ps.push({x: coords[curr].x, y: coords[curr].y});
-        prev = curr;
-        curr = g.edge(g.edges(curr, null)[0]).target;
-        g.delNode(prev);
-      }
-      while (dummyNodes[curr]);
-      g.addEdge(newE, root, curr);
-      points[newE] = ps;
-    }
-
-    function dfs(u) {
-      if (!(u in visited)) {
-        visited[u] = true;
-        g.edges(u, null).forEach(function(e) {
-          var edge = g.edge(e);
-          var v = edge.target;
-          if (dummyNodes[v]) {
-            collapseChain(e);
-          } else {
-            dfs(v);
-          }
-        });
-      }
-    }
-
-    g.nodes().forEach(function(u) {
-      if (!dummyNodes[u]) {
-        dfs(u);
-      }
+    values(dummyMap).forEach(function(u) {
+      var e = u.edge;
+      var points = edgeMap[e].points;
+      points[u.index] = { x: u.x, y: u.y };
     });
-
-    return points;
   }
 
   return layout;

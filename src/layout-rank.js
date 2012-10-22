@@ -1,17 +1,16 @@
 dagre.layout.rank = (function() {
-  function initRank(g) {
+  function initRank(g, nodeMap) {
     var pq = priorityQueue();
     g.nodes().forEach(function(u) {
       pq.add(u, g.edges(null, u).length);
     });
 
-    var ranks = {};
     var current = [];
     var rankNum = 0;
     while (pq.size() > 0) {
       for (var minId = pq.min(); pq.priority(minId) === 0; minId = pq.min()) {
         pq.removeMin();
-        ranks[minId] = rankNum;
+        nodeMap[minId].rank = rankNum;
         current.push(minId);
       }
 
@@ -30,21 +29,19 @@ dagre.layout.rank = (function() {
       current = [];
       ++rankNum;
     }
-
-    return ranks;
   }
 
-  function feasibleTree(g, ranks) {
+  function feasibleTree(g, nodeMap) {
     // TODO make minLength configurable per edge
     var minLength = 1;
     var tree = dagre.util.prim(g, function(u, v) {
-      return Math.abs(ranks[u] - ranks[v]) - minLength;
+      return Math.abs(nodeMap[u].rank - nodeMap[v].rank) - minLength;
     });
 
     var visited = {};
     function dfs(u, rank) {
       visited[u] = true;
-      ranks[u] = rank;
+      nodeMap[u].rank = rank;
 
       tree[u].forEach(function(v) {
         if (!(v in visited)) {
@@ -58,20 +55,17 @@ dagre.layout.rank = (function() {
     return tree;
   }
 
-  function normalize(g, ranks) {
-    var m = min(values(ranks));
-    g.nodes().forEach(function(u) {
-      ranks[u] -= m;
-    });
+  function normalize(g, nodeMap) {
+    var m = min(values(nodeMap).map(function(u) { return u.rank; }));
+    values(nodeMap).forEach(function(u) { u.rank -= m; });
   }
 
-  return function(g) {
-    var ranks = initRank(g);
+  return function(g, nodeMap) {
+    initRank(g, nodeMap);
     components(g).forEach(function(cmpt) {
       var subgraph = g.subgraph(cmpt);
-      var tree = feasibleTree(subgraph, ranks);
-      normalize(subgraph, ranks);
+      feasibleTree(subgraph, nodeMap);
+      normalize(subgraph, nodeMap);
     });
-    return ranks;
   };
 })();
