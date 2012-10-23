@@ -31,6 +31,15 @@
   fill: #fff;
 }
 
+#node-CLOSED rect {
+  stroke-width: 3px;
+  fill: #f88;
+}
+
+.node text {
+  font-family: Verdana;
+}
+
 path.edge {
   fill: none;
   stroke: #333;
@@ -87,7 +96,8 @@ path.edge {
     .data(states)
     .enter()
       .append("g")
-      .attr("class", "node");
+      .attr("class", "node")
+      .attr("id", function(d) { return "node-" + d.label });
 
   var edges = svgGroup
     .selectAll("g .edge")
