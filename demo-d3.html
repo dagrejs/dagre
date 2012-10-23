@@ -100,7 +100,7 @@ path.edge {
       .attr("id", function(d) { return "node-" + d.label });
 
   var edges = svgGroup
-    .selectAll("g .edge")
+    .selectAll("path .edge")
     .data(transitions)
     .enter()
       .append("path")
@@ -149,13 +149,13 @@ path.edge {
     .edges(transitions)
     .run();
 
-  nodes.attr("transform", function(d) { return "translate(" + d.x + "," + d.y +")"; });
+  nodes.attr("transform", function(d) { return "translate(" + d.dagre.x + "," + d.dagre.y +")"; });
 
   edges.attr("d", function(e) {
-    var points = e.points;
-      points.push(dagre.util.intersectRect(e.target, points.length > 0 ? points[points.length - 1] : e.source));
-      var origin = dagre.util.intersectRect(e.source, points[0]);
-      return "M" + dagre.util.pointStr(origin) + " L " + points.map(dagre.util.pointStr).join(" ");
+    var points = e.dagre.points;
+    points.push(dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre));
+    var origin = dagre.util.intersectRect(e.source.dagre, points[0]);
+    return "M" + dagre.util.pointStr(origin) + " L " + points.map(dagre.util.pointStr).join(" ");
   });
 
   // Resize the SVG element

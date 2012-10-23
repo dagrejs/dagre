@@ -108,20 +108,17 @@ dagre.layout = function() {
     // we add edges. Also copy relevant dimension information.
     nodes.forEach(function(u) {
       var id = nextId++;
-      nodeMap[id] = u;
+      nodeMap[id] = u.dagre = { id: id, width: u.width, height: u.height };
       g.addNode(id);
-
-      // Temporary id that we'll remove once we've built the graph
-      u._dagreId = id;
     });
 
     edges.forEach(function(e) {
-      var source = e.source._dagreId;
+      var source = e.source.dagre.id;
       if (!(source in nodeMap)) {
         throw new Error("Source node for '" + e + "' not in node list");
       }
 
-      var target = e.target._dagreId;
+      var target = e.target.dagre.id;
       if (!(target in nodeMap)) {
         throw new Error("Target node for '" + e + "' not in node list");
       }
@@ -130,18 +127,9 @@ dagre.layout = function() {
       // loops, so they can be skipped.
       if (source !== target) {
         var id = nextId++;
-        var edge = edgeMap[id] = e;
+        edgeMap[id] = e.dagre = { points: [] };
         g.addEdge(id, source, target);
-
-        // We initialize a points array which will be filled later for improper
-        // edges.
-        edge.points = [];
       }
-    });
-
-    // Cleanup
-    nodes.forEach(function(u) {
-      delete u._dagreId;
     });
   }
 

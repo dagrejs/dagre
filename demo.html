@@ -1,6 +1,25 @@
 <!doctype html>
+
 <meta charset="utf-8">
 <title>Dagre Test Page</title>
+
+<style>
+.node rect {
+  stroke-width: 1.5px;
+  stroke: #333;
+  fill: #fff;
+}
+
+.node text {
+  font-family: Verdana;
+}
+
+path.edge {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+</style>
 
 <style>
 h2 {
@@ -9,45 +28,6 @@ h2 {
 
 .error {
   color: red;
-}
-
-.node rect {
-  stroke-width: 1.5px;
-  stroke: #333;
-  fill: #fff;
-}
-
-.node text {
-  font-size: 18px;
-}
-
-#node-A {
-  font-size: 32px;
-}
-
-#node-A .big {
-  font-size: 40px;
-  font-weight: bold;
-}
-
-#node-C {
-  color: red;
-}
-
-#node-E rect {
-  fontName: arial;
-  fill: #acf;
-}
-
-.edge {
-  fill: none;
-  stroke-width: 1.5px;
-  stroke: #333;
-}
-
-#edge-A-B-0 {
-  stroke: green;
-  stroke-width: 3px;
 }
 </style>
 
@@ -68,14 +48,32 @@ digraph {
 
 <h2>Graph Visualization</h2>
 
-<svg width=0 height=0></svg>
+<svg width=0 height=0>
+  <defs>
+    <marker id="arrowhead"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerUnits="strokeWidth"
+            markerWidth="8"
+            markerHeight="5"
+            orient="auto"
+            style="fill: #333">
+      <path d="M 0 0 L 10 5 L 0 10 z"></path>
+    </marker>
+  </defs>
+</svg>
 
+<script src="http://d3js.org/d3.v2.min.js"></script>
 <script src="dagre.js"></script>
 
 <script>
+  var nodePadding = 10;
+
   var input = document.querySelector("#input");
 
-  var svgRoot = document.querySelector("svg");
+  var svg = d3.select("svg");
+  var svgGroup = svg.append("g").attr("transform", "translate(5, 5)");
 
   var graphRE = /[?&]graph=([^&]+)/;
   var graphMatch = window.location.search.match(graphRE);
@@ -106,20 +104,87 @@ digraph {
     }
 
     if (result) {
-      while (svgRoot.hasChildNodes()) {
-        svgRoot.removeChild(svgRoot.lastChild);
-      }
+      svgGroup.selectAll().remove();
 
-      var svg = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      svg.setAttribute("transform", "translate(5, 5)");
-      svgRoot.appendChild(svg);
+      // Get the data in the right form
+      var graphNodes = result.nodes;
+      var graphEdges = result.edges;
 
-      input.setAttribute("class", "");
-      dagre.render(result.nodes, result.edges, svg);
+      svgGroup.selectAll("g").remove();
+      svgGroup.selectAll("path").remove();
 
-      var bbox = svgRoot.getBBox();
-      svgRoot.setAttribute("width", bbox.width + 10);
-      svgRoot.setAttribute("height", bbox.height + 10);
+      // `nodes` is center positioned for easy layout later
+      var nodes = svgGroup
+        .selectAll("g .node")
+        .data(graphNodes)
+        .enter()
+          .append("g")
+            .attr("class", "node")
+            .attr("id", function(d) { return "node-" + d.label });
+
+      var edges = svgGroup
+        .selectAll("path .edge")
+        .data(graphEdges)
+        .enter()
+          .append("path")
+            .attr("class", "edge")
+            .attr("marker-end", "url(#arrowhead)");
+
+      // Append rectangles to the nodes. We do this before laying out the text
+      // because we want the text above the rectangle.
+      var rects = nodes.append("rect");
+
+      // Append text
+      var labels = nodes
+        .append("text")
+          .attr("text-anchor", "middle")
+          .attr("x", 0);
+
+      labels
+        .append("tspan")
+        .attr("x", 0)
+        .attr("dy", "1em")
+        .text(function(d) { return d.label; });
+
+      // We need width and height for layout.
+      labels.each(function(d) {
+        var bbox = this.getBBox();
+        d.bbox = bbox;
+        d.width = bbox.width + 2 * nodePadding;
+        d.height = bbox.height + 2 * nodePadding;
+      });
+
+      rects
+        .attr("x", function(d) { return -(d.bbox.width / 2 + nodePadding); })
+        .attr("y", function(d) { return -(d.bbox.height / 2 + nodePadding); })
+        .attr("width", function(d) { return d.width; })
+        .attr("height", function(d) { return d.height; });
+
+      labels
+        .attr("x", function(d) { return -d.bbox.width / 2; })
+        .attr("y", function(d) { return -d.bbox.height / 2; });
+
+      dagre.layout()
+        .nodeSep(50)
+        .edgeSep(10)
+        .rankSep(30)
+        .nodes(graphNodes)
+        .edges(graphEdges)
+        .run();
+
+      nodes.attr("transform", function(d) { return "translate(" + d.dagre.x + "," + d.dagre.y +")"; });
+
+      edges.attr("d", function(e) {
+        var points = e.dagre.points;
+        points.push(dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre));
+        var origin = dagre.util.intersectRect(e.source.dagre, points[0]);
+        return "M" + dagre.util.pointStr(origin) + " L " + points.map(dagre.util.pointStr).join(" ");
+      });
+
+      // Resize the SVG element
+      var svgBBox = svg.node().getBBox();
+      svg.attr("width", svgBBox.width + 10);
+      svg.attr("height", svgBBox.height + 10);
     }
   }
 </script>
