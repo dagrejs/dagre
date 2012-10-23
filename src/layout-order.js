@@ -165,12 +165,8 @@ dagre.layout.order = (function() {
     return layering.map(function(l) { return l.slice(0); });
   }
 
-  return function(g, orderIters, nodeMap, dummyMap) {
-    var allMap = {};
-    mergeAttributes(nodeMap, allMap);
-    mergeAttributes(dummyMap, allMap);
-
-    var layering = initOrder(g, allMap);
+  return function(g, orderIters, nodeMap) {
+    var layering = initOrder(g, nodeMap);
     var bestLayering = copyLayering(layering);
     var bestCC = crossCount(g, layering);
 

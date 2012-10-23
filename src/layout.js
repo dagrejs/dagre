@@ -20,8 +20,6 @@ dagre.layout = function() {
   var
       // Graph used to determine relationships quickly
       g,
-      // Dimensions for nodes in the graph
-      dims,
       // Map to original nodes using graph ids
       nodeMap,
       // Map to original edges using graph ids
@@ -84,10 +82,10 @@ dagre.layout = function() {
     var reversed = acyclic(g);
 
     dagre.layout.rank(g, nodeMap);
-    var dummyMap = addDummyNodes();
-    var layering = dagre.layout.order(g, orderIters, nodeMap, dummyMap);
-    dagre.layout.position(g, layering, nodeMap, dummyMap, rankSep, nodeSep, edgeSep, posDir);
-    collapseDummyNodes(dummyMap);
+    addDummyNodes();
+    var layering = dagre.layout.order(g, orderIters, nodeMap);
+    dagre.layout.position(g, layering, nodeMap, rankSep, nodeSep, edgeSep, posDir);
+    collapseDummyNodes();
 
     undoAcyclic(reversed);
 
@@ -188,8 +186,6 @@ dagre.layout = function() {
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
   function addDummyNodes() {
-    var dummyMap = {};
-
     g.edges().forEach(function(e) {
       var edge = g.edge(e);
       var sourceRank = nodeMap[edge.source].rank;
@@ -200,28 +196,29 @@ dagre.layout = function() {
         for (var u = edge.source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
           var v = prefix + rank;
           g.addNode(v);
-          dummyMap[v] = { width: 0,
+          nodeMap[v] = { width: 0,
                          height: 0,
                          edge: e,
                          index: i,
-                         rank: rank };
+                         rank: rank,
+                         dummy: true };
           g.addEdge(u + " -> " + v, u, v);
           u = v;
         }
         g.addEdge(u + " -> " + edge.target, u, edge.target);
       }
     });
-
-    return dummyMap;
   }
 
-  function collapseDummyNodes(dummyMap) {
+  function collapseDummyNodes() {
     var visited = {};
 
-    values(dummyMap).forEach(function(u) {
-      var e = u.edge;
-      var points = edgeMap[e].points;
-      points[u.index] = { x: u.x, y: u.y };
+    values(nodeMap).forEach(function(u) {
+      if (u.dummy) {
+        var e = u.edge;
+        var points = edgeMap[e].points;
+        points[u.index] = { x: u.x, y: u.y };
+      }
     });
   }
 
