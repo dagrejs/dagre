@@ -120,7 +120,7 @@ digraph {
         .enter()
           .append("g")
             .attr("class", "node")
-            .attr("id", function(d) { return "node-" + d.label });
+            .attr("id", function(d) { return "node-" + d.id });
 
       var edges = svgGroup
         .selectAll("path .edge")
