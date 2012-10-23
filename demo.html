@@ -36,9 +36,9 @@ h2 {
 <textarea id="input" rows="5" cols="80" style="display: block" onKeyUp="tryDraw();">
 /* Example */
 digraph {
-    A [label="<div>A <span class='big'>Big</span> <span style='color:red;'>HTML</span> Source!</div>"];
+    A [label="<div style='padding: 10px;'>A <span style='font-size:32px'>Big</span> <span style='color:red;'>HTML</span> Source!</div>"];
     C;
-    E [label="A blue sink!"];
+    E [label="A sink"];
     A -&gt; B -&gt; C;
     B -&gt; D -&gt; E;
     C -&gt; E;
@@ -68,8 +68,6 @@ digraph {
 <script src="dagre.js"></script>
 
 <script>
-  var nodePadding = 10;
-
   var input = document.querySelector("#input");
 
   var svg = d3.select("svg");
@@ -95,6 +93,7 @@ digraph {
     var result;
 
     if (oldInputValue !== input.value) {
+      input.setAttribute("class", "");
       oldInputValue = input.value;
       try {
         result = dagre.parseDot(input.value);
@@ -130,39 +129,59 @@ digraph {
             .attr("class", "edge")
             .attr("marker-end", "url(#arrowhead)");
 
-      // Append rectangles to the nodes. We do this before laying out the text
+      // Append rectangles to the nodes. We do this before laying out the labels
       // because we want the text above the rectangle.
       var rects = nodes.append("rect");
 
-      // Append text
+      // Append labels
       var labels = nodes
-        .append("text")
-          .attr("text-anchor", "middle")
-          .attr("x", 0);
+        .append("g")
+        .attr("class", "label")
+        .classed("inline-html", function(d) { return d.label[0] === "<"; });
 
-      labels
-        .append("tspan")
-        .attr("x", 0)
-        .attr("dy", "1em")
-        .text(function(d) { return d.label; });
+      var foLabel = nodes.selectAll("g .label.inline-html")
+        .append("foreignObject")
+        // TODO find a better way to get the dimensions for foriegnObjects
+        .attr("width", "100000");
+
+      foLabel
+        .append("xhtml:div")
+        .style("float", "left")
+        .html(function(d) { return d.label; })
+        .each(function(d) {
+          d.foWidth = this.clientWidth;
+          d.foHeight = this.clientHeight;
+          d.nodePadding = 0;
+        });
+
+      foLabel
+        .attr("width", function(d) { return d.foWidth; })
+        .attr("height", function(d) { return d.foHeight; });
+
+      nodes.selectAll("g .label:not(.inline-html)")
+        .append("text")
+          .attr("text-anchor", "left")
+            .append("tspan")
+            .attr("dy", "1em")
+            .text(function(d) { return d.label; })
+            .each(function(d) { d.nodePadding = 10; });
 
       // We need width and height for layout.
       labels.each(function(d) {
         var bbox = this.getBBox();
         d.bbox = bbox;
-        d.width = bbox.width + 2 * nodePadding;
-        d.height = bbox.height + 2 * nodePadding;
+        d.width = bbox.width + 2 * d.nodePadding;
+        d.height = bbox.height + 2 * d.nodePadding;
       });
 
       rects
-        .attr("x", function(d) { return -(d.bbox.width / 2 + nodePadding); })
-        .attr("y", function(d) { return -(d.bbox.height / 2 + nodePadding); })
+        .attr("x", function(d) { return -(d.bbox.width / 2 + d.nodePadding); })
+        .attr("y", function(d) { return -(d.bbox.height / 2 + d.nodePadding); })
         .attr("width", function(d) { return d.width; })
         .attr("height", function(d) { return d.height; });
 
       labels
-        .attr("x", function(d) { return -d.bbox.width / 2; })
-        .attr("y", function(d) { return -d.bbox.height / 2; });
+        .attr("transform", function(d) { return "translate(" + (-d.bbox.width / 2) + "," + (-d.bbox.height / 2) + ")"; });
 
       dagre.layout()
         .nodeSep(50)
