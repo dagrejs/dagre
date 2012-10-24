@@ -14,7 +14,6 @@ all: dagre.js package.json
 	src/layout-rank.js \
 	src/layout-order.js \
 	src/layout-position.js \
-	src/render.js \
 	src/util.js \
 	src/priority-queue.js \
 	src/parse-dot.js \
