@@ -112,6 +112,11 @@ digraph {
   var styleMatch = window.location.search.match(styleRE);
   if (styleMatch) {
     inputStyle.text(decodeURIComponent(styleMatch[1]));
+  } else if (graphMatch) {
+    // If we have graph input but no style input we clear out the current
+    // style. This is for backwards compatibility - we used to have only the
+    // graph definition coming in via the URL.
+    inputStyle.text("");
   }
 
   tryDraw();
