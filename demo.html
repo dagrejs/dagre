@@ -1,17 +1,13 @@
 <!doctype html>
 
 <meta charset="utf-8">
-<title>Dagre Test Page</title>
+<title>Dagre Interactive Demo</title>
 
 <style>
 .node rect {
   stroke-width: 1.5px;
   stroke: #333;
   fill: #fff;
-}
-
-.node text {
-  font-family: Verdana;
 }
 
 path.edge {
@@ -22,33 +18,60 @@ path.edge {
 </style>
 
 <style>
-h2 {
+h1, h2 {
   color: #333;
+}
+
+textarea {
+  width: 800px;
+}
+
+label {
+  margin-top: 1em;
+  display: block;
 }
 
 .error {
   color: red;
 }
+
+svg {
+  border: 1px solid #999;
+}
 </style>
 
-<h2>Graph Definition</h2>
+<h1>Dagre Interactive Demo</h1>
 
-<textarea id="input" rows="5" cols="80" style="display: block" onKeyUp="tryDraw();">
+<h2>Input</h2>
+
+<form>
+  <label for="inputGraph">Graphviz Definition</label>
+  <textarea id="inputGraph" rows="5" style="display: block" onKeyUp="tryDraw();">
 /* Example */
 digraph {
     A [label="<div style='padding: 10px;'>A <span style='font-size:32px'>Big</span> <span style='color:red;'>HTML</span> Source!</div>"];
     C;
-    E [label="A sink"];
+    E [label="A blue sink"];
     A -&gt; B -&gt; C;
     B -&gt; D -&gt; E;
     C -&gt; E;
     A -&gt; D;
 }
-</textarea>
+  </textarea>
+
+  <label for="inputStyle">CSS Styles</label>
+  <textarea id="inputStyle" rows="5" style="display: block" onKeyUp="tryDraw();">
+#node-E rect {
+  fill: #acf;
+}
+  </textarea>
+
+  <a id="graphLink">Link for this graph</a>
+</form>
 
 <h2>Graph Visualization</h2>
 
-<svg width=0 height=0>
+<svg width=800 height=600>
   <defs>
     <marker id="arrowhead"
             viewBox="0 0 10 10"
@@ -68,7 +91,14 @@ digraph {
 <script src="dagre.js"></script>
 
 <script>
-  var input = document.querySelector("#input");
+  var inputGraph = document.querySelector("#inputGraph");
+
+  var graphStyle = d3.select("head").append("style");
+  var inputStyle = d3.select("#inputStyle");
+  var graphLink = d3.select("#graphLink");
+
+  var oldInputGraphValue;
+  var oldInputStyleValue;
 
   var svg = d3.select("svg");
   var svgGroup = svg.append("g").attr("transform", "translate(5, 5)");
@@ -76,7 +106,12 @@ digraph {
   var graphRE = /[?&]graph=([^&]+)/;
   var graphMatch = window.location.search.match(graphRE);
   if (graphMatch) {
-    input.value = decodeURIComponent(graphMatch[1]);
+    inputGraph.value = decodeURIComponent(graphMatch[1]);
+  }
+  var styleRE = /[?&]style=([^&]+)/;
+  var styleMatch = window.location.search.match(styleRE);
+  if (styleMatch) {
+    inputStyle.text(decodeURIComponent(styleMatch[1]));
   }
 
   tryDraw();
@@ -85,24 +120,29 @@ digraph {
     return [window.location.protocol, '//',
             window.location.host,
             window.location.pathname,
-            '?graph=', encodeURIComponent(input.value)].join('');
+            '?graph=', encodeURIComponent(inputGraph.value),
+            '&style=', encodeURIComponent(inputStyle.node().value)].join('');
   }
 
-  var oldInputValue;
-  function tryDraw() {
+  function tryDraw(force) {
     var result;
 
-    if (oldInputValue !== input.value) {
-      input.setAttribute("class", "");
-      oldInputValue = input.value;
+    if (oldInputGraphValue !== inputGraph.value || oldInputStyleValue !== inputStyle.node().value) {
+      inputGraph.setAttribute("class", "");
+      oldInputGraphValue = inputGraph.value;
+      oldInputStyleValue = inputStyle.node().value;
       try {
-        result = dagre.parseDot(input.value);
+        result = dagre.parseDot(inputGraph.value);
       } catch (e) {
-        input.setAttribute("class", "error");
+        inputGraph.setAttribute("class", "error");
       }
     }
 
     if (result) {
+      // TODO why is inputStyle.text or inputStyle.html not working here?
+      graphStyle.html(inputStyle.node().value);
+      graphLink.attr("href", graphToURL());
+
       svgGroup.selectAll().remove();
 
       // Get the data in the right form
@@ -119,7 +159,7 @@ digraph {
         .enter()
           .append("g")
             .attr("class", "node")
-            .attr("id", function(d) { return "node-" + d.id });
+            .attr("id", function(d) { return "node-" + d.id; });
 
       var edges = svgGroup
         .selectAll("path .edge")
@@ -127,6 +167,7 @@ digraph {
         .enter()
           .append("path")
             .attr("class", "edge")
+            .attr("id", function(d) { return "edge-" + d.id; })
             .attr("marker-end", "url(#arrowhead)");
 
       // Append rectangles to the nodes. We do this before laying out the labels
@@ -202,8 +243,11 @@ digraph {
 
       // Resize the SVG element
       var svgBBox = svg.node().getBBox();
-      svg.attr("width", svgBBox.width + 10);
-      svg.attr("height", svgBBox.height + 10);
+      svg.call(d3.behavior.zoom().on("zoom", function redraw() {
+        svgGroup.attr("transform",
+              "translate(" + d3.event.translate + ")"
+              + " scale(" + d3.event.scale + ")");
+      }));
     }
   }
 </script>
