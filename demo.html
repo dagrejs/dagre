@@ -87,6 +87,8 @@ digraph {
   </defs>
 </svg>
 
+<p id="graphTime"></p>
+
 <script src="http://d3js.org/d3.v2.min.js"></script>
 <script src="dagre.js"></script>
 
@@ -133,11 +135,15 @@ digraph {
     var result;
 
     if (oldInputGraphValue !== inputGraph.value || oldInputStyleValue !== inputStyle.node().value) {
+      d3.select("#graphTime").text("");
       inputGraph.setAttribute("class", "");
       oldInputGraphValue = inputGraph.value;
       oldInputStyleValue = inputStyle.node().value;
+      var parseStart = new Date().getTime();
+      var parseEnd;
       try {
         result = dagre.parseDot(inputGraph.value);
+        parseEnd = new Date().getTime();
       } catch (e) {
         inputGraph.setAttribute("class", "error");
       }
@@ -229,6 +235,7 @@ digraph {
       labels
         .attr("transform", function(d) { return "translate(" + (-d.bbox.width / 2) + "," + (-d.bbox.height / 2) + ")"; });
 
+      var layoutStart = new Date().getTime();
       dagre.layout()
         .nodeSep(50)
         .edgeSep(10)
@@ -236,6 +243,7 @@ digraph {
         .nodes(graphNodes)
         .edges(graphEdges)
         .run();
+      var layoutEnd = new Date().getTime();
 
       nodes.attr("transform", function(d) { return "translate(" + d.dagre.x + "," + d.dagre.y +")"; });
 
@@ -253,6 +261,9 @@ digraph {
               "translate(" + d3.event.translate + ")"
               + " scale(" + d3.event.scale + ")");
       }));
+
+      // Print metrics
+      d3.select("#graphTime").text("Parse time: " + (parseEnd - parseStart) + "ms. Layout time: " + (layoutEnd - layoutStart) + "ms.");
     }
   }
 </script>
