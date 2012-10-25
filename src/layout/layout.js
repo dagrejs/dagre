@@ -81,7 +81,7 @@ dagre.layout = function() {
 
     var reversed = acyclic(g);
 
-    dagre.layout.rank(g, nodeMap);
+    dagre.layout.rank(g, nodeMap, edgeMap);
     addDummyNodes();
     var layering = dagre.layout.order(g, orderIters, nodeMap);
     dagre.layout.position(g, layering, nodeMap, rankSep, nodeSep, edgeSep, posDir);
@@ -127,7 +127,15 @@ dagre.layout = function() {
       // loops, so they can be skipped.
       if (source !== target) {
         var id = nextId++;
-        edgeMap[id] = e.dagre = { points: [] };
+        // TODO should we use prototypal inheritance for this?
+        edgeMap[id] = e.dagre = {
+          points: [],
+          source: nodeMap[source],
+          target: nodeMap[target],
+        };
+        if (e.minLen) {
+          e.dagre.minLen = e.minLen;
+        }
         g.addEdge(id, source, target);
       }
     });

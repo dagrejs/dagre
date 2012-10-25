@@ -1,41 +1,43 @@
 dagre.layout.rank = (function() {
-  function initRank(g, nodeMap) {
+  function initRank(g, nodeMap, edgeMap) {
+    var minRank = {};
     var pq = priorityQueue();
+
     g.nodes().forEach(function(u) {
       pq.add(u, g.edges(null, u).length);
+      minRank[u] = 0;
     });
 
-    var current = [];
-    var rankNum = 0;
     while (pq.size() > 0) {
-      for (var minId = pq.min(); pq.priority(minId) === 0; minId = pq.min()) {
-        pq.removeMin();
-        nodeMap[minId].rank = rankNum;
-        current.push(minId);
+      var minId = pq.min();
+      if (pq.priority(minId) > 0) {
+        throw new Error("Input graph is not acyclic: " + dagre.graph.write(g));
       }
+      pq.removeMin();
 
-      if (current.length === 0) {
-        throw new Error("Input graph is not acyclic: " + g.toString());
-      }
+      var rank = minRank[minId];
+      nodeMap[minId].rank = rank;
 
-      current.forEach(function(u) {
-        g.edges(u, null).forEach(function(e) {
-          var edge = g.edge(e);
-          var target = edge.target;
-          pq.decrease(target, pq.priority(target) - 1);
-        });
+      g.outEdges(minId).forEach(function(e) {
+        var edge = g.edge(e);
+        var target = edge.target;
+        minRank[target] = Math.max(minRank[target], rank + (edgeMap[e].minLen || 1));
+        pq.decrease(target, pq.priority(target) - 1);
       });
-
-      current = [];
-      ++rankNum;
     }
   }
 
-  function feasibleTree(g, nodeMap) {
-    // TODO make minLength configurable per edge
-    var minLength = 1;
+  function feasibleTree(g, nodeMap, edgeMap) {
+    // Precompute minimum lengths for each directed edge
+    var minLen = {};
+    g.edges().forEach(function(e) {
+      var edge = edgeMap[e];
+      var id = incidenceId(edge.source.id, edge.target.id);
+      minLen[id] = Math.max(minLen[id] || 1, edge.minLen || 1);
+    });
+
     var tree = dagre.util.prim(g, function(u, v) {
-      return Math.abs(nodeMap[u].rank - nodeMap[v].rank) - minLength;
+      return Math.abs(nodeMap[u].rank - nodeMap[v].rank) - minLen[incidenceId(u, v)];
     });
 
     var visited = {};
@@ -45,7 +47,8 @@ dagre.layout.rank = (function() {
 
       tree[u].forEach(function(v) {
         if (!(v in visited)) {
-          dfs(v, rank + (g.edges(u, v).length ? minLength : -minLength));
+          var delta = minLen[incidenceId(u, v)];
+          dfs(v, rank + (g.edges(u, v).length ? delta : -delta));
         }
       });
     }
@@ -60,11 +63,20 @@ dagre.layout.rank = (function() {
     values(nodeMap).forEach(function(u) { u.rank -= m; });
   }
 
-  return function(g, nodeMap) {
-    initRank(g, nodeMap);
+  /*
+   * This id can be used to group (in an undirected manner) multi-edges
+   * incident on the same two nodes.
+   */
+  function incidenceId(u, v) {
+    return u < v ?  u.length + ":" + u + "-" + v : v.length + ":" + v + "-" + u;
+
+  }
+
+  return function(g, nodeMap, edgeMap) {
+    initRank(g, nodeMap, edgeMap);
     components(g).forEach(function(cmpt) {
       var subgraph = g.subgraph(cmpt);
-      feasibleTree(subgraph, nodeMap);
+      feasibleTree(subgraph, nodeMap, edgeMap);
       normalize(subgraph, nodeMap);
     });
   };
