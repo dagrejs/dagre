@@ -114,14 +114,20 @@ dagre.layout.order = (function() {
 
     var toSort = [];
 
-    movable.forEach(function(u) {
+    movable.forEach(function(u, i) {
       var weight = weights[u];
       if (weight !== -1) {
-        toSort.push({node: u, weight: weight});
+        toSort.push({node: u, weight: weight, pos: i});
       }
     });
 
-    toSort.sort(function(x, y) { return x.weight - y.weight; });
+    toSort.sort(function(x, y) {
+      var d = x.weight - y.weight;
+      if (d === 0) {
+        return x.pos - y.pos;
+      }
+      return d;
+    });
 
     var toSortIndex = 0;
     for (var i = 0; i < movable.length; ++i) {
