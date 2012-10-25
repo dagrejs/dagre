@@ -1,4 +1,4 @@
-require("./common");
+require("../common");
 
 describe("dagre.layout", function() {
   it("preserves edge ids for graphs with edges spanning multiple ranks", function() {

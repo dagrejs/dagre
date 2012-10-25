@@ -2,7 +2,7 @@ NODE?=node
 NPM?=npm
 PEGJS?=node_modules/pegjs/bin/pegjs
 MOCHA?=node_modules/mocha/bin/mocha
-MOCHA_OPTS?=
+MOCHA_OPTS?=--recursive
 
 all: dagre.js package.json
 
@@ -10,10 +10,10 @@ all: dagre.js package.json
 	src/pre.js \
 	src/version.js \
 	src/graph.js \
-	src/layout.js \
-	src/layout-rank.js \
-	src/layout-order.js \
-	src/layout-position.js \
+	src/layout/layout.js \
+	src/layout/rank.js \
+	src/layout/order.js \
+	src/layout/position.js \
 	src/util.js \
 	src/priority-queue.js \
 	src/parse-dot.js \
