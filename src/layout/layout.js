@@ -79,15 +79,11 @@ dagre.layout = function() {
       return;
     }
 
-    var reversed = acyclic(g);
-
     dagre.layout.rank(g, nodeMap, edgeMap);
     addDummyNodes();
     var layering = dagre.layout.order(g, orderIters, nodeMap);
     dagre.layout.position(g, layering, nodeMap, rankSep, nodeSep, edgeSep, posDir);
     collapseDummyNodes();
-
-    undoAcyclic(reversed);
 
     resetInternalState();
   };
@@ -141,55 +137,17 @@ dagre.layout = function() {
     });
   }
 
-  function acyclic(g) {
-    var onStack = {};
-    var visited = {};
-    var reversed = [];
-
-    function dfs(u) {
-      if (u in visited)
-        return;
-
-      visited[u] = true;
-      onStack[u] = true;
-      g.edges(u, null).forEach(function(e) {
-        var edge = g.edge(e);
-        var v = edge.target;
-        if (v in onStack) {
-          g.delEdge(e);
-          reversed.push(e);
-          g.addEdge(e, v, u);
-        } else {
-          dfs(v);
-        }
-      });
-
-      delete onStack[u];
-    }
-
-    g.nodes().forEach(function(u) {
-      dfs(u);
-    });
-
-    return reversed;
-  }
-
-  function undoAcyclic(reversed) {
-    reversed.forEach(function(e) {
-      edgeMap[e].points.reverse();
-    });
-  }
-
   // Assumes input graph has no self-loops and is otherwise acyclic.
   function addDummyNodes() {
     g.edges().forEach(function(e) {
       var edge = g.edge(e);
       var sourceRank = nodeMap[edge.source].rank;
       var targetRank = nodeMap[edge.target].rank;
-      if (sourceRank + 1 < targetRank) {
+      var delta = sourceRank < targetRank ? 1 : -1;
+      if (sourceRank + delta !== targetRank) {
         var prefix = "D-" + e + "-";
         g.delEdge(e);
-        for (var u = edge.source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
+        for (var u = edge.source, rank = sourceRank + delta, i = 0; rank !== targetRank; rank += delta, ++i) {
           var v = prefix + rank;
           g.addNode(v);
           nodeMap[v] = { width: 0,

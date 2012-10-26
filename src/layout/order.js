@@ -24,9 +24,11 @@ dagre.layout.order = (function() {
     var edgeIndices = [];
     layer1.forEach(function(u) {
       var nodeEdges = [];
-      g.edges(u, null).forEach(function(e) {
-        var edge = g.edge(e);
-        nodeEdges.push(layer2Pos[edge.target]);
+      g.neighbors(u).forEach(function(v) {
+        var pos = layer2Pos[v];
+        if (pos !== undefined) {
+          nodeEdges.push(pos);
+        }
       });
       // TODO consider radix sort
       nodeEdges.sort(function(x, y) { return x - y; });
@@ -93,11 +95,11 @@ dagre.layout.order = (function() {
   function improveOrdering(g, i, layering) {
     if (i % 2 === 0) {
       for (var j = 1; j < layering.length; ++j) {
-        improveLayer(g, i, layering[j - 1], layering[j], "inEdges");
+        improveLayer(g, i, layering[j - 1], layering[j]);
       }
     } else {
       for (var j = layering.length - 2; j >= 0; --j) {
-        improveLayer(g, i, layering[j + 1], layering[j], "outEdges");
+        improveLayer(g, i, layering[j + 1], layering[j]);
       }
     }
   }
@@ -109,8 +111,8 @@ dagre.layout.order = (function() {
    *
    * This algorithm is based on the barycenter method.
    */
-  function improveLayer(g, i, fixed, movable, neighbors) {
-    var weights = rankWeights(g, fixed, movable, neighbors);
+  function improveLayer(g, i, fixed, movable) {
+    var weights = rankWeights(g, fixed, movable);
 
     var toSort = [];
 
@@ -144,24 +146,23 @@ dagre.layout.order = (function() {
    * return weights for the movable layer that can be used to reorder the layer
    * for potentially reduced edge crossings.
    */
-  function rankWeights(g, fixed, movable, neighbors) {
+  function rankWeights(g, fixed, movable) {
     var fixedPos = {};
     fixed.forEach(function(u, i) { fixedPos[u] = i; });
 
     var weights = {};
     movable.forEach(function(u) {
-      var weight = -1;
-      var edges = g[neighbors](u);
-      if (edges.length > 0) {
-        weight = 0;
-        edges.forEach(function(e) {
-          var edge = g.edge(e);
-          var neighborId = edge.source === u ? edge.target : edge.source;
-          weight += fixedPos[neighborId];
-        });
-        weight = weight / edges.length;
-      }
-      weights[u] = weight;
+      var weight;
+      var adjCount = 0;
+      g.neighbors(u).forEach(function(v) {
+        var vPos = fixedPos[v];
+        if (vPos !== undefined) {
+          if (!adjCount) { weight = 0; }
+          weight += vPos;
+          ++adjCount;
+        }
+      });
+      weights[u] = adjCount ? weight / adjCount : -1;
     });
 
     return weights;

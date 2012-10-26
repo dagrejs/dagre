@@ -48,5 +48,23 @@ describe("dagre.layout.rank", function() {
     assert.equal(nodeMap["A"].rank, 0);
     assert.equal(nodeMap["B"].rank, 2);
   });
+
+  it("can rank nodes even for graphs with cycles", function() {
+    var nodeMap = { A: {}, B: {}, C: {}, D: {} };
+    var edgeMap = { AB: { source: "A", target: "B" },
+                    BC: { source: "B", target: "C" },
+                    CD: { source: "C", target: "D" },
+                    DA: { source: "D", target: "A" } };
+    var g = makeTestGraph(nodeMap, edgeMap);
+
+    dagre.layout.rank(g, nodeMap, edgeMap);
+
+    var rankDelta = 4 - nodeMap["A"].rank;
+    
+    assert.equal((nodeMap["A"].rank + rankDelta) % 4, 0);
+    assert.equal((nodeMap["B"].rank + rankDelta) % 4, 1);
+    assert.equal((nodeMap["C"].rank + rankDelta) % 4, 2);
+    assert.equal((nodeMap["D"].rank + rankDelta) % 4, 3);
+  });
 });
 
