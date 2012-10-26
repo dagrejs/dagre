@@ -54,6 +54,23 @@ describe("graph", function() {
     });
   });
 
+  describe("node", function() {
+    it("throws if the node isn't in the graph", function() {
+      assert.throws(function() { g.node(1); });
+    });
+
+    it("has an undefined value if no value was assigned to the node", function() {
+      g.addNode(1);
+      assert.deepEqual(g.node(1), { value: undefined });
+    });
+
+    it("returns the node's value if one was set", function() {
+      var value = { abc: 123 };
+      g.addNode(1, value);
+      assert.strictEqual(g.node(1).value, value);
+    });
+  });
+
   describe("addEdge", function() {
     it("adds a new edge to the graph", function() {
       g.addNode(1);
@@ -81,6 +98,35 @@ describe("graph", function() {
       assert.lengthOf(g.successors(1), 0);
       assert.lengthOf(g.predecessors(1), 0);
       assert.lengthOf(g.neighbors(1), 0);
+    });
+  });
+
+  describe("edge", function() {
+    it("throws if the edge isn't in the graph", function() {
+      assert.throws(function() { g.edge(3); });
+    });
+
+    it("has the nodes that are incident on the edge", function() {
+      g.addNode(1);
+      g.addNode(2);
+      g.addEdge(3, 1, 2);
+      assert.equal(g.edge(3).source, 1);
+      assert.equal(g.edge(3).target, 2);
+    });
+
+    it("has an undefined value if no value was assigned to the edge", function() {
+      g.addNode(1);
+      g.addNode(2);
+      g.addEdge(3, 1, 2);
+      assert.isUndefined(g.edge(3).value);
+    });
+
+    it("returns the edge's value if one was set", function() {
+      var value = { abc: 123 };
+      g.addNode(1);
+      g.addNode(2);
+      g.addEdge(3, 1, 2, value);
+      assert.strictEqual(g.edge(3).value, value);
     });
   });
 

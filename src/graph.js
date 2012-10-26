@@ -14,17 +14,17 @@ dagre.graph = function() {
       edges = {},
       graph = {};
 
-  graph.addNode = function(u) {
+  graph.addNode = function(u, value) {
     if (graph.hasNode(u)) {
       throw new Error("Graph already has node '" + u + "':\n" + graph.toString());
     }
-    nodes[u] = u;
+    nodes[u] = { id: u, value: value };
     inEdges[u] = {};
     outEdges[u] = {};
   }
 
   graph.delNode = function(u) {
-    strictHasNode(u);
+    strictGetNode(u);
 
     graph.edges(u, null).forEach(function(e) { graph.delEdge(e); });
     graph.edges(null, u).forEach(function(e) { graph.delEdge(e); });
@@ -34,19 +34,26 @@ dagre.graph = function() {
     delete nodes[u];
   }
 
+  graph.node = function(u) {
+    var node = strictGetNode(u);
+    return {
+      value: node.value
+    };
+  }
+
   graph.hasNode = function(u) {
     return u in nodes;
   }
 
-  graph.addEdge = function(e, source, target) {
-    strictHasNode(source);
-    strictHasNode(target);
+  graph.addEdge = function(e, source, target, value) {
+    strictGetNode(source);
+    strictGetNode(target);
 
     if (graph.hasEdge(e)) {
       throw new Error("Graph already has edge '" + e + "':\n" + graph.toString());
     }
 
-    edges[e] = { source: source, target: target, key: e };
+    edges[e] = { id: e, source: source, target: target, value: value };
     addEdgeToMap(inEdges[target], source, e);
     addEdgeToMap(outEdges[source], target, e);
   }
@@ -62,7 +69,8 @@ dagre.graph = function() {
     var edge = strictGetEdge(e);
     return {
       source: edge.source,
-      target: edge.target
+      target: edge.target,
+      value: edge.value
     };
   }
 
@@ -71,36 +79,36 @@ dagre.graph = function() {
   }
 
   graph.successors = function(u) {
-    strictHasNode(u);
-    return keys(outEdges[u]).map(function(v) { return nodes[v]; });
+    strictGetNode(u);
+    return keys(outEdges[u]).map(function(v) { return nodes[v].id; });
   }
 
   graph.predecessors = function(u) {
-    strictHasNode(u);
-    return keys(inEdges[u]).map(function(v) { return nodes[v]; });
+    strictGetNode(u);
+    return keys(inEdges[u]).map(function(v) { return nodes[v].id; });
   }
 
   graph.neighbors = function(u) {
-    strictHasNode(u);
+    strictGetNode(u);
     var vs = {};
     keys(outEdges[u]).map(function(v) { vs[v] = true; });
     keys(inEdges[u]).map(function(v) { vs[v] = true; });
-    return keys(vs).map(function(v) { return nodes[v]; });
+    return keys(vs).map(function(v) { return nodes[v].id; });
   }
 
   graph.nodes = function() {
-    return values(nodes);
+    return values(nodes).map(function(u) { return u.id; });
   }
 
   graph.edges = function(source, target) {
     var sourceDefined = source !== undefined && source != null;
     var targetDefined = target !== undefined && target != null;
 
-    if (sourceDefined) { strictHasNode(source); }
-    if (targetDefined) { strictHasNode(target); }
+    if (sourceDefined) { strictGetNode(source); }
+    if (targetDefined) { strictGetNode(target); }
 
     if (!sourceDefined && !targetDefined) {
-      return values(edges).map(function(e) { return e.key; });
+      return values(edges).map(function(e) { return e.id; });
     } else {
       var es;
       if (sourceDefined) {
@@ -113,7 +121,7 @@ dagre.graph = function() {
       } else {
         es = concat(values(inEdges[target]).map(function(es) { return keys(es.edges); }));
       }
-      return es.map(function(e) { return edges[e].key });
+      return es.map(function(e) { return edges[e].id });
     }
   };
 
@@ -128,12 +136,12 @@ dagre.graph = function() {
   graph.subgraph = function(us) {
     var g = dagre.graph();
     us.forEach(function(u) {
-      strictHasNode(u);
+      strictGetNode(u);
       g.addNode(u);
     });
     values(edges).forEach(function(e) {
       if (g.hasNode(e.source) && g.hasNode(e.target)) {
-        g.addEdge(e.key, e.source, e.target);
+        g.addEdge(e.id, e.source, e.target);
       }
     });
     return g;
@@ -168,10 +176,12 @@ dagre.graph = function() {
     }
   }
 
-  function strictHasNode(u) {
+  function strictGetNode(u) {
+    var node = nodes[u];
     if (!(u in nodes)) {
       throw new Error("Node '" + u + "' is not in graph:\n" + graph.toString());
     }
+    return node;
   }
 
   function strictGetEdge(e) {
