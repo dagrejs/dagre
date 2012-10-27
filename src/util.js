@@ -144,3 +144,15 @@ var intersectRect = dagre.util.intersectRect = function(rect, point) {
 var pointStr = dagre.util.pointStr = function(point) {
   return point.x + "," + point.y;
 }
+
+var createTimer = function() {
+  var start = new Date().getTime();
+  var timer = {};
+  timer.elapsed = function() {
+    return new Date().getTime() - start;
+  }
+  timer.elapsedString = function() {
+    return timer.elapsed() + "ms";
+  }
+  return timer;
+}

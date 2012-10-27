@@ -14,7 +14,9 @@ dagre.layout = function() {
       // Number of passes to take during the ordering phase.
       orderIters = 24,
       // Debug positioning with a particular direction (up-left, up-right, down-left, down-right).
-      posDir = null;
+      posDir = null,
+      // How much debug information to include?
+      debugLevel = 0;
 
   // Internal state
   var
@@ -70,6 +72,12 @@ dagre.layout = function() {
     return layout;
   }
 
+  layout.debugLevel = function(x) {
+    if (!arguments.length) return debugLevel;
+    debugLevel = x;
+    return layout;
+  }
+
   layout.run = function() {
     // Build internal graph
     init();
@@ -83,7 +91,10 @@ dagre.layout = function() {
 
     dagre.layout.rank(g, nodeMap, edgeMap);
     addDummyNodes();
-    var layering = dagre.layout.order(g, orderIters, nodeMap);
+    var layering = dagre.layout.order()
+      .iterations(orderIters)
+      .debugLevel(debugLevel)
+      .run(g, nodeMap);
     dagre.layout.position(g, layering, nodeMap, rankSep, nodeSep, edgeSep, posDir);
     collapseDummyNodes();
 

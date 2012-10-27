@@ -1,4 +1,61 @@
-dagre.layout.order = (function() {
+dagre.layout.order = function() {
+  // External configuration
+  var
+    // Maximum number of passes to make
+    iterations = 24;
+
+    // Level 1: log time spent and best cross count found
+    // Level 2: log cross count on each iteration
+    debugLevel = 0;
+
+  var order = {};
+
+  order.iterations = function(x) {
+    if (!arguments.length) return iterations;
+    iterations = x;
+    return order;
+  }
+
+  order.debugLevel = function(x) {
+    if (!arguments.length) return debugLevel;
+    debugLevel = x;
+    return order;
+  }
+
+  order.run = function(g, nodeMap) {
+    var timer = createTimer();
+
+    var layering = initOrder(g, nodeMap);
+    var bestLayering = copyLayering(layering);
+    var bestCC = crossCount(g, layering);
+
+    if (debugLevel >= 2) {
+      console.log("Order phase start cross count: " + bestCC);
+    }
+
+    var cc;
+    for (var i = 0; i < iterations; ++i) {
+      improveOrdering(g, i, layering);
+      cc = crossCount(g, layering);
+      if (cc < bestCC) {
+        bestLayering = copyLayering(layering);
+        bestCC = cc;
+      }
+      if (debugLevel >= 2) {
+        console.log("Order phase iter " + i + " cross count: " + bestCC);
+      }
+    }
+
+    if (debugLevel >= 1) {
+      console.log("Order phase time: " + timer.elapsedString());
+      console.log("Order phase best cross count: " + bestCC);
+    }
+
+    return bestLayering;
+  }
+
+  return order;
+
   function crossCount(g, layering) {
     var cc = 0;
     var prevLayer;
@@ -170,22 +227,4 @@ dagre.layout.order = (function() {
   function copyLayering(layering) {
     return layering.map(function(l) { return l.slice(0); });
   }
-
-  return function(g, orderIters, nodeMap) {
-    var layering = initOrder(g, nodeMap);
-    var bestLayering = copyLayering(layering);
-    var bestCC = crossCount(g, layering);
-
-    var cc;
-    for (var i = 0; i < orderIters; ++i) {
-      improveOrdering(g, i, layering);
-      cc = crossCount(g, layering);
-      if (cc < bestCC) {
-        bestLayering = copyLayering(layering);
-        bestCC = cc;
-      }
-    }
-
-    return bestLayering;
-  }
-})();
+}
