@@ -2,27 +2,27 @@ dagre.layout.order = function() {
   // External configuration
   var
     // Maximum number of passes to make
-    iterations = 24;
+    iterations = 24,
 
     // Level 1: log time spent and best cross count found
     // Level 2: log cross count on each iteration
     debugLevel = 0;
 
-  var order = {};
+  var self = {};
 
-  order.iterations = function(x) {
+  self.iterations = function(x) {
     if (!arguments.length) return iterations;
     iterations = x;
-    return order;
+    return self;
   }
 
-  order.debugLevel = function(x) {
+  self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
     debugLevel = x;
-    return order;
+    return self;
   }
 
-  order.run = function(g, nodeMap) {
+  self.run = function(g, nodeMap) {
     var timer = createTimer();
 
     var layering = initOrder(g, nodeMap);
@@ -54,7 +54,7 @@ dagre.layout.order = function() {
     return bestLayering;
   }
 
-  return order;
+  return self;
 
   function crossCount(g, layering) {
     var cc = 0;

@@ -1,4 +1,34 @@
-dagre.layout.rank = (function() {
+dagre.layout.rank = function() {
+  // External configuration
+  var
+    // Level 1: log time spent
+    debugLevel = 0;
+
+  var self = {};
+
+  self.debugLevel = function(x) {
+    if (!arguments.length) return debugLevel;
+    debugLevel = x;
+    return self;
+  }
+
+  self.run = function(g, nodeMap, edgeMap) {
+    var timer = createTimer();
+
+    initRank(g, nodeMap, edgeMap);
+    components(g).forEach(function(cmpt) {
+      var subgraph = g.subgraph(cmpt);
+      feasibleTree(subgraph, nodeMap, edgeMap);
+      normalize(subgraph, nodeMap);
+    });
+
+    if (debugLevel >= 1) {
+      console.log("Rank phase time: " + timer.elapsedString());
+    }
+  };
+
+  return self;
+
   function initRank(g, nodeMap, edgeMap) {
     var minRank = {};
     var pq = priorityQueue();
@@ -71,13 +101,4 @@ dagre.layout.rank = (function() {
     return u < v ?  u.length + ":" + u + "-" + v : v.length + ":" + v + "-" + u;
 
   }
-
-  return function(g, nodeMap, edgeMap) {
-    initRank(g, nodeMap, edgeMap);
-    components(g).forEach(function(cmpt) {
-      var subgraph = g.subgraph(cmpt);
-      feasibleTree(subgraph, nodeMap, edgeMap);
-      normalize(subgraph, nodeMap);
-    });
-  };
-})();
+}

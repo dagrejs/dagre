@@ -2,7 +2,112 @@
  * The algorithms here are based on Brandes and Köpf, "Fast and Simple
  * Horizontal Coordinate Assignment".
  */
-dagre.layout.position = (function() {
+dagre.layout.position = function() {
+  // External configuration
+  var
+    nodeSep = 50,
+    edgeSep = 10,
+    rankSep = 30,
+    direction = null,
+    // Level 1: log time spent
+    debugLevel = 0;
+
+  var self = {};
+
+  self.nodeSep = function(x) {
+    if (!arguments.length) return nodeSep;
+    nodeSep = x;
+    return self;
+  };
+
+  self.edgeSep = function(x) {
+    if (!arguments.length) return edgeSep;
+    edgeSep = x;
+    return self;
+  };
+
+  self.rankSep = function(x) {
+    if (!arguments.length) return rankSep;
+    rankSep = x;
+    return self;
+  };
+
+  self.direction = function(x) {
+    if (!arguments.length) return direction;
+    direction = x;
+    return self;
+  };
+
+  self.debugLevel = function(x) {
+    if (!arguments.length) return debugLevel;
+    debugLevel = x;
+    return self;
+  };
+
+  self.run = function(g, layering, nodeMap) {
+    var timer = createTimer();
+
+    var type1Conflicts = findType1Conflicts(g, layering, nodeMap);
+
+    var xss = {};
+    ["up", "down"].forEach(function(vertDir) {
+      if (vertDir === "down") { layering.reverse(); }
+
+      ["left", "right"].forEach(function(horizDir) {
+        if (horizDir === "right") { reverseInnerOrder(layering); }
+
+        var dir = vertDir + "-" + horizDir;
+        if (!direction || direction === dir) {
+          var align = verticalAlignment(g, layering, type1Conflicts, vertDir === "up" ? "predecessors" : "successors");
+          xss[dir]= horizontalCompaction(layering, nodeMap, align.pos, align.root, align.align, nodeSep, edgeSep);
+          if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
+        }
+
+        if (horizDir === "right") { reverseInnerOrder(layering); }
+      });
+
+      if (vertDir === "down") { layering.reverse(); }
+    });
+
+    if (direction) {
+      // In debug mode we allow forcing layout to a particular alignment.
+      g.nodes().forEach(function(u) {
+        nodeMap[u].x = xss[direction][u];
+      });
+    } else {
+      alignToSmallest(layering, xss, nodeMap);
+
+      // Find average of medians for xss array
+      g.nodes().forEach(function(u) {
+        var xs = values(xss).map(function(xs) { return xs[u]; }).sort(function(x, y) { return x - y; });
+        nodeMap[u].x = (xs[1] + xs[2]) / 2;
+      });
+    }
+
+    // Align min center point with 0
+    var minX = min(g.nodes().map(function(u) { return nodeMap[u].x - nodeMap[u].width / 2; }));
+    g.nodes().forEach(function(u) {
+      nodeMap[u].x -= minX;
+    });
+
+    // Align y coordinates with ranks
+    var posY = 0;
+    layering.forEach(function(layer) {
+      var height = max(layer.map(function(u) { return nodeMap[u].height; }));
+      posY += height / 2;
+      layer.forEach(function(u) {
+        nodeMap[u].y = posY;
+      });
+      posY += height / 2 + rankSep;
+    });
+
+    if (debugLevel >= 1) {
+      console.log("Position phase time: " + timer.elapsedString());
+    }
+  };
+
+  return self;
+
   function findType1Conflicts(g, layering, nodeMap) {
     var type1Conflicts = {};
 
@@ -250,60 +355,4 @@ dagre.layout.position = (function() {
       layer.reverse();
     });
   }
-
-  return function(g, layering, nodeMap, rankSep, nodeSep, edgeSep, debugPosDir) {
-    var type1Conflicts = findType1Conflicts(g, layering, nodeMap);
-
-    var xss = {};
-    ["up", "down"].forEach(function(vertDir) {
-      if (vertDir === "down") { layering.reverse(); }
-
-      ["left", "right"].forEach(function(horizDir) {
-        if (horizDir === "right") { reverseInnerOrder(layering); }
-
-        var dir = vertDir + "-" + horizDir;
-        if (!debugPosDir || debugPosDir === dir) {
-          var align = verticalAlignment(g, layering, type1Conflicts, vertDir === "up" ? "predecessors" : "successors");
-          xss[dir]= horizontalCompaction(layering, nodeMap, align.pos, align.root, align.align, nodeSep, edgeSep);
-          if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
-        }
-
-        if (horizDir === "right") { reverseInnerOrder(layering); }
-      });
-
-      if (vertDir === "down") { layering.reverse(); }
-    });
-
-    if (debugPosDir) {
-      // In debug mode we allow forcing layout to a particular alignment.
-      g.nodes().forEach(function(u) {
-        nodeMap[u].x = xss[debugPosDir][u];
-      });
-    } else {
-      alignToSmallest(layering, xss, nodeMap);
-
-      // Find average of medians for xss array
-      g.nodes().forEach(function(u) {
-        var xs = values(xss).map(function(xs) { return xs[u]; }).sort(function(x, y) { return x - y; });
-        nodeMap[u].x = (xs[1] + xs[2]) / 2;
-      });
-    }
-
-    // Align min center point with 0
-    var minX = min(g.nodes().map(function(u) { return nodeMap[u].x - nodeMap[u].width / 2; }));
-    g.nodes().forEach(function(u) {
-      nodeMap[u].x -= minX;
-    });
-
-    // Align y coordinates with ranks
-    var posY = 0;
-    layering.forEach(function(layer) {
-      var height = max(layer.map(function(u) { return nodeMap[u].height; }));
-      posY += height / 2;
-      layer.forEach(function(u) {
-        nodeMap[u].y = posY;
-      });
-      posY += height / 2 + rankSep;
-    });
-  };
-})();
+}

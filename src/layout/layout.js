@@ -25,60 +25,69 @@ dagre.layout = function() {
       // Map to original nodes using graph ids
       nodeMap,
       // Map to original edges using graph ids
-      edgeMap;
+      edgeMap,
+
+      rank = dagre.layout.rank(),
+      order = dagre.layout.order(),
+      position = dagre.layout.position();
 
   // This layout object
-  var layout = {};
+  var self = {};
 
-  layout.nodes = function(x) {
+  self.nodes = function(x) {
     if (!arguments.length) return nodes;
     nodes = x;
-    return layout;
-  }
+    return self;
+  };
 
-  layout.edges = function(x) {
+  self.edges = function(x) {
     if (!arguments.length) return edges;
     edges = x;
-    return layout;
+    return self;
+  };
+
+  self.orderIters = function(x) {
+    if (!arguments.length) return order.iterations();
+    order.iterations(x);
+    return self;
   }
 
-  layout.nodeSep = function(x) {
-    if (!arguments.length) return nodeSep;
-    nodeSep = x;
-    return layout;
+  self.nodeSep = function(x) {
+    if (!arguments.length) return position.nodeSep();
+    position.nodeSep(x);
+    return self;
+  };
+
+  self.edgeSep = function(x) {
+    if (!arguments.length) return position.edgeSep();
+    position.edgeSep(x);
+    return self;
   }
 
-  layout.edgeSep = function(x) {
-    if (!arguments.length) return edgeSep;
-    edgeSep = x;
-    return layout;
+  self.rankSep = function(x) {
+    if (!arguments.length) return position.rankSep();
+    position.rankSep(x);
+    return self;
   }
 
-  layout.rankSep = function(x) {
-    if (!arguments.length) return rankSep;
-    rankSep = x;
-    return layout;
+  self.posDir = function(x) {
+    if (!arguments.length) return position.direction();
+    position.direction(x);
+    return self;
   }
 
-  layout.orderIters = function(x) {
-    if (!arguments.length) return orderIters;
-    orderIters = x;
-    return layout;
-  }
-
-  layout.posDir = function(x) {
-    if (!arguments.length) return posDir;
-    posDir = x;
-    return layout;
-  }
-
-  layout.debugLevel = function(x) {
+  self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
     debugLevel = x;
-    return layout;
+    rank.debugLevel(x);
+    order.debugLevel(x);
+    position.debugLevel(x);
+    return self;
   }
 
-  layout.run = function() {
+  self.run = function() {
+    var timer = createTimer();
+    
     // Build internal graph
     init();
 
@@ -89,19 +98,22 @@ dagre.layout = function() {
 
     var reversed = acyclic(g);
 
-    dagre.layout.rank(g, nodeMap, edgeMap);
+    rank.run(g, nodeMap, edgeMap);
     addDummyNodes();
-    var layering = dagre.layout.order()
-      .iterations(orderIters)
-      .debugLevel(debugLevel)
-      .run(g, nodeMap);
-    dagre.layout.position(g, layering, nodeMap, rankSep, nodeSep, edgeSep, posDir);
+    var layering = order.run(g, nodeMap);
+    position.run(g, layering, nodeMap);
     collapseDummyNodes();
 
     undoAcyclic(reversed);
 
     resetInternalState();
+
+    if (debugLevel >= 1) {
+      console.log("Total layout time: " + timer.elapsedString());
+    }
   };
+
+  return self;
 
   function resetInternalState() {
     g = dagre.graph();
@@ -230,6 +242,4 @@ dagre.layout = function() {
       }
     });
   }
-
-  return layout;
 }

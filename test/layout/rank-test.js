@@ -6,7 +6,7 @@ describe("dagre.layout.rank", function() {
     var edgeMap = {};
     var g = makeTestGraph(nodeMap, edgeMap);
 
-    dagre.layout.rank(g, nodeMap, edgeMap);
+    dagre.layout.rank().run(g, nodeMap, edgeMap);
 
     assert.equal(nodeMap["A"].rank, 0);
   });
@@ -16,7 +16,7 @@ describe("dagre.layout.rank", function() {
     var edgeMap = { AB: { source: "A", target: "B" } };
     var g = makeTestGraph(nodeMap, edgeMap);
 
-    dagre.layout.rank(g, nodeMap, edgeMap);
+    dagre.layout.rank().run(g, nodeMap, edgeMap);
 
     assert.equal(nodeMap["A"].rank, 0);
     assert.equal(nodeMap["B"].rank, 1);
@@ -31,7 +31,7 @@ describe("dagre.layout.rank", function() {
                     AC: { source: "A", target: "C" } };
     var g = makeTestGraph(nodeMap, edgeMap);
 
-    dagre.layout.rank(g, nodeMap, edgeMap);
+    dagre.layout.rank().run(g, nodeMap, edgeMap);
 
     assert.equal(nodeMap["A"].rank, 0);
     assert.equal(nodeMap["B"].rank, 1);
@@ -43,7 +43,7 @@ describe("dagre.layout.rank", function() {
     var edgeMap = { AB: { source: "A", target: "B", minLen: 2 } };
     var g = makeTestGraph(nodeMap, edgeMap);
 
-    dagre.layout.rank(g, nodeMap, edgeMap);
+    dagre.layout.rank().run(g, nodeMap, edgeMap);
 
     assert.equal(nodeMap["A"].rank, 0);
     assert.equal(nodeMap["B"].rank, 2);
