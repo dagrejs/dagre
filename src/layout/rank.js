@@ -11,7 +11,7 @@ dagre.layout.rank = (function() {
     while (pq.size() > 0) {
       var minId = pq.min();
       if (pq.priority(minId) > 0) {
-        throw new Error("Input graph is not acyclic: " + dagre.graph.write(g));
+        throw new Error("Input graph is not acyclic: " + g.toString());
       }
       pq.removeMin();
 
