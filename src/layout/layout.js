@@ -123,16 +123,18 @@ dagre.layout = function() {
         throw new Error("Target node for '" + e + "' not in node list");
       }
 
+      e.dagre = {
+        points: [],
+        source: nodeMap[source],
+        target: nodeMap[target],
+      };
+
       // Track edges that aren't self loops - layout does nothing for self
       // loops, so they can be skipped.
       if (source !== target) {
         var id = nextId++;
+        edgeMap[id] = e.dagre;
         // TODO should we use prototypal inheritance for this?
-        edgeMap[id] = e.dagre = {
-          points: [],
-          source: nodeMap[source],
-          target: nodeMap[target],
-        };
         if (e.minLen) {
           e.dagre.minLen = e.minLen;
         }
