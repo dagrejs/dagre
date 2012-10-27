@@ -51,7 +51,11 @@ dagre.layout.order = function() {
       console.log("Order phase best cross count: " + bestCC);
     }
 
-    return bestLayering;
+    bestLayering.forEach(function(layer) {
+      layer.forEach(function(u, i) {
+        nodeMap[u].order = i;
+      });
+    });
   }
 
   return self;
@@ -138,10 +142,12 @@ dagre.layout.order = function() {
       });
     }
 
-    g.nodes().forEach(function(u) {
-      if (nodeMap[u].rank === 0) {
-        dfs(u);
-      }
+    var nodes = g.nodes().sort(function(x, y) {
+      return nodeMap[x].rank - nodeMap[y].rank;
+    });
+
+    nodes.forEach(function(u) {
+      dfs(u);
     });
 
     return layering;

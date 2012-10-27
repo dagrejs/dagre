@@ -100,8 +100,8 @@ dagre.layout = function() {
 
     rank.run(g, nodeMap, edgeMap);
     addDummyNodes();
-    var layering = order.run(g, nodeMap);
-    position.run(g, layering, nodeMap);
+    order.run(g, nodeMap);
+    position.run(g, nodeMap);
     collapseDummyNodes();
 
     undoAcyclic(reversed);

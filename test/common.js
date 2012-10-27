@@ -5,6 +5,8 @@ dagre = require("../index");
 chai.Assertion.includeStack = true;
 
 makeTestGraph = function(nodeMap, edgeMap) {
+  if (!edgeMap) { edgeMap = {}; }
+
   var g = dagre.graph();
   dagre.util.keys(nodeMap).forEach(function(id) {
     nodeMap[id].id = id;

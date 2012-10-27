@@ -44,8 +44,15 @@ dagre.layout.position = function() {
     return self;
   };
 
-  self.run = function(g, layering, nodeMap) {
+  self.run = function(g, nodeMap) {
     var timer = createTimer();
+
+    var layering = [];
+    keys(nodeMap).forEach(function(u) {
+      var node = nodeMap[u];
+      var layer = layering[node.rank] || (layering[node.rank] = []);
+      layer[node.order] = u;
+    });
 
     var type1Conflicts = findType1Conflicts(g, layering, nodeMap);
 
