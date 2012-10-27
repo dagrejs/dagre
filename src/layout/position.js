@@ -61,7 +61,7 @@ dagre.layout.position = (function() {
     return type1Conflicts;
   }
 
-  function verticalAlignment(g, layering, type1Conflicts) {
+  function verticalAlignment(g, layering, type1Conflicts, relationship) {
     var pos = {};
     var root = {};
     var align = {};
@@ -74,12 +74,10 @@ dagre.layout.position = (function() {
       });
     });
 
-    var visited = {};
     layering.forEach(function(layer) {
       var prevIdx = -1;
       layer.forEach(function(v) {
-        visited[v] = true;
-        var related = g.neighbors(v).filter(function(w) { return w in visited; });
+        var related = g[relationship](v);
         if (related.length > 0) {
           // TODO could find medians with linear algorithm if performance warrants it.
           related.sort(function(x, y) { return pos[x] - pos[y]; });
@@ -265,7 +263,7 @@ dagre.layout.position = (function() {
 
         var dir = vertDir + "-" + horizDir;
         if (!debugPosDir || debugPosDir === dir) {
-          var align = verticalAlignment(g, layering, type1Conflicts);
+          var align = verticalAlignment(g, layering, type1Conflicts, vertDir === "up" ? "predecessors" : "successors");
           xss[dir]= horizontalCompaction(layering, nodeMap, align.pos, align.root, align.align, nodeSep, edgeSep);
           if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
         }

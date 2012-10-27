@@ -63,63 +63,21 @@ dagre.layout.rank = (function() {
     values(nodeMap).forEach(function(u) { u.rank -= m; });
   }
 
-  function acyclic(g) {
-    var onStack = {};
-    var visited = {};
-    var reversed = [];
-
-    function dfs(u) {
-      if (u in visited)
-        return;
-
-      visited[u] = true;
-      onStack[u] = true;
-      g.edges(u, null).forEach(function(e) {
-        var edge = g.edge(e);
-        var v = edge.target;
-        if (v in onStack) {
-          g.delEdge(e);
-          reversed.push(e);
-          g.addEdge(e, v, u);
-        } else {
-          dfs(v);
-        }
-      });
-
-      delete onStack[u];
-    }
-
-    g.nodes().forEach(function(u) {
-      dfs(u);
-    });
-
-    return reversed;
-  }
-
-  function undoAcyclic(g, reversed) {
-    reversed.forEach(function(e) {
-      var edge = g.edge(e);
-      g.delEdge(e);
-      g.addEdge(e, edge.target, edge.source);
-    });
-  }
-
   /*
    * This id can be used to group (in an undirected manner) multi-edges
    * incident on the same two nodes.
    */
   function incidenceId(u, v) {
     return u < v ?  u.length + ":" + u + "-" + v : v.length + ":" + v + "-" + u;
+
   }
 
   return function(g, nodeMap, edgeMap) {
-    var reversed = acyclic(g);
     initRank(g, nodeMap, edgeMap);
     components(g).forEach(function(cmpt) {
       var subgraph = g.subgraph(cmpt);
       feasibleTree(subgraph, nodeMap, edgeMap);
       normalize(subgraph, nodeMap);
     });
-    undoAcyclic(g, reversed);
   };
 })();
