@@ -26,8 +26,7 @@ dagre.graph = function() {
   graph.delNode = function(u) {
     strictGetNode(u);
 
-    graph.edges(u, null).forEach(function(e) { graph.delEdge(e); });
-    graph.edges(null, u).forEach(function(e) { graph.delEdge(e); });
+    graph.edges(u).forEach(function(e) { graph.delEdge(e); });
 
     delete inEdges[u];
     delete outEdges[u];
@@ -100,37 +99,28 @@ dagre.graph = function() {
     return values(nodes).map(function(u) { return u.id; });
   }
 
-  graph.edges = function(source, target) {
-    var sourceDefined = source !== undefined && source != null;
-    var targetDefined = target !== undefined && target != null;
-
-    if (sourceDefined) { strictGetNode(source); }
-    if (targetDefined) { strictGetNode(target); }
-
-    if (!sourceDefined && !targetDefined) {
+  graph.edges = function(u, v) {
+    if (!arguments.length) {
       return values(edges).map(function(e) { return e.id; });
-    } else {
-      var es;
-      if (sourceDefined) {
-        if (targetDefined) {
-          var sourceEdges = outEdges[source];
-          es = (target in sourceEdges) ? keys(sourceEdges[target].edges) : [];
-        } else {
-          es = concat(values(outEdges[source]).map(function(es) { return keys(es.edges); }));
-        }
-      } else {
-        es = concat(values(inEdges[target]).map(function(es) { return keys(es.edges); }));
-      }
+    } else if (arguments.length === 1) {
+      return union([graph.inEdges(u), graph.outEdges(u)]);
+    } else if (arguments.length === 2) {
+      strictGetNode(u);
+      strictGetNode(v);
+      var sourceEdges = outEdges[u];
+      var es = (v in sourceEdges) ? keys(sourceEdges[v].edges) : [];
       return es.map(function(e) { return edges[e].id });
     }
   };
 
   graph.inEdges = function(target) {
-    return graph.edges(null, target);
+    strictGetNode(target);
+    return concat(values(inEdges[target]).map(function(es) { return keys(es.edges); }));
   };
 
   graph.outEdges = function(source) {
-    return graph.edges(source);
+    strictGetNode(source);
+    return concat(values(outEdges[source]).map(function(es) { return keys(es.edges); }));
   };
 
   graph.subgraph = function(us) {

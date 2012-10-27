@@ -34,7 +34,7 @@ dagre.layout.rank = function() {
     var pq = priorityQueue();
 
     g.nodes().forEach(function(u) {
-      pq.add(u, g.edges(null, u).length);
+      pq.add(u, g.inEdges(u).length);
       minRank[u] = 0;
     });
 

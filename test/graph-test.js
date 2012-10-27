@@ -141,29 +141,20 @@ describe("graph", function() {
       assert.deepEqual(g.edges().sort(), ["A", "B", "C"]);
     });
 
-    it("returns all out edges if given a source", function() {
+    it("returns all edges that are incident on a node", function() {
       g.addNode(1);
       g.addNode(2);
       g.addEdge("A", 1, 2);
       g.addEdge("B", 1, 2);
-      g.addEdge("C", 2, 1);
+      g.addEdge("C", 1, 1);
+      g.addEdge("D", 2, 1);
+      g.addEdge("E", 2, 2);
 
-      assert.deepEqual(g.edges(1).sort(), ["A", "B"]);
-      assert.deepEqual(g.edges(1, null).sort(), ["A", "B"]);
+      assert.deepEqual(g.edges(1).sort(), ["A", "B", "C", "D"]);
+      assert.deepEqual(g.edges(2).sort(), ["A", "B", "D", "E"]);
     });
 
-    it("returns all in edges if given a target", function() {
-      g.addNode(1);
-      g.addNode(2);
-      g.addEdge("A", 1, 2);
-      g.addEdge("B", 1, 2);
-      g.addEdge("C", 2, 1);
-
-      assert.deepEqual(g.edges(undefined, 1).sort(), ["C"]);
-      assert.deepEqual(g.edges(null, 1).sort(), ["C"]);
-    });
-
-    it("returns all edges between source and target", function() {
+    it("returns all edges from a source to a target", function() {
       g.addNode(1);
       g.addNode(2);
       g.addNode(3);
@@ -176,6 +167,36 @@ describe("graph", function() {
       assert.deepEqual(g.edges(2, 1).sort(), ["C"]);
       assert.deepEqual(g.edges(2, 3).sort(), ["D"]);
       assert.deepEqual(g.edges(3, 1).sort(), []);
+    });
+  });
+
+  describe("outEdges", function() {
+    it("returns all out edges from a source", function() {
+      g.addNode(1);
+      g.addNode(2);
+      g.addEdge("A", 1, 2);
+      g.addEdge("B", 1, 2);
+      g.addEdge("C", 1, 1);
+      g.addEdge("D", 2, 1);
+      g.addEdge("E", 2, 2);
+
+      assert.deepEqual(g.outEdges(1).sort(), ["A", "B", "C"]);
+      assert.deepEqual(g.outEdges(2).sort(), ["D", "E"]);
+    });
+  });
+
+  describe("inEdges", function() {
+    it("returns all in edges to a target", function() {
+      g.addNode(1);
+      g.addNode(2);
+      g.addEdge("A", 1, 2);
+      g.addEdge("B", 1, 2);
+      g.addEdge("C", 1, 1);
+      g.addEdge("D", 2, 1);
+      g.addEdge("E", 2, 2);
+
+      assert.deepEqual(g.inEdges(1).sort(), ["C", "D"]);
+      assert.deepEqual(g.inEdges(2).sort(), ["A", "B", "E"]);
     });
   });
 

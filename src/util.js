@@ -29,6 +29,24 @@ function values(obj) {
   return Object.keys(obj).map(function(k) { return obj[k]; });
 }
 
+function union(arrays) {
+  var obj = {};
+  for (var i = 0; i < arrays.length; ++i) {
+    var a = arrays[i];
+    for (var j = 0; j < a.length; ++j) {
+      var v = a[j];
+      obj[v] = v;
+    }
+  }
+
+  var results = [];
+  for (var k in obj) {
+    results.push(obj[k]);
+  }
+
+  return results;
+}
+
 /*
  * Returns all components in the graph using undirected navigation.
  */

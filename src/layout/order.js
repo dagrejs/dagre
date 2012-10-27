@@ -85,7 +85,7 @@ dagre.layout.order = function() {
     var edgeIndices = [];
     layer1.forEach(function(u) {
       var nodeEdges = [];
-      g.edges(u, null).forEach(function(e) {
+      g.outEdges(u).forEach(function(e) {
         var edge = g.edge(e);
         nodeEdges.push(layer2Pos[edge.target]);
       });

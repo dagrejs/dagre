@@ -177,7 +177,7 @@ dagre.layout = function() {
 
       visited[u] = true;
       onStack[u] = true;
-      g.edges(u, null).forEach(function(e) {
+      g.outEdges(u).forEach(function(e) {
         var edge = g.edge(e);
         var v = edge.target;
         if (v in onStack) {
