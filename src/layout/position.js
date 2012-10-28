@@ -158,8 +158,7 @@ dagre.layout.position = function() {
           for (;currIdx <= j; ++currIdx) {
             var v = layer[currIdx];
             g.inEdges(v).forEach(function(e) {
-              var edge = g.edge(e);
-              var sourcePos = pos[edge.source];
+              var sourcePos = pos[g.source(e)];
               if (sourcePos < innerLeft || sourcePos > innerRight) {
                 type1Conflicts[e] = true;
               }

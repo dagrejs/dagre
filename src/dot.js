@@ -77,13 +77,12 @@ dagre.dot.toGraph = function(str) {
 
 dagre.dot.toObjects = function(str) {
   var g = dagre.dot.toGraph(str);
-  var nodes = g.nodes().map(function(u) { return g.node(u).value; });
+  var nodes = g.nodes().map(function(u) { return g.node(u); });
   var edges = g.edges().map(function(e) {
-    var edge = g.edge(e);
     return {
-      id: edge.value.id,
-      source: g.node(edge.source).value,
-      target: g.node(edge.target).value
+      id: g.edge(e).id,
+      source: g.node(g.source(e)),
+      target: g.node(g.target(e))
     };
   });
   return { nodes: nodes, edges: edges };

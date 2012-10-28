@@ -34,10 +34,7 @@ dagre.graph = function() {
   }
 
   graph.node = function(u) {
-    var node = strictGetNode(u);
-    return {
-      value: node.value
-    };
+    return strictGetNode(u).value;
   }
 
   graph.hasNode = function(u) {
@@ -65,12 +62,15 @@ dagre.graph = function() {
   }
 
   graph.edge = function(e) {
-    var edge = strictGetEdge(e);
-    return {
-      source: edge.source,
-      target: edge.target,
-      value: edge.value
-    };
+    return strictGetEdge(e).value;
+  }
+
+  graph.source = function(e) {
+    return strictGetEdge(e).source;
+  }
+
+  graph.target = function(e) {
+    return strictGetEdge(e).target;
   }
 
   graph.hasEdge = function(e) {

@@ -49,8 +49,7 @@ dagre.layout.rank = function() {
       nodeMap[minId].rank = rank;
 
       g.outEdges(minId).forEach(function(e) {
-        var edge = g.edge(e);
-        var target = edge.target;
+        var target = g.target(e);
         minRank[target] = Math.max(minRank[target], rank + (edgeMap[e].minLen || 1));
         pq.decrease(target, pq.priority(target) - 1);
       });

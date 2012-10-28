@@ -161,8 +161,8 @@ dagre.layout.order = function() {
       if (edges.length > 0) {
         weight = 0;
         edges.forEach(function(e) {
-          var edge = g.edge(e);
-          var neighborId = edge.source === u ? edge.target : edge.source;
+          var source = g.source(e);
+          var neighborId = g.source(e) === u ? g.target(e) : source;
           weight += fixedPos[neighborId];
         });
         weight = weight / edges.length;
@@ -204,8 +204,7 @@ function bilayerCrossCount(g, layer1, layer2) {
   layer1.forEach(function(u) {
     var nodeEdges = [];
     g.outEdges(u).forEach(function(e) {
-      var edge = g.edge(e);
-      nodeEdges.push(layer2Pos[edge.target]);
+      nodeEdges.push(layer2Pos[g.target(e)]);
     });
     // TODO consider radix sort
     nodeEdges.sort(function(x, y) { return x - y; });

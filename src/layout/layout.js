@@ -178,8 +178,7 @@ dagre.layout = function() {
       visited[u] = true;
       onStack[u] = true;
       g.outEdges(u).forEach(function(e) {
-        var edge = g.edge(e);
-        var v = edge.target;
+        var v = g.target(e);
         if (v in onStack) {
           g.delEdge(e);
           reversed.push(e);
@@ -208,13 +207,14 @@ dagre.layout = function() {
   // Assumes input graph has no self-loops and is otherwise acyclic.
   function addDummyNodes() {
     g.edges().forEach(function(e) {
-      var edge = g.edge(e);
-      var sourceRank = nodeMap[edge.source].rank;
-      var targetRank = nodeMap[edge.target].rank;
+      var source = g.source(e);
+      var target = g.target(e);
+      var sourceRank = nodeMap[source].rank;
+      var targetRank = nodeMap[target].rank;
       if (sourceRank + 1 < targetRank) {
         var prefix = "D-" + e + "-";
         g.delEdge(e);
-        for (var u = edge.source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
+        for (var u = source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
           var v = prefix + rank;
           g.addNode(v);
           nodeMap[v] = { width: 0,
@@ -226,7 +226,7 @@ dagre.layout = function() {
           g.addEdge(u + " -> " + v, u, v);
           u = v;
         }
-        g.addEdge(u + " -> " + edge.target, u, edge.target);
+        g.addEdge(u + " -> " + target, u, target);
       }
     });
   }

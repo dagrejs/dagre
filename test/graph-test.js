@@ -61,13 +61,13 @@ describe("graph", function() {
 
     it("has an undefined value if no value was assigned to the node", function() {
       g.addNode(1);
-      assert.deepEqual(g.node(1), { value: undefined });
+      assert.isUndefined(g.node(1));
     });
 
     it("returns the node's value if one was set", function() {
       var value = { abc: 123 };
       g.addNode(1, value);
-      assert.strictEqual(g.node(1).value, value);
+      assert.strictEqual(g.node(1), value);
     });
   });
 
@@ -110,15 +110,15 @@ describe("graph", function() {
       g.addNode(1);
       g.addNode(2);
       g.addEdge(3, 1, 2);
-      assert.equal(g.edge(3).source, 1);
-      assert.equal(g.edge(3).target, 2);
+      assert.equal(g.source(3), 1);
+      assert.equal(g.target(3), 2);
     });
 
     it("has an undefined value if no value was assigned to the edge", function() {
       g.addNode(1);
       g.addNode(2);
       g.addEdge(3, 1, 2);
-      assert.isUndefined(g.edge(3).value);
+      assert.isUndefined(g.edge(3));
     });
 
     it("returns the edge's value if one was set", function() {
@@ -126,7 +126,7 @@ describe("graph", function() {
       g.addNode(1);
       g.addNode(2);
       g.addEdge(3, 1, 2, value);
-      assert.strictEqual(g.edge(3).value, value);
+      assert.strictEqual(g.edge(3), value);
     });
   });
 
