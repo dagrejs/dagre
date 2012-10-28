@@ -10,6 +10,8 @@ dagre.layout.order = function() {
 
   var self = {};
 
+  var crossCount = dagre.layout.order.crossCount;
+
   self.iterations = function(x) {
     if (!arguments.length) return iterations;
     iterations = x;
@@ -56,70 +58,11 @@ dagre.layout.order = function() {
         nodeMap[u].order = i;
       });
     });
+
+    return bestLayering;
   }
 
   return self;
-
-  function crossCount(g, layering) {
-    var cc = 0;
-    var prevLayer;
-    layering.forEach(function(layer) {
-      if (prevLayer) {
-        cc += bilayerCrossCount(g, prevLayer, layer);
-      }
-      prevLayer = layer;
-    });
-    return cc;
-  }
-
-  /*
-   * This function searches through a ranked and ordered graph and counts the
-   * number of edges that cross. This algorithm is derived from:
-   *
-   *    W. Barth et al., Bilayer Cross Counting, JGAA, 8(2) 179–194 (2004)
-   */
-  function bilayerCrossCount(g, layer1, layer2) {
-    var layer2Pos = {};
-    layer2.forEach(function(u, i) { layer2Pos[u] = i; });
-
-    var edgeIndices = [];
-    layer1.forEach(function(u) {
-      var nodeEdges = [];
-      g.outEdges(u).forEach(function(e) {
-        var edge = g.edge(e);
-        nodeEdges.push(layer2Pos[edge.target]);
-      });
-      // TODO consider radix sort
-      nodeEdges.sort(function(x, y) { return x - y; });
-      edgeIndices = edgeIndices.concat(nodeEdges);
-    });
-
-    var firstIndex = 1;
-    while (firstIndex < layer2.length) {
-      firstIndex <<= 1;
-    }
-
-    var treeSize = 2 * firstIndex - 1;
-    firstIndex -= 1;
-
-    var tree = [];
-    for (var i = 0; i < treeSize; ++i) { tree[i] = 0; }
-
-    var cc = 0;
-    edgeIndices.forEach(function(i) {
-      var treeIndex = i + firstIndex;
-      tree[treeIndex]++;
-      while (treeIndex > 0) {
-        if (treeIndex % 2) {
-          cc += tree[treeIndex + 1];
-        }
-        treeIndex = (treeIndex - 1) >> 1;
-        tree[treeIndex]++;
-      }
-    });
-
-    return cc;
-  }
 
   function initOrder(g, nodeMap) {
     var layering = [];
@@ -233,4 +176,65 @@ dagre.layout.order = function() {
   function copyLayering(layering) {
     return layering.map(function(l) { return l.slice(0); });
   }
+}
+
+/*
+ * This function searches through a ranked and ordered graph and counts the
+ * number of edges that cross. This algorithm is derived from:
+ *
+ *    W. Barth et al., Bilayer Cross Counting, JGAA, 8(2) 179–194 (2004)
+ */
+dagre.layout.order.crossCount = function(g, layering) {
+  var cc = 0;
+  var prevLayer;
+  layering.forEach(function(layer) {
+    if (prevLayer) {
+      cc += bilayerCrossCount(g, prevLayer, layer);
+    }
+    prevLayer = layer;
+  });
+  return cc;
+}
+
+function bilayerCrossCount(g, layer1, layer2) {
+  var layer2Pos = {};
+  layer2.forEach(function(u, i) { layer2Pos[u] = i; });
+
+  var edgeIndices = [];
+  layer1.forEach(function(u) {
+    var nodeEdges = [];
+    g.outEdges(u).forEach(function(e) {
+      var edge = g.edge(e);
+      nodeEdges.push(layer2Pos[edge.target]);
+    });
+    // TODO consider radix sort
+    nodeEdges.sort(function(x, y) { return x - y; });
+    edgeIndices = edgeIndices.concat(nodeEdges);
+  });
+
+  var firstIndex = 1;
+  while (firstIndex < layer2.length) {
+    firstIndex <<= 1;
+  }
+
+  var treeSize = 2 * firstIndex - 1;
+  firstIndex -= 1;
+
+  var tree = [];
+  for (var i = 0; i < treeSize; ++i) { tree[i] = 0; }
+
+  var cc = 0;
+  edgeIndices.forEach(function(i) {
+    var treeIndex = i + firstIndex;
+    tree[treeIndex]++;
+    while (treeIndex > 0) {
+      if (treeIndex % 2) {
+        cc += tree[treeIndex + 1];
+      }
+      treeIndex = (treeIndex - 1) >> 1;
+      tree[treeIndex]++;
+    }
+  });
+
+  return cc;
 }

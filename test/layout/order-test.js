@@ -47,4 +47,22 @@ describe("dagre.layout", function() {
       assert.equal(nodeMap["B"].order, 0);
     }
   });
+
+  it("finds minimal crossings", function() {
+    var nodeMap = { A: { rank: 0 },
+                    B: { rank: 0 },
+                    C: { rank: 0 },
+                    D: { rank: 1 },
+                    E: { rank: 1 } };
+    var edgeMap = { AD: { source: "A", target: "D" },
+                    BD: { source: "B", target: "D" },
+                    BE: { source: "B", target: "E" },
+                    CD: { source: "C", target: "D" },
+                    CE: { source: "C", target: "E" } };
+    var g = makeTestGraph(nodeMap, edgeMap);
+
+    var layering = dagre.layout.order().run(g, nodeMap);
+
+    assert.equal(dagre.layout.order.crossCount(g, layering), 1);
+  });
 });
