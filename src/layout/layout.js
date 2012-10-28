@@ -21,12 +21,10 @@ dagre.layout = function() {
   // Internal state
   var
       // Graph used to determine relationships quickly
-      g,
-      // Map to original nodes using graph ids
-      nodeMap,
-      // Map to original edges using graph ids
-      edgeMap,
+      g;
 
+  // Phase functions
+  var
       rank = dagre.layout.rank(),
       order = dagre.layout.order(),
       position = dagre.layout.position();
@@ -98,15 +96,15 @@ dagre.layout = function() {
 
     var reversed = acyclic(g);
 
-    rank.run(g, nodeMap, edgeMap);
+    rank.run(g);
     addDummyNodes();
-    order.run(g, nodeMap);
-    position.run(g, nodeMap);
+    order.run(g);
+    position.run(g);
     collapseDummyNodes();
 
     undoAcyclic(reversed);
 
-    resetInternalState();
+    g = null;
 
     if (debugLevel >= 1) {
       console.log("Total layout time: " + timer.elapsedString());
@@ -115,15 +113,9 @@ dagre.layout = function() {
 
   return self;
 
-  function resetInternalState() {
-    g = dagre.graph();
-    nodeMap = {};
-    edgeMap = {};
-  }
-
   // Build graph and save mapping of generated ids to original nodes and edges
   function init() {
-    resetInternalState();
+    g = dagre.graph();
 
     var nextId = 0;
 
@@ -131,37 +123,36 @@ dagre.layout = function() {
     // we add edges. Also copy relevant dimension information.
     nodes.forEach(function(u) {
       var id = nextId++;
-      nodeMap[id] = u.dagre = { id: id, width: u.width, height: u.height };
-      g.addNode(id);
+      u.dagre = { id: id, width: u.width, height: u.height };
+      g.addNode(id, u.dagre);
     });
 
     edges.forEach(function(e) {
       var source = e.source.dagre.id;
-      if (!(source in nodeMap)) {
+      if (!g.hasNode(source)) {
         throw new Error("Source node for '" + e + "' not in node list");
       }
 
       var target = e.target.dagre.id;
-      if (!(target in nodeMap)) {
+      if (!g.hasNode(target)) {
         throw new Error("Target node for '" + e + "' not in node list");
       }
 
       e.dagre = {
         points: [],
-        source: nodeMap[source],
-        target: nodeMap[target],
+        source: g.node(source),
+        target: g.node(target)
       };
 
       // Track edges that aren't self loops - layout does nothing for self
       // loops, so they can be skipped.
       if (source !== target) {
         var id = nextId++;
-        edgeMap[id] = e.dagre;
         // TODO should we use prototypal inheritance for this?
         if (e.minLen) {
           e.dagre.minLen = e.minLen;
         }
-        g.addEdge(id, source, target);
+        g.addEdge(id, source, target, e.dagre);
       }
     });
   }
@@ -180,9 +171,10 @@ dagre.layout = function() {
       g.outEdges(u).forEach(function(e) {
         var v = g.target(e);
         if (v in onStack) {
+          var edge = g.edge(e);
           g.delEdge(e);
           reversed.push(e);
-          g.addEdge(e, v, u);
+          g.addEdge(e, v, u, edge);
         } else {
           dfs(v);
         }
@@ -200,7 +192,7 @@ dagre.layout = function() {
 
   function undoAcyclic(reversed) {
     reversed.forEach(function(e) {
-      edgeMap[e].points.reverse();
+      g.edge(e).points.reverse();
     });
   }
 
@@ -209,24 +201,27 @@ dagre.layout = function() {
     g.edges().forEach(function(e) {
       var source = g.source(e);
       var target = g.target(e);
-      var sourceRank = nodeMap[source].rank;
-      var targetRank = nodeMap[target].rank;
+      var sourceRank = g.node(source).rank;
+      var targetRank = g.node(target).rank;
       if (sourceRank + 1 < targetRank) {
         var prefix = "D-" + e + "-";
-        g.delEdge(e);
         for (var u = source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
           var v = prefix + rank;
-          g.addNode(v);
-          nodeMap[v] = { width: 0,
-                         height: 0,
-                         edge: e,
-                         index: i,
-                         rank: rank,
-                         dummy: true };
-          g.addEdge(u + " -> " + v, u, v);
+          var node = { width: 0,
+                       height: 0,
+                       edgeId: e,
+                       edge: g.edge(e),
+                       source: g.source(e),
+                       target: g.target(e),
+                       index: i,
+                       rank: rank,
+                       dummy: true };
+          g.addNode(v, node);
+          g.addEdge(u + " -> " + v, u, v, {});
           u = v;
         }
-        g.addEdge(u + " -> " + target, u, target);
+        g.addEdge(u + " -> " + target, u, target, {});
+        g.delEdge(e);
       }
     });
   }
@@ -234,11 +229,14 @@ dagre.layout = function() {
   function collapseDummyNodes() {
     var visited = {};
 
-    values(nodeMap).forEach(function(u) {
-      if (u.dummy) {
-        var e = u.edge;
-        var points = edgeMap[e].points;
-        points[u.index] = { x: u.x, y: u.y };
+    g.nodes().forEach(function(u) {
+      var node = g.node(u);
+      if (node.dummy) {
+        if (!g.hasEdge(node.edgeId)) {
+          g.addEdge(node.edgeId, node.source, node.target, node.edge);
+        }
+        var points = g.edge(node.edgeId).points;
+        points[node.index] = { x: node.x, y: node.y };
       }
     });
   }

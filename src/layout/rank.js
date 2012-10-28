@@ -12,14 +12,14 @@ dagre.layout.rank = function() {
     return self;
   }
 
-  self.run = function(g, nodeMap, edgeMap) {
+  self.run = function(g) {
     var timer = createTimer();
 
-    initRank(g, nodeMap, edgeMap);
+    initRank(g);
     components(g).forEach(function(cmpt) {
       var subgraph = g.subgraph(cmpt);
-      feasibleTree(subgraph, nodeMap, edgeMap);
-      normalize(subgraph, nodeMap);
+      feasibleTree(subgraph);
+      normalize(subgraph);
     });
 
     if (debugLevel >= 1) {
@@ -29,7 +29,7 @@ dagre.layout.rank = function() {
 
   return self;
 
-  function initRank(g, nodeMap, edgeMap) {
+  function initRank(g) {
     var minRank = {};
     var pq = priorityQueue();
 
@@ -46,33 +46,32 @@ dagre.layout.rank = function() {
       pq.removeMin();
 
       var rank = minRank[minId];
-      nodeMap[minId].rank = rank;
+      g.node(minId).rank = rank;
 
       g.outEdges(minId).forEach(function(e) {
         var target = g.target(e);
-        minRank[target] = Math.max(minRank[target], rank + (edgeMap[e].minLen || 1));
+        minRank[target] = Math.max(minRank[target], rank + (g.edge(e).minLen || 1));
         pq.decrease(target, pq.priority(target) - 1);
       });
     }
   }
 
-  function feasibleTree(g, nodeMap, edgeMap) {
+  function feasibleTree(g) {
     // Precompute minimum lengths for each directed edge
     var minLen = {};
     g.edges().forEach(function(e) {
-      var edge = edgeMap[e];
-      var id = incidenceId(edge.source.id, edge.target.id);
-      minLen[id] = Math.max(minLen[id] || 1, edge.minLen || 1);
+      var id = incidenceId(g.source(e), g.target(e));
+      minLen[id] = Math.max(minLen[id] || 1, g.edge(e).minLen || 1);
     });
 
     var tree = dagre.util.prim(g, function(u, v) {
-      return Math.abs(nodeMap[u].rank - nodeMap[v].rank) - minLen[incidenceId(u, v)];
+      return Math.abs(g.node(u).rank - g.node(v).rank) - minLen[incidenceId(u, v)];
     });
 
     var visited = {};
     function dfs(u, rank) {
       visited[u] = true;
-      nodeMap[u].rank = rank;
+      g.node(u).rank = rank;
 
       tree[u].forEach(function(v) {
         if (!(v in visited)) {
@@ -87,9 +86,9 @@ dagre.layout.rank = function() {
     return tree;
   }
 
-  function normalize(g, nodeMap) {
-    var m = min(values(nodeMap).map(function(u) { return u.rank; }));
-    values(nodeMap).forEach(function(u) { u.rank -= m; });
+  function normalize(g) {
+    var m = min(g.nodes().map(function(u) { return g.node(u).rank; }));
+    g.nodes().forEach(function(u) { g.node(u).rank -= m; });
   }
 
   /*
@@ -98,6 +97,5 @@ dagre.layout.rank = function() {
    */
   function incidenceId(u, v) {
     return u < v ?  u.length + ":" + u + "-" + v : v.length + ":" + v + "-" + u;
-
   }
 }

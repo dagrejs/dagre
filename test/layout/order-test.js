@@ -2,66 +2,50 @@ require("../common");
 
 describe("dagre.layout", function() {
   it("sets order = 0 for a single node", function() {
-    var nodeMap = { A: { rank: 0 } };
-    var g = makeTestGraph(nodeMap);
+    var g = dagre.dot.toGraph("digraph { A [rank=0] }");
 
-    dagre.layout.order().run(g, nodeMap);
+    dagre.layout.order().run(g);
 
-    assert.equal(nodeMap["A"].order, 0);
+    assert.equal(g.node("A").order, 0);
   });
 
   it("sets order = 0 for 2 connected nodes on different ranks", function() {
-    var nodeMap = { A: { rank: 0 },
-                    B: { rank: 1 } };
-    var edgeMap = { AB: { source: "A", target: "B" } };
-    var g = makeTestGraph(nodeMap, edgeMap);
+    var g = dagre.dot.toGraph("digraph { A [rank=0]; B [rank=1]; A -> B }");
 
-    dagre.layout.order().run(g, nodeMap);
+    dagre.layout.order().run(g);
 
-    assert.equal(nodeMap["A"].order, 0);
-    assert.equal(nodeMap["B"].order, 0);
+    assert.equal(g.node("A").order, 0);
+    assert.equal(g.node("B").order, 0);
   });
 
   it("sets order = 0 for 2 unconnected nodes on different ranks", function() {
-    var nodeMap = { A: { rank: 0 },
-                    B: { rank: 1 } };
-    var g = makeTestGraph(nodeMap);
+    var g = dagre.dot.toGraph("digraph { A [rank=0]; B [rank=1]; }");
 
-    dagre.layout.order().run(g, nodeMap);
+    dagre.layout.order().run(g);
 
-    assert.equal(nodeMap["A"].order, 0);
-    assert.equal(nodeMap["B"].order, 0);
+    assert.equal(g.node("A").order, 0);
+    assert.equal(g.node("B").order, 0);
   });
 
   it("sets order = 0, 1 for 2 nodes on the same rank", function() {
-    var nodeMap = { A: { rank: 0 },
-                    B: { rank: 0 } };
-    var g = makeTestGraph(nodeMap);
+    var g = dagre.dot.toGraph("digraph { A [rank=0]; B [rank=0]; }");
 
-    dagre.layout.order().run(g, nodeMap);
+    dagre.layout.order().run(g);
 
-    if (nodeMap["A"].order === 0) {
-      assert.equal(nodeMap["B"].order, 1);
+    if (g.node("A").order === 0) {
+      assert.equal(g.node("B").order, 1);
     } else {
-      assert.equal(nodeMap["A"].order, 1);
-      assert.equal(nodeMap["B"].order, 0);
+      assert.equal(g.node("A").order, 1);
+      assert.equal(g.node("B").order, 0);
     }
   });
 
   it("finds minimal crossings", function() {
-    var nodeMap = { A: { rank: 0 },
-                    B: { rank: 0 },
-                    C: { rank: 0 },
-                    D: { rank: 1 },
-                    E: { rank: 1 } };
-    var edgeMap = { AD: { source: "A", target: "D" },
-                    BD: { source: "B", target: "D" },
-                    BE: { source: "B", target: "E" },
-                    CD: { source: "C", target: "D" },
-                    CE: { source: "C", target: "E" } };
-    var g = makeTestGraph(nodeMap, edgeMap);
+    var str = "digraph { A [rank=0]; B [rank=0]; C [rank=0]; D [rank=1]; E [rank=1]; " +
+                "A -> D; B -> D; B -> E; C -> D; C -> E }";
+    var g = dagre.dot.toGraph(str);
 
-    var layering = dagre.layout.order().run(g, nodeMap);
+    var layering = dagre.layout.order().run(g);
 
     assert.equal(dagre.layout.order.crossCount(g, layering), 1);
   });

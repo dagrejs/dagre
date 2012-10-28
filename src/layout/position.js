@@ -44,17 +44,17 @@ dagre.layout.position = function() {
     return self;
   };
 
-  self.run = function(g, nodeMap) {
+  self.run = function(g) {
     var timer = createTimer();
 
     var layering = [];
-    keys(nodeMap).forEach(function(u) {
-      var node = nodeMap[u];
+    g.nodes().forEach(function(u) {
+      var node = g.node(u);
       var layer = layering[node.rank] || (layering[node.rank] = []);
       layer[node.order] = u;
     });
 
-    var type1Conflicts = findType1Conflicts(g, layering, nodeMap);
+    var type1Conflicts = findType1Conflicts(g, layering);
 
     var xss = {};
     ["up", "down"].forEach(function(vertDir) {
@@ -66,7 +66,7 @@ dagre.layout.position = function() {
         var dir = vertDir + "-" + horizDir;
         if (!direction || direction === dir) {
           var align = verticalAlignment(g, layering, type1Conflicts, vertDir === "up" ? "predecessors" : "successors");
-          xss[dir]= horizontalCompaction(layering, nodeMap, align.pos, align.root, align.align, nodeSep, edgeSep);
+          xss[dir]= horizontalCompaction(g, layering, align.pos, align.root, align.align);
           if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
         }
 
@@ -79,31 +79,31 @@ dagre.layout.position = function() {
     if (direction) {
       // In debug mode we allow forcing layout to a particular alignment.
       g.nodes().forEach(function(u) {
-        nodeMap[u].x = xss[direction][u];
+        g.node(u).x = xss[direction][u];
       });
     } else {
-      alignToSmallest(layering, xss, nodeMap);
+      alignToSmallest(g, layering, xss);
 
       // Find average of medians for xss array
       g.nodes().forEach(function(u) {
         var xs = values(xss).map(function(xs) { return xs[u]; }).sort(function(x, y) { return x - y; });
-        nodeMap[u].x = (xs[1] + xs[2]) / 2;
+        g.node(u).x = (xs[1] + xs[2]) / 2;
       });
     }
 
     // Align min center point with 0
-    var minX = min(g.nodes().map(function(u) { return nodeMap[u].x - nodeMap[u].width / 2; }));
+    var minX = min(g.nodes().map(function(u) { return g.node(u).x - g.node(u).width / 2; }));
     g.nodes().forEach(function(u) {
-      nodeMap[u].x -= minX;
+      g.node(u).x -= minX;
     });
 
     // Align y coordinates with ranks
     var posY = 0;
     layering.forEach(function(layer) {
-      var height = max(layer.map(function(u) { return nodeMap[u].height; }));
+      var height = max(layer.map(function(u) { return g.node(u).height; }));
       posY += height / 2;
       layer.forEach(function(u) {
-        nodeMap[u].y = posY;
+        g.node(u).y = posY;
       });
       posY += height / 2 + rankSep;
     });
@@ -115,7 +115,7 @@ dagre.layout.position = function() {
 
   return self;
 
-  function findType1Conflicts(g, layering, nodeMap) {
+  function findType1Conflicts(g, layering) {
     var type1Conflicts = {};
 
     var pos = {};
@@ -138,9 +138,9 @@ dagre.layout.position = function() {
 
         // Search for the next inner segment in the previous layer
         var innerRight = null;
-        if (nodeMap[u].dummy) {
+        if (g.node(u).dummy) {
           g.predecessors(u).some(function(v) {
-            if (nodeMap[v].dummy) {
+            if (g.node(v).dummy) {
               innerRight = pos[v];
               return true;
             }
@@ -216,12 +216,12 @@ dagre.layout.position = function() {
    * Determines how much spacing u needs from its origin (center) to satisfy
    * width and node separation.
    */
-  function deltaX(u, nodeSep, edgeSep) {
+  function deltaX(u) {
     var sep = u.dummy ? edgeSep : nodeSep;
     return u.width / 2 + sep / 2;
   }
 
-  function horizontalCompaction(layering, nodeMap, pos, root, align, nodeSep, edgeSep) {
+  function horizontalCompaction(g, layering, pos, root, align) {
     // Mapping of node id -> sink node id for class
     var sink = {};
 
@@ -252,8 +252,7 @@ dagre.layout.position = function() {
             if (sink[v] === v) {
               sink[v] = sink[u];
             }
-            var delta = deltaX(nodeMap[pred[w]], nodeSep, edgeSep) +
-                        deltaX(nodeMap[w], nodeSep, edgeSep);
+            var delta = deltaX(g.node(pred[w])) + deltaX(g.node(w));
             if (sink[v] !== sink[u]) {
               shift[sink[u]] = Math.min(shift[sink[u]] || Number.POSITIVE_INFINITY, xs[v] - xs[u] - delta);
             } else {
@@ -295,17 +294,17 @@ dagre.layout.position = function() {
     return xs;
   }
 
-  function findMinCoord(layering, xs, nodeMap) {
+  function findMinCoord(g, layering, xs) {
     return min(layering.map(function(layer) {
       var u = layer[0];
-      return xs[u] - nodeMap[u].width / 2;
+      return xs[u] - g.node(u).width / 2;
     }));
   }
 
-  function findMaxCoord(layering, xs, nodeMap) {
+  function findMaxCoord(g, layering, xs) {
     return max(layering.map(function(layer) {
       var u = layer[layer.length - 1];
-      return xs[u] - nodeMap[u].width / 2;
+      return xs[u] - g.node(u).width / 2;
     }));
   }
 
@@ -315,14 +314,14 @@ dagre.layout.position = function() {
     });
   }
 
-  function alignToSmallest(layering, xss, nodeMap) {
+  function alignToSmallest(g, layering, xss) {
     // First find the smallest width
     var smallestWidthMinCoord;
     var smallestWidthMaxCoord;
     var smallestWidth = Number.POSITIVE_INFINITY;
     values(xss).forEach(function(xs) {
-      var minCoord = findMinCoord(layering, xs, nodeMap);
-      var maxCoord = findMaxCoord(layering, xs, nodeMap);
+      var minCoord = findMinCoord(g, layering, xs);
+      var maxCoord = findMaxCoord(g, layering, xs);
       var width = maxCoord - minCoord;
       if (width < smallestWidth) {
         smallestWidthMinCoord = minCoord;
@@ -334,7 +333,7 @@ dagre.layout.position = function() {
     // Realign coordinates with smallest width
     ["up", "down"].forEach(function(vertDir) {
       var xs = xss[vertDir + "-left"];
-      var delta = smallestWidthMinCoord - findMinCoord(layering, xs, nodeMap);
+      var delta = smallestWidthMinCoord - findMinCoord(g, layering, xs);
       if (delta) {
         shiftX(delta, xs);
       }
@@ -342,7 +341,7 @@ dagre.layout.position = function() {
 
     ["up", "down"].forEach(function(vertDir) {
       var xs = xss[vertDir + "-right"];
-      var delta = smallestWidthMaxCoord - findMaxCoord(layering, xs, nodeMap);
+      var delta = smallestWidthMaxCoord - findMaxCoord(g, layering, xs);
       if (delta) {
         shiftX(delta, xs);
       }

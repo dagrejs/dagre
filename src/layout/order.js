@@ -24,10 +24,10 @@ dagre.layout.order = function() {
     return self;
   }
 
-  self.run = function(g, nodeMap) {
+  self.run = function(g) {
     var timer = createTimer();
 
-    var layering = initOrder(g, nodeMap);
+    var layering = initOrder(g);
     var bestLayering = copyLayering(layering);
     var bestCC = crossCount(g, layering);
 
@@ -55,7 +55,7 @@ dagre.layout.order = function() {
 
     bestLayering.forEach(function(layer) {
       layer.forEach(function(u, i) {
-        nodeMap[u].order = i;
+        g.node(u).order = i;
       });
     });
 
@@ -64,7 +64,7 @@ dagre.layout.order = function() {
 
   return self;
 
-  function initOrder(g, nodeMap) {
+  function initOrder(g) {
     var layering = [];
     var visited = {};
 
@@ -74,7 +74,7 @@ dagre.layout.order = function() {
       }
       visited[u] = true;
 
-      var rank = nodeMap[u].rank;
+      var rank = g.node(u).rank;
       for (var i = layering.length; i <= rank; ++i) {
         layering[i] = [];
       }
@@ -86,7 +86,7 @@ dagre.layout.order = function() {
     }
 
     var nodes = g.nodes().sort(function(x, y) {
-      return nodeMap[x].rank - nodeMap[y].rank;
+      return g.node(x).rank - g.node(y).rank;
     });
 
     nodes.forEach(function(u) {
