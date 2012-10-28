@@ -138,11 +138,14 @@ dagre.graph = function() {
 
   graph.toString = function() {
     var str = "GRAPH:\n";
-    str += "    Nodes: [" + keys(nodes).join(", ") + "]\n";
+    str += "    Nodes:\n";
+    keys(nodes).forEach(function(u) {
+      str += "        " + u + ": " + JSON.stringify(nodes[u].value) + "\n";
+    });
     str += "    Edges:\n";
     keys(edges).forEach(function(e) {
       var edge = edges[e];
-      str += "        " + e + ": " + edge.source + " -> " + edge.target + "\n";
+      str += "        " + e + " (" + edge.source + " -> " + edge.target + "): " + JSON.stringify(edges[e].value) + "\n";
     });
     return str;
   };

@@ -122,7 +122,7 @@ dagre.layout = function() {
     // Tag each node so that we can properly represent relationships when
     // we add edges. Also copy relevant dimension information.
     nodes.forEach(function(u) {
-      var id = nextId++;
+      var id = "id" in u ? u.id : "_N" + nextId++;
       u.dagre = { id: id, width: u.width, height: u.height };
       g.addNode(id, u.dagre);
     });
@@ -139,15 +139,13 @@ dagre.layout = function() {
       }
 
       e.dagre = {
-        points: [],
-        source: g.node(source),
-        target: g.node(target)
+        points: []
       };
 
       // Track edges that aren't self loops - layout does nothing for self
       // loops, so they can be skipped.
       if (source !== target) {
-        var id = nextId++;
+        var id = "id" in e ? e.id : "_E" + nextId++;
         // TODO should we use prototypal inheritance for this?
         if (e.minLen) {
           e.dagre.minLen = e.minLen;
@@ -204,7 +202,7 @@ dagre.layout = function() {
       var sourceRank = g.node(source).rank;
       var targetRank = g.node(target).rank;
       if (sourceRank + 1 < targetRank) {
-        var prefix = "D-" + e + "-";
+        var prefix = "_D-" + e + "-";
         for (var u = source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
           var v = prefix + rank;
           var node = { width: 0,
@@ -237,6 +235,7 @@ dagre.layout = function() {
         }
         var points = g.edge(node.edgeId).points;
         points[node.index] = { x: node.x, y: node.y };
+        g.delNode(u);
       }
     });
   }
