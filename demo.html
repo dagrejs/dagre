@@ -137,7 +137,7 @@ digraph {
       oldInputGraphValue = inputGraph.value;
       oldInputStyleValue = inputStyle.node().value;
       try {
-        result = dagre.parseDot(inputGraph.value);
+        result = dagre.dot.toObjects(inputGraph.value);
       } catch (e) {
         inputGraph.setAttribute("class", "error");
       }
@@ -232,7 +232,7 @@ digraph {
       dagre.layout()
         .nodes(graphNodes)
         .edges(graphEdges)
-        .debugLevel(2)
+        .debugLevel(1)
         .run();
 
       nodes.attr("transform", function(d) { return "translate(" + d.dagre.x + "," + d.dagre.y +")"; });

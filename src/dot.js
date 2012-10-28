@@ -1,15 +1,16 @@
-dagre.parseDot = function(str) {
+dagre.dot = {};
+
+dagre.dot.toGraph = function(str) {
   var parseTree = dot_parser.parse(str);
-  var nodes = {};
-  var edges = [];
+  var g = dagre.graph();
   var undir = parseTree.type === "graph";
 
   function createNode(id, attrs) {
-    if (!(id in nodes)) {
-      nodes[id] = { id: id, label: id };
+    if (!(g.hasNode(id))) {
+      g.addNode(id, { id: id, label: id });
     }
     if (attrs) {
-      mergeAttributes(attrs, nodes[id]);
+      mergeAttributes(attrs, g.node(id));
     }
   }
 
@@ -22,12 +23,11 @@ dagre.parseDot = function(str) {
     }
     edgeCount[edgeKey]++;
 
+    var id = edgeKey + "-" + count;
     var edge = {};
     mergeAttributes(attrs, edge);
-    mergeAttributes({ id: edgeKey + "-" + count,
-                      source: nodes[source],
-                      target: nodes[target]}, edge);
-    edges.push(edge);
+    mergeAttributes({ id: id }, edge);
+    g.addEdge(id, source, target, edge);
   }
 
   function handleStmt(stmt) {
@@ -72,5 +72,19 @@ dagre.parseDot = function(str) {
     });
   }
 
-  return { nodes: values(nodes), edges: edges };
-}
+  return g;
+};
+
+dagre.dot.toObjects = function(str) {
+  var g = dagre.dot.toGraph(str);
+  var nodes = g.nodes().map(function(u) { return g.node(u).value; });
+  var edges = g.edges().map(function(e) {
+    var edge = g.edge(e);
+    return {
+      id: edge.value.id,
+      source: g.node(edge.source).value,
+      target: g.node(edge.target).value
+    };
+  });
+  return { nodes: nodes, edges: edges };
+};

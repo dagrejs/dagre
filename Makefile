@@ -16,7 +16,7 @@ all: dagre.js package.json
 	src/layout/position.js \
 	src/util.js \
 	src/priority-queue.js \
-	src/parse-dot.js \
+	src/dot.js \
 	src/dot-grammar.js \
 	src/post.js
 
