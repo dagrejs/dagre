@@ -211,6 +211,27 @@ describe("graph", function() {
       assert.deepEqual(subgraph.nodes().sort(), [1, 2]);
       assert.deepEqual(subgraph.edges(), ["a"]);
     });
+
+    it("includes each node's value in the subgraph", function() {
+      var g = dagre.graph();
+      [1,2,3].forEach(function(u) { g.addNode(u, "V" + u); });
+      g.addEdge("a", 1, 2);
+      g.addEdge("b", 2, 3);
+
+      var subgraph = g.subgraph([1, 2]);
+      assert.equal(subgraph.node(1), "V1");
+      assert.equal(subgraph.node(2), "V2");
+    });
+
+    it("includes each edge's value in the subgraph", function() {
+      var g = dagre.graph();
+      [1,2,3].forEach(function(u) { g.addNode(u); });
+      g.addEdge("a", 1, 2, "VA");
+      g.addEdge("b", 2, 3);
+
+      var subgraph = g.subgraph([1, 2]);
+      assert.equal(subgraph.edge("a"), "VA");
+    });
   });
 });
 

@@ -126,12 +126,11 @@ dagre.graph = function() {
   graph.subgraph = function(us) {
     var g = dagre.graph();
     us.forEach(function(u) {
-      strictGetNode(u);
-      g.addNode(u);
+      g.addNode(u, graph.node(u));
     });
     values(edges).forEach(function(e) {
       if (g.hasNode(e.source) && g.hasNode(e.target)) {
-        g.addEdge(e.id, e.source, e.target);
+        g.addEdge(e.id, e.source, e.target, graph.edge(e.id));
       }
     });
     return g;
