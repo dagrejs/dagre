@@ -89,15 +89,31 @@ dagre.layout = function() {
       return;
     }
 
-    var reversed = acyclic(g);
+    // Reverse edges to get an acyclic graph, we keep the graph in an acyclic
+    // state until the very end.
+    acyclic(g);
 
+    // Determine the rank for each node. Nodes with a lower rank will appear
+    // above nodes of higher rank.
     rank.run(g);
-    addDummyNodes(g);
-    order.run(g);
-    position.run(g);
-    collapseDummyNodes(g);
 
-    undoAcyclic(g, reversed);
+    // Normalize the graph by ensuring that every edge is proper (each edge has
+    // a length of 1). We achieve this by adding dummy nodes to long edges,
+    // thus shortening them.
+    normalize(g);
+
+    // Order the nodes so that edge crossings are minimized.
+    order.run(g);
+
+    // Find the x and y coordinates for every node in the graph.
+    position.run(g);
+
+    // De-normalize the graph by removing dummy nodes and augmenting the
+    // original long edges with coordinate information.
+    undoNormalize(g);
+
+    // Reverse edges that were revered previously to get an acyclic graph.
+    undoAcyclic(g);
 
     if (debugLevel >= 1) {
       console.log("Total layout time: " + timer.elapsedString());
@@ -153,7 +169,6 @@ dagre.layout = function() {
   function acyclic(g) {
     var onStack = {};
     var visited = {};
-    var reversed = [];
 
     function dfs(u) {
       if (u in visited)
@@ -166,7 +181,7 @@ dagre.layout = function() {
         if (v in onStack) {
           var edge = g.edge(e);
           g.delEdge(e);
-          reversed.push(e);
+          edge.reversed = true;
           g.addEdge(e, v, u, edge);
         } else {
           dfs(v);
@@ -179,18 +194,27 @@ dagre.layout = function() {
     g.nodes().forEach(function(u) {
       dfs(u);
     });
-
-    return reversed;
   }
 
-  function undoAcyclic(g, reversed) {
-    reversed.forEach(function(e) {
-      g.edge(e).points.reverse();
+  function undoAcyclic(g) {
+    g.edges().forEach(function(e) {
+      var edge = g.edge(e);
+      if (edge.reversed) {
+        var source = g.source(e);
+        var target = g.target(e);
+        delete edge.reversed;
+
+        // Reverse the points array because it was populated for the reversed
+        // edge.
+        edge.points.reverse();
+        g.delEdge(e);
+        g.addEdge(e, target, source, edge);
+      }
     });
   }
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
-  function addDummyNodes(g) {
+  function normalize(g) {
     g.edges().forEach(function(e) {
       var source = g.source(e);
       var target = g.target(e);
@@ -219,7 +243,7 @@ dagre.layout = function() {
     });
   }
 
-  function collapseDummyNodes(g) {
+  function undoNormalize(g) {
     var visited = {};
 
     g.nodes().forEach(function(u) {
