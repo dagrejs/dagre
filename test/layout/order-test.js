@@ -50,3 +50,39 @@ describe("dagre.layout", function() {
     assert.equal(dagre.layout.order.crossCount(g, layering), 1);
   });
 });
+
+describe("dagre.layout.bilayerCrossCount", function() {
+  it("calculates 0 crossings for an empty graph", function() {
+    var g = dagre.dot.toGraph("digraph {}");
+    var layer1 = [];
+    var layer2 = [];
+
+    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 0);
+  });
+
+  it("calculates 0 crossings for 2 layers with no crossings", function() {
+    var g = dagre.dot.toGraph("digraph {11 -> 21; 12 -> 22; 13 -> 23}");
+    var layer1 = [11, 12, 13];
+    var layer2 = [21, 22, 23];
+
+    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 0);
+  });
+
+  it("calculates the correct number of crossings 1", function() {
+    // Here we have 12 -> 22 crossing 13 -> 21
+    var g = dagre.dot.toGraph("digraph {11 -> 21; 12 -> 21; 12 -> 22; 13 -> 21; 13 -> 22}");
+    var layer1 = [11, 12, 13];
+    var layer2 = [21, 22];
+
+    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 1);
+  });
+
+  it("calculates the correct number of crossings 2", function() {
+    // Here we have 11 -> 22 crossing 12 -> 21 and 13 -> 21, and we have 12 -> 22 crossing 13 -> 21
+    var g = dagre.dot.toGraph("digraph {11 -> 22; 12 -> 21; 12 -> 22; 13 -> 21; 13 -> 22}");
+    var layer1 = [11, 12, 13];
+    var layer2 = [21, 22];
+
+    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 3);
+  });
+});

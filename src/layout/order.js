@@ -10,8 +10,6 @@ dagre.layout.order = function() {
 
   var self = {};
 
-  var crossCount = dagre.layout.order.crossCount;
-
   self.iterations = function(x) {
     if (!arguments.length) return iterations;
     iterations = x;
@@ -184,7 +182,7 @@ dagre.layout.order = function() {
  *
  *    W. Barth et al., Bilayer Cross Counting, JGAA, 8(2) 179–194 (2004)
  */
-dagre.layout.order.crossCount = function(g, layering) {
+var crossCount = dagre.layout.order.crossCount = function(g, layering) {
   var cc = 0;
   var prevLayer;
   layering.forEach(function(layer) {
@@ -196,7 +194,7 @@ dagre.layout.order.crossCount = function(g, layering) {
   return cc;
 }
 
-function bilayerCrossCount(g, layer1, layer2) {
+var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer1, layer2) {
   var layer2Pos = {};
   layer2.forEach(function(u, i) { layer2Pos[u] = i; });
 
