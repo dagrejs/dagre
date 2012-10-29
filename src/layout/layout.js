@@ -18,11 +18,6 @@ dagre.layout = function() {
       // How much debug information to include?
       debugLevel = 0;
 
-  // Internal state
-  var
-      // Graph used to determine relationships quickly
-      g;
-
   // Phase functions
   var
       rank = dagre.layout.rank(),
@@ -87,7 +82,7 @@ dagre.layout = function() {
     var timer = createTimer();
     
     // Build internal graph
-    init();
+    var g = init();
 
     if (g.nodes().length === 0) {
       // Nothing to do!
@@ -97,14 +92,12 @@ dagre.layout = function() {
     var reversed = acyclic(g);
 
     rank.run(g);
-    addDummyNodes();
+    addDummyNodes(g);
     order.run(g);
     position.run(g);
-    collapseDummyNodes();
+    collapseDummyNodes(g);
 
-    undoAcyclic(reversed);
-
-    g = null;
+    undoAcyclic(g, reversed);
 
     if (debugLevel >= 1) {
       console.log("Total layout time: " + timer.elapsedString());
@@ -115,7 +108,7 @@ dagre.layout = function() {
 
   // Build graph and save mapping of generated ids to original nodes and edges
   function init() {
-    g = dagre.graph();
+    var g = dagre.graph();
 
     var nextId = 0;
 
@@ -153,6 +146,8 @@ dagre.layout = function() {
         g.addEdge(id, source, target, e.dagre);
       }
     });
+
+    return g;
   }
 
   function acyclic(g) {
@@ -188,14 +183,14 @@ dagre.layout = function() {
     return reversed;
   }
 
-  function undoAcyclic(reversed) {
+  function undoAcyclic(g, reversed) {
     reversed.forEach(function(e) {
       g.edge(e).points.reverse();
     });
   }
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
-  function addDummyNodes() {
+  function addDummyNodes(g) {
     g.edges().forEach(function(e) {
       var source = g.source(e);
       var target = g.target(e);
@@ -224,7 +219,7 @@ dagre.layout = function() {
     });
   }
 
-  function collapseDummyNodes() {
+  function collapseDummyNodes(g) {
     var visited = {};
 
     g.nodes().forEach(function(u) {
