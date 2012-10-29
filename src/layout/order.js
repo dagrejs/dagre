@@ -194,19 +194,21 @@ var crossCount = dagre.layout.order.crossCount = function(g, layering) {
   return cc;
 }
 
-var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer1, layer2) {
+var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer1, layer2, weightFunc) {
+  if (!weightFunc) { weightFunc = function() { return 1; }; }
+
   var layer2Pos = {};
   layer2.forEach(function(u, i) { layer2Pos[u] = i; });
 
-  var edgeIndices = [];
+  var edges = [];
   layer1.forEach(function(u) {
     var nodeEdges = [];
     g.outEdges(u).forEach(function(e) {
-      nodeEdges.push(layer2Pos[g.target(e)]);
+      nodeEdges.push({ edge: e, pos: layer2Pos[g.target(e)] });
     });
     // TODO consider radix sort
-    nodeEdges.sort(function(x, y) { return x - y; });
-    edgeIndices = edgeIndices.concat(nodeEdges);
+    nodeEdges.sort(function(x, y) { return x.pos - y.pos; });
+    edges = edges.concat(nodeEdges);
   });
 
   var firstIndex = 1;
@@ -221,16 +223,19 @@ var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer
   for (var i = 0; i < treeSize; ++i) { tree[i] = 0; }
 
   var cc = 0;
-  edgeIndices.forEach(function(i) {
-    var treeIndex = i + firstIndex;
-    tree[treeIndex]++;
+  edges.forEach(function(edge) {
+    var edgeWeight = weightFunc(edge.edge);
+    var treeIndex = edge.pos + firstIndex;
+    tree[treeIndex] += edgeWeight;
+    var weightSum = 0;
     while (treeIndex > 0) {
       if (treeIndex % 2) {
-        cc += tree[treeIndex + 1];
+        weightSum += tree[treeIndex + 1];
       }
       treeIndex = (treeIndex - 1) >> 1;
-      tree[treeIndex]++;
+      tree[treeIndex] += edgeWeight;
     }
+    cc += edgeWeight * weightSum;
   });
 
   return cc;

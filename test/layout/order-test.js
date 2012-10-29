@@ -85,4 +85,14 @@ describe("dagre.layout.bilayerCrossCount", function() {
 
     assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 3);
   });
+
+  it("calculates the correct weight of crossings with edge weights", function() {
+    var g = dagre.dot.toGraph("digraph {11 -> 22 [weight=2]; 12 -> 21 [weight=3]; }");
+    var layer1 = [11, 12];
+    var layer2 = [21, 22];
+
+    function edgeWeight(e) { return g.edge(e).weight; }
+
+    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2, edgeWeight), 6);
+  });
 });
