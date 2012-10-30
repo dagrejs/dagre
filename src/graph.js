@@ -96,22 +96,41 @@ dagre.graph = function() {
   }
 
   graph.nodes = function() {
-    return values(nodes).map(function(u) { return u.id; });
+    var nodes = [];
+    graph.eachNode(function(id, _) { nodes.push(id); });
+    return nodes;
+  }
+
+  graph.eachNode = function(func) {
+    for (var k in nodes) {
+      var node = nodes[k];
+      func(node.id, node.value);
+    }
   }
 
   graph.edges = function(u, v) {
+    var es, sourceEdges;
     if (!arguments.length) {
-      return values(edges).map(function(e) { return e.id; });
+      es = [];
+      graph.eachEdge(function(id) { es.push(id); });
+      return es;
     } else if (arguments.length === 1) {
       return union([graph.inEdges(u), graph.outEdges(u)]);
     } else if (arguments.length === 2) {
       strictGetNode(u);
       strictGetNode(v);
-      var sourceEdges = outEdges[u];
-      var es = (v in sourceEdges) ? keys(sourceEdges[v].edges) : [];
+      sourceEdges = outEdges[u];
+      es = (v in sourceEdges) ? keys(sourceEdges[v].edges) : [];
       return es.map(function(e) { return edges[e].id });
     }
   };
+
+  graph.eachEdge = function(func) {
+    for (var k in edges) {
+      var edge = edges[k];
+      func(edge.id, edge.value, edge.source, edge.target);
+    }
+  }
 
   graph.inEdges = function(target) {
     strictGetNode(target);

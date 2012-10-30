@@ -181,17 +181,14 @@ dagre.layout = function() {
       delete onStack[u];
     }
 
-    g.nodes().forEach(function(u) {
+    g.eachNode(function(u) {
       dfs(u);
     });
   }
 
   function undoAcyclic(g) {
-    g.edges().forEach(function(e) {
-      var edge = g.edge(e);
+    g.eachEdge(function(e, edge, source, target) {
       if (edge.reversed) {
-        var source = g.source(e);
-        var target = g.target(e);
         delete edge.reversed;
 
         // Reverse the points array because it was populated for the reversed
@@ -205,9 +202,7 @@ dagre.layout = function() {
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
   function normalize(g) {
-    g.edges().forEach(function(e) {
-      var source = g.source(e);
-      var target = g.target(e);
+    g.eachEdge(function(e, _, source, target) {
       var sourceRank = g.node(source).rank;
       var targetRank = g.node(target).rank;
       if (sourceRank + 1 < targetRank) {
@@ -236,8 +231,7 @@ dagre.layout = function() {
   function undoNormalize(g) {
     var visited = {};
 
-    g.nodes().forEach(function(u) {
-      var node = g.node(u);
+    g.eachNode(function(u, node) {
       if (node.dummy) {
         if (!g.hasEdge(node.edgeId)) {
           g.addEdge(node.edgeId, node.source, node.target, node.edge);

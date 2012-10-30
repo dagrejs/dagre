@@ -64,7 +64,7 @@ var components = dagre.util.components = function(g) {
     }
   };
 
-  g.nodes().forEach(function(u) {
+  g.eachNode(function(u) {
     var component = [];
     dfs(u, component);
     if (component.length > 0) {
@@ -90,7 +90,7 @@ var prim = dagre.util.prim = function(g, weight) {
     return result;
   }
 
-  g.nodes().forEach(function(u) {
+  g.eachNode(function(u) {
     q.add(u, Number.POSITIVE_INFINITY);
     result[u] = [];
   });

@@ -33,7 +33,7 @@ dagre.layout.rank = function() {
     var minRank = {};
     var pq = priorityQueue();
 
-    g.nodes().forEach(function(u) {
+    g.eachNode(function(u) {
       pq.add(u, g.inEdges(u).length);
       minRank[u] = 0;
     });
@@ -59,9 +59,9 @@ dagre.layout.rank = function() {
   function feasibleTree(g) {
     // Precompute minimum lengths for each directed edge
     var minLen = {};
-    g.edges().forEach(function(e) {
-      var id = incidenceId(g.source(e), g.target(e));
-      minLen[id] = Math.max(minLen[id] || 1, g.edge(e).minLen || 1);
+    g.eachEdge(function(e, edge, source, target) {
+      var id = incidenceId(source, target);
+      minLen[id] = Math.max(minLen[id] || 1, edge.minLen || 1);
     });
 
     var tree = dagre.util.prim(g, function(u, v) {
@@ -88,7 +88,7 @@ dagre.layout.rank = function() {
 
   function normalize(g) {
     var m = min(g.nodes().map(function(u) { return g.node(u).rank; }));
-    g.nodes().forEach(function(u) { g.node(u).rank -= m; });
+    g.eachNode(function(u, node) { node.rank -= m; });
   }
 
   /*

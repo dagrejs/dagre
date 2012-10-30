@@ -48,8 +48,7 @@ dagre.layout.position = function() {
     var timer = createTimer();
 
     var layering = [];
-    g.nodes().forEach(function(u) {
-      var node = g.node(u);
+    g.eachNode(function(u, node) {
       var layer = layering[node.rank] || (layering[node.rank] = []);
       layer[node.order] = u;
     });
@@ -78,23 +77,23 @@ dagre.layout.position = function() {
 
     if (direction) {
       // In debug mode we allow forcing layout to a particular alignment.
-      g.nodes().forEach(function(u) {
-        g.node(u).x = xss[direction][u];
+      g.eachNode(function(u, node) {
+        node.x = xss[direction][u];
       });
     } else {
       alignToSmallest(g, layering, xss);
 
       // Find average of medians for xss array
-      g.nodes().forEach(function(u) {
+      g.eachNode(function(u, node) {
         var xs = values(xss).map(function(xs) { return xs[u]; }).sort(function(x, y) { return x - y; });
-        g.node(u).x = (xs[1] + xs[2]) / 2;
+        node.x = (xs[1] + xs[2]) / 2;
       });
     }
 
     // Align min center point with 0
     var minX = min(g.nodes().map(function(u) { return g.node(u).x - g.node(u).width / 2; }));
-    g.nodes().forEach(function(u) {
-      g.node(u).x -= minX;
+    g.eachNode(function(u, node) {
+      node.x -= minX;
     });
 
     // Align y coordinates with ranks
