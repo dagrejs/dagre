@@ -35,8 +35,7 @@ dagre.layout.order = function() {
 
     var cc;
     for (var i = 0; i < iterations; ++i) {
-      improveOrdering(g, i, layering);
-      cc = crossCount(g, layering);
+      cc = improveOrdering(g, i, layering);
       if (cc < bestCC) {
         bestLayering = copyLayering(layering);
         bestCC = cc;
@@ -95,15 +94,17 @@ dagre.layout.order = function() {
   }
 
   function improveOrdering(g, i, layering) {
+    var cc = 0;
     if (i % 2 === 0) {
       for (var j = 1; j < layering.length; ++j) {
-        improveLayer(g, i, layering[j - 1], layering[j], "inEdges");
+        cc += improveLayer(g, i, layering[j - 1], layering[j], "inEdges");
       }
     } else {
       for (var j = layering.length - 2; j >= 0; --j) {
-        improveLayer(g, i, layering[j + 1], layering[j], "outEdges");
+        cc += improveLayer(g, i, layering[j + 1], layering[j], "outEdges");
       }
     }
+    return cc;
   }
 
   /*
@@ -141,6 +142,10 @@ dagre.layout.order = function() {
         movable[i] = toSort[toSortIndex++].node;
       }
     }
+
+    return neighbors === "inEdges"
+      ? bilayerCrossCount(g, fixed, movable)
+      : bilayerCrossCount(g, movable, fixed);
   }
 
   /*
@@ -176,12 +181,6 @@ dagre.layout.order = function() {
   }
 }
 
-/*
- * This function searches through a ranked and ordered graph and counts the
- * number of edges that cross. This algorithm is derived from:
- *
- *    W. Barth et al., Bilayer Cross Counting, JGAA, 8(2) 179–194 (2004)
- */
 var crossCount = dagre.layout.order.crossCount = function(g, layering) {
   var cc = 0;
   var prevLayer;
@@ -194,6 +193,12 @@ var crossCount = dagre.layout.order.crossCount = function(g, layering) {
   return cc;
 }
 
+/*
+ * This function searches through a ranked and ordered graph and counts the
+ * number of edges that cross. This algorithm is derived from:
+ *
+ *    W. Barth et al., Bilayer Cross Counting, JGAA, 8(2) 179–194 (2004)
+ */
 var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer1, layer2, weightFunc) {
   if (!weightFunc) { weightFunc = function() { return 1; }; }
 
