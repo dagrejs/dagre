@@ -35,7 +35,7 @@ dagre.layout.order = function() {
 
     var cc;
     for (var i = 0; i < iterations; ++i) {
-      cc = improveOrdering(g, i, layering);
+      cc = barycenterLayering(g, i, layering);
       if (cc < bestCC) {
         bestLayering = copyLayering(layering);
         bestCC = cc;
@@ -93,15 +93,15 @@ dagre.layout.order = function() {
     return layering;
   }
 
-  function improveOrdering(g, i, layering) {
+  function barycenterLayering(g, i, layering) {
     var cc = 0;
     if (i % 2 === 0) {
       for (var j = 1; j < layering.length; ++j) {
-        cc += improveLayer(g, i, layering[j - 1], layering[j], "inEdges");
+        cc += barycenterLayer(g, i, layering[j - 1], layering[j], "inEdges");
       }
     } else {
       for (var j = layering.length - 2; j >= 0; --j) {
-        cc += improveLayer(g, i, layering[j + 1], layering[j], "outEdges");
+        cc += barycenterLayer(g, i, layering[j + 1], layering[j], "outEdges");
       }
     }
     return cc;
@@ -114,7 +114,7 @@ dagre.layout.order = function() {
    *
    * This algorithm is based on the barycenter method.
    */
-  function improveLayer(g, i, fixed, movable, neighbors) {
+  function barycenterLayer(g, i, fixed, movable, neighbors) {
     var weights = rankWeights(g, fixed, movable, neighbors);
 
     var toSort = [];
