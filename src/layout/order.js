@@ -46,16 +46,16 @@ dagre.layout.order = function() {
       }
     }
 
-    if (debugLevel >= 1) {
-      console.log("Order phase time: " + timer.elapsedString());
-      console.log("Order phase best cross count: " + bestCC);
-    }
-
     bestLayering.forEach(function(layer) {
       layer.forEach(function(u, i) {
         g.node(u).order = i;
       });
     });
+
+    if (debugLevel >= 1) {
+      console.log("Order phase time: " + timer.elapsedString());
+      console.log("Order phase best cross count: " + bestCC);
+    }
 
     return bestLayering;
   }
