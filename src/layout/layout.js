@@ -5,16 +5,6 @@ dagre.layout = function() {
       nodes = [],
       // Edges to lay out. At mimimum must have `source` and `target` attributes.
       edges = [],
-      // Min separation between adjacent nodes in the same rank.
-      nodeSep = 50,
-      // Min separation between adjacent edges in the same rank.
-      edgeSep = 10,
-      // Min separation between ranks.
-      rankSep = 30,
-      // Number of passes to take during the ordering phase.
-      orderIters = 24,
-      // Debug positioning with a particular direction (up-left, up-right, down-left, down-right).
-      posDir = null,
       // How much debug information to include?
       debugLevel = 0;
 
