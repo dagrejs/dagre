@@ -128,7 +128,7 @@ dagre.graph = function() {
   graph.eachEdge = function(func) {
     for (var k in edges) {
       var edge = edges[k];
-      func(edge.id, edge.value, edge.source, edge.target);
+      func(edge.id, edge.source, edge.target, edge.value);
     }
   }
 

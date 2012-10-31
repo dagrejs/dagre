@@ -187,7 +187,7 @@ dagre.layout = function() {
   }
 
   function undoAcyclic(g) {
-    g.eachEdge(function(e, edge, source, target) {
+    g.eachEdge(function(e, source, target, edge) {
       if (edge.reversed) {
         delete edge.reversed;
 
@@ -202,7 +202,7 @@ dagre.layout = function() {
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
   function normalize(g) {
-    g.eachEdge(function(e, _, source, target) {
+    g.eachEdge(function(e, source, target) {
       var sourceRank = g.node(source).rank;
       var targetRank = g.node(target).rank;
       if (sourceRank + 1 < targetRank) {

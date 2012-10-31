@@ -59,7 +59,7 @@ dagre.layout.rank = function() {
   function feasibleTree(g) {
     // Precompute minimum lengths for each directed edge
     var minLen = {};
-    g.eachEdge(function(e, edge, source, target) {
+    g.eachEdge(function(e, source, target, edge) {
       var id = incidenceId(source, target);
       minLen[id] = Math.max(minLen[id] || 1, edge.minLen || 1);
     });
