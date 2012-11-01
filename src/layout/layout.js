@@ -71,39 +71,36 @@ dagre.layout = function() {
   self.run = function() {
     var timer = createTimer();
     
-    // Build internal graph
-    var g = init();
+    if (nodes.length) {
+      // Build internal graph
+      var g = init();
 
-    if (g.nodes().length === 0) {
-      // Nothing to do!
-      return;
+      // Reverse edges to get an acyclic graph, we keep the graph in an acyclic
+      // state until the very end.
+      acyclic(g);
+
+      // Determine the rank for each node. Nodes with a lower rank will appear
+      // above nodes of higher rank.
+      rank.run(g);
+
+      // Normalize the graph by ensuring that every edge is proper (each edge has
+      // a length of 1). We achieve this by adding dummy nodes to long edges,
+      // thus shortening them.
+      normalize(g);
+
+      // Order the nodes so that edge crossings are minimized.
+      order.run(g);
+
+      // Find the x and y coordinates for every node in the graph.
+      position.run(g);
+
+      // De-normalize the graph by removing dummy nodes and augmenting the
+      // original long edges with coordinate information.
+      undoNormalize(g);
+
+      // Reverse edges that were revered previously to get an acyclic graph.
+      undoAcyclic(g);
     }
-
-    // Reverse edges to get an acyclic graph, we keep the graph in an acyclic
-    // state until the very end.
-    acyclic(g);
-
-    // Determine the rank for each node. Nodes with a lower rank will appear
-    // above nodes of higher rank.
-    rank.run(g);
-
-    // Normalize the graph by ensuring that every edge is proper (each edge has
-    // a length of 1). We achieve this by adding dummy nodes to long edges,
-    // thus shortening them.
-    normalize(g);
-
-    // Order the nodes so that edge crossings are minimized.
-    order.run(g);
-
-    // Find the x and y coordinates for every node in the graph.
-    position.run(g);
-
-    // De-normalize the graph by removing dummy nodes and augmenting the
-    // original long edges with coordinate information.
-    undoNormalize(g);
-
-    // Reverse edges that were revered previously to get an acyclic graph.
-    undoAcyclic(g);
 
     if (debugLevel >= 1) {
       console.log("Total layout time: " + timer.elapsedString());
