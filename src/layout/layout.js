@@ -156,6 +156,8 @@ dagre.layout = function() {
       if (source !== target) {
         var id = "id" in e ? e.id : "_E" + nextId++;
         e.dagre.minLen = e.minLen || 1;
+        e.dagre.width = e.width || 0;
+        e.dagre.height = e.height || 0;
         g.addEdge(id, source, target, e.dagre);
       }
     });
@@ -216,8 +218,8 @@ dagre.layout = function() {
         var prefix = "_D-" + e + "-";
         for (var u = source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
           var v = prefix + rank;
-          var node = { width: 0,
-                       height: 0,
+          var node = { width: g.edge(e).width,
+                       height: g.edge(e).height,
                        edgeId: e,
                        edge: g.edge(e),
                        source: g.source(e),

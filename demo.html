@@ -4,13 +4,21 @@
 <title>Dagre Interactive Demo</title>
 
 <style>
-.node rect {
-  stroke-width: 1.5px;
-  stroke: #333;
+rect {
   fill: #fff;
 }
 
-path.edge {
+.node > rect {
+  stroke-width: 3px;
+  stroke: #333;
+  fill: none;
+}
+
+.edge rect {
+  fill: #fff
+}
+
+.edge path {
   fill: none;
   stroke: #333;
   stroke-width: 1.5px;
@@ -55,7 +63,7 @@ digraph {
     A -&gt; B -&gt; C;
     B -&gt; D -&gt; E;
     C -&gt; E;
-    A -&gt; D;
+    A -&gt; D [label="<div>A multi-rank <span style='color:blue;'>HTML</span> edge!</div>"];
 }
   </textarea>
 
@@ -138,6 +146,7 @@ digraph {
       oldInputStyleValue = inputStyle.node().value;
       try {
         result = dagre.dot.toObjects(inputGraph.value);
+        result.edges.forEach(function(e) { if (!e.label) { e.label = ""; } });
       } catch (e) {
         inputGraph.setAttribute("class", "error");
       }
@@ -154,8 +163,9 @@ digraph {
       var graphNodes = result.nodes;
       var graphEdges = result.edges;
 
+      // Clear everything out
+      // TODO: support incremental updates
       svgGroup.selectAll("g").remove();
-      svgGroup.selectAll("path").remove();
 
       // `nodes` is center positioned for easy layout later
       var nodes = svgGroup
@@ -164,33 +174,40 @@ digraph {
         .enter()
           .append("g")
             .attr("class", "node")
-            .attr("id", function(d) { return "node-" + d.id; });
+            .attr("id", function(d) { return "node-" + d.id; })
+            .each(function(d) { d.nodePadding = 10; });
 
       var edges = svgGroup
-        .selectAll("path .edge")
+        .selectAll("g .edge")
         .data(graphEdges)
         .enter()
-          .append("path")
+          .append("g")
             .attr("class", "edge")
             .attr("id", function(d) { return "edge-" + d.id; })
-            .attr("marker-end", "url(#arrowhead)");
+            .each(function(d) { d.nodePadding = 0; })
+            .append("path")
+              .attr("marker-end", "url(#arrowhead)");
 
       // Append rectangles to the nodes. We do this before laying out the labels
       // because we want the text above the rectangle.
-      var rects = nodes.append("rect");
+      var nodesAndEdges = svgGroup.selectAll("g .node, g .edge");
+
+      var nodeRects = nodes.append("rect");
 
       // Append labels
-      var labels = nodes
+      var labels = nodesAndEdges
         .append("g")
         .attr("class", "label")
         .classed("inline-html", function(d) { return d.label[0] === "<"; });
 
-      var foLabel = nodes.selectAll("g .label.inline-html")
+      var labelRects = labels.append("rect");
+
+      var foLabels = nodesAndEdges.selectAll("g .label.inline-html")
         .append("foreignObject")
         // TODO find a better way to get the dimensions for foriegnObjects
         .attr("width", "100000");
 
-      foLabel
+      foLabels
         .append("xhtml:div")
         .style("float", "left")
         .html(function(d) { return d.label; })
@@ -200,29 +217,38 @@ digraph {
           d.nodePadding = 0;
         });
 
-      foLabel
+      foLabels
         .attr("width", function(d) { return d.foWidth; })
         .attr("height", function(d) { return d.foHeight; });
 
-      nodes.selectAll("g .label:not(.inline-html)")
+      nodesAndEdges.selectAll("g .label:not(.inline-html)")
         .append("text")
           .attr("text-anchor", "left")
             .append("tspan")
             .attr("dy", "1em")
-            .text(function(d) { return d.label; })
-            .each(function(d) { d.nodePadding = 10; });
+            .text(function(d) { return d.label; });
 
       // We need width and height for layout.
       labels.each(function(d) {
         var bbox = this.getBBox();
         d.bbox = bbox;
-        d.width = bbox.width + 2 * d.nodePadding;
-        d.height = bbox.height + 2 * d.nodePadding;
+        if (d.label.length) {
+          d.width = bbox.width + 2 * d.nodePadding;
+          d.height = bbox.height + 2 * d.nodePadding;
+        } else {
+          d.width = d.height = 0;
+        }
       });
 
-      rects
+      nodeRects
         .attr("x", function(d) { return -(d.bbox.width / 2 + d.nodePadding); })
         .attr("y", function(d) { return -(d.bbox.height / 2 + d.nodePadding); })
+        .attr("width", function(d) { return d.width; })
+        .attr("height", function(d) { return d.height; });
+
+      labelRects
+        .attr("x", function(d) { return -d.nodePadding; })
+        .attr("y", function(d) { return -d.nodePadding; })
         .attr("width", function(d) { return d.width; })
         .attr("height", function(d) { return d.height; });
 
@@ -239,10 +265,24 @@ digraph {
 
       edges.attr("d", function(e) {
         var points = e.dagre.points;
-        points.push(dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre));
-        var origin = dagre.util.intersectRect(e.source.dagre, points[0]);
-        return "M" + dagre.util.pointStr(origin) + " L " + points.map(dagre.util.pointStr).join(" ");
+        var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.source.dagre);
+        var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
+        points.unshift(source);
+        points.push(target);
+        return d3.svg.line()
+          .x(function(d) { return d.x; })
+          .y(function(d) { return d.y; })
+          (points);
       });
+
+      svgGroup
+        .selectAll(".edge g.label")
+        .attr("transform", function(e) {
+          var mp = e.dagre.points[Math.floor(e.dagre.points.length / 2)];
+          var xDelta = -e.bbox.width / 2;
+          var yDelta = -e.bbox.height / 2;
+          return "translate(" + (mp.x + xDelta) + "," + (mp.y + yDelta) + ")";
+        });
 
       // Resize the SVG element
       var svgBBox = svg.node().getBBox();

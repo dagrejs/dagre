@@ -1,3 +1,11 @@
+# v0.0.5
+
+* Initial support for edge labels
+* Demo changes:
+    * Edges are now wrapped in a <g>...</g> element. This will potentially
+      impact CSS selectors. Where matching with `path.edge` previously now
+      match with `.edge path`.
+
 # v0.0.4
 
 * We have significantly reduced the amount of graph based customization. Most
