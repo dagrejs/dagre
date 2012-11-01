@@ -71,9 +71,20 @@ dagre.layout = function() {
   self.run = function() {
     var timer = createTimer();
     
-    if (nodes.length) {
+    var rankSep = self.rankSep();
+    try {
+      if (!nodes.length) {
+        return;
+      }
+
       // Build internal graph
       var g = init();
+
+      // Make space for edge labels
+      g.eachEdge(function(e, s, t, a) {
+        a.minLen *= 2;
+      });
+      self.rankSep(rankSep / 2);
 
       // Reverse edges to get an acyclic graph, we keep the graph in an acyclic
       // state until the very end.
@@ -100,10 +111,12 @@ dagre.layout = function() {
 
       // Reverse edges that were revered previously to get an acyclic graph.
       undoAcyclic(g);
-    }
+    } finally {
+      self.rankSep(rankSep);
 
-    if (debugLevel >= 1) {
-      console.log("Total layout time: " + timer.elapsedString());
+      if (debugLevel >= 1) {
+        console.log("Total layout time: " + timer.elapsedString());
+      }
     }
   };
 
@@ -142,10 +155,7 @@ dagre.layout = function() {
       // loops, so they can be skipped.
       if (source !== target) {
         var id = "id" in e ? e.id : "_E" + nextId++;
-        // TODO should we use prototypal inheritance for this?
-        if (e.minLen) {
-          e.dagre.minLen = e.minLen;
-        }
+        e.dagre.minLen = e.minLen || 1;
         g.addEdge(id, source, target, e.dagre);
       }
     });
