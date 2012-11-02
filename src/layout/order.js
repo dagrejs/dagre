@@ -97,11 +97,11 @@ dagre.layout.order = function() {
     var cc = 0;
     if (i % 2 === 0) {
       for (var j = 1; j < layering.length; ++j) {
-        cc += barycenterLayer(g, i, layering[j - 1], layering[j], "inEdges");
+        cc += barycenterLayer(g, layering[j - 1], layering[j], "inEdges");
       }
     } else {
       for (var j = layering.length - 2; j >= 0; --j) {
-        cc += barycenterLayer(g, i, layering[j + 1], layering[j], "outEdges");
+        cc += barycenterLayer(g, layering[j + 1], layering[j], "outEdges");
       }
     }
     return cc;
@@ -114,7 +114,7 @@ dagre.layout.order = function() {
    *
    * This algorithm is based on the barycenter method.
    */
-  function barycenterLayer(g, i, fixed, movable, neighbors) {
+  function barycenterLayer(g, fixed, movable, neighbors) {
     var weights = rankWeights(g, fixed, movable, neighbors);
 
     var toSort = [];
