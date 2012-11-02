@@ -133,6 +133,20 @@ digraph {
 
   tryDraw();
 
+  function spline(points) {
+    var line = d3.svg.line()
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; })
+      .interpolate("basis")
+      (points);
+    var curves = line.split("C");
+    var last = curves.pop();
+    line = curves.join("C");
+    var points = last.split(",");
+    line += "L" + points.slice(points.length - 2).join(",");
+    return line;
+  }
+
   function graphToURL() {
     return [window.location.protocol, '//',
             window.location.host,
@@ -273,10 +287,7 @@ digraph {
         var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
         points.unshift(source);
         points.push(target);
-        return d3.svg.line()
-          .x(function(d) { return d.x; })
-          .y(function(d) { return d.y; })
-          (points);
+        return spline(points);
       });
 
       svgGroup

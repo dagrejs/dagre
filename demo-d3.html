@@ -74,6 +74,20 @@ path.edge {
     { source: "TIME WAIT", target: "CLOSED" },
   ];
 
+  function spline(points) {
+    var line = d3.svg.line()
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; })
+      .interpolate("basis")
+      (points);
+    var curves = line.split("C");
+    var last = curves.pop();
+    line = curves.join("C");
+    var points = last.split(",");
+    line += "L" + points.slice(points.length - 2).join(",");
+    return line;
+  }
+
   // Get the data in the right form
   var stateKeys = {};
   transitions.forEach(function(d) {
@@ -153,9 +167,11 @@ path.edge {
 
   edges.attr("d", function(e) {
     var points = e.dagre.points;
-    points.push(dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre));
-    var origin = dagre.util.intersectRect(e.source.dagre, points[0]);
-    return "M" + dagre.util.pointStr(origin) + " L " + points.map(dagre.util.pointStr).join(" ");
+    var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.source.dagre);
+    var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
+    points.unshift(source);
+    points.push(target);
+    return spline(points);
   });
 
   // Resize the SVG element
