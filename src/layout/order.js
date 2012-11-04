@@ -35,7 +35,7 @@ dagre.layout.order = function() {
 
     var cc;
     for (var i = 0, lastBest = 0; lastBest < 4 && i < iterations; ++i, ++lastBest) {
-      cc = barycenterLayering(g, i, layering);
+      cc = sweep(g, i, layering);
       if (cc < bestCC) {
         bestLayering = copyLayering(layering);
         bestCC = cc;
@@ -72,15 +72,15 @@ dagre.layout.order = function() {
     return layering;
   }
 
-  function barycenterLayering(g, i, layering) {
+  function sweep(g, iter, layering) {
     var cc = 0;
-    if (i % 2 === 0) {
-      for (var j = 1; j < layering.length; ++j) {
-        cc += barycenterLayer(g, layering[j - 1], layering[j], "inEdges");
+    if (iter % 2 === 0) {
+      for (var i = 1; i < layering.length; ++i) {
+        cc += barycenterLayer(g, layering[i - 1], layering[i], "inEdges");
       }
     } else {
-      for (var j = layering.length - 2; j >= 0; --j) {
-        cc += barycenterLayer(g, layering[j + 1], layering[j], "outEdges");
+      for (var i = layering.length - 2; i >= 0; --i) {
+        cc += barycenterLayer(g, layering[i + 1], layering[i], "outEdges");
       }
     }
     return cc;
