@@ -40,6 +40,33 @@ If you want to verify the integrity of the library, use:
 
     $ make test
 
+## References
+
+This work was produced by taking advantage of many papers and books. Here we
+summarize the sources used to develop Dagre.
+
+The general skeleton for Dagre comes from *Gansner, et al., "A Technique for
+Drawing Directed Graphs"*, which gives both an excellent high level overview of
+the phases involved in layered drawing as well as diving into the details and
+problems of each of the phases. Besides the basic skeleton, we specifically
+used the technique described in the paper to produce an acyclic graph, and we
+use the idea of a minimum spanning tree for ranking.  We do not currently use
+the network simplex algorithm for ranking. If there is one paper to start with
+when learning about layered graph drawing, this seems to be it!
+
+For crossing minimization we used *Jünger and Mutzel, "2-Layer Straightline
+Crossing Minimization"*, which provides a comparison of the performance of
+various heuristics and exact algorithms for crossing minimization.
+
+For counting the number of edge crossings between two layers we use the `O(|E|
+log |V_small|)` algorithm described in *Barth, et al., "Simple and Efficient
+Bilayer Cross Counting"*.
+
+For positioning (or coordinate assignment), we derived our algorithm from
+*Brandes and Köpf, "Fast and Simple Horizontal Coordinate Assignment"*. We made
+some some adjustments to get tighter graphs when node and edges sizes vary
+greatly.
+
 ## License
 
 dagre is licensed under the terms of the MIT License. See the LICENSE file
