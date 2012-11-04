@@ -63,33 +63,11 @@ dagre.layout.order = function() {
 
   function initOrder(g) {
     var layering = [];
-    var visited = {};
-
-    function dfs(u) {
-      if (u in visited) {
-        return;
-      }
-      visited[u] = true;
-
-      var rank = g.node(u).rank;
-      for (var i = layering.length; i <= rank; ++i) {
-        layering[i] = [];
-      }
-      layering[rank].push(u);
-
-      g.neighbors(u).forEach(function(v) {
-        dfs(v);
-      });
-    }
-
-    var nodes = g.nodes().sort(function(x, y) {
-      return g.node(x).rank - g.node(y).rank;
+    g.eachNode(function(n, a) {
+      var layer = layering[a.rank];
+      if (!layer) layer = layering[a.rank] = [];
+      layer.push(n);
     });
-
-    nodes.forEach(function(u) {
-      dfs(u);
-    });
-
     return layering;
   }
 
