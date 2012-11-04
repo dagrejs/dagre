@@ -34,11 +34,12 @@ dagre.layout.order = function() {
     }
 
     var cc;
-    for (var i = 0; i < iterations; ++i) {
+    for (var i = 0, lastBest = 0; lastBest < 4 && i < iterations; ++i, ++lastBest) {
       cc = barycenterLayering(g, i, layering);
       if (cc < bestCC) {
         bestLayering = copyLayering(layering);
         bestCC = cc;
+        lastBest = 0;
       }
       if (debugLevel >= 2) {
         console.log("Order phase iter " + i + " cross count: " + bestCC);
