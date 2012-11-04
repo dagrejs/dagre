@@ -177,27 +177,20 @@ var crossCount = dagre.layout.order.crossCount = function(g, layering) {
  *
  *    W. Barth et al., Bilayer Cross Counting, JGAA, 8(2) 179–194 (2004)
  */
-var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer1, layer2, weightFunc) {
-  if (!weightFunc) { weightFunc = function() { return 1; }; }
-
+var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer1, layer2) {
   var layer2Pos = {};
   layer2.forEach(function(u, i) { layer2Pos[u] = i; });
 
-  var edges = [];
+  var indices = [];
   layer1.forEach(function(u) {
-    var nodeEdges = [];
-    g.outEdges(u).forEach(function(e) {
-      nodeEdges.push({ edge: e, pos: layer2Pos[g.target(e)] });
-    });
-    // TODO consider radix sort
-    nodeEdges.sort(function(x, y) { return x.pos - y.pos; });
-    edges = edges.concat(nodeEdges);
+    var nodeIndices = [];
+    g.outEdges(u).forEach(function(e) { nodeIndices.push(layer2Pos[g.target(e)]); });
+    nodeIndices.sort(function(x, y) { return x - y; });
+    indices = indices.concat(nodeIndices);
   });
 
   var firstIndex = 1;
-  while (firstIndex < layer2.length) {
-    firstIndex <<= 1;
-  }
+  while (firstIndex < layer2.length) firstIndex <<= 1;
 
   var treeSize = 2 * firstIndex - 1;
   firstIndex -= 1;
@@ -206,19 +199,17 @@ var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer
   for (var i = 0; i < treeSize; ++i) { tree[i] = 0; }
 
   var cc = 0;
-  edges.forEach(function(edge) {
-    var edgeWeight = weightFunc(edge.edge);
-    var treeIndex = edge.pos + firstIndex;
-    tree[treeIndex] += edgeWeight;
+  indices.forEach(function(i) {
+    var treeIndex = i + firstIndex;
+    ++tree[treeIndex];
     var weightSum = 0;
     while (treeIndex > 0) {
       if (treeIndex % 2) {
-        weightSum += tree[treeIndex + 1];
+        cc += tree[treeIndex + 1];
       }
       treeIndex = (treeIndex - 1) >> 1;
-      tree[treeIndex] += edgeWeight;
+      ++tree[treeIndex];
     }
-    cc += edgeWeight * weightSum;
   });
 
   return cc;
