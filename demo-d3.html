@@ -75,17 +75,11 @@ path.edge {
   ];
 
   function spline(points) {
-    var line = d3.svg.line()
+    return d3.svg.line()
       .x(function(d) { return d.x; })
       .y(function(d) { return d.y; })
-      .interpolate("basis")
+      .interpolate("linear")
       (points);
-    var curves = line.split("C");
-    var last = curves.pop();
-    line = curves.join("C");
-    var points = last.split(",");
-    line += "L" + points.slice(points.length - 2).join(",");
-    return line;
   }
 
   // Get the data in the right form
