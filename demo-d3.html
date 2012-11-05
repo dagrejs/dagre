@@ -161,6 +161,7 @@ path.edge {
     .rankSep(50)
     .nodes(states)
     .edges(transitions)
+    .debugLevel(1)
     .run();
 
   nodes.attr("transform", function(d) { return "translate(" + d.dagre.x + "," + d.dagre.y +")"; });

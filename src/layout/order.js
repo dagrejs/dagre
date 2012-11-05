@@ -33,8 +33,8 @@ dagre.layout.order = function() {
       console.log("Order phase start cross count: " + bestCC);
     }
 
-    var cc;
-    for (var i = 0, lastBest = 0; lastBest < 4 && i < iterations; ++i, ++lastBest) {
+    var cc, i, lastBest;
+    for (i = 0, lastBest = 0; lastBest < 4 && i < iterations; ++i, ++lastBest) {
       cc = sweep(g, i, layering);
       if (cc < bestCC) {
         bestLayering = copyLayering(layering);
@@ -53,6 +53,7 @@ dagre.layout.order = function() {
     });
 
     if (debugLevel >= 1) {
+      console.log("Order iterations: " + i);
       console.log("Order phase time: " + timer.elapsedString());
       console.log("Order phase best cross count: " + bestCC);
     }
@@ -65,21 +66,21 @@ dagre.layout.order = function() {
   function initOrder(g) {
     var layering = [];
     g.eachNode(function(n, a) {
-      var layer = layering[a.rank];
-      if (!layer) layer = layering[a.rank] = [];
+      var layer = layering[a.rank] || (layering[a.rank] = []);
       layer.push(n);
     });
     return layering;
   }
 
   function sweep(g, iter, layering) {
-    var cc = 0;
+    var cc = 0,
+        i;
     if (iter % 2 === 0) {
-      for (var i = 1; i < layering.length; ++i) {
+      for (i = 1; i < layering.length; ++i) {
         cc += barycenterLayer(g, layering[i - 1], layering[i], "inEdges");
       }
     } else {
-      for (var i = layering.length - 2; i >= 0; --i) {
+      for (i = layering.length - 2; i >= 0; --i) {
         cc += barycenterLayer(g, layering[i + 1], layering[i], "outEdges");
       }
     }
