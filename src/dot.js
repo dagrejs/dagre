@@ -23,7 +23,7 @@ dagre.dot.toGraph = function(str) {
     }
     edgeCount[edgeKey]++;
 
-    var id = edgeKey + "-" + count;
+    var id = attrs.id || edgeKey + "-" + count;
     var edge = {};
     mergeAttributes(attrs, edge);
     mergeAttributes({ id: id }, edge);
