@@ -1,18 +1,33 @@
 dagre.layout.acyclic = function() {
   // External configuration
-  var debugLevel = 0;
+  var debugLevel = 0,
+      timer = createTimer();
 
   var self = {};
 
   self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
     debugLevel = x;
+    timer.enabled(debugLevel);
     return self;
   }
 
-  self.run = function(g) {
-    var timer = debugLevel ? createTimer() : null,
-        onStack = {},
+  self.run = timer.wrap("Acyclic Phase", run);
+
+  self.undo = function(g) {
+    g.eachEdge(function(e, s, t, a) {
+      if (a.reversed) {
+        delete a.reversed;
+        g.delEdge(e);
+        g.addEdge(e, t, s, a);
+      }
+    });
+  }
+
+  return self;
+
+  function run(g) {
+    var onStack = {},
         visited = {};
 
     function dfs(u) {
@@ -37,19 +52,5 @@ dagre.layout.acyclic = function() {
     }
 
     g.eachNode(function(u) { dfs(u); });
-
-    if (timer) console.log("Acyclic time: " + timer.elapsedString());
   }
-
-  self.undo = function(g) {
-    g.eachEdge(function(e, s, t, a) {
-      if (a.reversed) {
-        delete a.reversed;
-        g.delEdge(e);
-        g.addEdge(e, t, s, a);
-      }
-    });
-  }
-
-  return self;
 };

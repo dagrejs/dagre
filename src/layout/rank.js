@@ -2,32 +2,31 @@ dagre.layout.rank = function() {
   // External configuration
   var
     // Level 1: log time spent
-    debugLevel = 0;
+    debugLevel = 0,
+    timer = createTimer();
 
   var self = {};
 
   self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
     debugLevel = x;
+    timer.enabled(debugLevel);
     return self;
   }
 
-  self.run = function(g) {
-    var timer = createTimer();
+  self.run = timer.wrap("Rank Phase", run);
 
+  return self;
+
+  function run(g) {
     initRank(g);
     components(g).forEach(function(cmpt) {
       var subgraph = g.subgraph(cmpt);
       feasibleTree(subgraph);
       normalize(subgraph);
     });
-
-    if (debugLevel >= 1) {
-      console.log("Rank phase time: " + timer.elapsedString());
-    }
   };
 
-  return self;
 
   function initRank(g) {
     var minRank = {};

@@ -6,7 +6,8 @@ dagre.layout.order = function() {
 
     // Level 1: log time spent and best cross count found
     // Level 2: log cross count on each iteration
-    debugLevel = 0;
+    debugLevel = 0,
+    timer = createTimer();
 
   var self = {};
 
@@ -19,12 +20,15 @@ dagre.layout.order = function() {
   self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
     debugLevel = x;
+    timer.enabled(x);
     return self;
   }
 
-  self.run = function(g) {
-    var timer = createTimer();
+  self.run = timer.wrap("Order Phase", run);
 
+  return self;
+
+  function run(g) {
     var layering = initOrder(g);
     var bestLayering = copyLayering(layering);
     var bestCC = crossCount(g, layering);
@@ -54,14 +58,11 @@ dagre.layout.order = function() {
 
     if (debugLevel >= 1) {
       console.log("Order iterations: " + i);
-      console.log("Order phase time: " + timer.elapsedString());
       console.log("Order phase best cross count: " + bestCC);
     }
 
     return bestLayering;
   }
-
-  return self;
 
   function initOrder(g) {
     var layering = [];

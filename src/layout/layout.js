@@ -6,7 +6,8 @@ dagre.layout = function() {
       // Edges to lay out. At mimimum must have `source` and `target` attributes.
       edges = [],
       // How much debug information to include?
-      debugLevel = 0;
+      debugLevel = 0,
+      timer = createTimer();
 
   // Phase functions
   var
@@ -63,6 +64,7 @@ dagre.layout = function() {
   self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
     debugLevel = x;
+    timer.enabled(debugLevel);
     acyclic.debugLevel(x);
     rank.debugLevel(x);
     order.debugLevel(x);
@@ -70,60 +72,7 @@ dagre.layout = function() {
     return self;
   }
 
-  self.run = function() {
-    var timer = createTimer();
-    
-    var rankSep = self.rankSep();
-    try {
-      if (!nodes.length) {
-        return;
-      }
-
-      // Build internal graph
-      var g = init();
-
-      // Make space for edge labels
-      g.eachEdge(function(e, s, t, a) {
-        a.minLen *= 2;
-      });
-      self.rankSep(rankSep / 2);
-
-      // Reverse edges to get an acyclic graph, we keep the graph in an acyclic
-      // state until the very end.
-      acyclic.run(g);
-
-      // Determine the rank for each node. Nodes with a lower rank will appear
-      // above nodes of higher rank.
-      rank.run(g);
-
-      // Normalize the graph by ensuring that every edge is proper (each edge has
-      // a length of 1). We achieve this by adding dummy nodes to long edges,
-      // thus shortening them.
-      normalize(g);
-
-      // Order the nodes so that edge crossings are minimized.
-      order.run(g);
-
-      // Find the x and y coordinates for every node in the graph.
-      position.run(g);
-
-      // De-normalize the graph by removing dummy nodes and augmenting the
-      // original long edges with coordinate information.
-      undoNormalize(g);
-
-      // Reverses points for edges that are in a reversed state.
-      fixupEdgePoints(g);
-
-      // Reverse edges that were revered previously to get an acyclic graph.
-      acyclic.undo(g);
-    } finally {
-      self.rankSep(rankSep);
-
-      if (debugLevel >= 1) {
-        console.log("Total layout time: " + timer.elapsedString());
-      }
-    }
-  };
+  self.run = timer.wrap("Total layout", run);
 
   return self;
 
@@ -170,6 +119,54 @@ dagre.layout = function() {
     return g;
   }
 
+  function run () {
+    var rankSep = self.rankSep();
+    try {
+      if (!nodes.length) {
+        return;
+      }
+
+      // Build internal graph
+      var g = init();
+
+      // Make space for edge labels
+      g.eachEdge(function(e, s, t, a) {
+        a.minLen *= 2;
+      });
+      self.rankSep(rankSep / 2);
+
+      // Reverse edges to get an acyclic graph, we keep the graph in an acyclic
+      // state until the very end.
+      acyclic.run(g);
+
+      // Determine the rank for each node. Nodes with a lower rank will appear
+      // above nodes of higher rank.
+      rank.run(g);
+
+      // Normalize the graph by ensuring that every edge is proper (each edge has
+      // a length of 1). We achieve this by adding dummy nodes to long edges,
+      // thus shortening them.
+      normalize(g);
+
+      // Order the nodes so that edge crossings are minimized.
+      order.run(g);
+
+      // Find the x and y coordinates for every node in the graph.
+      position.run(g);
+
+      // De-normalize the graph by removing dummy nodes and augmenting the
+      // original long edges with coordinate information.
+      undoNormalize(g);
+
+      // Reverses points for edges that are in a reversed state.
+      fixupEdgePoints(g);
+
+      // Reverse edges that were revered previously to get an acyclic graph.
+      acyclic.undo(g);
+    } finally {
+      self.rankSep(rankSep);
+    }
+  }
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
   function normalize(g) {

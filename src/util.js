@@ -164,13 +164,25 @@ var pointStr = dagre.util.pointStr = function(point) {
 }
 
 var createTimer = function() {
-  var start = new Date().getTime();
-  var timer = {};
-  timer.elapsed = function() {
-    return new Date().getTime() - start;
-  }
-  timer.elapsedString = function() {
-    return timer.elapsed() + "ms";
-  }
-  return timer;
+  var self = {},
+      enabled = false;
+
+  self.enabled = function(x) {
+    if (!arguments.length) return enabled;
+    enabled = x;
+    return self;
+  };
+
+  self.wrap = function(name, func) {
+    return function() {
+      var start = enabled ? new Date().getTime() : null;
+      try {
+        return func.apply(null, arguments);
+      } finally {
+        if (start) console.log(name + " time: " + (new Date().getTime() - start) + "ms");
+      }
+    }
+  };
+
+  return self;
 }

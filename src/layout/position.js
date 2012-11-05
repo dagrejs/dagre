@@ -10,7 +10,8 @@ dagre.layout.position = function() {
     rankSep = 30,
     direction = null,
     // Level 1: log time spent
-    debugLevel = 0;
+    debugLevel = 0,
+    timer = createTimer();
 
   var self = {};
 
@@ -41,12 +42,15 @@ dagre.layout.position = function() {
   self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
     debugLevel = x;
+    timer.enabled(x);
     return self;
   };
 
-  self.run = function(g) {
-    var timer = createTimer();
+  self.run = timer.wrap("Position Phase", run);
 
+  return self;
+
+  function run(g) {
     var layering = [];
     g.eachNode(function(u, node) {
       var layer = layering[node.rank] || (layering[node.rank] = []);
@@ -106,13 +110,7 @@ dagre.layout.position = function() {
       });
       posY += height / 2 + rankSep;
     });
-
-    if (debugLevel >= 1) {
-      console.log("Position phase time: " + timer.elapsedString());
-    }
   };
-
-  return self;
 
   function findType1Conflicts(g, layering) {
     var type1Conflicts = {};

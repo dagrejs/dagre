@@ -270,7 +270,7 @@ digraph {
       dagre.layout()
         .nodes(graphNodes)
         .edges(graphEdges)
-        .debugLevel(1)
+        .debugLevel(2)
         .run();
 
       nodes.attr("transform", function(d) { return "translate(" + d.dagre.x + "," + d.dagre.y +")"; });
