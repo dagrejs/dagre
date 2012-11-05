@@ -11,6 +11,7 @@ all: dagre.js package.json
 	src/version.js \
 	src/graph.js \
 	src/layout/layout.js \
+	src/layout/acyclic.js \
 	src/layout/rank.js \
 	src/layout/order.js \
 	src/layout/position.js \
