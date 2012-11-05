@@ -3,9 +3,9 @@ NPM?=npm
 PEGJS?=node_modules/pegjs/bin/pegjs
 MOCHA?=node_modules/mocha/bin/mocha
 MOCHA_OPTS?=--recursive
-JS_COMPILER = node_modules/uglify-js/bin/uglifyjs
+JS_COMPILER=node_modules/uglify-js/bin/uglifyjs
 
-all: package.json dagre.js dagre.min.js 
+all: package.json dagre.js dagre.min.js
 
 .INTERMEDIATE dagre.js: \
 	src/pre.js \
