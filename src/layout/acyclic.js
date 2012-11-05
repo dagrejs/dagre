@@ -28,7 +28,8 @@ dagre.layout.acyclic = function() {
 
   function run(g) {
     var onStack = {},
-        visited = {};
+        visited = {},
+        reverseCount = 0;
 
     function dfs(u) {
       if (u in visited) return;
@@ -42,6 +43,7 @@ dagre.layout.acyclic = function() {
           a = g.edge(e);
           g.delEdge(e);
           a.reversed = true;
+          ++reverseCount;
           g.addEdge(e, t, u, a);
         } else {
           dfs(t);
@@ -52,5 +54,7 @@ dagre.layout.acyclic = function() {
     }
 
     g.eachNode(function(u) { dfs(u); });
+
+    if (debugLevel >= 2) console.log("Acyclic Phase: reversed " + reverseCount + " edge(s)");
   }
 };

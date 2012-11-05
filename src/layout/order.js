@@ -45,7 +45,7 @@ dagre.layout.order = function() {
         bestCC = cc;
         lastBest = 0;
       }
-      if (debugLevel >= 2) {
+      if (debugLevel >= 3) {
         console.log("Order phase iter " + i + " cross count: " + bestCC);
       }
     }
@@ -56,7 +56,7 @@ dagre.layout.order = function() {
       });
     });
 
-    if (debugLevel >= 1) {
+    if (debugLevel >= 2) {
       console.log("Order iterations: " + i);
       console.log("Order phase best cross count: " + bestCC);
     }
