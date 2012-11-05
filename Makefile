@@ -3,8 +3,9 @@ NPM?=npm
 PEGJS?=node_modules/pegjs/bin/pegjs
 MOCHA?=node_modules/mocha/bin/mocha
 MOCHA_OPTS?=--recursive
+JS_COMPILER = node_modules/uglify-js/bin/uglifyjs
 
-all: dagre.js package.json
+all: package.json dagre.js dagre.min.js 
 
 .INTERMEDIATE dagre.js: \
 	src/pre.js \
@@ -20,6 +21,10 @@ all: dagre.js package.json
 	src/dot.js \
 	src/dot-grammar.js \
 	src/post.js
+
+dagre.min.js: dagre.js
+	$(JS_COMPILER) dagre.js > $@
+	@chmod a-w $@
 
 dagre.js: Makefile node_modules
 	@rm -f $@
@@ -41,4 +46,4 @@ test: dagre.js
 	$(MOCHA) $(MOCHA_OPTS)
 
 clean:
-	rm -f dagre.js package.json
+	rm -f dagre.js package.json dagre.min.js
