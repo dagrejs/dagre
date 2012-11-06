@@ -1,3 +1,8 @@
+# v0.0.6
+
+* Added support for left-right drawing direction. Use
+  `dagre.layout().rankDir("LR")` to use it.
+
 # v0.0.5
 
 * Initial support for edge labels

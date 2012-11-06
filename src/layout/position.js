@@ -8,6 +8,7 @@ dagre.layout.position = function() {
     nodeSep: 50,
     edgeSep: 10,
     rankSep: 30,
+    rankDir: "TB",
     debugAlignment: null,
     debugLevel: 0
   };
@@ -19,6 +20,7 @@ dagre.layout.position = function() {
   self.nodeSep = propertyAccessor(self, config, "nodeSep");
   self.edgeSep = propertyAccessor(self, config, "edgeSep");
   self.rankSep = propertyAccessor(self, config, "rankSep");
+  self.rankDir = propertyAccessor(self, config, "rankDir");
   self.debugAlignment = propertyAccessor(self, config, "debugAlignment");
   self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
     timer.enabled(x);
@@ -60,33 +62,29 @@ dagre.layout.position = function() {
     if (config.debugAlignment) {
       // In debug mode we allow forcing layout to a particular alignment.
       g.eachNode(function(u, node) {
-        node.x = xss[config.debugAlignment][u];
+        x(g, u, xss[config.debugAlignment][u]);
       });
     } else {
       alignToSmallest(g, layering, xss);
 
       // Find average of medians for xss array
-      g.eachNode(function(u, node) {
+      g.eachNode(function(u) {
         var xs = values(xss).map(function(xs) { return xs[u]; }).sort(function(x, y) { return x - y; });
-        node.x = (xs[1] + xs[2]) / 2;
+        x(g, u, (xs[1] + xs[2]) / 2);
       });
     }
 
     // Align min center point with 0
-    var minX = min(g.nodes().map(function(u) { return g.node(u).x - g.node(u).width / 2; }));
-    g.eachNode(function(u, node) {
-      node.x -= minX;
-    });
+    var minX = min(g.nodes().map(function(u) { return x(g, u) - width(g, u) / 2; }));
+    g.eachNode(function(u) { x(g, u, x(g, u) - minX); });
 
     // Align y coordinates with ranks
     var posY = 0;
     layering.forEach(function(layer) {
-      var height = max(layer.map(function(u) { return g.node(u).height; }));
-      posY += height / 2;
-      layer.forEach(function(u) {
-        g.node(u).y = posY;
-      });
-      posY += height / 2 + config.rankSep;
+      var maxHeight = max(layer.map(function(u) { return height(g, u); }));
+      posY += maxHeight / 2;
+      layer.forEach(function(u) { y(g, u, posY); });
+      posY += maxHeight / 2 + config.rankSep;
     });
   };
 
@@ -191,9 +189,9 @@ dagre.layout.position = function() {
    * Determines how much spacing u needs from its origin (center) to satisfy
    * width and node separation.
    */
-  function deltaX(u) {
-    var sep = u.dummy ? config.edgeSep : config.nodeSep;
-    return u.width / 2 + sep / 2;
+  function deltaX(g, u) {
+    var sep = g.node(u).dummy ? config.edgeSep : config.nodeSep;
+    return width(g, u) / 2 + sep / 2;
   }
 
   function horizontalCompaction(g, layering, pos, root, align) {
@@ -227,7 +225,7 @@ dagre.layout.position = function() {
             if (sink[v] === v) {
               sink[v] = sink[u];
             }
-            var delta = deltaX(g.node(pred[w])) + deltaX(g.node(w));
+            var delta = deltaX(g, pred[w]) + deltaX(g, w);
             if (sink[v] !== sink[u]) {
               shift[sink[u]] = Math.min(shift[sink[u]] || Number.POSITIVE_INFINITY, xs[v] - xs[u] - delta);
             } else {
@@ -272,14 +270,14 @@ dagre.layout.position = function() {
   function findMinCoord(g, layering, xs) {
     return min(layering.map(function(layer) {
       var u = layer[0];
-      return xs[u] - g.node(u).width / 2;
+      return xs[u] - width(g, u) / 2;
     }));
   }
 
   function findMaxCoord(g, layering, xs) {
     return max(layering.map(function(layer) {
       var u = layer[layer.length - 1];
-      return xs[u] - g.node(u).width / 2;
+      return xs[u] - width(g, u) / 2;
     }));
   }
 
@@ -334,5 +332,55 @@ dagre.layout.position = function() {
     layering.forEach(function(layer) {
       layer.reverse();
     });
+  }
+
+  function width(g, u) {
+    switch (config.rankDir) {
+      case "LR": return g.node(u).height;
+      default:   return g.node(u).width;
+    }
+  }
+
+  function height(g, u) {
+    switch(config.rankDir) {
+      case "LR": return g.node(u).width;
+      default:   return g.node(u).height;
+    }
+  }
+
+  function x(g, u, x) {
+    switch (config.rankDir) {
+      case "LR":
+        if (arguments.length < 3) {
+          return g.node(u).y;
+        } else {
+          g.node(u).y = x;
+        }
+        break;
+      default:
+        if (arguments.length < 3) {
+          return g.node(u).x;
+        } else {
+          g.node(u).x = x;
+        }
+    }
+  }
+
+  function y(g, u, y) {
+    switch (config.rankDir) {
+      case "LR":
+        if (arguments.length < 3) {
+          return g.node(u).x;
+        } else {
+          g.node(u).x = y;
+        }
+        break;
+      default:
+        if (arguments.length < 3) {
+          return g.node(u).y;
+        } else {
+          g.node(u).y = y;
+        }
+    }
   }
 }
