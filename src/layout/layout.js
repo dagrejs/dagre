@@ -1,13 +1,15 @@
 dagre.layout = function() {
   // External configuration
-  var
+  var config = {
       // Nodes to lay out. At minimum must have `width` and `height` attributes.
-      nodes = [],
+      nodes: [],
       // Edges to lay out. At mimimum must have `source` and `target` attributes.
-      edges = [],
+      edges: [],
       // How much debug information to include?
-      debugLevel = 0,
-      timer = createTimer();
+      debugLevel: 0,
+  };
+
+  var timer = createTimer();
 
   // Phase functions
   var
@@ -19,17 +21,8 @@ dagre.layout = function() {
   // This layout object
   var self = {};
 
-  self.nodes = function(x) {
-    if (!arguments.length) return nodes;
-    nodes = x;
-    return self;
-  };
-
-  self.edges = function(x) {
-    if (!arguments.length) return edges;
-    edges = x;
-    return self;
-  };
+  self.nodes = propertyAccessor(self, config, "nodes");
+  self.edges = propertyAccessor(self, config, "edges");
 
   self.orderIters = delegateProperty(order.iterations);
 
@@ -38,16 +31,13 @@ dagre.layout = function() {
   self.rankSep = delegateProperty(position.rankSep);
   self.debugAlignment = delegateProperty(position.debugAlignment);
 
-  self.debugLevel = function(x) {
-    if (!arguments.length) return debugLevel;
-    debugLevel = x;
-    timer.enabled(debugLevel);
+  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
+    timer.enabled(x);
     acyclic.debugLevel(x);
     rank.debugLevel(x);
     order.debugLevel(x);
     position.debugLevel(x);
-    return self;
-  }
+  });
 
   self.run = timer.wrap("Total layout", run);
 
@@ -61,13 +51,13 @@ dagre.layout = function() {
 
     // Tag each node so that we can properly represent relationships when
     // we add edges. Also copy relevant dimension information.
-    nodes.forEach(function(u) {
+    config.nodes.forEach(function(u) {
       var id = "id" in u ? u.id : "_N" + nextId++;
       u.dagre = { id: id, width: u.width, height: u.height };
       g.addNode(id, u.dagre);
     });
 
-    edges.forEach(function(e) {
+    config.edges.forEach(function(e) {
       var source = e.source.dagre.id;
       if (!g.hasNode(source)) {
         throw new Error("Source node for '" + e + "' not in node list");
@@ -99,7 +89,7 @@ dagre.layout = function() {
   function run () {
     var rankSep = self.rankSep();
     try {
-      if (!nodes.length) {
+      if (!config.nodes.length) {
         return;
       }
 

@@ -186,3 +186,12 @@ var createTimer = function() {
 
   return self;
 }
+
+function propertyAccessor(self, config, field, setHook) {
+  return function(x) {
+    if (!arguments.length) return config[field];
+    config[field] = x;
+    if (setHook) setHook(x);
+    return self;
+  };
+}

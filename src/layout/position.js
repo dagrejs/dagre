@@ -4,47 +4,25 @@
  */
 dagre.layout.position = function() {
   // External configuration
-  var
-    nodeSep = 50,
-    edgeSep = 10,
-    rankSep = 30,
-    debugAlignment = null,
-    // Level 1: log time spent
-    debugLevel = 0,
-    timer = createTimer();
+  var config = {
+    nodeSep: 50,
+    edgeSep: 10,
+    rankSep: 30,
+    debugAlignment: null,
+    debugLevel: 0
+  };
+
+  var timer = createTimer();
 
   var self = {};
 
-  self.nodeSep = function(x) {
-    if (!arguments.length) return nodeSep;
-    nodeSep = x;
-    return self;
-  };
-
-  self.edgeSep = function(x) {
-    if (!arguments.length) return edgeSep;
-    edgeSep = x;
-    return self;
-  };
-
-  self.rankSep = function(x) {
-    if (!arguments.length) return rankSep;
-    rankSep = x;
-    return self;
-  };
-
-  self.debugAlignment = function(x) {
-    if (!arguments.length) return debugAlignment;
-    debugAlignment = x;
-    return self;
-  };
-
-  self.debugLevel = function(x) {
-    if (!arguments.length) return debugLevel;
-    debugLevel = x;
+  self.nodeSep = propertyAccessor(self, config, "nodeSep");
+  self.edgeSep = propertyAccessor(self, config, "edgeSep");
+  self.rankSep = propertyAccessor(self, config, "rankSep");
+  self.debugAlignment = propertyAccessor(self, config, "debugAlignment");
+  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
     timer.enabled(x);
-    return self;
-  };
+  });
 
   self.run = timer.wrap("Position Phase", run);
 
@@ -67,7 +45,7 @@ dagre.layout.position = function() {
         if (horizDir === "right") { reverseInnerOrder(layering); }
 
         var dir = vertDir + "-" + horizDir;
-        if (!debugAlignment || debugAlignment === dir) {
+        if (!config.debugAlignment || config.debugAlignment === dir) {
           var align = verticalAlignment(g, layering, type1Conflicts, vertDir === "up" ? "predecessors" : "successors");
           xss[dir]= horizontalCompaction(g, layering, align.pos, align.root, align.align);
           if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
@@ -79,10 +57,10 @@ dagre.layout.position = function() {
       if (vertDir === "down") { layering.reverse(); }
     });
 
-    if (debugAlignment) {
+    if (config.debugAlignment) {
       // In debug mode we allow forcing layout to a particular alignment.
       g.eachNode(function(u, node) {
-        node.x = xss[debugAlignment][u];
+        node.x = xss[config.debugAlignment][u];
       });
     } else {
       alignToSmallest(g, layering, xss);
@@ -108,7 +86,7 @@ dagre.layout.position = function() {
       layer.forEach(function(u) {
         g.node(u).y = posY;
       });
-      posY += height / 2 + rankSep;
+      posY += height / 2 + config.rankSep;
     });
   };
 
@@ -214,7 +192,7 @@ dagre.layout.position = function() {
    * width and node separation.
    */
   function deltaX(u) {
-    var sep = u.dummy ? edgeSep : nodeSep;
+    var sep = u.dummy ? config.edgeSep : config.nodeSep;
     return u.width / 2 + sep / 2;
   }
 

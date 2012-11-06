@@ -1,16 +1,16 @@
 dagre.layout.acyclic = function() {
   // External configuration
-  var debugLevel = 0,
-      timer = createTimer();
+  var config = {
+    debugLevel: 0
+  }
+
+  var timer = createTimer();
 
   var self = {};
 
-  self.debugLevel = function(x) {
-    if (!arguments.length) return debugLevel;
-    debugLevel = x;
-    timer.enabled(debugLevel);
-    return self;
-  }
+  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
+    timer.enabled(x);
+  });
 
   self.run = timer.wrap("Acyclic Phase", run);
 
@@ -55,6 +55,6 @@ dagre.layout.acyclic = function() {
 
     g.eachNode(function(u) { dfs(u); });
 
-    if (debugLevel >= 2) console.log("Acyclic Phase: reversed " + reverseCount + " edge(s)");
+    if (config.debugLevel >= 2) console.log("Acyclic Phase: reversed " + reverseCount + " edge(s)");
   }
 };

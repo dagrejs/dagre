@@ -1,28 +1,18 @@
 dagre.layout.order = function() {
-  // External configuration
-  var
-    // Maximum number of passes to make
-    iterations = 24,
+  var config = {
+    iterations: 24, // max number of iterations
+    debugLevel: 0
+  };
 
-    // Level 1: log time spent and best cross count found
-    // Level 2: log cross count on each iteration
-    debugLevel = 0,
-    timer = createTimer();
+  var timer = createTimer();
 
   var self = {};
 
-  self.iterations = function(x) {
-    if (!arguments.length) return iterations;
-    iterations = x;
-    return self;
-  }
+  self.iterations = propertyAccessor(self, config, "iterations");
 
-  self.debugLevel = function(x) {
-    if (!arguments.length) return debugLevel;
-    debugLevel = x;
+  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
     timer.enabled(x);
-    return self;
-  }
+  });
 
   self.run = timer.wrap("Order Phase", run);
 
@@ -33,19 +23,19 @@ dagre.layout.order = function() {
     var bestLayering = copyLayering(layering);
     var bestCC = crossCount(g, layering);
 
-    if (debugLevel >= 2) {
+    if (config.debugLevel >= 2) {
       console.log("Order phase start cross count: " + bestCC);
     }
 
     var cc, i, lastBest;
-    for (i = 0, lastBest = 0; lastBest < 4 && i < iterations; ++i, ++lastBest) {
+    for (i = 0, lastBest = 0; lastBest < 4 && i < config.iterations; ++i, ++lastBest) {
       cc = sweep(g, i, layering);
       if (cc < bestCC) {
         bestLayering = copyLayering(layering);
         bestCC = cc;
         lastBest = 0;
       }
-      if (debugLevel >= 3) {
+      if (config.debugLevel >= 3) {
         console.log("Order phase iter " + i + " cross count: " + bestCC);
       }
     }
@@ -56,7 +46,7 @@ dagre.layout.order = function() {
       });
     });
 
-    if (debugLevel >= 2) {
+    if (config.debugLevel >= 2) {
       console.log("Order iterations: " + i);
       console.log("Order phase best cross count: " + bestCC);
     }

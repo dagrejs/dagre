@@ -1,18 +1,16 @@
 dagre.layout.rank = function() {
   // External configuration
-  var
-    // Level 1: log time spent
-    debugLevel = 0,
-    timer = createTimer();
+  var config = {
+    debugLevel: 0
+  };
+
+  var timer = createTimer();
 
   var self = {};
 
-  self.debugLevel = function(x) {
-    if (!arguments.length) return debugLevel;
-    debugLevel = x;
-    timer.enabled(debugLevel);
-    return self;
-  }
+  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
+    timer.enabled(x);
+  });
 
   self.run = timer.wrap("Rank Phase", run);
 
