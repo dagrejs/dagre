@@ -11,6 +11,9 @@ dagre.layout = function() {
 
   var timer = createTimer();
 
+	// Graph
+	var g = dagre.graph();
+
   // Phase functions
   var
       acyclic = dagre.layout.acyclic(),
@@ -42,12 +45,14 @@ dagre.layout = function() {
 
   self.run = timer.wrap("Total layout", run);
 
+	self.graph = function() {
+		return g;
+	};
+
   return self;
 
   // Build graph and save mapping of generated ids to original nodes and edges
   function init() {
-    var g = dagre.graph();
-
     var nextId = 0;
 
     // Tag each node so that we can properly represent relationships when
@@ -77,6 +82,7 @@ dagre.layout = function() {
       // loops, so they can be skipped.
       if (source !== target) {
         var id = "id" in e ? e.id : "_E" + nextId++;
+        e.dagre.id = id;
         e.dagre.minLen = e.minLen || 1;
         e.dagre.width = e.width || 0;
         e.dagre.height = e.height || 0;
@@ -133,6 +139,8 @@ dagre.layout = function() {
       acyclic.undo(g);
     } finally {
       self.rankSep(rankSep);
+
+      return self;
     }
   }
 

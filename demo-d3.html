@@ -40,10 +40,22 @@
   font: 300 16px "Helvetica Neue";
 }
 
+.node:hover {
+	cursor: pointer;
+	opacity: 0.4;
+	filter: alpha(opacity=40);
+}
+
 path.edge {
   fill: none;
   stroke: #333;
   stroke-width: 1.5px;
+}
+
+.edge:hover {
+	cursor: pointer;
+	opacity: 0.4;
+	filter: alpha(opacity=40);
 }
 </style>
 
@@ -105,7 +117,7 @@ path.edge {
     .enter()
       .append("g")
       .attr("class", "node")
-      .attr("id", function(d) { return "node-" + d.label });
+			.attr("id", function(d) { return "node-" + d.label });
 
   var edges = svgGroup
     .selectAll("path .edge")
@@ -113,7 +125,7 @@ path.edge {
     .enter()
       .append("path")
       .attr("class", "edge")
-      .attr("marker-end", "url(#arrowhead)");
+			.attr("marker-end", "url(#arrowhead)");
 
   // Append rectangles to the nodes. We do this before laying out the text
   // because we want the text above the rectangle.
@@ -149,28 +161,81 @@ path.edge {
     .attr("x", function(d) { return -d.bbox.width / 2; })
     .attr("y", function(d) { return -d.bbox.height / 2; });
 
-  dagre.layout()
+	// Create the layout and get the graph
+  var graph = dagre.layout()
     .nodeSep(50)
     .edgeSep(10)
     .rankSep(50)
     .nodes(states)
     .edges(transitions)
     .debugLevel(1)
-    .run();
+	.run()
+	.graph();
 
-  nodes.attr("transform", function(d) { return "translate(" + d.dagre.x + "," + d.dagre.y +")"; });
+	nodes.attr("transform", function(d) { return 'translate('+ d.dagre.x +','+ d.dagre.y +')'; });
 
-  edges.attr("d", function(e) {
-    var points = e.dagre.points;
-    var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.source.dagre);
-    var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
-    points.unshift(source);
-    points.push(target);
-    return spline(points);
-  });
+	edges
+		// Set the id. of the SVG element to have access to it later
+		.attr('id', function(e) { return e.dagre.id; })
+		.attr("d", function(e) {
+			var points = e.dagre.points;
+			var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.source.dagre);
+			var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
+			points.unshift(source);
+			points.push(target);
+			return spline(points);
+		});
 
-  // Resize the SVG element
-  var svgBBox = svg.node().getBBox();
-  svg.attr("width", svgBBox.width + 10);
-  svg.attr("height", svgBBox.height + 10);
+	// Resize the SVG element
+	var svgBBox = svg.node().getBBox();
+	svg.attr("width", svgBBox.width + 10);
+	svg.attr("height", svgBBox.height + 10);
+
+	// Drag handlers
+	var nodeDrag = d3.behavior.drag()
+		// Set the right origin (based on the Dagre layout or the current position)
+		.origin(function(d) { return d.pos ? {x: d.pos.x, y: d.pos.y} : {x: d.dagre.x, y: d.dagre.y}; })
+		.on('drag', function (d, i) {
+			// Store the current node position without overwriting the original Dagre value
+			d.pos || (d.pos = {x: d.dagre.x, y: d.dagre.y});
+
+			// The node must be inside the SVG area
+			d.pos.x = Math.max(d.width / 2, Math.min(svgBBox.width - d.width / 2, d3.event.x));
+			d.pos.y = Math.max(d.height / 2, Math.min(svgBBox.height - d.height / 2, d3.event.y));
+			d3.select(this).attr('transform', 'translate('+ d.pos.x +','+ d.pos.y +')');
+
+			// Edges position (inside SVG area)
+			graph.inEdges(d.dagre.id).forEach(function(edgeId) {
+				d3.select('#'+ edgeId).attr('d', function(edge) {
+					for (var i = 1, p = edge.dagre.points; i < p.length; i++)
+						p[i] = {x: p[i].x + d3.event.dx, y: p[i].y + d3.event.dy};
+
+					return spline(p);
+				});
+			});
+			graph.outEdges(d.dagre.id).forEach(function(edgeId) {
+				d3.select('#'+ edgeId).attr('d', function(edge) {
+					for (var i = 0, p = edge.dagre.points; i < p.length - 1; i++)
+						p[i] = {x: p[i].x + d3.event.dx, y: p[i].y + d3.event.dy};
+
+					return spline(p);
+				});
+			});
+		});
+
+	var edgeDrag = d3.behavior.drag()
+		.on('drag', function (d, i) {
+			d3.select(this).attr('d', function() {
+				for (var i = 1, p= d.dagre.points; i < p.length - 1; i++)
+					p[i] = {
+						x: Math.max(0, Math.min(svgBBox.width, p[i].x + d3.event.dx)),
+						y: Math.max(0, Math.min(svgBBox.height, p[i].y + d3.event.dy))
+					};
+
+				return spline(p);
+			});
+		});
+
+	nodes.call(nodeDrag);
+	edges.call(edgeDrag);
 </script>
