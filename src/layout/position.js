@@ -8,7 +8,7 @@ dagre.layout.position = function() {
     nodeSep = 50,
     edgeSep = 10,
     rankSep = 30,
-    direction = null,
+    debugAlignment = null,
     // Level 1: log time spent
     debugLevel = 0,
     timer = createTimer();
@@ -33,9 +33,9 @@ dagre.layout.position = function() {
     return self;
   };
 
-  self.direction = function(x) {
-    if (!arguments.length) return direction;
-    direction = x;
+  self.debugAlignment = function(x) {
+    if (!arguments.length) return debugAlignment;
+    debugAlignment = x;
     return self;
   };
 
@@ -67,7 +67,7 @@ dagre.layout.position = function() {
         if (horizDir === "right") { reverseInnerOrder(layering); }
 
         var dir = vertDir + "-" + horizDir;
-        if (!direction || direction === dir) {
+        if (!debugAlignment || debugAlignment === dir) {
           var align = verticalAlignment(g, layering, type1Conflicts, vertDir === "up" ? "predecessors" : "successors");
           xss[dir]= horizontalCompaction(g, layering, align.pos, align.root, align.align);
           if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
@@ -79,10 +79,10 @@ dagre.layout.position = function() {
       if (vertDir === "down") { layering.reverse(); }
     });
 
-    if (direction) {
+    if (debugAlignment) {
       // In debug mode we allow forcing layout to a particular alignment.
       g.eachNode(function(u, node) {
-        node.x = xss[direction][u];
+        node.x = xss[debugAlignment][u];
       });
     } else {
       alignToSmallest(g, layering, xss);

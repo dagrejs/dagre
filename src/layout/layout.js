@@ -36,7 +36,7 @@ dagre.layout = function() {
   self.nodeSep = delegateProperty(position.nodeSep);
   self.edgeSep = delegateProperty(position.edgeSep);
   self.rankSep = delegateProperty(position.rankSep);
-  self.posDir = delegateProperty(position.direction);
+  self.debugAlignment = delegateProperty(position.debugAlignment);
 
   self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
