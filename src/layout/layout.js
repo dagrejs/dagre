@@ -11,8 +11,8 @@ dagre.layout = function() {
 
   var timer = createTimer();
 
-	// Graph
-	var g = dagre.graph();
+  // Graph
+  var g = dagre.graph();
 
   // Phase functions
   var
@@ -45,9 +45,9 @@ dagre.layout = function() {
 
   self.run = timer.wrap("Total layout", run);
 
-	self.graph = function() {
-		return g;
-	};
+  self.graph = function() {
+    return g;
+  };
 
   return self;
 

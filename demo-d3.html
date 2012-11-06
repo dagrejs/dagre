@@ -115,7 +115,7 @@ path.edge {
     .enter()
       .append("g")
       .attr("class", "node")
-			.attr("id", function(d) { return "node-" + d.label });
+      .attr("id", function(d) { return "node-" + d.label });
 
   var edges = svgGroup
     .selectAll("path .edge")
@@ -123,7 +123,7 @@ path.edge {
     .enter()
       .append("path")
       .attr("class", "edge")
-			.attr("marker-end", "url(#arrowhead)");
+      .attr("marker-end", "url(#arrowhead)");
 
   // Append rectangles to the nodes. We do this before laying out the text
   // because we want the text above the rectangle.
