@@ -108,6 +108,11 @@ dagre.graph = function() {
     }
   }
 
+	/*
+	 * Return all edges with no arguments,
+	 * the ones that are incident on a node (one argument),
+	 * or all edges from a source to a target (two arguments)
+	 */
   graph.edges = function(u, v) {
     var es, sourceEdges;
     if (!arguments.length) {
@@ -132,11 +137,17 @@ dagre.graph = function() {
     }
   }
 
+	/*
+	 * Return all in edges to a target node
+	 */
   graph.inEdges = function(target) {
     strictGetNode(target);
     return concat(values(inEdges[target]).map(function(es) { return keys(es.edges); }));
   };
 
+	/*
+	 * Return all out edges to a target node
+	 */
   graph.outEdges = function(source) {
     strictGetNode(source);
     return concat(values(outEdges[source]).map(function(es) { return keys(es.edges); }));
