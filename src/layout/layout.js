@@ -31,35 +31,12 @@ dagre.layout = function() {
     return self;
   };
 
-  self.orderIters = function(x) {
-    if (!arguments.length) return order.iterations();
-    order.iterations(x);
-    return self;
-  }
+  self.orderIters = delegateProperty(order.iterations);
 
-  self.nodeSep = function(x) {
-    if (!arguments.length) return position.nodeSep();
-    position.nodeSep(x);
-    return self;
-  };
-
-  self.edgeSep = function(x) {
-    if (!arguments.length) return position.edgeSep();
-    position.edgeSep(x);
-    return self;
-  }
-
-  self.rankSep = function(x) {
-    if (!arguments.length) return position.rankSep();
-    position.rankSep(x);
-    return self;
-  }
-
-  self.posDir = function(x) {
-    if (!arguments.length) return position.direction();
-    position.direction(x);
-    return self;
-  }
+  self.nodeSep = delegateProperty(position.nodeSep);
+  self.edgeSep = delegateProperty(position.edgeSep);
+  self.rankSep = delegateProperty(position.rankSep);
+  self.posDir = delegateProperty(position.direction);
 
   self.debugLevel = function(x) {
     if (!arguments.length) return debugLevel;
@@ -213,5 +190,13 @@ dagre.layout = function() {
 
   function fixupEdgePoints(g) {
     g.eachEdge(function(e, s, t, a) { if (a.reversed) a.points.reverse(); });
+  }
+
+  function delegateProperty(f) {
+    return function() {
+      if (!arguments.length) return f();
+      f.apply(null, arguments);
+      return self;
+    }
   }
 }
