@@ -146,7 +146,7 @@ dagre.graph = function() {
   };
 
 	/*
-	 * Return all out edges to a target node
+	 * Return all out edges from a source node
 	 */
   graph.outEdges = function(source) {
     strictGetNode(source);
