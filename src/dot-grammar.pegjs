@@ -126,7 +126,7 @@ id "identifier"
     = fst:[a-zA-Z\u0200-\u0377_] rest:[a-zA-Z\u0200-\u0377_0-9]* { return fst + rest.join(""); }
     / sign:'-'? dot:'.' after:[0-9]+ { return sign + dot + after.join(""); }
     / sign:'-'? before:[0-9]+ after:('.' [0-9]*)? { return sign + before.join("") + (after[0] || "") + (after[1] || []).join(""); }
-    / '"' id:("\\\"" { return '"'; } / "\\" ch:[^"] { return "\\" + ch; }  / [^"])+ '"' { return id.join(""); }
+    / '"' id:("\\\"" { return '"'; } / "\\" ch:[^"] { return "\\" + ch; }  / [^"])* '"' { return id.join(""); }
 
 node = k:"node"i { return k.toLowerCase(); }
 edge = k:"edge"i { return k.toLowerCase(); }
