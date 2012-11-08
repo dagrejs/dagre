@@ -40,6 +40,14 @@ If you want to verify the integrity of the library, use:
 
     $ make test
 
+## Contact
+
+We've been manging bugs and enhancement request through our [issue
+tracker](https://github.com/cpettitt/dagre/issues).
+
+We also having a [google group](https://groups.google.com/group/dagre) for
+questions and discussion.
+
 ## References
 
 This work was produced by taking advantage of many papers and books. Here we
