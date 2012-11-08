@@ -45,7 +45,7 @@ If you want to verify the integrity of the library, use:
 We've been manging bugs and enhancement request through our [issue
 tracker](https://github.com/cpettitt/dagre/issues).
 
-We also having a [google group](https://groups.google.com/group/dagre) for
+We also have a [google group](https://groups.google.com/group/dagre) for
 questions and discussion.
 
 ## References
