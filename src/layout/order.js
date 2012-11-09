@@ -68,11 +68,13 @@ dagre.layout.order = function() {
         i;
     if (iter % 2 === 0) {
       for (i = 1; i < layering.length; ++i) {
-        cc += barycenterLayer(g, layering[i - 1], layering[i], "inEdges");
+        barycenterLayer(g, layering[i - 1], layering[i], "inEdges");
+        cc += bilayerCrossCount(g, layering[i-1], layering[i]);
       }
     } else {
       for (i = layering.length - 2; i >= 0; --i) {
-        cc += barycenterLayer(g, layering[i + 1], layering[i], "outEdges");
+        barycenterLayer(g, layering[i + 1], layering[i], "outEdges");
+        cc += bilayerCrossCount(g, layering[i], layering[i+1]);
       }
     }
     return cc;
@@ -86,37 +88,18 @@ dagre.layout.order = function() {
    * This algorithm is based on the barycenter method.
    */
   function barycenterLayer(g, fixed, movable, neighbors) {
-    var weights = rankWeights(g, fixed, movable, neighbors);
+    var pos = layerPos(movable);
+    var bs = barycenters(g, fixed, movable, neighbors);
 
-    var toSort = [];
-
-    movable.forEach(function(u, i) {
-      var weight = weights[u];
-      if (weight !== -1) {
-        toSort.push({node: u, weight: weight, pos: i});
-      }
+    var toSort = movable.slice(0).sort(function(x, y) {
+      return bs[x] - bs[y] || pos[x] - pos[y];
     });
 
-    toSort.sort(function(x, y) {
-      var d = x.weight - y.weight;
-      if (d === 0) {
-        return x.pos - y.pos;
-      }
-      return d;
-    });
-
-    var toSortIndex = 0;
-    for (var i = 0; i < movable.length; ++i) {
-      var u = movable[i];
-      var weight = weights[u];
-      if (weight !== -1) {
-        movable[i] = toSort[toSortIndex++].node;
+    for (var i = movable.length - 1; i >= 0; --i) {
+      if (bs[movable[i]] !== -1) {
+        movable[i] = toSort.pop();
       }
     }
-
-    return neighbors === "inEdges"
-      ? bilayerCrossCount(g, fixed, movable)
-      : bilayerCrossCount(g, movable, fixed);
   }
 
   /*
@@ -124,27 +107,26 @@ dagre.layout.order = function() {
    * return weights for the movable layer that can be used to reorder the layer
    * for potentially reduced edge crossings.
    */
-  function rankWeights(g, fixed, movable, neighbors) {
-    var fixedPos = {};
-    fixed.forEach(function(u, i) { fixedPos[u] = i; });
+  function barycenters(g, fixed, movable, neighbors) {
+    var fixedPos = layerPos(fixed);
 
-    var weights = {};
+    var bs = {};
     movable.forEach(function(u) {
-      var weight = -1;
+      var b = -1;
       var edges = g[neighbors](u);
       if (edges.length > 0) {
-        weight = 0;
+        b = 0;
         edges.forEach(function(e) {
           var source = g.source(e);
-          var neighborId = g.source(e) === u ? g.target(e) : source;
-          weight += fixedPos[neighborId];
+          var neighborId = source === u ? g.target(e) : source;
+          b += fixedPos[neighborId];
         });
-        weight = weight / edges.length;
+        b = b / edges.length;
       }
-      weights[u] = weight;
+      bs[u] = b;
     });
 
-    return weights;
+    return bs;
   }
 
   function copyLayering(layering) {
@@ -171,8 +153,7 @@ var crossCount = dagre.layout.order.crossCount = function(g, layering) {
  *    W. Barth et al., Bilayer Cross Counting, JGAA, 8(2) 179–194 (2004)
  */
 var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer1, layer2) {
-  var layer2Pos = {};
-  layer2.forEach(function(u, i) { layer2Pos[u] = i; });
+  var layer2Pos = layerPos(layer2);
 
   var indices = [];
   layer1.forEach(function(u) {
@@ -206,4 +187,10 @@ var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer
   });
 
   return cc;
+}
+
+function layerPos(layer) {
+  var pos = {};
+  layer.forEach(function(u, i) { pos[u] = i; });
+  return pos;
 }
