@@ -139,9 +139,9 @@ dagre.layout = function() {
       acyclic.undo(g);
     } finally {
       self.rankSep(rankSep);
-
-      return self;
     }
+
+    return self;
   }
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
