@@ -41,8 +41,8 @@
 }
 
 .node:hover {
-	cursor: pointer;
-	opacity: 0.4;
+  cursor: pointer;
+  opacity: 0.4;
 }
 
 path.edge {
@@ -52,8 +52,8 @@ path.edge {
 }
 
 .edge:hover {
-	cursor: pointer;
-	opacity: 0.4;
+  cursor: pointer;
+  opacity: 0.4;
 }
 </style>
 
@@ -84,7 +84,12 @@ path.edge {
     { source: "TIME WAIT", target: "CLOSED" },
   ];
 
-  function spline(points) {
+  function spline(e) {
+    var points = e.dagre.points.slice(0);
+    var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.source.dagre);
+    var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
+    points.unshift(source);
+    points.push(target);
     return d3.svg.line()
       .x(function(d) { return d.x; })
       .y(function(d) { return d.y; })
@@ -92,11 +97,23 @@ path.edge {
       (points);
   }
 
+  // Translates all points in the edge using `dx` and `dy`.
+  function translateEdge(e, dx, dy) {
+    e.dagre.points.forEach(function(p) {
+      p.x = Math.max(0, Math.min(svgBBox.width, p.x + dx));
+      p.y = Math.max(0, Math.min(svgBBox.height, p.y + dy));
+    });
+  }
+
   // Get the data in the right form
   var stateKeys = {};
   transitions.forEach(function(d) {
-    stateKeys[d.source] = { label: d.source };
-    stateKeys[d.target] = { label: d.target };
+    var source = stateKeys[d.source],
+        target = stateKeys[d.target];
+    if (!source) source = stateKeys[d.source] = { label: d.source, edges: [] };
+    if (!target) target = stateKeys[d.target] = { label: d.target, edges: [] };
+    source.edges.push(d);
+    target.edges.push(d);
   });
   var states = d3.values(stateKeys);
   transitions.forEach(function(d) {
@@ -159,81 +176,57 @@ path.edge {
     .attr("x", function(d) { return -d.bbox.width / 2; })
     .attr("y", function(d) { return -d.bbox.height / 2; });
 
-	// Create the layout and get the graph
-  var graph = dagre.layout()
+  // Create the layout and get the graph
+  dagre.layout()
     .nodeSep(50)
     .edgeSep(10)
     .rankSep(50)
     .nodes(states)
     .edges(transitions)
     .debugLevel(1)
-	.run()
-	.graph();
+    .run();
 
-	nodes.attr("transform", function(d) { return 'translate('+ d.dagre.x +','+ d.dagre.y +')'; });
+  nodes.attr("transform", function(d) { return 'translate('+ d.dagre.x +','+ d.dagre.y +')'; });
 
-	edges
-		// Set the id. of the SVG element to have access to it later
-		.attr('id', function(e) { return e.dagre.id; })
-		.attr("d", function(e) {
-			var points = e.dagre.points;
-			var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.source.dagre);
-			var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
-			points.unshift(source);
-			points.push(target);
-			return spline(points);
-		});
+  edges
+    // Set the id. of the SVG element to have access to it later
+    .attr('id', function(e) { return e.dagre.id; })
+    .attr("d", function(e) { return spline(e); });
 
-	// Resize the SVG element
-	var svgBBox = svg.node().getBBox();
-	svg.attr("width", svgBBox.width + 10);
-	svg.attr("height", svgBBox.height + 10);
+  // Resize the SVG element
+  var svgBBox = svg.node().getBBox();
+  svg.attr("width", svgBBox.width + 10);
+  svg.attr("height", svgBBox.height + 10);
 
-	// Drag handlers
-	var nodeDrag = d3.behavior.drag()
-		// Set the right origin (based on the Dagre layout or the current position)
-		.origin(function(d) { return d.pos ? {x: d.pos.x, y: d.pos.y} : {x: d.dagre.x, y: d.dagre.y}; })
-		.on('drag', function (d, i) {
-			// Store the current node position without overwriting the original Dagre value
-			d.pos || (d.pos = {x: d.dagre.x, y: d.dagre.y});
+  // Drag handlers
+  var nodeDrag = d3.behavior.drag()
+    // Set the right origin (based on the Dagre layout or the current position)
+    .origin(function(d) { return d.pos ? {x: d.pos.x, y: d.pos.y} : {x: d.dagre.x, y: d.dagre.y}; })
+    .on('drag', function (d, i) {
+      var prevX = d.dagre.x,
+          prevY = d.dagre.y;
 
-			// The node must be inside the SVG area
-			d.pos.x = Math.max(d.width / 2, Math.min(svgBBox.width - d.width / 2, d3.event.x));
-			d.pos.y = Math.max(d.height / 2, Math.min(svgBBox.height - d.height / 2, d3.event.y));
-			d3.select(this).attr('transform', 'translate('+ d.pos.x +','+ d.pos.y +')');
+      // The node must be inside the SVG area
+      d.dagre.x = Math.max(d.width / 2, Math.min(svgBBox.width - d.width / 2, d3.event.x));
+      d.dagre.y = Math.max(d.height / 2, Math.min(svgBBox.height - d.height / 2, d3.event.y));
+      d3.select(this).attr('transform', 'translate('+ d.dagre.x +','+ d.dagre.y +')');
 
-			// Edges position (inside SVG area)
-			graph.inEdges(d.dagre.id).forEach(function(edgeId) {
-				d3.select('#'+ edgeId).attr('d', function(edge) {
-					for (var i = 1, p = edge.dagre.points; i < p.length; i++)
-						p[i] = {x: p[i].x + d3.event.dx, y: p[i].y + d3.event.dy};
+      var dx = d.dagre.x - prevX,
+          dy = d.dagre.y - prevY;
 
-					return spline(p);
-				});
-			});
-			graph.outEdges(d.dagre.id).forEach(function(edgeId) {
-				d3.select('#'+ edgeId).attr('d', function(edge) {
-					for (var i = 0, p = edge.dagre.points; i < p.length - 1; i++)
-						p[i] = {x: p[i].x + d3.event.dx, y: p[i].y + d3.event.dy};
+      // Edges position (inside SVG area)
+      d.edges.forEach(function(e) {
+        translateEdge(e, dx, dy);
+        d3.select('#'+ e.dagre.id).attr('d', spline(e));
+      });
+    });
 
-					return spline(p);
-				});
-			});
-		});
+  var edgeDrag = d3.behavior.drag()
+    .on('drag', function (d, i) {
+      translateEdge(d, d3.event.dx, d3.event.dy);
+      d3.select(this).attr('d', spline(d));
+    });
 
-	var edgeDrag = d3.behavior.drag()
-		.on('drag', function (d, i) {
-			d3.select(this).attr('d', function() {
-				for (var i = 1, p= d.dagre.points; i < p.length - 1; i++)
-					p[i] = {
-						x: Math.max(0, Math.min(svgBBox.width, p[i].x + d3.event.dx)),
-						y: Math.max(0, Math.min(svgBBox.height, p[i].y + d3.event.dy))
-					};
-
-				return spline(p);
-			});
-		});
-
-	nodes.call(nodeDrag);
-	edges.call(edgeDrag);
+  nodes.call(nodeDrag);
+  edges.call(edgeDrag);
 </script>
