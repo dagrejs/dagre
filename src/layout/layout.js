@@ -146,27 +146,26 @@ dagre.layout = function() {
 
   // Assumes input graph has no self-loops and is otherwise acyclic.
   function normalize(g) {
-    g.eachEdge(function(e, source, target) {
-      var sourceRank = g.node(source).rank;
-      var targetRank = g.node(target).rank;
+    var dummyCount = 0;
+    g.eachEdge(function(e, s, t, a) {
+      var sourceRank = g.node(s).rank;
+      var targetRank = g.node(t).rank;
       if (sourceRank + 1 < targetRank) {
-        var prefix = "_D-" + e + "-";
-        for (var u = source, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
-          var v = prefix + rank;
-          var node = { width: g.edge(e).width,
-                       height: g.edge(e).height,
-                       edgeId: e,
-                       edge: g.edge(e),
-                       source: g.source(e),
-                       target: g.target(e),
-                       index: i,
-                       rank: rank,
-                       dummy: true };
+        for (var u = s, rank = sourceRank + 1, i = 0; rank < targetRank; ++rank, ++i) {
+          var v = "_D" + ++dummyCount;
+          var node = {
+            width: a.width,
+            height: a.height,
+            edge: { id: e, source: s, target: t, attrs: a },
+            index: i,
+            rank: rank,
+            dummy: true
+          };
           g.addNode(v, node);
-          g.addEdge(u + " -> " + v, u, v, {});
+          g.addEdge("_D" + ++dummyCount, u, v, {});
           u = v;
         }
-        g.addEdge(u + " -> " + target, u, target, {});
+        g.addEdge("_D" + ++dummyCount, u, t, {});
         g.delEdge(e);
       }
     });
@@ -175,13 +174,14 @@ dagre.layout = function() {
   function undoNormalize(g) {
     var visited = {};
 
-    g.eachNode(function(u, node) {
-      if (node.dummy) {
-        if (!g.hasEdge(node.edgeId)) {
-          g.addEdge(node.edgeId, node.source, node.target, node.edge);
+    g.eachNode(function(u, a) {
+      if (a.dummy) {
+        var edge = a.edge;
+        if (!g.hasEdge(edge.id)) {
+          g.addEdge(edge.id, edge.source, edge.target, edge.attrs);
         }
-        var points = g.edge(node.edgeId).points;
-        points[node.index] = { x: node.x, y: node.y };
+        var points = g.edge(edge.id).points;
+        points[a.index] = { x: a.x, y: a.y };
         g.delNode(u);
       }
     });
