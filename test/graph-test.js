@@ -84,6 +84,17 @@ describe("graph", function() {
       assert.deepEqual(g.neighbors(1), [2]);
       assert.deepEqual(g.neighbors(2), [1]);
     });
+
+    it("assigns an arbitrary edge id if the given id is null", function() {
+      g.addNode(1);
+      g.addNode(2);
+      g.addNode(3);
+      g.addEdge(null, 1, 2);
+      g.addEdge(null, 2, 3);
+
+      assert.deepEqual(g.successors(1), [2]);
+      assert.deepEqual(g.successors(2), [3]);
+    });
   });
 
   describe("delEdge", function() {

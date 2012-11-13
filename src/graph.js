@@ -12,7 +12,8 @@ dagre.graph = function() {
       inEdges = {},
       outEdges = {},
       edges = {},
-      graph = {};
+      graph = {},
+      idCounter = 0;
 
   graph.addNode = function(u, value) {
     if (graph.hasNode(u)) {
@@ -45,7 +46,10 @@ dagre.graph = function() {
     strictGetNode(source);
     strictGetNode(target);
 
-    if (graph.hasEdge(e)) {
+    if (e === null) {
+      e = "_ANON-" + ++idCounter;
+    }
+    else if (graph.hasEdge(e)) {
       throw new Error("Graph already has edge '" + e + "':\n" + graph.toString());
     }
 

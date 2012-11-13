@@ -156,10 +156,10 @@ dagre.layout = function() {
             dummy: true
           };
           g.addNode(v, node);
-          g.addEdge("_D" + ++dummyCount, u, v, {});
+          g.addEdge(null, u, v, {});
           u = v;
         }
-        g.addEdge("_D" + ++dummyCount, u, t, {});
+        g.addEdge(null, u, t, {});
         g.delEdge(e);
       }
     });
