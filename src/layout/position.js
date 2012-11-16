@@ -37,7 +37,7 @@ dagre.layout.position = function() {
       layer[node.order] = u;
     });
 
-    var type1Conflicts = findType1Conflicts(g, layering);
+    var conflicts = findConflicts(g, layering);
 
     var xss = {};
     ["up", "down"].forEach(function(vertDir) {
@@ -48,7 +48,7 @@ dagre.layout.position = function() {
 
         var dir = vertDir + "-" + horizDir;
         if (!config.debugAlignment || config.debugAlignment === dir) {
-          var align = verticalAlignment(g, layering, type1Conflicts, vertDir === "up" ? "predecessors" : "successors");
+          var align = verticalAlignment(g, layering, conflicts, vertDir === "up" ? "predecessors" : "successors");
           xss[dir]= horizontalCompaction(g, layering, align.pos, align.root, align.align);
           if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
         }
@@ -88,67 +88,67 @@ dagre.layout.position = function() {
     });
   };
 
-  function findType1Conflicts(g, layering) {
-    var type1Conflicts = {};
+  /*
+   * Generate an ID that can be used to represent any undirected edge that is
+   * incident on `u` and `v`.
+   */
+  function undirEdgeId(u, v) {
+    return u < v
+      ? u.toString().length + ":" + u + "-" + v
+      : v.toString().length + ":" + v + "-" + u;
+  }
 
-    var pos = {};
-    layering[0].forEach(function(u, i) {
-      pos[u] = i;
-    });
+  function findConflicts(g, layering) {
+    if (layering.length <= 2) return conflicts;
 
-    for (var i = 1; i < layering.length; ++i) {
-      var layer = layering[i];
+    var conflicts = {}, // Set of conflicting edge ids
+        pos = {};       // Position of node in its layer
 
-      // Position of last inner segment in the previous layer
-      var innerLeft = 0;
-      var currIdx = 0;
+    layering[1].forEach(function(u, i) { pos[u] = i; });
+    for (var i = 1; i < layering.length - 1; ++i) {
+      prevLayer = layering[i];
+      currLayer = layering[i+1];
+      var k0 = 0; // Position of the last inner segment in the previous layer
+      var l = 0;  // Current position in the current layer (for iteration up to `l1`)
 
-      // Scan current layer for next node with an inner segment.
-      for (var j = 0; j < layer.length; ++j) {
-        var u = layer[j];
-        // Update positions map for next layer iteration
-        pos[u] = j;
+      // Scan current layer for next node that is incident to an inner segement
+      // between layering[i+1] and layering[i].
+      for (var l1 = 0; l1 < currLayer.length; ++l1) {
+        var u = currLayer[l1]; // Next inner segment in the current layer or
+                               // last node in the current layer
+        pos[u] = l1;
 
-        // Search for the next inner segment in the previous layer
-        var innerRight = null;
+        var k1 = undefined; // Position of the next inner segment in the previous layer or
+                            // the position of the last element in the previous layer
         if (g.node(u).dummy) {
-          g.predecessors(u).some(function(v) {
-            if (g.node(v).dummy) {
-              innerRight = pos[v];
-              return true;
-            }
-            return false;
-          });
+          var uPred = g.predecessors(u)[0];
+          if (g.node(uPred).dummy)
+            k1 = pos[uPred];
         }
+        if (k1 === undefined && l1 === currLayer.length - 1)
+          k1 = prevLayer.length - 1;
 
-        // If no inner segment but at the end of the list we still
-        // need to check for type 1 conflicts with earlier segments
-        if (innerRight === null && j === layer.length - 1) {
-          innerRight = layering[i-1].length - 1;
-        }
-
-        if (innerRight !== null) {
-          for (;currIdx <= j; ++currIdx) {
-            var v = layer[currIdx];
-            g.inEdges(v).forEach(function(e) {
-              var sourcePos = pos[g.source(e)];
-              if (sourcePos < innerLeft || sourcePos > innerRight) {
-                type1Conflicts[e] = true;
-              }
+        if (k1 !== undefined) {
+          for (; l <= l1; ++l) {
+            g.predecessors(currLayer[l]).forEach(function(v) {
+              var k = pos[v];
+              if (k < k0 || k > k1)
+                conflicts[undirEdgeId(currLayer[l], v)] = true;
             });
           }
-          innerLeft = innerRight;
+          k0 = k1;
         }
       }
     }
 
-    return type1Conflicts;
+    return conflicts;
   }
 
-  function verticalAlignment(g, layering, type1Conflicts, relationship) {
-    var pos = {};
-    var root = {};
-    var align = {};
+  function verticalAlignment(g, layering, conflicts, relationship) {
+    var pos = {},   // Position for a node in its layer
+        root = {},  // Root of the block that the node participates in
+        align = {}; // Points to the next node in the block or, if the last
+                    // element in the block, points to the first block's root
 
     layering.forEach(function(layer) {
       layer.forEach(function(u, i) {
@@ -161,17 +161,15 @@ dagre.layout.position = function() {
     layering.forEach(function(layer) {
       var prevIdx = -1;
       layer.forEach(function(v) {
-        var related = g[relationship](v);
+        var related = g[relationship](v), // Adjacent nodes from the previous layer
+            m;                            // The mid point in the related array
+
         if (related.length > 0) {
-          // TODO could find medians with linear algorithm if performance warrants it.
           related.sort(function(x, y) { return pos[x] - pos[y]; });
-          var mid = (related.length - 1) / 2;
+          mid = (related.length - 1) / 2;
           related.slice(Math.floor(mid), Math.ceil(mid) + 1).forEach(function(u) {
             if (align[v] === v) {
-              // TODO should we collapse multi-edges for vertical alignment?
-              
-              // Only need to check first returned edge for a type 1 conflict
-              if (!type1Conflicts[concat([g.edges(v, u), g.edges(u, v)])[0]] && prevIdx < pos[u]) {
+              if (!conflicts[undirEdgeId(u, v)] && prevIdx < pos[u]) {
                 align[u] = v;
                 align[v] = root[v] = root[u];
                 prevIdx = pos[u];
