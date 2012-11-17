@@ -151,10 +151,17 @@ dagre.layout = function() {
             width: a.width,
             height: a.height,
             edge: { id: e, source: s, target: t, attrs: a },
-            index: i,
             rank: rank,
             dummy: true
           };
+
+          // If this node represents a bend then we will use it as a control
+          // point. For edges with 2 segments this will be the center dummy
+          // node. For edges with more than two segments, this will be the
+          // first and last dummy node.
+          if (i === 0) node.index = 0;
+          else if (rank + 1 === targetRank) node.index = 1;
+
           g.addNode(v, node);
           g.addEdge(null, u, v, {});
           u = v;
@@ -169,7 +176,7 @@ dagre.layout = function() {
     var visited = {};
 
     g.eachNode(function(u, a) {
-      if (a.dummy) {
+      if (a.dummy && "index" in a) {
         var edge = a.edge;
         if (!g.hasEdge(edge.id)) {
           g.addEdge(edge.id, edge.source, edge.target, edge.attrs);

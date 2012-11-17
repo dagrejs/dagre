@@ -133,7 +133,12 @@ digraph {
 
   tryDraw();
 
-  function spline(points) {
+  function spline(e) {
+    var points = e.dagre.points.slice(0);
+    var source = dagre.util.intersectRect(e.source.dagre, points[0]);
+    var target = dagre.util.intersectRect(e.target.dagre, points[points.length - 1]);
+    points.unshift(source);
+    points.push(target);
     return d3.svg.line()
       .x(function(d) { return d.x; })
       .y(function(d) { return d.y; })
@@ -275,19 +280,41 @@ digraph {
 
       nodes.attr("transform", function(d) { return "translate(" + d.dagre.x + "," + d.dagre.y +")"; });
 
-      edges.attr("d", function(e) {
-        var points = e.dagre.points;
-        var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.target.dagre);
-        var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
-        points.unshift(source);
-        points.push(target);
-        return spline(points);
+      // Ensure that we have at least two points between source and target
+      edges.each(function(d) {
+        var points = d.dagre.points;
+        if (!points.length) {
+          var s = e.source.dagre;
+          var t = e.target.dagre;
+          points.push({ x: Math.abs(s.x - t.x) / 2, y: Math.abs(s.y + t.y) / 2 });
+        }
+
+        if (points.length === 1) {
+          points.push({ x: points[0].x, y: points[0].y });
+        }
       });
+
+      edges
+        // Set the id. of the SVG element to have access to it later
+        .attr('id', function(e) { return e.dagre.id; })
+        .attr("d", function(e) { return spline(e); });
 
       svgGroup
         .selectAll(".edge g.label")
         .attr("transform", function(e) {
-          var mp = e.dagre.points[Math.floor(e.dagre.points.length / 2)];
+          var points = e.dagre.points;
+          var mp;
+
+          if (points.length % 2 == 1) {
+            mp = points[points.length / 2];
+          } else {
+            var fst = points.length / 2 - 1;
+            mp = {
+              x: (points[fst].x + points[fst + 1].x) / 2,
+              y: (points[fst].y + points[fst + 1].y) / 2
+            }
+          }
+
           var xDelta = -e.bbox.width / 2;
           var yDelta = -e.bbox.height / 2;
           return "translate(" + (mp.x + xDelta) + "," + (mp.y + yDelta) + ")";

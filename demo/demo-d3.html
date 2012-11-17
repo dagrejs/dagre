@@ -86,8 +86,8 @@ path.edge {
 
   function spline(e) {
     var points = e.dagre.points.slice(0);
-    var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.target.dagre);
-    var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
+    var source = dagre.util.intersectRect(e.source.dagre, points[0]);
+    var target = dagre.util.intersectRect(e.target.dagre, points[points.length - 1]);
     points.unshift(source);
     points.push(target);
     return d3.svg.line()
@@ -187,6 +187,20 @@ path.edge {
     .run();
 
   nodes.attr("transform", function(d) { return 'translate('+ d.dagre.x +','+ d.dagre.y +')'; });
+
+  // Ensure that we have at least two points between source and target
+  edges.each(function(d) {
+    var points = d.dagre.points;
+    if (!points.length) {
+      var s = e.source.dagre;
+      var t = e.target.dagre;
+      points.push({ x: Math.abs(s.x - t.x) / 2, y: Math.abs(s.y + t.y) / 2 });
+    }
+
+    if (points.length === 1) {
+      points.push({ x: points[0].x, y: points[0].y });
+    }
+  });
 
   edges
     // Set the id. of the SVG element to have access to it later
