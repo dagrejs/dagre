@@ -63,14 +63,43 @@ dagre.layout.order = function() {
     return layering;
   }
 
+  /*
+   * Returns a function that will return the predecessors for a node. This
+   * function differs from `g.predecessors(u)` in that a predecessor appears
+   * for each incident edge (`g.predecessors(u)` treats predecessors as a set).
+   * This allows pseudo-weighting of predecessor nodes.
+   */
+  function multiPredecessors(g) {
+    return function(u) {
+      var preds = [];
+      g.inEdges(u).forEach(function(e) {
+        preds.push(g.source(e));
+      });
+      return preds;
+    }
+  }
+
+  /*
+   * Same as `multiPredecessors(g)` but for successors.
+   */
+  function multiSuccessors(g) {
+    return function(u) {
+      var sucs = [];
+      g.outEdges(u).forEach(function(e) {
+        sucs.push(g.target(e));
+      });
+      return sucs;
+    }
+  }
+
   function sweep(g, iter, layering) {
     if (iter % 2 === 0) {
       for (var i = 1; i < layering.length; ++i) {
-        barycenterLayer(g, layering[i - 1], layering[i], "inEdges");
+        barycenterLayer(layering[i - 1], layering[i], multiPredecessors(g));
       }
     } else {
       for (var i = layering.length - 2; i >= 0; --i) {
-        barycenterLayer(g, layering[i + 1], layering[i], "outEdges");
+        barycenterLayer(layering[i + 1], layering[i], multiSuccessors(g));
       }
     }
     return crossCount(g, layering);
@@ -83,9 +112,9 @@ dagre.layout.order = function() {
    *
    * This algorithm is based on the barycenter method.
    */
-  function barycenterLayer(g, fixed, movable, neighbors) {
+  function barycenterLayer(fixed, movable, predecessors) {
     var pos = layerPos(movable);
-    var bs = barycenters(g, fixed, movable, neighbors);
+    var bs = barycenters(fixed, movable, predecessors);
 
     var toSort = movable.slice(0).sort(function(x, y) {
       return bs[x] - bs[y] || pos[x] - pos[y];
@@ -103,21 +132,17 @@ dagre.layout.order = function() {
    * return weights for the movable layer that can be used to reorder the layer
    * for potentially reduced edge crossings.
    */
-  function barycenters(g, fixed, movable, neighbors) {
-    var fixedPos = layerPos(fixed);
+  function barycenters(fixed, movable, predecessors) {
+    var pos = layerPos(fixed), // Position of node in fixed list
+        bs = {};               // Barycenters for each node
 
-    var bs = {};
     movable.forEach(function(u) {
       var b = -1;
-      var edges = g[neighbors](u);
-      if (edges.length > 0) {
+      var preds = predecessors(u);
+      if (preds.length > 0) {
         b = 0;
-        edges.forEach(function(e) {
-          var source = g.source(e);
-          var neighborId = source === u ? g.target(e) : source;
-          b += fixedPos[neighborId];
-        });
-        b = b / edges.length;
+        preds.forEach(function(v) { b += pos[v]; });
+        b = b / preds.length;
       }
       bs[u] = b;
     });
