@@ -41,40 +41,32 @@ dagre.layout.position = function() {
 
     var xss = {};
     ["up", "down"].forEach(function(vertDir) {
-      if (vertDir === "down") { layering.reverse(); }
+      if (vertDir === "down") layering.reverse();
 
       ["left", "right"].forEach(function(horizDir) {
-        if (horizDir === "right") { reverseInnerOrder(layering); }
+        if (horizDir === "right") reverseInnerOrder(layering);
 
         var dir = vertDir + "-" + horizDir;
         if (!config.debugAlignment || config.debugAlignment === dir) {
           var align = verticalAlignment(g, layering, conflicts, vertDir === "up" ? "predecessors" : "successors");
           xss[dir]= horizontalCompaction(g, layering, align.pos, align.root, align.align);
-          if (horizDir === "right") { flipHorizontally(layering, xss[dir]); }
+          if (horizDir === "right") flipHorizontally(layering, xss[dir]);
         }
 
-        if (horizDir === "right") { reverseInnerOrder(layering); }
+        if (horizDir === "right") reverseInnerOrder(layering);
       });
 
-      if (vertDir === "down") { layering.reverse(); }
+      if (vertDir === "down") layering.reverse();
     });
 
     if (config.debugAlignment) {
       // In debug mode we allow forcing layout to a particular alignment.
-      g.eachNode(function(u, node) {
-        x(g, u, xss[config.debugAlignment][u]);
-      });
+      g.eachNode(function(u, node) { x(g, u, xss[config.debugAlignment][u]); });
     } else {
-      alignToSmallest(g, layering, xss);
-
-      // Find average of medians for xss array
-      g.eachNode(function(u) {
-        var xs = values(xss).map(function(xs) { return xs[u]; }).sort(function(x, y) { return x - y; });
-        x(g, u, (xs[1] + xs[2]) / 2);
-      });
+      balance(g, layering, xss);
     }
 
-    // Align min center point with 0
+    // Translate layout so left edge of bounding rectangle has coordinate 0
     var minX = min(g.nodes().map(function(u) { return x(g, u) - width(g, u) / 2; }));
     g.eachNode(function(u) { x(g, u, x(g, u) - minX); });
 
@@ -192,23 +184,21 @@ dagre.layout.position = function() {
     return width(g, u) / 2 + sep / 2;
   }
 
+  // This function deviates from the standard BK algorithm in two ways. First
+  // it takes into account the size of the nodes. Second it includes a fix to
+  // the original algorithm that is described in Carstens, "Node and Label
+  // Placement in a Layered Layout Algorithm".
   function horizontalCompaction(g, layering, pos, root, align) {
-    // Mapping of node id -> sink node id for class
-    var sink = {};
-
-    // Mapping of sink node id -> x delta
-    var shift = {};
-
-    // Mapping of node id -> predecessor node (or null)
-    var pred = {};
-
-    // Calculated X positions
-    var xs = {};
+    var sink = {},  // Mapping of node id -> sink node id for class
+        shift = {}, // Mapping of sink node id -> x delta
+        pred = {},  // Mapping of node id -> predecessor node (or null)
+        xs = {};    // Calculated X positions
 
     layering.forEach(function(layer) {
       layer.forEach(function(u, i) {
         sink[u] = u;
-        pred[u] = i > 0 ? layer[i - 1] : null;
+        if (i > 0)
+          pred[u] = layer[i - 1];
       });
     });
 
@@ -240,25 +230,13 @@ dagre.layout.position = function() {
       placeBlock(v);
     });
 
-    var prevShift = 0;
-    layering.forEach(function(layer) {
-      var s = shift[layer[0]];
-      if (s === undefined) {
-        s = 0;
-      }
-      prevShift = shift[layer[0]] = s + prevShift;
-    });
-
     // Absolute coordinates
     layering.forEach(function(layer) {
       layer.forEach(function(v) {
         xs[v] = xs[root[v]];
-        if (root[v] === v) {
-          var xDelta = shift[sink[v]];
-          if (xDelta < Number.POSITIVE_INFINITY) {
-            xs[v] += xDelta;
-          }
-        }
+        var xDelta = shift[sink[v]];
+        if (root[v] === v && xDelta < Number.POSITIVE_INFINITY)
+          xs[v] += xDelta;
       });
     });
 
@@ -279,43 +257,41 @@ dagre.layout.position = function() {
     }));
   }
 
-  function shiftX(delta, xs) {
-    Object.keys(xs).forEach(function(x) {
-      xs[x] += delta;
-    });
-  }
+  function balance(g, layering, xss) {
+    var min = {},                            // Min coordinate for the alignment
+        max = {},                            // Max coordinate for the alginment
+        smallestAlignment,
+        shift = {};                          // Amount to shift a given alignment
 
-  function alignToSmallest(g, layering, xss) {
-    // First find the smallest width
-    var smallestWidthMinCoord;
-    var smallestWidthMaxCoord;
-    var smallestWidth = Number.POSITIVE_INFINITY;
-    values(xss).forEach(function(xs) {
-      var minCoord = findMinCoord(g, layering, xs);
-      var maxCoord = findMaxCoord(g, layering, xs);
-      var width = maxCoord - minCoord;
-      if (width < smallestWidth) {
-        smallestWidthMinCoord = minCoord;
-        smallestWidthMaxCoord = maxCoord;
-        smallestWidth = width;
+    var smallest = Number.POSITIVE_INFINITY;
+    for (var alignment in xss) {
+      var xs = xss[alignment];
+      min[alignment] = findMinCoord(g, layering, xs);
+      max[alignment] = findMaxCoord(g, layering, xs);
+      var w = max[alignment] - min[alignment];
+      if (w < smallest) {
+        smallest = w;
+        smallestAlignment = alignment;
       }
-    });
+    }
 
-    // Realign coordinates with smallest width
+    // Determine how much to adjust positioning for each alignment
     ["up", "down"].forEach(function(vertDir) {
-      var xs = xss[vertDir + "-left"];
-      var delta = smallestWidthMinCoord - findMinCoord(g, layering, xs);
-      if (delta) {
-        shiftX(delta, xs);
-      }
+      ["left", "right"].forEach(function(horizDir) {
+        var alignment = vertDir + "-" + horizDir;
+        shift[alignment] = horizDir === "left"
+            ? min[smallestAlignment] - min[alignment]
+            : max[smallestAlignment] - max[alignment];
+      });
     });
 
-    ["up", "down"].forEach(function(vertDir) {
-      var xs = xss[vertDir + "-right"];
-      var delta = smallestWidthMaxCoord - findMaxCoord(g, layering, xs);
-      if (delta) {
-        shiftX(delta, xs);
-      }
+    // Find average of medians for xss array
+    g.eachNode(function(v) {
+      var xs = [];
+      for (alignment in xss)
+        xs.push(xss[alignment][v] + shift[alignment]);
+      xs.sort(function(x, y) { return x - y; });
+      x(g, v, (xs[1] + xs[2]) / 2);
     });
   }
 
