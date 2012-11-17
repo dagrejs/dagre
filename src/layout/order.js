@@ -64,20 +64,16 @@ dagre.layout.order = function() {
   }
 
   function sweep(g, iter, layering) {
-    var cc = 0,
-        i;
     if (iter % 2 === 0) {
-      for (i = 1; i < layering.length; ++i) {
+      for (var i = 1; i < layering.length; ++i) {
         barycenterLayer(g, layering[i - 1], layering[i], "inEdges");
-        cc += bilayerCrossCount(g, layering[i-1], layering[i]);
       }
     } else {
-      for (i = layering.length - 2; i >= 0; --i) {
+      for (var i = layering.length - 2; i >= 0; --i) {
         barycenterLayer(g, layering[i + 1], layering[i], "outEdges");
-        cc += bilayerCrossCount(g, layering[i], layering[i+1]);
       }
     }
-    return cc;
+    return crossCount(g, layering);
   }
 
   /*
