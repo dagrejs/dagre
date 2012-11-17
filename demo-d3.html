@@ -86,7 +86,7 @@ path.edge {
 
   function spline(e) {
     var points = e.dagre.points.slice(0);
-    var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.source.dagre);
+    var source = dagre.util.intersectRect(e.source.dagre, points.length > 0 ? points[0] : e.target.dagre);
     var target = dagre.util.intersectRect(e.target.dagre, points.length > 0 ? points[points.length - 1] : e.source.dagre);
     points.unshift(source);
     points.push(target);

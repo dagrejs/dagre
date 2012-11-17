@@ -91,10 +91,10 @@ dagre.layout.position = function() {
   }
 
   function findConflicts(g, layering) {
-    if (layering.length <= 2) return conflicts;
-
     var conflicts = {}, // Set of conflicting edge ids
         pos = {};       // Position of node in its layer
+
+    if (layering.length <= 2) return conflicts;
 
     layering[1].forEach(function(u, i) { pos[u] = i; });
     for (var i = 1; i < layering.length - 1; ++i) {
