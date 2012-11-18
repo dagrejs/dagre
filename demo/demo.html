@@ -37,6 +37,16 @@ rect {
   cursor: pointer;
   opacity: 0.4;
 }
+
+.cp {
+  opacity: 0;
+}
+
+.cp:hover {
+  cursor:pointer;
+  opacity: 1;
+}
+
 </style>
 
 <style>
@@ -168,10 +178,13 @@ function tryDraw() {
       graphStyle.html(inputStyle.node().value);
       graphLink.attr("href", graphToURL());
 
-      result.nodes.forEach(function(node) { node.edges = []; });
+      result.nodes.forEach(function(node) {
+        node.inEdges = [];
+        node.outEdges = [];
+      });
       result.edges.forEach(function(edge) {
-        edge.source.edges.push(edge);
-        edge.target.edges.push(edge);
+        edge.source.outEdges.push(edge);
+        edge.target.inEdges.push(edge);
       });
 
       draw(result.nodes, result.edges);
@@ -222,23 +235,6 @@ function draw(nodeData, edgeData) {
 
   recalcLabels();
 
-  nodes.call(d3.behavior.drag()
-    .origin(function(d) { return {x: d.dagre.x, y: d.dagre.y}; })
-    .on('drag', function (d, i) {
-      d.dagre.x = d3.event.x;
-      d.dagre.y = d3.event.y;
-      d.edges.forEach(function(e) {
-        translateEdge(e, d3.event.dx, d3.event.dy);
-      });
-      update();
-    }));
-
-  edges.call(d3.behavior.drag()
-    .on('drag', function (d, i) {
-      translateEdge(d, d3.event.dx, d3.event.dy);
-      update();
-    }));
-
   // Add zoom behavior to the SVG canvas
   svg.call(d3.behavior.zoom().on("zoom", function redraw() {
     svgGroup.attr("transform",
@@ -256,6 +252,59 @@ function draw(nodeData, edgeData) {
   // Ensure that we have at least two points between source and target
   edges.each(function(d) { ensureTwoControlPoints(d); });
 
+  nodes.call(d3.behavior.drag()
+    .origin(function(d) { return {x: d.dagre.x, y: d.dagre.y}; })
+    .on('drag', function (d, i) {
+      d.dagre.x = d3.event.x;
+      d.dagre.y = d3.event.y;
+      d.outEdges.forEach(function(e) {
+        var points = e.dagre.points;
+        if (points[0].y === points[1].y) {
+          points[1].y += d3.event.dy;
+        }
+        points[0].y += d3.event.dy;
+        if (points[1].y < points[0].y) {
+          points[0].y = points[1].y;
+        }
+        translateEdge(e, d3.event.dx, 0);
+      });
+      d.inEdges.forEach(function(e) {
+        var points = e.dagre.points;
+        if (points[1].y === points[0].y) {
+          points[0].y += d3.event.dy;
+        }
+        points[1].y += d3.event.dy;
+        if (points[0].y > points[1].y) {
+          points[1].y = points[0].y;
+        }
+        translateEdge(e, d3.event.dx, 0);
+      });
+      update();
+    }));
+
+  edges
+    .call(d3.behavior.drag()
+    .on('drag', function (d, i) {
+      translateEdge(d, d3.event.dx, d3.event.dy);
+      update();
+    }));
+
+  edgeEnter
+    .selectAll("circle.cp")
+    .data(function(d) {
+      d.dagre.points.forEach(function(p) { p.parent = d; });
+      return d.dagre.points.slice(0).reverse();
+    })
+    .enter()
+    .append("circle")
+      .attr("class", "cp")
+      .call(d3.behavior.drag()
+        .on("drag", function(d) {
+          d.y += d3.event.dy;
+          translateEdge(d.parent, d3.event.dx, 0);
+          update();
+        }));
+
   // Re-render
   update();
 }
@@ -269,7 +318,6 @@ function addLabels(selection) {
   var foLabel = labelGroup
     .filter(function(d) { return d.label[0] === "<"; })
     .append("foreignObject")
-      // For some reason we can't select by foreignObject in D3, so we add a class
       .attr("class", "htmllabel");
 
   foLabel
@@ -370,6 +418,12 @@ function update() {
         .interpolate("linear")
         (points);
     });
+
+  edges
+    .selectAll("circle")
+    .attr("r", 5)
+    .attr("cx", function(d) { return d.x; })
+    .attr("cy", function(d) { return d.y; });
 
   svgGroup
     .selectAll("g.label rect")
