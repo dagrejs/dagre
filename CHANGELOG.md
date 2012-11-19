@@ -1,5 +1,8 @@
 # v0.0.6
 
+* Added support for dragging nodes and edges in demo.html
+* Now we only add control points to edges where bends occur. Previously we
+  added more control points than strictly necessary.
 * Added support for left-right drawing direction. Use
   `dagre.layout().rankDir("LR")` to use it.
 
