@@ -157,6 +157,10 @@ if (styleMatch) {
   // graph definition coming in via the URL.
   inputStyle.text("");
 }
+var debugAlignmentRE = /[?&]alignment=([^&]+)/;
+var debugAlignmentMatch = window.location.search.match(debugAlignmentRE);
+var debugAlignment;
+if (debugAlignmentMatch) debugAlignment = debugAlignmentMatch[1];
 
 var nodeCache = {},
     edgeCache = {};
@@ -243,11 +247,16 @@ function draw(nodeData, edgeData) {
   }));
 
   // Run the actual layout
-  dagre.layout()
+  var layout = dagre.layout()
     .nodes(nodeData)
     .edges(edgeData)
-    .debugLevel(2)
-    .run();
+    .debugLevel(2);
+
+  if (debugAlignment) {
+    layout.debugAlignment(debugAlignment);
+  }
+
+  layout.run();
 
   // Ensure that we have at least two points between source and target
   edges.each(function(d) { ensureTwoControlPoints(d); });
