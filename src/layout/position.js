@@ -64,6 +64,12 @@ dagre.layout.position = function() {
       g.eachNode(function(u, node) { x(g, u, xss[config.debugAlignment][u]); });
     } else {
       balance(g, layering, xss);
+      g.eachNode(function(v) {
+        var xs = [];
+        for (alignment in xss) xs.push(xss[alignment][v]);
+        xs.sort(function(x, y) { return x - y; });
+        x(g, v, (xs[1] + xs[2]) / 2);
+      });
     }
 
     // Translate layout so left edge of bounding rectangle has coordinate 0
@@ -286,13 +292,11 @@ dagre.layout.position = function() {
     });
 
     // Find average of medians for xss array
-    g.eachNode(function(v) {
-      var xs = [];
-      for (alignment in xss)
-        xs.push(xss[alignment][v] + shift[alignment]);
-      xs.sort(function(x, y) { return x - y; });
-      x(g, v, (xs[1] + xs[2]) / 2);
-    });
+    for (var alignment in xss) {
+      g.eachNode(function(v) {
+        xss[alignment][v] += shift[alignment];
+      });
+    };
   }
 
   function flipHorizontally(layering, xs) {
