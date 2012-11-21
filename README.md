@@ -20,7 +20,7 @@ Key priorities for this library are:
 
 ## Demo
 
-Try our [interactive demo](http://cpettitt.github.com/project/dagre/latest/demo.html)! 
+Try our [interactive demo](http://cpettitt.github.com/project/dagre/latest/demo/demo.html)!
 
 If you've checked out the project, you can build the Dagre library and then try
 out the demo by opening `demo.html` in your browser. There is no need to use a
