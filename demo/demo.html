@@ -126,11 +126,20 @@ digraph {
 // Input related code goes here
 
 function graphToURL() {
-  return [window.location.protocol, '//',
-          window.location.host,
-          window.location.pathname,
-          '?graph=', encodeURIComponent(inputGraph.value),
-          '&style=', encodeURIComponent(inputStyle.node().value)].join('');
+  var elems = [window.location.protocol, '//',
+               window.location.host,
+               window.location.pathname,
+               '?'];
+
+  var queryParams = [];
+  if (debugAlignment) {
+    queryParams.push('alignment=' + debugAlignment);
+  }
+  queryParams.push('graph=' + encodeURIComponent(inputGraph.value));
+  queryParams.push('style=', encodeURIComponent(inputStyle.node().value));
+  elems.push(queryParams.join('&'));
+
+  return elems.join('');
 }
 
 var inputGraph = document.querySelector("#inputGraph");
