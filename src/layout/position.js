@@ -50,7 +50,7 @@ dagre.layout.position = function() {
         if (!config.debugAlignment || config.debugAlignment === dir) {
           var align = verticalAlignment(g, layering, conflicts, vertDir === "up" ? "predecessors" : "successors");
           xss[dir]= horizontalCompaction(g, layering, align.pos, align.root, align.align);
-          if (horizDir === "right") flipHorizontally(layering, xss[dir]);
+          if (horizDir === "right") flipHorizontally(xss[dir]);
         }
 
         if (horizDir === "right") reverseInnerOrder(layering);
@@ -299,11 +299,10 @@ dagre.layout.position = function() {
     };
   }
 
-  function flipHorizontally(layering, xs) {
-    var maxCenter = max(values(xs));
-    Object.keys(xs).forEach(function(u) {
-      xs[u] = maxCenter - xs[u];
-    });
+  function flipHorizontally(xs) {
+    for (var u in xs) {
+      xs[u] = -xs[u];
+    }
   }
 
   function reverseInnerOrder(layering) {
