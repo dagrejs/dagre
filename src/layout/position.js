@@ -246,14 +246,14 @@ dagre.layout.position = function() {
   function findMinCoord(g, layering, xs) {
     return min(layering.map(function(layer) {
       var u = layer[0];
-      return xs[u] - width(g, u) / 2;
+      return xs[u];
     }));
   }
 
   function findMaxCoord(g, layering, xs) {
     return max(layering.map(function(layer) {
       var u = layer[layer.length - 1];
-      return xs[u] - width(g, u) / 2;
+      return xs[u];
     }));
   }
 
