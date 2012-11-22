@@ -9,7 +9,6 @@ dagre.layout.position = function() {
     edgeSep: 10,
     rankSep: 30,
     rankDir: "TB",
-    debugAlignment: null,
     debugLevel: 0
   };
 
@@ -21,7 +20,6 @@ dagre.layout.position = function() {
   self.edgeSep = propertyAccessor(self, config, "edgeSep");
   self.rankSep = propertyAccessor(self, config, "rankSep");
   self.rankDir = propertyAccessor(self, config, "rankDir");
-  self.debugAlignment = propertyAccessor(self, config, "debugAlignment");
   self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
     timer.enabled(x);
   });
@@ -40,37 +38,33 @@ dagre.layout.position = function() {
     var conflicts = findConflicts(g, layering);
 
     var xss = {};
-    ["up", "down"].forEach(function(vertDir) {
-      if (vertDir === "down") layering.reverse();
+    ["u", "d"].forEach(function(vertDir) {
+      if (vertDir === "d") layering.reverse();
 
-      ["left", "right"].forEach(function(horizDir) {
-        if (horizDir === "right") reverseInnerOrder(layering);
+      ["l", "r"].forEach(function(horizDir) {
+        if (horizDir === "r") reverseInnerOrder(layering);
 
-        var dir = vertDir + "-" + horizDir;
-        if (!config.debugAlignment || config.debugAlignment === dir) {
-          var align = verticalAlignment(g, layering, conflicts, vertDir === "up" ? "predecessors" : "successors");
-          xss[dir]= horizontalCompaction(g, layering, align.pos, align.root, align.align);
-          if (horizDir === "right") flipHorizontally(xss[dir]);
-        }
+        var dir = vertDir + horizDir;
+        var align = verticalAlignment(g, layering, conflicts, vertDir === "u" ? "predecessors" : "successors");
+        xss[dir]= horizontalCompaction(g, layering, align.pos, align.root, align.align);
+        if (horizDir === "r") flipHorizontally(xss[dir]);
 
-        if (horizDir === "right") reverseInnerOrder(layering);
+        if (horizDir === "r") reverseInnerOrder(layering);
       });
 
-      if (vertDir === "down") layering.reverse();
+      if (vertDir === "d") layering.reverse();
     });
 
-    if (config.debugAlignment) {
-      // In debug mode we allow forcing layout to a particular alignment.
-      g.eachNode(function(u, node) { x(g, u, xss[config.debugAlignment][u]); });
-    } else {
-      balance(g, layering, xss);
-      g.eachNode(function(v) {
-        var xs = [];
-        for (alignment in xss) xs.push(xss[alignment][v]);
-        xs.sort(function(x, y) { return x - y; });
-        x(g, v, (xs[1] + xs[2]) / 2);
-      });
-    }
+    balance(g, layering, xss);
+    g.eachNode(function(v) {
+      var xs = [];
+      for (alignment in xss) {
+        xDebug(alignment, g, v, xss[alignment][v]);
+        xs.push(xss[alignment][v]);
+      }
+      xs.sort(function(x, y) { return x - y; });
+      x(g, v, (xs[1] + xs[2]) / 2);
+    });
 
     // Translate layout so left edge of bounding rectangle has coordinate 0
     var minX = min(g.nodes().map(function(u) { return x(g, u) - width(g, u) / 2; }));
@@ -282,10 +276,10 @@ dagre.layout.position = function() {
     }
 
     // Determine how much to adjust positioning for each alignment
-    ["up", "down"].forEach(function(vertDir) {
-      ["left", "right"].forEach(function(horizDir) {
-        var alignment = vertDir + "-" + horizDir;
-        shift[alignment] = horizDir === "left"
+    ["u", "d"].forEach(function(vertDir) {
+      ["l", "r"].forEach(function(horizDir) {
+        var alignment = vertDir + horizDir;
+        shift[alignment] = horizDir === "l"
             ? min[smallestAlignment] - min[alignment]
             : max[smallestAlignment] - max[alignment];
       });
@@ -339,6 +333,24 @@ dagre.layout.position = function() {
           return g.node(u).x;
         } else {
           g.node(u).x = x;
+        }
+    }
+  }
+
+  function xDebug(name, g, u, x) {
+    switch (config.rankDir) {
+      case "LR":
+        if (arguments.length < 3) {
+          return g.node(u)[name];
+        } else {
+          g.node(u)[name] = x;
+        }
+        break;
+      default:
+        if (arguments.length < 3) {
+          return g.node(u)[name];
+        } else {
+          g.node(u)[name] = x;
         }
     }
   }

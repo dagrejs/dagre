@@ -259,13 +259,17 @@ function draw(nodeData, edgeData) {
   var layout = dagre.layout()
     .nodes(nodeData)
     .edges(edgeData)
-    .debugLevel(2);
+    .debugLevel(2)
+    .run();
 
   if (debugAlignment) {
-    layout.debugAlignment(debugAlignment);
+    edges.each(function(e) {
+      e.dagre.points.forEach(function(p) {
+        p.x = p[debugAlignment];
+      });
+    });
+    nodes.each(function(d) { d.dagre.x = d.dagre[debugAlignment]; });
   }
-
-  layout.run();
 
   // Ensure that we have at least two points between source and target
   edges.each(function(d) { ensureTwoControlPoints(d); });

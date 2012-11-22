@@ -1,0 +1,231 @@
+<!doctype html>
+
+<!-- A simple tool for debugging coordinate assignment -->
+
+<meta charset="utf-8">
+<title>Dagre Alignment Debugger</title>
+
+<style>
+.node {
+  fill-opacity: 0.2;
+}
+
+.ul .node {
+  fill: red;
+  stroke: red;
+}
+
+.ur .node {
+  fill: green;
+  stroke: green;
+}
+
+.dl .node {
+  fill: blue;
+  stroke: blue;
+}
+
+.dr .node {
+  fill: yellow;
+  stroke: yellow;
+}
+</style>
+
+<style>
+h1, h2 {
+  color: #333;
+}
+
+textarea {
+  width: 800px;
+}
+
+label {
+  margin-top: 1em;
+  display: block;
+}
+
+.error {
+  color: red;
+}
+
+svg {
+  border: 1px solid #999;
+}
+</style>
+
+<h1>Dagre Alignment Debugger</h1>
+
+<h2>Input</h2>
+
+<form>
+  <label for="inputGraph">Graphviz Definition</label>
+  <textarea id="inputGraph" rows="5" style="display: block" onKeyUp="tryDraw();">
+/* Example */
+digraph {
+    A;
+    B;
+    C;
+    D;
+    E;
+    A -&gt; B -&gt; C;
+    B -&gt; D -&gt; E;
+    C -&gt; E;
+    A -&gt; D
+}
+  </textarea>
+  <a id="graphLink">Link for this graph</a>
+</form>
+
+<h2>Graph Visualization</h2>
+
+<svg width=800 height=600>
+  <defs>
+    <marker id="arrowhead"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerUnits="strokeWidth"
+            markerWidth="8"
+            markerHeight="5"
+            orient="auto"
+            style="fill: #333">
+      <path d="M 0 0 L 10 5 L 0 10 z"></path>
+    </marker>
+  </defs>
+</svg>
+
+<script src="http://d3js.org/d3.v2.min.js"></script>
+<script src="../dagre.js"></script>
+
+<script>
+var svg = d3.select("svg");
+var svgOuter = svg.append("g");
+
+// Add zoom behavior to the SVG canvas
+svg.call(d3.behavior.zoom().on("zoom", function redraw() {
+  svgOuter.attr("transform",
+        "translate(" + d3.event.translate + ")"
+        + " scale(" + d3.event.scale + ")");
+}));
+
+function instance(alignment, offset) {
+  var svgGroup = svgOuter.append("g");
+  svgGroup
+    .attr("class", alignment)
+    .attr("transform", "translate(5, " + (5 + offset) + ")");
+
+  var nodes, edges;
+  function draw(nodeData, edgeData) {
+    // D3 doesn't appear to like rebinding with the same id but a new object,
+    // so for now we remove everything.
+    svgGroup.selectAll("*").remove();
+
+    nodes = svgGroup
+      .selectAll("g .node")
+      .data(nodeData, function(d) { return d.id; });
+
+    var nodeEnter = nodes
+      .enter()
+      .append("g")
+        .attr("class", "node")
+        .attr("id", function(d) { return "node-" + d.id; });
+    nodeEnter.append("rect");
+    nodes.exit().remove();
+
+    nodes
+      .attr("transform", function(d) { return "translate(" + d.dagre[alignment] + "," + d.dagre.y + ")"; })
+      .selectAll("g.node rect")
+        .attr("x", function(d) { return -d.width / 2; })
+        .attr("y", function(d) { return -d.height / 2; })
+        .attr("width", function(d) { return d.width; })
+        .attr("height", function(d) { return d.height; });
+  }
+
+  return {
+    draw: draw
+  };
+}
+</script>
+
+<script>
+// Input related code goes here
+
+function graphToURL() {
+  var elems = [window.location.protocol, '//',
+               window.location.host,
+               window.location.pathname,
+               '?'];
+
+  var queryParams = [];
+  queryParams.push('graph=' + encodeURIComponent(inputGraph.value));
+  elems.push(queryParams.join('&'));
+
+  return elems.join('');
+}
+
+var inputGraph = document.querySelector("#inputGraph");
+var graphLink = d3.select("#graphLink");
+
+var oldInputGraphValue;
+
+var graphRE = /[?&]graph=([^&]+)/;
+var graphMatch = window.location.search.match(graphRE);
+if (graphMatch) {
+  inputGraph.value = decodeURIComponent(graphMatch[1]);
+}
+
+var instances = [
+//  instance("x", 0),
+  instance("ul", 5),
+  instance("ur", 10),
+  instance("dl", 15),
+  instance("dr", 20)
+];
+function tryDraw() {
+  var result;
+  if (oldInputGraphValue !== inputGraph.value) {
+    inputGraph.setAttribute("class", "");
+    oldInputGraphValue = inputGraph.value;
+    try {
+      result = dagre.dot.toObjects(inputGraph.value);
+      result.edges.forEach(function(e) { if (!e.label) { e.label = ""; } });
+    } catch (e) {
+      inputGraph.setAttribute("class", "error");
+    }
+
+    if (result) {
+      graphLink.attr("href", graphToURL());
+
+      result.nodes.forEach(function(node) {
+        node.inEdges = [];
+        node.outEdges = [];
+      });
+      result.edges.forEach(function(edge) {
+        edge.source.outEdges.push(edge);
+        edge.target.inEdges.push(edge);
+      });
+
+      // Set widths / heights
+      result.nodes.forEach(function(node) {
+        node.width = node.width || 50;
+        node.height = node.height || 50;
+      });
+
+      // Run the actual layout
+      var layout = dagre.layout()
+        .nodes(result.nodes)
+        .edges(result.edges)
+        .rankSep(50)
+        .debugLevel(2)
+        .run();
+
+      instances.forEach(function(instance) {
+        instance.draw(result.nodes, result.edges);
+      });
+    }
+  }
+}
+
+tryDraw();
+</script>
