@@ -7,6 +7,7 @@ dagre.layout.position = function() {
   var config = {
     nodeSep: 50,
     edgeSep: 10,
+    universalSep: null,
     rankSep: 30,
     rankDir: "TB",
     debugLevel: 0
@@ -18,6 +19,10 @@ dagre.layout.position = function() {
 
   self.nodeSep = propertyAccessor(self, config, "nodeSep");
   self.edgeSep = propertyAccessor(self, config, "edgeSep");
+  // If not null this separation value is used for all nodes and edges
+  // regardless of their widths. `nodeSep` and `edgeSep` are ignored with this
+  // option.
+  self.universalSep = propertyAccessor(self, config, "universalSep");
   self.rankSep = propertyAccessor(self, config, "rankSep");
   self.rankDir = propertyAccessor(self, config, "rankDir");
   self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
@@ -311,6 +316,9 @@ dagre.layout.position = function() {
   }
 
   function sep(g, u) {
+    if (config.universalSep !== null) {
+      return config.universalSep;
+    }
     var w = width(g, u);
     var s = g.node(u).dummy ? config.edgeSep : config.nodeSep;
     return (w + s) / 2;

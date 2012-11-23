@@ -28,6 +28,7 @@ dagre.layout = function() {
 
   self.nodeSep = delegateProperty(position.nodeSep);
   self.edgeSep = delegateProperty(position.edgeSep);
+  self.universalSep = delegateProperty(position.universalSep);
   self.rankSep = delegateProperty(position.rankSep);
   self.rankDir = delegateProperty(position.rankDir);
   self.debugAlignment = delegateProperty(position.debugAlignment);
