@@ -23,6 +23,7 @@ all: package.json dagre.js dagre.min.js
 	src/post.js
 
 dagre.min.js: dagre.js
+	@rm -f $@
 	$(JS_COMPILER) dagre.js > $@
 	@chmod a-w $@
 
