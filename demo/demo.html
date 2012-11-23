@@ -398,9 +398,9 @@ function recalcLabels() {
 function ensureTwoControlPoints(d) {
   var points = d.dagre.points;
   if (!points.length) {
-    var s = e.source.dagre;
-    var t = e.target.dagre;
-    points.push({ x: Math.abs(s.x - t.x) / 2, y: Math.abs(s.y + t.y) / 2 });
+    var s = d.source.dagre;
+    var t = d.target.dagre;
+    points.push({ x: (s.x + t.x) / 2, y: (s.y + t.y) / 2 });
   }
 
   if (points.length === 1) {
