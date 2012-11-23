@@ -175,15 +175,6 @@ dagre.layout.position = function() {
     return { pos: pos, root: root, align: align };
   }
 
-  /*
-   * Determines how much spacing u needs from its origin (center) to satisfy
-   * width and node separation.
-   */
-  function deltaX(g, u) {
-    var sep = g.node(u).dummy ? config.edgeSep : config.nodeSep;
-    return width(g, u) / 2 + sep / 2;
-  }
-
   // This function deviates from the standard BK algorithm in two ways. First
   // it takes into account the size of the nodes. Second it includes a fix to
   // the original algorithm that is described in Carstens, "Node and Label
@@ -213,7 +204,7 @@ dagre.layout.position = function() {
             if (sink[v] === v) {
               sink[v] = sink[u];
             }
-            var delta = deltaX(g, pred[w]) + deltaX(g, w);
+            var delta = sep(g, pred[w]) + sep(g, w);
             if (sink[v] !== sink[u]) {
               shift[sink[u]] = Math.min(shift[sink[u]] || Number.POSITIVE_INFINITY, xs[v] - xs[u] - delta);
             } else {
@@ -317,6 +308,12 @@ dagre.layout.position = function() {
       case "LR": return g.node(u).width;
       default:   return g.node(u).height;
     }
+  }
+
+  function sep(g, u) {
+    var w = width(g, u);
+    var s = g.node(u).dummy ? config.edgeSep : config.nodeSep;
+    return (w + s) / 2;
   }
 
   function x(g, u, x) {
