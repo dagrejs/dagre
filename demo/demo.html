@@ -380,18 +380,14 @@ function recalcLabels() {
       .attr("text-anchor", "left")
         .append("tspan")
         .attr("dy", "1em")
-        .text(function(d) { return d.label; });
+        .text(function(d) { return d.label || " "; });
 
   labelGroup
     .each(function(d) {
       var bbox = this.getBBox();
       d.bbox = bbox;
-      if (d.label.length) {
-        d.width = bbox.width + 2 * d.nodePadding;
-        d.height = bbox.height + 2 * d.nodePadding;
-      } else {
-        d.width = d.height = 0;
-      }
+      d.width = bbox.width + 2 * d.nodePadding;
+      d.height = bbox.height + 2 * d.nodePadding;
     });
 }
 
