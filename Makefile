@@ -32,7 +32,7 @@ dagre.js: Makefile node_modules
 	cat $(filter %.js, $^) > $@
 	@chmod a-w $@
 
-src/dot-grammar.js: node_modules
+src/dot-grammar.js: src/dot-grammar.pegjs node_modules
 	$(PEGJS) -e dot_parser src/dot-grammar.pegjs $@
 
 node_modules: package.json
