@@ -63,7 +63,7 @@ dagre.layout.position = function() {
     balance(g, layering, xss);
     g.eachNode(function(v) {
       var xs = [];
-      for (alignment in xss) {
+      for (var alignment in xss) {
         xDebug(alignment, g, v, xss[alignment][v]);
         xs.push(xss[alignment][v]);
       }
@@ -103,8 +103,8 @@ dagre.layout.position = function() {
 
     layering[1].forEach(function(u, i) { pos[u] = i; });
     for (var i = 1; i < layering.length - 1; ++i) {
-      prevLayer = layering[i];
-      currLayer = layering[i+1];
+      var prevLayer = layering[i];
+      var currLayer = layering[i+1];
       var k0 = 0; // Position of the last inner segment in the previous layer
       var l = 0;  // Current position in the current layer (for iteration up to `l1`)
 
@@ -159,7 +159,7 @@ dagre.layout.position = function() {
       var prevIdx = -1;
       layer.forEach(function(v) {
         var related = g[relationship](v), // Adjacent nodes from the previous layer
-            m;                            // The mid point in the related array
+            mid;                          // The mid point in the related array
 
         if (related.length > 0) {
           related.sort(function(x, y) { return pos[x] - pos[y]; });
