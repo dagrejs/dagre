@@ -1,6 +1,6 @@
 require("../common");
 
-describe("dagre.layout", function() {
+describe("dagre.layout.order", function() {
   it("sets order = 0 for a single node", function() {
     var g = dagre.dot.toGraph("digraph { A [rank=0] }");
 
@@ -51,7 +51,18 @@ describe("dagre.layout", function() {
   });
 });
 
-describe("dagre.layout.bilayerCrossCount", function() {
+describe("dagre.layout.order.barycenterLayer", function() {
+  it("Leaves nodes with no adjacencies in the same position", function() {
+    var g = dagre.dot.toGraph("digraph { 12 -> 21; 22; 11 -> 23 }");
+    var layer1 = [11, 12];
+    var layer2 = [21, 22, 23];
+
+    dagre.layout.order()._barycenterLayer(layer1, layer2, g.predecessors);
+    assert.deepEqual([23, 22, 21], layer2);
+  });
+});
+
+describe("dagre.layout.order.bilayerCrossCount", function() {
   it("calculates 0 crossings for an empty graph", function() {
     var g = dagre.dot.toGraph("digraph {}");
     var layer1 = [];

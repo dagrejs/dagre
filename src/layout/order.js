@@ -16,6 +16,9 @@ dagre.layout.order = function() {
 
   self.run = timer.wrap("Order Phase", run);
 
+  // Expose barycenterLayer for testing
+  self._barycenterLayer = barycenterLayer;
+
   return self;
 
   function run(g) {
@@ -116,7 +119,8 @@ dagre.layout.order = function() {
     var pos = layerPos(movable);
     var bs = barycenters(fixed, movable, predecessors);
 
-    var toSort = movable.slice(0).sort(function(x, y) {
+    var toSort = movable.filter(function(u) { return bs[u] !== -1; });
+    toSort.sort(function(x, y) {
       return bs[x] - bs[y] || pos[x] - pos[y];
     });
 
