@@ -4,6 +4,7 @@ PEGJS?=node_modules/pegjs/bin/pegjs
 MOCHA?=node_modules/mocha/bin/mocha
 MOCHA_OPTS?=--recursive
 JS_COMPILER=node_modules/uglify-js/bin/uglifyjs
+JS_COMPILER_OPTS?=--no-seqs
 
 all: package.json dagre.js dagre.min.js
 
@@ -24,7 +25,7 @@ all: package.json dagre.js dagre.min.js
 
 dagre.min.js: dagre.js
 	@rm -f $@
-	$(JS_COMPILER) dagre.js > $@
+	$(JS_COMPILER) $(JS_COMPILER_OPTS) dagre.js > $@
 	@chmod a-w $@
 
 dagre.js: Makefile node_modules
