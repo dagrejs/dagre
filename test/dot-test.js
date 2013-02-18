@@ -24,7 +24,7 @@ describe("dagre.dot.toGraph", function() {
     var dot = "digraph { node [color=black]; n1 [label=\"n1\"]; node [shape=box]; n2 [label=\"n2\"]; }";
     var g = dagre.dot.toGraph(dot);
     assert.equal(g.node("n1").color, "black");
-    assert.equal(g.node("n1").shape, undefined);
+    assert.isUndefined(g.node("n1").shape);
 
     assert.equal(g.node("n2").color, "black");
     assert.equal(g.node("n2").shape, "box");
@@ -46,6 +46,18 @@ describe("dagre.dot.toGraph", function() {
     var dot = "digraph { node [color=black]; n1 [label=\"n1\" fontsize=12]; n2 [label=\"n2\"]; n1 -> n2; }";
     var g = dagre.dot.toGraph(dot);
     assert.equal(g.node("n1").fontsize, 12);
-    assert.equal(g.node("n2").fontsize, undefined, "n2.fontsize should not be defined");
+    assert.isUndefined(g.node("n2").fontsize, "n2.fontsize should not be defined");
+  });
+  it("applies default attributes to nodes created in an edge statement", function() {
+    var dot = "digraph { node [color=blue]; n1 -> n2; }";
+    var g = dagre.dot.toGraph(dot);
+    assert.equal(g.node("n1").color, "blue");
+    assert.equal(g.node("n2").color, "blue");
+  });
+  it("applies default label if an explicit label is not set", function() {
+    var dot = "digraph { node [label=xyz]; n2 [label=123]; n1 -> n2; }";
+    var g = dagre.dot.toGraph(dot);
+    assert.equal(g.node("n1").label, "xyz");
+    assert.equal(g.node("n2").label, "123");
   });
 });

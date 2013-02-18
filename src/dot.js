@@ -7,7 +7,16 @@ dagre.dot.toGraph = function(str) {
 
   function createNode(id, attrs) {
     if (!(g.hasNode(id))) {
-      g.addNode(id, { id: id, label: id });
+      // We only apply default attributes to a node when it is first defined.
+      // If the node is subsequently used in edges, we skip apply default
+      // attributes.
+      g.addNode(id, defaultAttrs.get("node", { id: id }));
+
+      // The "label" attribute is given special treatment: if it is not
+      // defined we set it to the id of the node.
+      if (g.node(id).label === undefined) {
+        g.node(id).label = id;
+      }
     }
     if (attrs) {
       mergeAttributes(attrs, g.node(id));
@@ -25,7 +34,7 @@ dagre.dot.toGraph = function(str) {
 
     var id = attrs.id || edgeKey + "-" + count;
     var edge = {};
-    mergeAttributes(attrs, edge);
+    mergeAttributes(defaultAttrs.get("edge", attrs), edge);
     mergeAttributes({ id: id }, edge);
     g.addEdge(id, source, target, edge);
   }
@@ -51,14 +60,8 @@ dagre.dot.toGraph = function(str) {
     }
   };
 
-  function handleStmt(stmt, skipDefaultAttributes) {
-    var attrs;
-    if (typeof skipDefaultAttributes === "undefined" || skipDefaultAttributes !== true) {
-       attrs = defaultAttrs.get(stmt.type, stmt.attrs);
-    } else {
-      attrs = stmt.attrs;
-    }
-
+  function handleStmt(stmt) {
+    var attrs = stmt.attrs;
     switch (stmt.type) {
       case "node":
         createNode(stmt.id, attrs);
@@ -66,12 +69,7 @@ dagre.dot.toGraph = function(str) {
       case "edge":
         var prev;
         stmt.elems.forEach(function(elem) {
-          // Default attribute inclusion has to be skipped for nested calls
-          // to not overwrite attributes that have been defined through preceding
-          // default attribute statements.
-          // 
-          // Test "overrides redefined default attributes" in test/dot-test.js checks that.
-          handleStmt(elem, true);
+          handleStmt(elem);
 
           switch(elem.type) {
             case "node":
@@ -92,7 +90,7 @@ dagre.dot.toGraph = function(str) {
         });
         break;
       case "attr":
-        defaultAttrs.set(stmt.attrType, stmt.attrs);
+        defaultAttrs.set(stmt.attrType, attrs);
         break;
       default:
         throw new Error("Unsupported statement type: " + stmt.type);
