@@ -30,10 +30,30 @@ dagre.dot.toGraph = function(str) {
     g.addEdge(id, source, target, edge);
   }
 
+  var defaultAttrs = {
+    _default: {},
+
+    get: function get(type, attrs) {
+      if (typeof this._default[type] !== "undefined") {
+        var mergedAttrs = this._default[type];
+        mergeAttributes(attrs, mergedAttrs);
+        return mergedAttrs;
+      } else {
+        return attrs;
+      }
+    },
+
+    set: function set(type, attrs) {
+      this._default[type] = this.get(type, attrs);
+    }
+  };
+
   function handleStmt(stmt) {
+    var attrs = defaultAttrs.get(stmt.type, stmt.attrs);
+
     switch (stmt.type) {
       case "node":
-        createNode(stmt.id, stmt.attrs);
+        createNode(stmt.id, attrs);
         break;
       case "edge":
         var prev;
@@ -45,9 +65,9 @@ dagre.dot.toGraph = function(str) {
               var curr = elem.id;
 
               if (prev) {
-                createEdge(prev, curr, stmt.attrs);
+                createEdge(prev, curr, attrs);
                 if (undir) {
-                  createEdge(curr, prev, stmt.attrs);
+                  createEdge(curr, prev, attrs);
                 }
               }
               prev = curr;
@@ -59,7 +79,8 @@ dagre.dot.toGraph = function(str) {
         });
         break;
       case "attr":
-        // Ignore for now
+        // attr will extend existing default attributes, new definitions take precedence
+        defaultAttrs.set(stmt.attrType, stmt.attrs);
         break;
       default:
         throw new Error("Unsupported statement type: " + stmt.type);
