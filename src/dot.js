@@ -35,7 +35,10 @@ dagre.dot.toGraph = function(str) {
 
     get: function get(type, attrs) {
       if (typeof this._default[type] !== "undefined") {
-        var mergedAttrs = this._default[type];
+        var mergedAttrs = {};
+        // clone default attributes so they won't get overwritten in the next step
+        mergeAttributes(this._default[type], mergedAttrs);
+        // merge statement attributes with default attributes, precedence give to stmt attributes
         mergeAttributes(attrs, mergedAttrs);
         return mergedAttrs;
       } else {
@@ -48,8 +51,13 @@ dagre.dot.toGraph = function(str) {
     }
   };
 
-  function handleStmt(stmt) {
-    var attrs = defaultAttrs.get(stmt.type, stmt.attrs);
+  function handleStmt(stmt, skipDefaultAttributes) {
+    var attrs;
+    if (typeof skipDefaultAttributes === "undefined" || skipDefaultAttributes !== true) {
+       attrs = defaultAttrs.get(stmt.type, stmt.attrs);
+    } else {
+      attrs = stmt.attrs;
+    }
 
     switch (stmt.type) {
       case "node":
@@ -58,7 +66,12 @@ dagre.dot.toGraph = function(str) {
       case "edge":
         var prev;
         stmt.elems.forEach(function(elem) {
-          handleStmt(elem);
+          // Default attribute inclusion has to be skipped for nested calls
+          // to not overwrite attributes that have been defined through preceding
+          // default attribute statements.
+          // 
+          // Test "overrides redefined default attributes" in test/dot-test.js checks that.
+          handleStmt(elem, true);
 
           switch(elem.type) {
             case "node":
@@ -79,7 +92,6 @@ dagre.dot.toGraph = function(str) {
         });
         break;
       case "attr":
-        // attr will extend existing default attributes, new definitions take precedence
         defaultAttrs.set(stmt.attrType, stmt.attrs);
         break;
       default:
