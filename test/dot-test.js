@@ -42,4 +42,10 @@ describe("dagre.dot.toGraph", function() {
     // defined nodes could be overwritten, causing both nodes in this test case to
     // have "color" set to green. 
   });
+  it("does not carry attributes from one node over to the next", function() {
+    var dot = "digraph { node [color=black]; n1 [label=\"n1\" fontsize=12]; n2 [label=\"n2\"]; n1 -> n2; }";
+    var g = dagre.dot.toGraph(dot);
+    assert.equal(g.node("n1").fontsize, 12);
+    assert.equal(g.node("n2").fontsize, undefined, "n2.fontsize should not be defined");
+  });
 });
