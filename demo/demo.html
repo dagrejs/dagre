@@ -208,7 +208,7 @@ function tryDraw() {
 
 <script>
 var svg = d3.select("svg");
-var svgGroup = svg.append("g").attr("transform", "translate(5, 5)");
+var svgGroup = svg.append("g");
 
 var nodes, edges;
 function draw(nodeData, edgeData) {
@@ -249,6 +249,7 @@ function draw(nodeData, edgeData) {
   recalcLabels();
 
   // Add zoom behavior to the SVG canvas
+  svgGroup.attr("transform", "translate(5, 5)");
   svg.call(d3.behavior.zoom().on("zoom", function redraw() {
     svgGroup.attr("transform",
           "translate(" + d3.event.translate + ")"
