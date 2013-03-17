@@ -60,4 +60,50 @@ describe("dagre.dot.toGraph", function() {
     assert.equal(g.node("n1").label, "xyz");
     assert.equal(g.node("n2").label, "123");
   });
+  it("supports an implicit subgraph statement", function() {
+    var dot = "digraph { x; {y; z} }";
+    var g = dagre.dot.toGraph(dot);
+    assert.isTrue(g.hasNode("x"));
+    assert.isTrue(g.hasNode("y"));
+    assert.isTrue(g.hasNode("z"));
+  });
+  it("supports an explicit subgraph statement", function() {
+    var dot = "digraph { x; subgraph {y; z} }";
+    var g = dagre.dot.toGraph(dot);
+    assert.isTrue(g.hasNode("x"));
+    assert.isTrue(g.hasNode("y"));
+    assert.isTrue(g.hasNode("z"));
+  });
+  it("supports a subgraph as the RHS of an edge statement", function() {
+    var dot = "digraph { x -> {y; z} }";
+    var g = dagre.dot.toGraph(dot);
+    assert.deepEqual(g.predecessors("y"), ["x"]);
+    assert.deepEqual(g.predecessors("z"), ["x"]);
+  });
+  it("supports a subgraph as the LHS of an edge statement", function() {
+    var dot = "digraph { {x; y} -> {z} }";
+    var g = dagre.dot.toGraph(dot);
+    assert.deepEqual(g.successors("x"), ["z"]);
+    assert.deepEqual(g.successors("y"), ["z"]);
+  });
+  it("applies edge attributes to all nodes in a subgraph", function() {
+    var dot = "digraph { x -> {y; z} [prop=123] }";
+    var g = dagre.dot.toGraph(dot);
+    assert.equal(g.edge(g.edges("x", "y")[0]).prop, 123);
+    assert.equal(g.edge(g.edges("x", "z")[0]).prop, 123);
+  });
+  it("only applies attributes in a subgraph to nodes created in that subgraph", function() {
+    var dot = "digraph { x; subgraph { node [prop=123]; y; z; } }";
+    var g = dagre.dot.toGraph(dot);
+    assert.isUndefined(g.node("x").prop);
+    assert.equal(g.node("y").prop, 123);
+    assert.equal(g.node("z").prop, 123);
+  });
+  it("applies parent defaults to subgraph nodes when appropriate", function() {
+    var dot = "digraph { node [prop=123]; subgraph { x; subgraph { y; z [prop=456]; } } }";
+    var g = dagre.dot.toGraph(dot);
+    assert.equal(g.node("x").prop, 123);
+    assert.equal(g.node("y").prop, 123);
+    assert.equal(g.node("z").prop, 456);
+  });
 });

@@ -37,9 +37,9 @@ stmtList
 
 stmt
     = attrStmt
+    / edgeStmt
     / subgraphStmt
     / inlineAttrStmt
-    / edgeStmt
     / nodeStmt
 
 attrStmt

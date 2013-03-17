@@ -39,6 +39,33 @@ dagre.dot.toGraph = function(str) {
     g.addEdge(id, source, target, edge);
   }
 
+  function collectNodeIds(stmt) {
+    var ids = {},
+        stack = [],
+        curr;
+    stack.push(stmt);
+    while (stack.length != 0) {
+      curr = stack.pop();
+      switch (curr.type) {
+        case "node": ids[curr.id] = true; break;
+        case "edge":
+          curr.elems.forEach(function(e) { stack.push(e); });
+          break;
+        case "subgraph":
+          curr.stmts.forEach(function(s) { stack.push(s); });
+          break;
+      }
+    }
+    return dagre.util.keys(ids);
+  }
+
+  /*
+   * We use a chain of prototypes to maintain properties as we descend into
+   * subgraphs. This allows us to simply get the value for a property and have
+   * the VM do appropriate resolution. When we leave a subgraph we simply set
+   * the current context to the prototype of the current defaults object.
+   * Alternatively, this could have been written using a stack.
+   */
   var defaultAttrs = {
     _default: {},
 
@@ -57,6 +84,17 @@ dagre.dot.toGraph = function(str) {
 
     set: function set(type, attrs) {
       this._default[type] = this.get(type, attrs);
+    },
+
+    enterSubGraph: function() {
+      function SubGraph() {}
+      SubGraph.prototype = this._default;
+      var subgraph = new SubGraph();
+      this._default = subgraph;
+    },
+
+    exitSubGraph: function() {
+      this._default = Object.getPrototypeOf(this._default);
     }
   };
 
@@ -67,27 +105,36 @@ dagre.dot.toGraph = function(str) {
         createNode(stmt.id, attrs);
         break;
       case "edge":
-        var prev;
+        var prev,
+            curr;
         stmt.elems.forEach(function(elem) {
           handleStmt(elem);
 
           switch(elem.type) {
-            case "node":
-              var curr = elem.id;
-
-              if (prev) {
-                createEdge(prev, curr, attrs);
-                if (undir) {
-                  createEdge(curr, prev, attrs);
-                }
-              }
-              prev = curr;
-              break;
+            case "node": curr = [elem.id]; break;
+            case "subgraph": curr = collectNodeIds(elem); break;
             default:
               // We don't currently support subgraphs incident on an edge
               throw new Error("Unsupported type incident on edge: " + elem.type);
           }
+
+          if (prev) {
+            prev.forEach(function(p) {
+              curr.forEach(function(c) {
+                createEdge(p, c, attrs);
+                if (undir) {
+                  createEdge(c, p, attrs);
+                }
+              });
+            });
+          }
+          prev = curr;
         });
+        break;
+      case "subgraph":
+        defaultAttrs.enterSubGraph();
+        stmt.stmts.forEach(function(s) { handleStmt(s); });
+        defaultAttrs.exitSubGraph();
         break;
       case "attr":
         defaultAttrs.set(stmt.attrType, attrs);

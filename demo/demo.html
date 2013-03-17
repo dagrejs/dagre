@@ -183,6 +183,7 @@ function tryDraw() {
       result = dagre.dot.toObjects(inputGraph.value);
       result.edges.forEach(function(e) { if (!e.label) { e.label = ""; } });
     } catch (e) {
+      throw e;
       inputGraph.setAttribute("class", "error");
     }
 
