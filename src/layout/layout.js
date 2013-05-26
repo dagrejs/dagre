@@ -45,10 +45,32 @@ dagre.layout = function() {
 
   return self;
 
-  // Build graph and save mapping of generated ids to original nodes and edges
-  function init() {
+  /*
+   * Constructs an adjacency graph using the nodes and edges specified through
+   * config. For each node and edge we add a property `dagre` that contains an
+   * object that will hold intermediate and final layout information. Some of
+   * the contents include:
+   *
+   *  1) A generated ID that uniquely identifies the object.
+   *  2) Dimension information for nodes (copied from the source node).
+   *  3) Optional dimension information for edges.
+   *
+   * After the adjacency graph is constructed the code no longer needs to use
+   * the original nodes and edges passed in via config.
+   */
+  function buildAdjacencyGraph() {
     var g = dagre.graph();
     var nextId = 0;
+
+    // Get the node id for the type ("source" or "target") or throw if we
+    // haven't seen the node.
+    function safeGetNodeId(type, edge) {
+      var nodeId = edge[type].dagre.id;
+      if (!g.hasNode(nodeId)) {
+        throw new Error(type + " node for '" + e + "' not in node list");
+      }
+      return nodeId;
+    }
 
     // Tag each node so that we can properly represent relationships when
     // we add edges. Also copy relevant dimension information.
@@ -59,19 +81,10 @@ dagre.layout = function() {
     });
 
     config.edges.forEach(function(e) {
-      var source = e.source.dagre.id;
-      if (!g.hasNode(source)) {
-        throw new Error("Source node for '" + e + "' not in node list");
-      }
+      var source = safeGetNodeId("source", e);
+      var target = safeGetNodeId("target", e);
 
-      var target = e.target.dagre.id;
-      if (!g.hasNode(target)) {
-        throw new Error("Target node for '" + e + "' not in node list");
-      }
-
-      e.dagre = {
-        points: []
-      };
+      e.dagre = { points: [] };
 
       // Track edges that aren't self loops - layout does nothing for self
       // loops, so they can be skipped.
@@ -96,7 +109,7 @@ dagre.layout = function() {
       }
 
       // Build internal graph
-      var g = init();
+      var g = buildAdjacencyGraph();
 
       // Make space for edge labels
       g.eachEdge(function(e, s, t, a) {
@@ -139,7 +152,15 @@ dagre.layout = function() {
     return self;
   }
 
-  // Assumes input graph has no self-loops and is otherwise acyclic.
+  /*
+   * This function is responsible for "normalizing" the graph. The process of
+   * normalization ensures that no edge in the graph has spans more than one
+   * rank. To do this it inserts dummy nodes as needed and links them by adding
+   * dummy edges. This function keeps enough information in the dummy nodes and
+   * edges to ensure that the original graph can be reconstructed later.
+   *
+   * This method assumes that the input graph is cycle free.
+   */
   function normalize(g) {
     var dummyCount = 0;
     g.eachEdge(function(e, s, t, a) {
@@ -173,6 +194,11 @@ dagre.layout = function() {
     });
   }
 
+  /*
+   * Reconstructs the graph as it was before normalization. The positions of
+   * dummy nodes are used to build an array of points for the original "long"
+   * edge. Dummy nodes and edges are removed.
+   */
   function undoNormalize(g) {
     var visited = {};
 
@@ -189,10 +215,18 @@ dagre.layout = function() {
     });
   }
 
+  /*
+   * For each edge that was reversed during the `acyclic` step, reverse its
+   * array of points.
+   */
   function fixupEdgePoints(g) {
     g.eachEdge(function(e, s, t, a) { if (a.reversed) a.points.reverse(); });
   }
 
+  /*
+   * Given a function, a new function is returned that invokes the given
+   * function. The return value from the function is always the `self` object.
+   */
   function delegateProperty(f) {
     return function() {
       if (!arguments.length) return f();
