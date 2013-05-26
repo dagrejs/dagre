@@ -141,14 +141,10 @@ dagre.layout.order = function() {
         bs = {};               // Barycenters for each node
 
     movable.forEach(function(u) {
-      var b = -1;
       var preds = predecessors(u);
-      if (preds.length > 0) {
-        b = 0;
-        preds.forEach(function(v) { b += pos[v]; });
-        b = b / preds.length;
-      }
-      bs[u] = b;
+      bs[u] = preds.length > 0
+          ? sum(preds.map(function(v) { return pos[v]; })) / preds.length
+          : -1;
     });
 
     return bs;

@@ -2,6 +2,16 @@ require("./common");
 
 var assert2 = require("assert");
 
+describe("dagre.util.sum", function() {
+  it("returns the sum of all elements in the array", function() {
+    assert.equal(dagre.util.sum([1,2,3,4]), 10);
+  });
+
+  it("returns 0 if there are no elements in the array", function() {
+    assert.equal(dagre.util.sum([]), 0);
+  });
+});
+
 describe("dagre.util.components", function() {
   it("returns all nodes in a connected graph", function() {
     var g = dagre.graph();
