@@ -43,16 +43,18 @@ dagre.dot.toGraph = function(str) {
     var ids = {},
         stack = [],
         curr;
-    stack.push(stmt);
-    while (stack.length != 0) {
+    function pushStack(e) { stack.push(e); }
+
+    pushStack(stmt);
+    while (stack.length !== 0) {
       curr = stack.pop();
       switch (curr.type) {
         case "node": ids[curr.id] = true; break;
         case "edge":
-          curr.elems.forEach(function(e) { stack.push(e); });
+          curr.elems.forEach(pushStack);
           break;
         case "subgraph":
-          curr.stmts.forEach(function(s) { stack.push(s); });
+          curr.stmts.forEach(pushStack);
           break;
       }
     }

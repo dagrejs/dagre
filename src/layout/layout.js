@@ -232,6 +232,6 @@ dagre.layout = function() {
       if (!arguments.length) return f();
       f.apply(null, arguments);
       return self;
-    }
+    };
   }
-}
+};

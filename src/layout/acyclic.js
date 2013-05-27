@@ -2,7 +2,7 @@ dagre.layout.acyclic = function() {
   // External configuration
   var config = {
     debugLevel: 0
-  }
+  };
 
   var timer = createTimer();
 
@@ -22,7 +22,7 @@ dagre.layout.acyclic = function() {
         g.addEdge(e, t, s, a);
       }
     });
-  }
+  };
 
   return self;
 

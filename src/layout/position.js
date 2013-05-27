@@ -115,8 +115,8 @@ dagre.layout.position = function() {
                                // last node in the current layer
         pos[u] = l1;
 
-        var k1 = undefined; // Position of the next inner segment in the previous layer or
-                            // the position of the last element in the previous layer
+        var k1; // Position of the next inner segment in the previous layer or
+                // the position of the last element in the previous layer
         if (g.node(u).dummy) {
           var uPred = g.predecessors(u)[0];
           if (g.node(uPred).dummy)
@@ -286,7 +286,7 @@ dagre.layout.position = function() {
       g.eachNode(function(v) {
         xss[alignment][v] += shift[alignment];
       });
-    };
+    }
   }
 
   function flipHorizontally(xs) {
@@ -377,4 +377,4 @@ dagre.layout.position = function() {
         }
     }
   }
-}
+};

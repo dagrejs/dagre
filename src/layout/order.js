@@ -79,7 +79,7 @@ dagre.layout.order = function() {
         preds.push(g.source(e));
       });
       return preds;
-    }
+    };
   }
 
   /*
@@ -92,16 +92,17 @@ dagre.layout.order = function() {
         sucs.push(g.target(e));
       });
       return sucs;
-    }
+    };
   }
 
   function sweep(g, iter, layering) {
+    var i;
     if (iter % 2 === 0) {
-      for (var i = 1; i < layering.length; ++i) {
+      for (i = 1; i < layering.length; ++i) {
         barycenterLayer(layering[i - 1], layering[i], multiPredecessors(g));
       }
     } else {
-      for (var i = layering.length - 2; i >= 0; --i) {
+      for (i = layering.length - 2; i >= 0; --i) {
         barycenterLayer(layering[i + 1], layering[i], multiSuccessors(g));
       }
     }
@@ -153,7 +154,7 @@ dagre.layout.order = function() {
   function copyLayering(layering) {
     return layering.map(function(l) { return l.slice(0); });
   }
-}
+};
 
 var crossCount = dagre.layout.order.crossCount = function(g, layering) {
   var cc = 0;
@@ -165,7 +166,7 @@ var crossCount = dagre.layout.order.crossCount = function(g, layering) {
     prevLayer = layer;
   });
   return cc;
-}
+};
 
 /*
  * This function searches through a ranked and ordered graph and counts the
@@ -208,7 +209,7 @@ var bilayerCrossCount = dagre.layout.order.bilayerCrossCount = function(g, layer
   });
 
   return cc;
-}
+};
 
 function layerPos(layer) {
   var pos = {};

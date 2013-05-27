@@ -22,7 +22,7 @@ dagre.graph = function() {
     nodes[u] = { id: u, value: value };
     inEdges[u] = {};
     outEdges[u] = {};
-  }
+  };
 
   graph.delNode = function(u) {
     strictGetNode(u);
@@ -32,15 +32,15 @@ dagre.graph = function() {
     delete inEdges[u];
     delete outEdges[u];
     delete nodes[u];
-  }
+  };
 
   graph.node = function(u) {
     return strictGetNode(u).value;
-  }
+  };
 
   graph.hasNode = function(u) {
     return u in nodes;
-  }
+  };
 
   graph.addEdge = function(e, source, target, value) {
     strictGetNode(source);
@@ -56,40 +56,40 @@ dagre.graph = function() {
     edges[e] = { id: e, source: source, target: target, value: value };
     addEdgeToMap(inEdges[target], source, e);
     addEdgeToMap(outEdges[source], target, e);
-  }
+  };
 
   graph.delEdge = function(e) {
     var edge = strictGetEdge(e);
-    delEdgeFromMap(inEdges[edge.target], edge.source, e)
-    delEdgeFromMap(outEdges[edge.source], edge.target, e)
+    delEdgeFromMap(inEdges[edge.target], edge.source, e);
+    delEdgeFromMap(outEdges[edge.source], edge.target, e);
     delete edges[e];
-  }
+  };
 
   graph.edge = function(e) {
     return strictGetEdge(e).value;
-  }
+  };
 
   graph.source = function(e) {
     return strictGetEdge(e).source;
-  }
+  };
 
   graph.target = function(e) {
     return strictGetEdge(e).target;
-  }
+  };
 
   graph.hasEdge = function(e) {
     return e in edges;
-  }
+  };
 
   graph.successors = function(u) {
     strictGetNode(u);
     return keys(outEdges[u]).map(function(v) { return nodes[v].id; });
-  }
+  };
 
   graph.predecessors = function(u) {
     strictGetNode(u);
     return keys(inEdges[u]).map(function(v) { return nodes[v].id; });
-  }
+  };
 
   graph.neighbors = function(u) {
     strictGetNode(u);
@@ -97,20 +97,20 @@ dagre.graph = function() {
     keys(outEdges[u]).map(function(v) { vs[v] = true; });
     keys(inEdges[u]).map(function(v) { vs[v] = true; });
     return keys(vs).map(function(v) { return nodes[v].id; });
-  }
+  };
 
   graph.nodes = function() {
     var nodes = [];
     graph.eachNode(function(id, _) { nodes.push(id); });
     return nodes;
-  }
+  };
 
   graph.eachNode = function(func) {
     for (var k in nodes) {
       var node = nodes[k];
       func(node.id, node.value);
     }
-  }
+  };
 
   /*
    * Return all edges with no arguments,
@@ -130,7 +130,7 @@ dagre.graph = function() {
       strictGetNode(v);
       sourceEdges = outEdges[u];
       es = (v in sourceEdges) ? keys(sourceEdges[v].edges) : [];
-      return es.map(function(e) { return edges[e].id });
+      return es.map(function(e) { return edges[e].id; });
     }
   };
 
@@ -139,7 +139,7 @@ dagre.graph = function() {
       var edge = edges[k];
       func(edge.id, edge.source, edge.target, edge.value);
     }
-  }
+  };
 
   /*
    * Return all in edges to a target node
@@ -195,7 +195,7 @@ dagre.graph = function() {
 
   function delEdgeFromMap(map, v, e) {
     var vEntry = map[v];
-    if (--vEntry.count == 0) {
+    if (--vEntry.count === 0) {
       delete map[v];
     } else {
       delete vEntry.edges[e];
@@ -219,4 +219,4 @@ dagre.graph = function() {
   }
 
   return graph;
-}
+};

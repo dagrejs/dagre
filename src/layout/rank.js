@@ -23,8 +23,7 @@ dagre.layout.rank = function() {
       feasibleTree(subgraph);
       normalize(subgraph);
     });
-  };
-
+  }
 
   function initRank(g) {
     var minRank = {};
@@ -95,4 +94,4 @@ dagre.layout.rank = function() {
   function incidenceId(u, v) {
     return u < v ?  u.length + ":" + u + "-" + v : v.length + ":" + v + "-" + u;
   }
-}
+};

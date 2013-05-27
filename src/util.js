@@ -27,7 +27,7 @@ function max(values) {
  */
 var sum = dagre.util.sum = function(values) {
   return values.reduce(function(acc, x) { return acc + x; }, 0);
-}
+};
 
 /*
  * Joins all of the given arrays into a single array.
@@ -84,7 +84,7 @@ var components = dagre.util.components = function(g) {
         dfs(v, component);
       });
     }
-  };
+  }
 
   g.eachNode(function(u) {
     var component = [];
@@ -179,11 +179,11 @@ var intersectRect = dagre.util.intersectRect = function(rect, point) {
   }
 
   return {x: x + sx, y: y + sy};
-}
+};
 
 var pointStr = dagre.util.pointStr = function(point) {
   return point.x + "," + point.y;
-}
+};
 
 var createTimer = function() {
   var self = {},
@@ -203,11 +203,11 @@ var createTimer = function() {
       } finally {
         if (start) console.log(name + " time: " + (new Date().getTime() - start) + "ms");
       }
-    }
+    };
   };
 
   return self;
-}
+};
 
 function propertyAccessor(self, config, field, setHook) {
   return function(x) {
