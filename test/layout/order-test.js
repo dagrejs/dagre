@@ -40,25 +40,38 @@ describe("dagre.layout.order", function() {
     }
   });
 
-  it("finds minimal crossings", function() {
-    var str = "digraph { A [rank=0]; B [rank=0]; C [rank=0]; D [rank=1]; E [rank=1]; " +
-                "A -> D; B -> D; B -> E; C -> D; C -> E }";
-    var g = dagre.dot.toGraph(str);
+  describe("finds minimial crossings", function() {
+    it("graph1", function() {
+      var str = "digraph { A [rank=0]; B [rank=0]; C [rank=1]; D [rank=1]; " +
+                  "A -> D; B -> C; }";
+      var g = dagre.dot.toGraph(str);
 
-    var layering = dagre.layout.order().run(g);
+      var layering = dagre.layout.order().run(g);
 
-    assert.equal(dagre.layout.order.crossCount(g, layering), 1);
-  });
-});
+      assert.equal(dagre.layout.order.crossCount(g, layering), 0);
+    });
 
-describe("dagre.layout.order.barycenterLayer", function() {
-  it("Leaves nodes with no adjacencies in the same position", function() {
-    var g = dagre.dot.toGraph("digraph { 12 -> 21; 22; 11 -> 23 }");
-    var layer1 = [11, 12];
-    var layer2 = [21, 22, 23];
+    it("graph2", function() {
+      var str = "digraph { A [rank=0]; B [rank=0]; C [rank=0]; D [rank=1]; E [rank=1]; " +
+                  "A -> D; B -> D; B -> E; C -> D; C -> E }";
+      var g = dagre.dot.toGraph(str);
 
-    dagre.layout.order()._barycenterLayer(layer1, layer2, g.predecessors);
-    assert.deepEqual([23, 22, 21], layer2);
+      var layering = dagre.layout.order().run(g);
+
+      assert.equal(dagre.layout.order.crossCount(g, layering), 1);
+    });
+
+    it("graph3", function() {
+      var str = "digraph { A [rank=0]; B [rank=0]; C [rank=0];" +
+                  "D [rank=1]; E [rank=1]; F [rank=1];" +
+                  "G [rank=2]; H [rank=2]; I [rank=2];" +
+                  "A -> E; B -> D; C -> F; D -> I; E -> H; F -> G }";
+      var g = dagre.dot.toGraph(str);
+
+      var layering = dagre.layout.order().run(g);
+
+      assert.equal(dagre.layout.order.crossCount(g, layering), 0);
+    });
   });
 });
 

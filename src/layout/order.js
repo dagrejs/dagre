@@ -16,9 +16,6 @@ dagre.layout.order = function() {
 
   self.run = timer.wrap("Order Phase", run);
 
-  // Expose barycenterLayer for testing
-  self._barycenterLayer = barycenterLayer;
-
   return self;
 
   function run(g) {
@@ -99,53 +96,53 @@ dagre.layout.order = function() {
     var i;
     if (iter % 2 === 0) {
       for (i = 1; i < layering.length; ++i) {
-        barycenterLayer(layering[i - 1], layering[i], multiPredecessors(g));
+        sortLayer(layering[i], multiPredecessors(g), layerPos(layering[i-1]));
       }
     } else {
       for (i = layering.length - 2; i >= 0; --i) {
-        barycenterLayer(layering[i + 1], layering[i], multiSuccessors(g));
+        sortLayer(layering[i], multiSuccessors(g), layerPos(layering[i+1]));
       }
     }
     return crossCount(g, layering);
   }
 
   /*
-   * Given a fixed layer and a movable layer in a graph this function will
-   * attempt to find an improved ordering for the movable layer such that
-   * edge crossings may be reduced.
-   *
-   * This algorithm is based on the barycenter method.
+   * Given a list of nodes, a function that returns neighbors of a node, and
+   * a mapping of the neighbor nodes to their weights, this function sorts
+   * the node list by the barycenter calculated for each node.
    */
-  function barycenterLayer(fixed, movable, predecessors) {
-    var pos = layerPos(movable);
-    var bs = barycenters(fixed, movable, predecessors);
+  function sortLayer(nodes, neighbors, weights) {
+    var pos = layerPos(nodes);
+    var bs = barycenters(nodes, neighbors, weights);
 
-    var toSort = movable.filter(function(u) { return bs[u] !== -1; });
+    var toSort = nodes.filter(function(u) { return bs[u] !== -1; });
     toSort.sort(function(x, y) {
       return bs[x] - bs[y] || pos[x] - pos[y];
     });
 
-    for (var i = movable.length - 1; i >= 0; --i) {
-      if (bs[movable[i]] !== -1) {
-        movable[i] = toSort.pop();
+    for (var i = nodes.length - 1; i >= 0; --i) {
+      if (bs[nodes[i]] !== -1) {
+        nodes[i] = toSort.pop();
       }
     }
   }
 
   /*
-   * Given a fixed layer and a movable layer in a graph, this function will
-   * return weights for the movable layer that can be used to reorder the layer
-   * for potentially reduced edge crossings.
+   * Given a list of nodes, a function that returns neighbors of a node, and
+   * a mapping of the neighbor nodes to their weights, this function returns
+   * a mapping of the input nodes to their calculated barycenters. The
+   * barycenter values are the average weights of all neighbors of the
+   * node. If a node has no neighbors it is assigned a barycenter of -1.
    */
-  function barycenters(fixed, movable, predecessors) {
-    var pos = layerPos(fixed), // Position of node in fixed list
-        bs = {};               // Barycenters for each node
+  function barycenters(nodes, neighbors, weights) {
+    var bs = {}; // barycenters
 
-    movable.forEach(function(u) {
-      var preds = predecessors(u);
-      bs[u] = preds.length > 0
-          ? sum(preds.map(function(v) { return pos[v]; })) / preds.length
-          : -1;
+    nodes.forEach(function(u) {
+      var vs = neighbors(u);
+      var b = -1;
+      if (vs.length > 0)
+        b = sum(vs.map(function(v) { return weights[v]; })) / vs.length;
+      bs[u] = b;
     });
 
     return bs;
