@@ -47,5 +47,9 @@ package.json: src/version.js package.js
 test: dagre.js
 	$(MOCHA) $(MOCHA_OPTS)
 
+.PHONY: score
+score: dagre.js
+	$(NODE) score/score.js
+
 clean:
 	rm -f dagre.js package.json dagre.min.js

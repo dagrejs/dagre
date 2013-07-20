@@ -1,0 +1,7 @@
+Graphs were generated with igraphs:
+
+for x in range(0, 5):
+    for i in [5, 10, 15, 20, 50]:
+        for j in [1, 3, 5, 10]:
+            g = Graph.Barabasi(i, j, directed=True)
+            g.write_dot("barabasi_" + str(i) + "_" + str(j) + "_" + str(x) + ".dot")

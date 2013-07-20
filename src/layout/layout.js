@@ -43,6 +43,8 @@ dagre.layout = function() {
 
   self.run = timer.wrap("Total layout", run);
 
+  self._normalize = normalize;
+
   return self;
 
   /*
