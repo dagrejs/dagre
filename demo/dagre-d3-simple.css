@@ -1,0 +1,79 @@
+text {
+  /*font: 300 16px "Helvetica Neue";*/
+  font-weight:300;
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:14px;
+}
+
+.demo-label1{
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:32px;
+  color:green;
+}
+
+.demo-label2{
+  font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:16px;
+  color:blue;
+}
+
+rect {
+  fill: #fff;
+}
+
+.node > rect {
+  stroke-width: 3px;
+  stroke: #333;
+  fill: none;
+  opacity:0.5;
+}
+
+.node:hover {
+  cursor: pointer;
+  opacity: 0.4;
+}
+
+.edge rect {
+  fill: #fff
+}
+
+.edge path {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+
+.edge:hover {
+  cursor: pointer;
+  opacity: 0.4;
+}
+
+.cp {
+  opacity: 0;
+}
+
+.cp:hover {
+  cursor:pointer;
+  opacity: 1;
+}
+
+h1, h2 {
+  color: #333;
+}
+
+textarea {
+  width: 800px;
+}
+
+label {
+  margin-top: 1em;
+  display: block;
+}
+
+.error {
+  color: red;
+}
+
+svg {
+  border: 1px solid #999;
+}
