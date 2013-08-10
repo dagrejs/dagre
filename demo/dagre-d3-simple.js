@@ -13,22 +13,26 @@ function renderDotToD3(graphDef, svgSelector) {
  *  if edges had direct references to nodes.  See state-graph-js.html for example.
  */
 function renderJSObjsToD3(nodeData, edgeData, svgSelector) {
-
   var nodeRefs = [];
   var edgeRefs = [];
+  var idCounter = 0;
 
   edgeData.forEach(function(e){
     edgeRefs.push({
       source: nodeData[e.source],
       target: nodeData[e.target],
       label: e.label,
-      id: e.id
+      id: e.id !== undefined ? e.id : (idCounter++ + "|" + e.source + "->" + e.target)
     });
   });
 
   for (var nodeKey in nodeData) {
     if (nodeData.hasOwnProperty(nodeKey)) {
-      nodeRefs.push(nodeData[nodeKey]);
+      var u = nodeData[nodeKey];
+      if (u.id === undefined) {
+        u.id = nodeKey;
+      }
+      nodeRefs.push(u);
     }
   }
 
@@ -39,7 +43,6 @@ function renderJSObjsToD3(nodeData, edgeData, svgSelector) {
  *  Render javscript objects to svg, as produced by  dagre.dot.
  */
 function renderDagreObjsToD3(graphData, svgSelector) {
-
   var nodeData = graphData.nodes;
   var edgeData = graphData.edges;
 
@@ -162,8 +165,7 @@ function renderDagreObjsToD3(graphData, svgSelector) {
   svgGroup.attr("transform", "translate(5, 5)");
   svg.call(d3.behavior.zoom().on("zoom", function redraw() {
     svgGroup.attr("transform",
-      "translate(" + d3.event.translate + ")"
-        + " scale(" + d3.event.scale + ")");
+      "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
   }));
 
   // Run the actual layout
