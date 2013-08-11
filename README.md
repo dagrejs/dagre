@@ -26,6 +26,22 @@ If you've checked out the project, you can build the Dagre library and then try
 out the demo by opening `demo.html` in your browser. There is no need to use a
 web server for the demo.
 
+## Third Party Examples
+
+Dagre has been included as a part of some very cool projects. Here are just a
+couple that stand out:
+
+[JointJS](http://www.daviddurman.com/automatic-graph-layout-with-jointjs-and-dagre.html)
+has a plugin that uses dagre for layout. JointJS focuses on rendering and
+interaction with diagrams, which synergizes well with Dagre. If you want the
+ability to move nodes and manipulate edges interactive, this is a good place to
+start!
+
+Jonathan Mace has a
+[demo](http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json) that
+makes it possible to interactively explore graphs. In his demo, you can
+highlight paths, collapse subgraphs, via detailed node information, and more!
+
 ## Building
 
 [![Build Status](https://secure.travis-ci.org/cpettitt/dagre.png)](http://travis-ci.org/cpettitt/dagre)
