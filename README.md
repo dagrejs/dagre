@@ -34,8 +34,8 @@ couple that stand out:
 [JointJS](http://www.daviddurman.com/automatic-graph-layout-with-jointjs-and-dagre.html)
 has a plugin that uses dagre for layout. JointJS focuses on rendering and
 interaction with diagrams, which synergizes well with Dagre. If you want the
-ability to move nodes and manipulate edges interactive, this is a good place to
-start!
+ability to move nodes and manipulate edges interactively, this is a good place
+to start!
 
 Jonathan Mace has a
 [demo](http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json) that
