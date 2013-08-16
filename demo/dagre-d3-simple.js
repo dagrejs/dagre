@@ -1,4 +1,3 @@
-
 /*
  * Render a pure graphviz definition to the svg specified by svg selector.
  */
@@ -17,7 +16,7 @@ function renderJSObjsToD3(nodeData, edgeData, svgSelector) {
   var edgeRefs = [];
   var idCounter = 0;
 
-  edgeData.forEach(function(e){
+  edgeData.forEach(function (e) {
     edgeRefs.push({
       source: nodeData[e.source],
       target: nodeData[e.target],
@@ -173,6 +172,15 @@ function renderDagreObjsToD3(graphData, svgSelector) {
     .nodes(nodeData)
     .edges(edgeData)
     .run();
+
+  edges.each(function (d) {
+    var points = d.dagre.points;
+    if (!points.length) {
+      var s = d.source.dagre;
+      var t = d.target.dagre;
+      points.push({ x: (s.x + t.x) / 2, y: (s.y + t.y) / 2 });
+    }
+  });
 
   nodes
     .attr("transform", function (d) {
