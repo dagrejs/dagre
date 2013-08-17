@@ -14,6 +14,8 @@ dagre.layout.order = function() {
     timer.enabled(x);
   });
 
+  self._initOrder = initOrder;
+
   self.run = timer.wrap("Order Phase", run);
 
   return self;

@@ -5,7 +5,8 @@ var path = require("path"),
     dagre = require("../index");
 
 var graphBase = path.resolve(__dirname, "graphs");
-var totalCC = 0;
+var samples = [];
+var times = [];
 fs.readdirSync(graphBase).forEach(function(file) {
   if (/\.dot$/.test(file)) {
     var f = fs.readFileSync(path.resolve(graphBase, file), "UTF-8");
@@ -13,10 +14,22 @@ fs.readdirSync(graphBase).forEach(function(file) {
     dagre.layout.acyclic().run(g);
     dagre.layout.rank().run(g);
     dagre.layout()._normalize(g);
-    var layering = dagre.layout.order().run(g);
-    var cc = dagre.layout.order.crossCount(g, layering);
-    console.log(file + ": " + cc);
-    totalCC += cc;
+    var preLayering = dagre.layout.order()._initOrder(g);
+    var pre = dagre.layout.order.crossCount(g, preLayering);
+    if (pre !== 0) {
+      var start = new Date().getTime();
+      var postLayering = dagre.layout.order().run(g);
+      var end = new Date().getTime();
+      var post = dagre.layout.order.crossCount(g, postLayering);
+      var eff = (pre - post) / pre;
+      console.log(file + ": PRE: " + pre + " POST: " + post + " Efficiency: " + eff);
+      samples.push(eff);
+      times.push(end - start);
+    } else {
+      console.log(file + ": SKIPPING - 0 CROSSINGS");
+    }
   }
 });
-console.log("Total crossings: " + totalCC);
+console.log("# Graphs: " + samples.length);
+console.log("Reduction efficiency (larger is better): " + (dagre.util.sum(samples) / samples.length));
+console.log("Execution time: " + dagre.util.sum(times) + "ms (avg: " + Math.round(dagre.util.sum(times) / times.length) + "ms)");
