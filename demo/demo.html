@@ -261,7 +261,7 @@ function draw(nodeData, edgeData) {
   var layout = dagre.layout()
     .nodes(nodeData)
     .edges(edgeData)
-    .debugLevel(2)
+    .debugLevel(3)
     .run();
 
   if (debugAlignment) {

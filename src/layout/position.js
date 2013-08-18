@@ -189,18 +189,28 @@ dagre.layout.position = function() {
   // the original algorithm that is described in Carstens, "Node and Label
   // Placement in a Layered Layout Algorithm".
   function horizontalCompaction(g, layering, pos, root, align) {
-    var sink = {},  // Mapping of node id -> sink node id for class
-        shift = {}, // Mapping of sink node id -> x delta
-        pred = {},  // Mapping of node id -> predecessor node (or null)
-        xs = {};    // Calculated X positions
+    var sink = {},       // Mapping of node id -> sink node id for class
+        maybeShift = {}, // Mapping of sink node id -> { class node id, min shift }
+        shift = {},      // Mapping of sink node id -> shift
+        pred = {},       // Mapping of node id -> predecessor node (or null)
+        xs = {};         // Calculated X positions
 
     layering.forEach(function(layer) {
       layer.forEach(function(u, i) {
         sink[u] = u;
+        maybeShift[u] = {};
         if (i > 0)
           pred[u] = layer[i - 1];
       });
     });
+
+    function updateShift(toShift, neighbor, delta) {
+      if (!(neighbor in maybeShift[toShift])) {
+        maybeShift[toShift][neighbor] = delta;
+      } else {
+        maybeShift[toShift][neighbor] = Math.min(maybeShift[toShift][neighbor], delta);
+      }
+    }
 
     function placeBlock(v) {
       if (!(v in xs)) {
@@ -215,7 +225,7 @@ dagre.layout.position = function() {
             }
             var delta = sep(g, pred[w]) + sep(g, w);
             if (sink[v] !== sink[u]) {
-              shift[sink[u]] = Math.min(shift[sink[u]] || Number.POSITIVE_INFINITY, xs[v] - xs[u] - delta);
+              updateShift(sink[u], sink[v], xs[v] - xs[u] - delta);
             } else {
               xs[v] = Math.max(xs[v], xs[u] + delta);
             }
@@ -231,12 +241,29 @@ dagre.layout.position = function() {
     });
 
     // Absolute coordinates
+    // There is an assumption here that we've resolved shifts for any classes
+    // that begin at an earlier layer. We guarantee this by visiting layers in
+    // order.
     layering.forEach(function(layer) {
       layer.forEach(function(v) {
         xs[v] = xs[root[v]];
-        var xDelta = shift[sink[v]];
-        if (root[v] === v && xDelta < Number.POSITIVE_INFINITY)
-          xs[v] += xDelta;
+        if (v === root[v] && v === sink[v]) {
+          var minShift = 0;
+          if (v in maybeShift && Object.keys(maybeShift[v]).length > 0) {
+            minShift = min(Object.keys(maybeShift[v])
+                                 .map(function(u) {
+                                      return maybeShift[v][u] + (u in shift ? shift[u] : 0);
+                                      }
+                                 ));
+          }
+          shift[v] = minShift;
+        }
+      });
+    });
+
+    layering.forEach(function(layer) {
+      layer.forEach(function(v) {
+        xs[v] += shift[sink[root[v]]] || 0;
       });
     });
 
@@ -390,7 +417,7 @@ dagre.layout.position = function() {
         if (u) {
           var s = sep(g, u) + sep(g, v);
           if (xV - xU < s)
-            console.log("Position phase: sep violation. Align: " + align + ". Layer " + li + ". " +
+            console.log("Position phase: sep violation. Align: " + align + ". Layer: " + li + ". " +
               "U: " + u + " V: " + v + ". Actual sep: " + (xV - xU) + " Expected sep: " + s);
         }
         u = v;
