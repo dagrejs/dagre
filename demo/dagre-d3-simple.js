@@ -1,10 +1,11 @@
-var util = require("./lib/util");
+var util = require("./lib/util"),
+    dot = require("./lib/dot");
 
 /*
  * Render a pure graphviz definition to the svg specified by svg selector.
  */
 function renderDotToD3(graphDef, svgSelector) {
-  var result = dagre.dot.toObjects(graphDef);
+  var result = dot.toObjects(graphDef);
   renderDagreObjsToD3({nodes: result.nodes, edges: result.edges}, svgSelector);
 }
 
@@ -41,7 +42,7 @@ function renderJSObjsToD3(nodeData, edgeData, svgSelector) {
 }
 
 /*
- *  Render javscript objects to svg, as produced by  dagre.dot.
+ *  Render javscript objects to svg, as produced by  dot.
  */
 function renderDagreObjsToD3(graphData, svgSelector) {
   var nodeData = graphData.nodes;

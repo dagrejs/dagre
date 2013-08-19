@@ -2,7 +2,7 @@ require("../common");
 
 describe("dagre.layout.rank", function() {
   it("assigns rank 0 to a node in a singleton graph", function() {
-    var g = dagre.dot.toGraph("digraph { A }");
+    var g = dot.toGraph("digraph { A }");
 
     dagre.layout.rank().run(g);
 
@@ -10,7 +10,7 @@ describe("dagre.layout.rank", function() {
   });
 
   it("assigns successive ranks to succesors", function() {
-    var g = dagre.dot.toGraph("digraph { A -> B }");
+    var g = dot.toGraph("digraph { A -> B }");
 
     dagre.layout.rank().run(g);
 
@@ -21,7 +21,7 @@ describe("dagre.layout.rank", function() {
   it("assigns the minimum rank that satisfies all in-edges", function() {
     // Note that C has in-edges from A and B, so it should be placed at a rank
     // below both of them.
-    var g = dagre.dot.toGraph("digraph { A -> B; B -> C; A -> C }");
+    var g = dot.toGraph("digraph { A -> B; B -> C; A -> C }");
 
     dagre.layout.rank().run(g);
 
@@ -31,7 +31,7 @@ describe("dagre.layout.rank", function() {
   });
 
   it("uses an edge's minLen attribute to determine rank", function() {
-    var g = dagre.dot.toGraph("digraph { A -> B [minLen=2] }");
+    var g = dot.toGraph("digraph { A -> B [minLen=2] }");
 
     dagre.layout.rank().run(g);
 

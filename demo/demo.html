@@ -122,7 +122,8 @@ digraph {
 <script src="http://d3js.org/d3.v2.min.js"></script>
 <script src="../dagre.js"></script>
 <script>
-  var util = require("./lib/util");
+  var util = require("./lib/util"),
+      dot = require("./lib/dot");
 </script>
 
 <script>
@@ -183,7 +184,7 @@ function tryDraw() {
     oldInputGraphValue = inputGraph.value;
     oldInputStyleValue = inputStyle.node().value;
     try {
-      result = dagre.dot.toObjects(inputGraph.value);
+      result = dot.toObjects(inputGraph.value);
       result.edges.forEach(function(e) { if (!e.label) { e.label = ""; } });
     } catch (e) {
       throw e;

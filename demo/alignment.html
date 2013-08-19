@@ -97,6 +97,9 @@ digraph {
 
 <script src="http://d3js.org/d3.v2.min.js"></script>
 <script src="../dagre.js"></script>
+<script>
+  var dot = require("./lib/dot");
+</script>
 
 <script>
 var svg = d3.select("svg");
@@ -188,7 +191,7 @@ function tryDraw() {
     inputGraph.setAttribute("class", "");
     oldInputGraphValue = inputGraph.value;
     try {
-      result = dagre.dot.toObjects(inputGraph.value);
+      result = dot.toObjects(inputGraph.value);
       result.edges.forEach(function(e) { if (!e.label) { e.label = ""; } });
     } catch (e) {
       inputGraph.setAttribute("class", "error");
