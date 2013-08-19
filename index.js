@@ -1,2 +1,2 @@
-require('./dagre.js');
+require('./dagre-old.js');
 module.exports = dagre;

@@ -19,6 +19,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+var util = require('./lib/util');
+
 dagre.dot = {};
 
 dagre.dot.toGraph = function(str) {
@@ -40,7 +42,7 @@ dagre.dot.toGraph = function(str) {
       }
     }
     if (attrs) {
-      mergeAttributes(attrs, g.node(id));
+      util.mergeAttributes(attrs, g.node(id));
     }
   }
 
@@ -55,8 +57,8 @@ dagre.dot.toGraph = function(str) {
 
     var id = attrs.id || edgeKey + "-" + count;
     var edge = {};
-    mergeAttributes(defaultAttrs.get("edge", attrs), edge);
-    mergeAttributes({ id: id }, edge);
+    util.mergeAttributes(defaultAttrs.get("edge", attrs), edge);
+    util.mergeAttributes({ id: id }, edge);
     g.addEdge(id, source, target, edge);
   }
 
@@ -96,9 +98,9 @@ dagre.dot.toGraph = function(str) {
       if (typeof this._default[type] !== "undefined") {
         var mergedAttrs = {};
         // clone default attributes so they won't get overwritten in the next step
-        mergeAttributes(this._default[type], mergedAttrs);
+        util.mergeAttributes(this._default[type], mergedAttrs);
         // merge statement attributes with default attributes, precedence give to stmt attributes
-        mergeAttributes(attrs, mergedAttrs);
+        util.mergeAttributes(attrs, mergedAttrs);
         return mergedAttrs;
       } else {
         return attrs;

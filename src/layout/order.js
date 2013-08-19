@@ -19,19 +19,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
+var util = require("./lib/util");
+
 dagre.layout.order = function() {
   var config = {
     iterations: 24, // max number of iterations
     debugLevel: 0
   };
 
-  var timer = createTimer();
+  var timer = util.createTimer();
 
   var self = {};
 
-  self.iterations = propertyAccessor(self, config, "iterations");
+  self.iterations = util.propertyAccessor(self, config, "iterations");
 
-  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
+  self.debugLevel = util.propertyAccessor(self, config, "debugLevel", function(x) {
     timer.enabled(x);
   });
 
@@ -164,7 +167,7 @@ dagre.layout.order = function() {
       var vs = neighbors(u);
       var b = -1;
       if (vs.length > 0)
-        b = sum(vs.map(function(v) { return weights[v]; })) / vs.length;
+        b = util.sum(vs.map(function(v) { return weights[v]; })) / vs.length;
       bs[u] = b;
     });
 

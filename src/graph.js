@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+var util = require("./lib/util");
+
 /*
  * Directed multi-graph used during layout.
  */
@@ -146,7 +148,7 @@ dagre.graph = function() {
       graph.eachEdge(function(id) { es.push(id); });
       return es;
     } else if (arguments.length === 1) {
-      return union([graph.inEdges(u), graph.outEdges(u)]);
+      return util.union([graph.inEdges(u), graph.outEdges(u)]);
     } else if (arguments.length === 2) {
       strictGetNode(u);
       strictGetNode(v);
@@ -168,7 +170,7 @@ dagre.graph = function() {
    */
   graph.inEdges = function(target) {
     strictGetNode(target);
-    return concat(values(inEdges[target]).map(function(es) { return Object.keys(es.edges); }));
+    return util.concat(util.values(inEdges[target]).map(function(es) { return Object.keys(es.edges); }));
   };
 
   /*
@@ -176,7 +178,7 @@ dagre.graph = function() {
    */
   graph.outEdges = function(source) {
     strictGetNode(source);
-    return concat(values(outEdges[source]).map(function(es) { return Object.keys(es.edges); }));
+    return util.concat(util.values(outEdges[source]).map(function(es) { return Object.keys(es.edges); }));
   };
 
   graph.subgraph = function(us) {
@@ -184,7 +186,7 @@ dagre.graph = function() {
     us.forEach(function(u) {
       g.addNode(u, graph.node(u));
     });
-    values(edges).forEach(function(e) {
+    util.values(edges).forEach(function(e) {
       if (g.hasNode(e.source) && g.hasNode(e.target)) {
         g.addEdge(e.id, e.source, e.target, graph.edge(e.id));
       }

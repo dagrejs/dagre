@@ -19,17 +19,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
+var util = require("./lib/util"),
+    priorityQueue = require("./lib/priorityQueue");
+
 dagre.layout.rank = function() {
   // External configuration
   var config = {
     debugLevel: 0
   };
 
-  var timer = createTimer();
+  var timer = util.createTimer();
 
   var self = {};
 
-  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
+  self.debugLevel = util.propertyAccessor(self, config, "debugLevel", function(x) {
     timer.enabled(x);
   });
 
@@ -39,7 +43,7 @@ dagre.layout.rank = function() {
 
   function run(g) {
     initRank(g);
-    components(g).forEach(function(cmpt) {
+    util.components(g).forEach(function(cmpt) {
       var subgraph = g.subgraph(cmpt);
     /*
       feasibleTree(subgraph);
@@ -106,7 +110,7 @@ dagre.layout.rank = function() {
   }
 
   function normalize(g) {
-    var m = min(g.nodes().map(function(u) { return g.node(u).rank; }));
+    var m = util.min(g.nodes().map(function(u) { return g.node(u).rank; }));
     g.eachNode(function(u, node) { node.rank -= m; });
   }
 

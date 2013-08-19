@@ -19,6 +19,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
+var util = require("./lib/util");
+
 dagre.layout = function() {
   // External configuration
   var config = {
@@ -30,7 +33,7 @@ dagre.layout = function() {
       debugLevel: 0,
   };
 
-  var timer = createTimer();
+  var timer = util.createTimer();
 
   // Phase functions
   var
@@ -42,8 +45,8 @@ dagre.layout = function() {
   // This layout object
   var self = {};
 
-  self.nodes = propertyAccessor(self, config, "nodes");
-  self.edges = propertyAccessor(self, config, "edges");
+  self.nodes = util.propertyAccessor(self, config, "nodes");
+  self.edges = util.propertyAccessor(self, config, "edges");
 
   self.orderIters = delegateProperty(order.iterations);
 
@@ -54,7 +57,7 @@ dagre.layout = function() {
   self.rankDir = delegateProperty(position.rankDir);
   self.debugAlignment = delegateProperty(position.debugAlignment);
 
-  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
+  self.debugLevel = util.propertyAccessor(self, config, "debugLevel", function(x) {
     timer.enabled(x);
     acyclic.debugLevel(x);
     rank.debugLevel(x);

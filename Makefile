@@ -1,5 +1,6 @@
 NODE?=node
 NPM?=npm
+BROWSERIFY?=node_modules/browserify/bin/cmd.js
 PEGJS?=node_modules/pegjs/bin/pegjs
 MOCHA?=node_modules/mocha/bin/mocha
 MOCHA_OPTS?=--recursive
@@ -8,7 +9,7 @@ JS_COMPILER_OPTS?=--no-seqs
 
 all: package.json dagre.js dagre.min.js
 
-.INTERMEDIATE dagre.js: \
+.INTERMEDIATE dagre-old.js: \
 	src/pre.js \
 	src/version.js \
 	src/graph.js \
@@ -17,20 +18,21 @@ all: package.json dagre.js dagre.min.js
 	src/layout/rank.js \
 	src/layout/order.js \
 	src/layout/position.js \
-	src/util.js \
-	src/priority-queue.js \
 	src/dot.js \
 	src/dot-grammar.js \
 	src/post.js
 
+dagre-old.js: Makefile node_modules
+	@rm -f $@
+	cat $(filter %.js, $^) > $@
+	@chmod a-w $@
+
+dagre.js: dagre-old.js
+	$(BROWSERIFY) -r ./lib/util index.js > dagre.js
+
 dagre.min.js: dagre.js
 	@rm -f $@
 	$(JS_COMPILER) $(JS_COMPILER_OPTS) dagre.js > $@
-	@chmod a-w $@
-
-dagre.js: Makefile node_modules
-	@rm -f $@
-	cat $(filter %.js, $^) > $@
 	@chmod a-w $@
 
 src/dot-grammar.js: src/dot-grammar.pegjs node_modules

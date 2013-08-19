@@ -19,6 +19,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
+var util = require("./lib/util");
+
 /*
  * The algorithms here are based on Brandes and Köpf, "Fast and Simple
  * Horizontal Coordinate Assignment".
@@ -34,19 +37,19 @@ dagre.layout.position = function() {
     debugLevel: 0
   };
 
-  var timer = createTimer();
+  var timer = util.createTimer();
 
   var self = {};
 
-  self.nodeSep = propertyAccessor(self, config, "nodeSep");
-  self.edgeSep = propertyAccessor(self, config, "edgeSep");
+  self.nodeSep = util.propertyAccessor(self, config, "nodeSep");
+  self.edgeSep = util.propertyAccessor(self, config, "edgeSep");
   // If not null this separation value is used for all nodes and edges
   // regardless of their widths. `nodeSep` and `edgeSep` are ignored with this
   // option.
-  self.universalSep = propertyAccessor(self, config, "universalSep");
-  self.rankSep = propertyAccessor(self, config, "rankSep");
-  self.rankDir = propertyAccessor(self, config, "rankDir");
-  self.debugLevel = propertyAccessor(self, config, "debugLevel", function(x) {
+  self.universalSep = util.propertyAccessor(self, config, "universalSep");
+  self.rankSep = util.propertyAccessor(self, config, "rankSep");
+  self.rankDir = util.propertyAccessor(self, config, "rankDir");
+  self.debugLevel = util.propertyAccessor(self, config, "debugLevel", function(x) {
     timer.enabled(x);
   });
 
@@ -97,13 +100,13 @@ dagre.layout.position = function() {
     });
 
     // Translate layout so left edge of bounding rectangle has coordinate 0
-    var minX = min(g.nodes().map(function(u) { return x(g, u) - width(g, u) / 2; }));
+    var minX = util.min(g.nodes().map(function(u) { return x(g, u) - width(g, u) / 2; }));
     g.eachNode(function(u) { x(g, u, x(g, u) - minX); });
 
     // Align y coordinates with ranks
     var posY = 0;
     layering.forEach(function(layer) {
-      var maxHeight = max(layer.map(function(u) { return height(g, u); }));
+      var maxHeight = util.max(layer.map(function(u) { return height(g, u); }));
       posY += maxHeight / 2;
       layer.forEach(function(u) { y(g, u, posY); });
       posY += maxHeight / 2 + config.rankSep;
@@ -257,7 +260,7 @@ dagre.layout.position = function() {
     }
 
     // Root coordinates relative to sink
-    values(root).forEach(function(v) {
+    util.values(root).forEach(function(v) {
       placeBlock(v);
     });
 
@@ -271,7 +274,7 @@ dagre.layout.position = function() {
         if (v === root[v] && v === sink[v]) {
           var minShift = 0;
           if (v in maybeShift && Object.keys(maybeShift[v]).length > 0) {
-            minShift = min(Object.keys(maybeShift[v])
+            minShift = util.min(Object.keys(maybeShift[v])
                                  .map(function(u) {
                                       return maybeShift[v][u] + (u in shift ? shift[u] : 0);
                                       }
@@ -292,14 +295,14 @@ dagre.layout.position = function() {
   }
 
   function findMinCoord(g, layering, xs) {
-    return min(layering.map(function(layer) {
+    return util.min(layering.map(function(layer) {
       var u = layer[0];
       return xs[u];
     }));
   }
 
   function findMaxCoord(g, layering, xs) {
-    return max(layering.map(function(layer) {
+    return util.max(layering.map(function(layer) {
       var u = layer[layer.length - 1];
       return xs[u];
     }));

@@ -20,10 +20,11 @@ sys.puts(JSON.stringify({
     "graph"
   ],
   devDependencies: {
-    pegjs: "0.7.x",
-    mocha: "1.5.x",
+    browserify: "2.28.x",
     chai: "1.3.x",
-    "uglify-js": "1.2.3"
+    mocha: "1.5.x",
+    pegjs: "0.7.x",
+    "uglify-js": "1.2.3",
   },
   author: "Chris Pettitt <chris@samsarin.com>",
   repository: {

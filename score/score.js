@@ -2,7 +2,8 @@
 
 var path = require("path"),
     fs = require("fs"),
-    dagre = require("../index");
+    dagre = require("../index"),
+    util = require("../lib/util");
 
 var graphBase = path.resolve(__dirname, "graphs");
 var samples = [];
@@ -31,5 +32,5 @@ fs.readdirSync(graphBase).forEach(function(file) {
   }
 });
 console.log("# Graphs: " + samples.length);
-console.log("Reduction efficiency (larger is better): " + (dagre.util.sum(samples) / samples.length));
-console.log("Execution time: " + dagre.util.sum(times) + "ms (avg: " + Math.round(dagre.util.sum(times) / times.length) + "ms)");
+console.log("Reduction efficiency (larger is better): " + (util.sum(samples) / samples.length));
+console.log("Execution time: " + util.sum(times) + "ms (avg: " + Math.round(util.sum(times) / times.length) + "ms)");

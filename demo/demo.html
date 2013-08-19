@@ -121,6 +121,9 @@ digraph {
 
 <script src="http://d3js.org/d3.v2.min.js"></script>
 <script src="../dagre.js"></script>
+<script>
+  var util = require("./lib/util");
+</script>
 
 <script>
 // Input related code goes here
@@ -428,8 +431,8 @@ function update() {
     .selectAll("path")
     .attr("d", function(d) {
       var points = d.dagre.points.slice(0);
-      var source = dagre.util.intersectRect(d.source.dagre, points[0]);
-      var target = dagre.util.intersectRect(d.target.dagre, points[points.length - 1]);
+      var source = util.intersectRect(d.source.dagre, points[0]);
+      var target = util.intersectRect(d.target.dagre, points[points.length - 1]);
       points.unshift(source);
       points.push(target);
       return d3.svg.line()
