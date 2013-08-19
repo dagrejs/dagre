@@ -57,8 +57,6 @@ function concat(arrays) {
   return Array.prototype.concat.apply([], arrays);
 }
 
-var keys = dagre.util.keys = Object.keys;
-
 /*
  * Returns an array of all values in the given object.
  */

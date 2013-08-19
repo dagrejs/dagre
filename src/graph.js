@@ -105,20 +105,20 @@ dagre.graph = function() {
 
   graph.successors = function(u) {
     strictGetNode(u);
-    return keys(outEdges[u]).map(function(v) { return nodes[v].id; });
+    return Object.keys(outEdges[u]).map(function(v) { return nodes[v].id; });
   };
 
   graph.predecessors = function(u) {
     strictGetNode(u);
-    return keys(inEdges[u]).map(function(v) { return nodes[v].id; });
+    return Object.keys(inEdges[u]).map(function(v) { return nodes[v].id; });
   };
 
   graph.neighbors = function(u) {
     strictGetNode(u);
     var vs = {};
-    keys(outEdges[u]).map(function(v) { vs[v] = true; });
-    keys(inEdges[u]).map(function(v) { vs[v] = true; });
-    return keys(vs).map(function(v) { return nodes[v].id; });
+    Object.keys(outEdges[u]).map(function(v) { vs[v] = true; });
+    Object.keys(inEdges[u]).map(function(v) { vs[v] = true; });
+    return Object.keys(vs).map(function(v) { return nodes[v].id; });
   };
 
   graph.nodes = function() {
@@ -151,7 +151,7 @@ dagre.graph = function() {
       strictGetNode(u);
       strictGetNode(v);
       sourceEdges = outEdges[u];
-      es = (v in sourceEdges) ? keys(sourceEdges[v].edges) : [];
+      es = (v in sourceEdges) ? Object.keys(sourceEdges[v].edges) : [];
       return es.map(function(e) { return edges[e].id; });
     }
   };
@@ -168,7 +168,7 @@ dagre.graph = function() {
    */
   graph.inEdges = function(target) {
     strictGetNode(target);
-    return concat(values(inEdges[target]).map(function(es) { return keys(es.edges); }));
+    return concat(values(inEdges[target]).map(function(es) { return Object.keys(es.edges); }));
   };
 
   /*
@@ -176,7 +176,7 @@ dagre.graph = function() {
    */
   graph.outEdges = function(source) {
     strictGetNode(source);
-    return concat(values(outEdges[source]).map(function(es) { return keys(es.edges); }));
+    return concat(values(outEdges[source]).map(function(es) { return Object.keys(es.edges); }));
   };
 
   graph.subgraph = function(us) {
@@ -195,11 +195,11 @@ dagre.graph = function() {
   graph.toString = function() {
     var str = "GRAPH:\n";
     str += "    Nodes:\n";
-    keys(nodes).forEach(function(u) {
+    Object.keys(nodes).forEach(function(u) {
       str += "        " + u + ": " + JSON.stringify(nodes[u].value) + "\n";
     });
     str += "    Edges:\n";
-    keys(edges).forEach(function(e) {
+    Object.keys(edges).forEach(function(e) {
       var edge = edges[e];
       str += "        " + e + " (" + edge.source + " -> " + edge.target + "): " + JSON.stringify(edges[e].value) + "\n";
     });

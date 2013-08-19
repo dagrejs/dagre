@@ -79,7 +79,7 @@ dagre.dot.toGraph = function(str) {
           break;
       }
     }
-    return dagre.util.keys(ids);
+    return Object.keys(ids);
   }
 
   /*
