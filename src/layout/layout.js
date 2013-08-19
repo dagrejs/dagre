@@ -20,7 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-var util = require("./lib/util");
+var util = require("./lib/util"),
+    graph = require("./lib/graph");
 
 dagre.layout = function() {
   // External configuration
@@ -85,7 +86,7 @@ dagre.layout = function() {
    * the original nodes and edges passed in via config.
    */
   function buildAdjacencyGraph() {
-    var g = dagre.graph();
+    var g = graph();
     var nextId = 0;
 
     // Get the node id for the type ("source" or "target") or throw if we

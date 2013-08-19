@@ -12,7 +12,6 @@ all: package.json dagre.js dagre.min.js
 .INTERMEDIATE dagre-old.js: \
 	src/pre.js \
 	src/version.js \
-	src/graph.js \
 	src/layout/layout.js \
 	src/layout/acyclic.js \
 	src/layout/rank.js \
@@ -54,4 +53,4 @@ score: dagre.js
 	$(NODE) score/score.js
 
 clean:
-	rm -f dagre.js package.json dagre.min.js
+	rm -f dagre.js package.json dagre.min.js dagre-old.js

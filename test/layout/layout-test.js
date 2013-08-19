@@ -2,7 +2,7 @@ require("../common");
 
 describe("dagre.layout", function() {
   it("preserves edge ids for graphs with edges spanning multiple ranks", function() {
-    var g = dagre.graph();
+    var g = graph();
     g.addNode(1);
     g.addNode(2);
     g.addNode(3);

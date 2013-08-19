@@ -1,4 +1,6 @@
-var util = require("../lib/util");
+var util = require("../lib/util"),
+    graph = require("../lib/graph");
+
 require("./common");
 
 var assert2 = require("assert");
@@ -15,7 +17,7 @@ describe("util.sum", function() {
 
 describe("util.components", function() {
   it("returns all nodes in a connected graph", function() {
-    var g = dagre.graph();
+    var g = graph();
     [1, 2, 3].forEach(function(u) { g.addNode(u); });
     g.addEdge("A", 1, 2);
     g.addEdge("B", 2, 3);
@@ -25,7 +27,7 @@ describe("util.components", function() {
   });
 
   it("returns maximal subsets of connected nodes", function() {
-    var g = dagre.graph();
+    var g = graph();
     [1, 2, 3, 4, 5, 6].forEach(function(u) { g.addNode(u); });
     g.addEdge("A", 1, 2);
     g.addEdge("B", 2, 3);
@@ -39,7 +41,7 @@ describe("util.components", function() {
 
 describe("util.prim", function() {
   it("returns a deterministic minimal spanning tree", function() {
-    var g = dagre.graph();
+    var g = graph();
     [1, 2, 3, 4].forEach(function(u) { g.addNode(u); });
     g.addEdge("12", 1, 2);
     g.addEdge("13", 1, 3);
@@ -53,7 +55,7 @@ describe("util.prim", function() {
   });
 
   it("returns a single field for a single node graph", function() {
-    var g = dagre.graph();
+    var g = graph();
     g.addNode(1);
     assert.deepEqual({1: []}, util.prim(g));
   });

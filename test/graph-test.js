@@ -4,7 +4,7 @@ describe("graph", function() {
   var g;
 
   beforeEach(function() {
-    g = dagre.graph();
+    g = graph();
   });
 
   describe("empty graph", function() {
@@ -213,7 +213,7 @@ describe("graph", function() {
 
   describe("subgraph", function() {
     it("returns a graph containing a subset of nodes", function() {
-      var g = dagre.graph();
+      var g = graph();
       [1,2,3].forEach(function(u) { g.addNode(u); });
       g.addEdge("a", 1, 2);
       g.addEdge("b", 2, 3);
@@ -224,7 +224,7 @@ describe("graph", function() {
     });
 
     it("includes each node's value in the subgraph", function() {
-      var g = dagre.graph();
+      var g = graph();
       [1,2,3].forEach(function(u) { g.addNode(u, "V" + u); });
       g.addEdge("a", 1, 2);
       g.addEdge("b", 2, 3);
@@ -235,7 +235,7 @@ describe("graph", function() {
     });
 
     it("includes each edge's value in the subgraph", function() {
-      var g = dagre.graph();
+      var g = graph();
       [1,2,3].forEach(function(u) { g.addNode(u); });
       g.addEdge("a", 1, 2, "VA");
       g.addEdge("b", 2, 3);

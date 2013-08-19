@@ -19,13 +19,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-var util = require('./lib/util');
+var util = require("./lib/util"),
+    graph = require("./lib/graph");
 
 dagre.dot = {};
 
 dagre.dot.toGraph = function(str) {
   var parseTree = dot_parser.parse(str);
-  var g = dagre.graph();
+  var g = graph();
   var undir = parseTree.type === "graph";
 
   function createNode(id, attrs) {
