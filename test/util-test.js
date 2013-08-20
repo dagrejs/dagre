@@ -1,4 +1,4 @@
-  var util = require("../lib/util"),
+var util = require("../lib/util"),
     graph = require("../lib/graph");
 
 require("./common");
