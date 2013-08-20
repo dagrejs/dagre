@@ -6,3 +6,7 @@ graph = require("../lib/graph");
 dot = require("../lib/dot");
 
 chai.Assertion.includeStack = true;
+
+exports.requireSrc = function(path) {
+  return require(__dirname + "/../" + path);
+};

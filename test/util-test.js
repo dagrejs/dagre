@@ -1,9 +1,7 @@
-var util = require("../lib/util"),
-    graph = require("../lib/graph");
-
-require("./common");
-
-var assert2 = require("assert");
+var common = require("./common"),
+    assert2 = require("assert"),
+    util = common.requireSrc("./lib/util"),
+    graph = common.requireSrc("./lib/graph");
 
 describe("util.sum", function() {
   it("returns the sum of all elements in the array", function() {
