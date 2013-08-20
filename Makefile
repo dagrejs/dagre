@@ -9,7 +9,7 @@ JS_COMPILER_OPTS?=--no-seqs
 
 all: package.json dagre.js dagre.min.js
 
-.INTERMEDIATE dagre.js: lib/dot-grammar.js 
+.INTERMEDIATE dagre.js: lib/dot-grammar.js
 dagre.js: Makefile index.js node_modules
 	@rm -f $@
 	$(BROWSERIFY) browser.js > dagre.js
@@ -31,10 +31,12 @@ package.json: lib/version.js package.js
 	$(NODE) package.js > $@
 
 .PHONY: test
+.INTERMEDIATE test: lib/dot-grammar.js
 test: dagre.js
 	$(MOCHA) $(MOCHA_OPTS)
 
 .PHONY: score
+.INTERMEDIATE score: lib/dot-grammar.js
 score: dagre.js
 	$(NODE) score/score.js
 
