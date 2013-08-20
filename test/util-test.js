@@ -1,9 +1,7 @@
-var util = require("../lib/util"),
+  var util = require("../lib/util"),
     graph = require("../lib/graph");
 
 require("./common");
-
-var assert2 = require("assert");
 
 describe("util.sum", function() {
   it("returns the sum of all elements in the array", function() {
@@ -34,7 +32,7 @@ describe("util.components", function() {
     g.addEdge("C", 4, 5);
 
     var cmpts = util.components(g).sort(function(x, y) { return y.length - x.length; });
-    assert2.deepEqual(cmpts.map(function(cmpt) { return cmpt.sort(); }),
+    assert.deepEqual(cmpts.map(function(cmpt) { return cmpt.sort(); }),
                      [[1, 2, 3], [4, 5], [6]]);
   });
 });
