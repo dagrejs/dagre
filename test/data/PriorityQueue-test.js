@@ -1,8 +1,8 @@
-var common = require("../common");
+var common = require("../common"),
+    assert = require("chai").assert,
+    PriorityQueue = common.requireSrc("./lib/data/PriorityQueue");
 
-var PriorityQueue = common.requireSrc("./lib/data/PriorityQueue");
-
-describe("PriorityQueue", function() {
+describe("data/PriorityQueue", function() {
   var pq;
   beforeEach(function() {
     pq = new PriorityQueue();

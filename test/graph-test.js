@@ -1,4 +1,6 @@
-require("./common");
+var common = require("./common"),
+    assert = require("chai").assert,
+    graph = common.requireSrc("./lib/graph");
 
 describe("graph", function() {
   var g;

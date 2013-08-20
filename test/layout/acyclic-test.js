@@ -1,6 +1,7 @@
-require("../common");
-
-var acyclic = require("../../lib/layout/acyclic");
+var common = require("../common"),
+    assert = require("chai").assert,
+    dot = common.requireSrc("./lib/dot"),
+    acyclic = common.requireSrc("./lib/layout/acyclic");
 
 describe("acyclic", function() {
   it("does not change acyclic graphs", function() {

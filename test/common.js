@@ -1,10 +1,4 @@
-self = {};
-
-chai = require("chai");
-assert = chai.assert;
-graph = require("../lib/graph");
-dot = require("../lib/dot");
-
+var chai = require("chai");
 chai.Assertion.includeStack = true;
 
 exports.requireSrc = function(path) {
