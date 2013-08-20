@@ -1,3 +1,5 @@
+require('./common')
+
 describe("dot.toGraph", function() {
   it("allows an empty label", function() {
     var g = dot.toGraph("digraph { a [label=\"\"]; }");
