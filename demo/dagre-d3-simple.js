@@ -1,5 +1,6 @@
 var util = require("./lib/util"),
-    dot = require("./lib/dot");
+    dot = require("./lib/dot"),
+    dagre = { layout: require("./lib/layout/layout") };
 
 /*
  * Render a pure graphviz definition to the svg specified by svg selector.

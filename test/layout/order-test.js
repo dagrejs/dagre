@@ -1,10 +1,12 @@
 require("../common");
 
-describe("dagre.layout.order", function() {
+var order = require("../../lib/layout/order");
+
+describe("order", function() {
   it("sets order = 0 for a single node", function() {
     var g = dot.toGraph("digraph { A [rank=0] }");
 
-    dagre.layout.order().run(g);
+    order().run(g);
 
     assert.equal(g.node("A").order, 0);
   });
@@ -12,7 +14,7 @@ describe("dagre.layout.order", function() {
   it("sets order = 0 for 2 connected nodes on different ranks", function() {
     var g = dot.toGraph("digraph { A [rank=0]; B [rank=1]; A -> B }");
 
-    dagre.layout.order().run(g);
+    order().run(g);
 
     assert.equal(g.node("A").order, 0);
     assert.equal(g.node("B").order, 0);
@@ -21,7 +23,7 @@ describe("dagre.layout.order", function() {
   it("sets order = 0 for 2 unconnected nodes on different ranks", function() {
     var g = dot.toGraph("digraph { A [rank=0]; B [rank=1]; }");
 
-    dagre.layout.order().run(g);
+    order().run(g);
 
     assert.equal(g.node("A").order, 0);
     assert.equal(g.node("B").order, 0);
@@ -30,7 +32,7 @@ describe("dagre.layout.order", function() {
   it("sets order = 0, 1 for 2 nodes on the same rank", function() {
     var g = dot.toGraph("digraph { A [rank=0]; B [rank=0]; }");
 
-    dagre.layout.order().run(g);
+    order().run(g);
 
     if (g.node("A").order === 0) {
       assert.equal(g.node("B").order, 1);
@@ -46,9 +48,9 @@ describe("dagre.layout.order", function() {
                   "A -> D; B -> C; }";
       var g = dot.toGraph(str);
 
-      var layering = dagre.layout.order().run(g);
+      var layering = order().run(g);
 
-      assert.equal(dagre.layout.order.crossCount(g, layering), 0);
+      assert.equal(order().crossCount(g, layering), 0);
     });
 
     it("graph2", function() {
@@ -56,9 +58,9 @@ describe("dagre.layout.order", function() {
                   "A -> D; B -> D; B -> E; C -> D; C -> E }";
       var g = dot.toGraph(str);
 
-      var layering = dagre.layout.order().run(g);
+      var layering = order().run(g);
 
-      assert.equal(dagre.layout.order.crossCount(g, layering), 1);
+      assert.equal(order().crossCount(g, layering), 1);
     });
 
     it("graph3", function() {
@@ -68,20 +70,20 @@ describe("dagre.layout.order", function() {
                   "A -> E; B -> D; C -> F; D -> I; E -> H; F -> G }";
       var g = dot.toGraph(str);
 
-      var layering = dagre.layout.order().run(g);
+      var layering = order().run(g);
 
-      assert.equal(dagre.layout.order.crossCount(g, layering), 0);
+      assert.equal(order().crossCount(g, layering), 0);
     });
   });
 });
 
-describe("dagre.layout.order.bilayerCrossCount", function() {
+describe("order().bilayerCrossCount", function() {
   it("calculates 0 crossings for an empty graph", function() {
     var g = dot.toGraph("digraph {}");
     var layer1 = [];
     var layer2 = [];
 
-    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 0);
+    assert.equal(order().bilayerCrossCount(g, layer1, layer2), 0);
   });
 
   it("calculates 0 crossings for 2 layers with no crossings", function() {
@@ -89,7 +91,7 @@ describe("dagre.layout.order.bilayerCrossCount", function() {
     var layer1 = [11, 12, 13];
     var layer2 = [21, 22, 23];
 
-    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 0);
+    assert.equal(order().bilayerCrossCount(g, layer1, layer2), 0);
   });
 
   it("calculates the correct number of crossings 1", function() {
@@ -98,7 +100,7 @@ describe("dagre.layout.order.bilayerCrossCount", function() {
     var layer1 = [11, 12, 13];
     var layer2 = [21, 22];
 
-    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 1);
+    assert.equal(order().bilayerCrossCount(g, layer1, layer2), 1);
   });
 
   it("calculates the correct number of crossings 2", function() {
@@ -107,6 +109,6 @@ describe("dagre.layout.order.bilayerCrossCount", function() {
     var layer1 = [11, 12, 13];
     var layer2 = [21, 22];
 
-    assert.equal(dagre.layout.order.bilayerCrossCount(g, layer1, layer2), 3);
+    assert.equal(order().bilayerCrossCount(g, layer1, layer2), 3);
   });
 });

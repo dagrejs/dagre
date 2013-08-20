@@ -12,11 +12,6 @@ all: package.json dagre.js dagre.min.js
 .INTERMEDIATE dagre-old.js: \
 	src/pre.js \
 	src/version.js \
-	src/layout/layout.js \
-	src/layout/acyclic.js \
-	src/layout/rank.js \
-	src/layout/order.js \
-	src/layout/position.js \
 	src/dot-grammar.js \
 	src/post.js
 
@@ -26,7 +21,7 @@ dagre-old.js: Makefile node_modules
 	@chmod a-w $@
 
 dagre.js: dagre-old.js
-	$(BROWSERIFY) -r ./lib/util -r ./lib/dot index.js > dagre.js
+	$(BROWSERIFY) -r ./lib/util -r ./lib/dot -r ./lib/layout/layout index.js > dagre.js
 
 dagre.min.js: dagre.js
 	@rm -f $@

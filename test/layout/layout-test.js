@@ -1,6 +1,8 @@
 require("../common");
 
-describe("dagre.layout", function() {
+var layout = require("../../lib/layout/layout");
+
+describe("layout", function() {
   it("preserves edge ids for graphs with edges spanning multiple ranks", function() {
     var g = graph();
     g.addNode(1);
@@ -9,7 +11,7 @@ describe("dagre.layout", function() {
     g.addEdge("1->2", 1, 2);
     g.addEdge("2->3", 2, 3);
     g.addEdge("1->3", 1, 3);
-    dagre.layout.apply(g);
+    layout.apply(g);
     assert.include(g.edges(), "1->3");
   });
 
@@ -17,7 +19,7 @@ describe("dagre.layout", function() {
     var nodes = [{width: 10, height: 10}, {width: 10, height: 10}];
     var edges = [{source: nodes[0], target: nodes[1]}];
 
-    dagre.layout()
+    layout()
       .nodes(nodes)
       .edges(edges)
       .run();

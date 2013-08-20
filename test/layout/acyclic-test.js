@@ -1,9 +1,11 @@
 require("../common");
 
-describe("dagre.layout.acyclic", function() {
+var acyclic = require("../../lib/layout/acyclic");
+
+describe("acyclic", function() {
   it("does not change acyclic graphs", function() {
     var g = dot.toGraph("digraph { A -> B; C }");
-    dagre.layout.acyclic().run(g);
+    acyclic().run(g);
     assert.deepEqual(g.nodes().sort(), ["A", "B", "C"]);
     assert.deepEqual(g.successors("A"), ["B"]);
   });
@@ -11,7 +13,7 @@ describe("dagre.layout.acyclic", function() {
   it("reverses edges to make the graph acyclic", function() {
     var g = dot.toGraph("digraph { A -> B [id=\"AB\"]; B -> A [id=\"BA\"] }");
     assert.isFalse(isAcyclic(g));
-    dagre.layout.acyclic().run(g);
+    acyclic().run(g);
     assert.deepEqual(g.nodes().sort(), ["A", "B"]);
     assert.notEqual(g.source("AB"), g.target("AB"));
     assert.equal(g.target("AB"), g.target("BA"));
@@ -21,8 +23,8 @@ describe("dagre.layout.acyclic", function() {
 
   it("is a reversible process", function() {
     var g = dot.toGraph("digraph { A -> B [id=\"AB\"]; B -> A [id=\"BA\"] }");
-    dagre.layout.acyclic().run(g);
-    dagre.layout.acyclic().undo(g);
+    acyclic().run(g);
+    acyclic().undo(g);
     assert.deepEqual(g.nodes().sort(), ["A", "B"]);
     assert.equal(g.source("AB"), "A");
     assert.equal(g.target("AB"), "B");
@@ -33,7 +35,7 @@ describe("dagre.layout.acyclic", function() {
   it("works for multiple cycles", function() {
     var g = dot.toGraph("digraph { A -> B -> A; B -> C; C -> D -> E -> C; E -> F; F -> A; G -> C; G -> H -> G; E -> H }");
     assert.isFalse(isAcyclic(g));
-    dagre.layout.acyclic().run(g);
+    acyclic().run(g);
     assert.isTrue(isAcyclic(g));
   });
 
