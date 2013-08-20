@@ -1,12 +1,8 @@
-var util = require("./lib/util"),
-    dot = require("./lib/dot"),
-    dagre = { layout: require("./lib/layout/layout") };
-
 /*
  * Render a pure graphviz definition to the svg specified by svg selector.
  */
 function renderDotToD3(graphDef, svgSelector) {
-  var result = dot.toObjects(graphDef);
+  var result = dagre.dot.toObjects(graphDef);
   renderDagreObjsToD3({nodes: result.nodes, edges: result.edges}, svgSelector);
 }
 
@@ -43,7 +39,7 @@ function renderJSObjsToD3(nodeData, edgeData, svgSelector) {
 }
 
 /*
- *  Render javscript objects to svg, as produced by  dot.
+ *  Render javscript objects to svg, as produced by  dagre.dot.
  */
 function renderDagreObjsToD3(graphData, svgSelector) {
   var nodeData = graphData.nodes;
@@ -210,10 +206,10 @@ function renderDagreObjsToD3(graphData, svgSelector) {
     .selectAll("path")
     .attr("d", function (d) {
       var points = d.dagre.points.slice(0);
-      points.unshift(util.intersectRect(d.source.dagre, points[0]));
+      points.unshift(dagre.util.intersectRect(d.source.dagre, points[0]));
 
       var preTarget = points[points.length - 2];
-      var target = util.intersectRect(d.target.dagre, points[points.length - 1]);
+      var target = dagre.util.intersectRect(d.target.dagre, points[points.length - 1]);
 
       //  This shortens the line by a couple pixels so the arrowhead won't overshoot the edge of the target
       var deltaX = preTarget.x - target.x;

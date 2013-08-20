@@ -9,32 +9,24 @@ JS_COMPILER_OPTS?=--no-seqs
 
 all: package.json dagre.js dagre.min.js
 
-.INTERMEDIATE dagre-old.js: \
-	src/pre.js \
-	src/version.js \
-	src/dot-grammar.js \
-	src/post.js
-
-dagre-old.js: Makefile node_modules
+.INTERMEDIATE dagre.js: lib/dot-grammar.js 
+dagre.js: Makefile index.js node_modules
 	@rm -f $@
-	cat $(filter %.js, $^) > $@
+	$(BROWSERIFY) browser.js > dagre.js
 	@chmod a-w $@
-
-dagre.js: dagre-old.js
-	$(BROWSERIFY) -r ./lib/util -r ./lib/dot -r ./lib/layout/layout index.js > dagre.js
 
 dagre.min.js: dagre.js
 	@rm -f $@
 	$(JS_COMPILER) $(JS_COMPILER_OPTS) dagre.js > $@
 	@chmod a-w $@
 
-src/dot-grammar.js: src/dot-grammar.pegjs node_modules
+lib/dot-grammar.js: src/dot-grammar.pegjs node_modules
 	$(PEGJS) -e dot_parser src/dot-grammar.pegjs $@
 
 node_modules: package.json
 	$(NPM) install
 
-package.json: src/version.js package.js
+package.json: lib/version.js package.js
 	@rm -f $@
 	$(NODE) package.js > $@
 
@@ -47,4 +39,4 @@ score: dagre.js
 	$(NODE) score/score.js
 
 clean:
-	rm -f dagre.js package.json dagre.min.js dagre-old.js
+	rm -f dagre.js package.json dagre.min.js

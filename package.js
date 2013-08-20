@@ -1,12 +1,11 @@
 dagre = {};
 
-require('./src/version.js');
-
-var sys = require('sys');
+var sys = require('sys'),
+    version = require('./lib/version');
 
 sys.puts(JSON.stringify({
   name: "dagre",
-  version: dagre.version,
+  version: version,
   description: "Directed graph rendering",
   main: "index.js",
   directories: {
