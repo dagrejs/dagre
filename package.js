@@ -18,6 +18,11 @@ sys.puts(JSON.stringify({
   keywords: [
     "graph"
   ],
+  "testling": {
+    "files": "test/**/*.js",
+    "browsers": [ "ie8", "ie9", "ff/13", "chrome/20" ],
+    "harness" : "mocha"
+  },
   devDependencies: {
     browserify: "2.28.x",
     chai: "1.3.x",
