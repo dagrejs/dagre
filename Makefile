@@ -21,7 +21,7 @@ dagre.min.js: dagre.js
 	@chmod a-w $@
 
 lib/dot-grammar.js: src/dot-grammar.pegjs node_modules
-	$(PEGJS) -e dot_parser src/dot-grammar.pegjs $@
+	$(PEGJS) -e 'module.exports' src/dot-grammar.pegjs $@
 
 node_modules: package.json
 	$(NPM) install
