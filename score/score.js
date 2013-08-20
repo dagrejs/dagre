@@ -18,7 +18,7 @@ fs.readdirSync(graphBase).forEach(function(file) {
     var f = fs.readFileSync(path.resolve(graphBase, file), "UTF-8");
     var g = dot.toGraph(f);
     acyclic().run(g);
-    rank().run(g);
+    rank(g);
     layout()._normalize(g);
     var preLayering = order()._initOrder(g);
     var pre = order().crossCount(g, preLayering);

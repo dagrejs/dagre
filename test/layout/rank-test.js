@@ -7,7 +7,7 @@ describe("rank", function() {
   it("assigns rank 0 to a node in a singleton graph", function() {
     var g = dot.toGraph("digraph { A }");
 
-    rank().run(g);
+    rank(g);
 
     assert.equal(g.node("A").rank, 0);
   });
@@ -15,7 +15,7 @@ describe("rank", function() {
   it("assigns successive ranks to succesors", function() {
     var g = dot.toGraph("digraph { A -> B }");
 
-    rank().run(g);
+    rank(g);
 
     assert.equal(g.node("A").rank, 0);
     assert.equal(g.node("B").rank, 1);
@@ -26,7 +26,7 @@ describe("rank", function() {
     // below both of them.
     var g = dot.toGraph("digraph { A -> B; B -> C; A -> C }");
 
-    rank().run(g);
+    rank(g);
 
     assert.equal(g.node("A").rank, 0);
     assert.equal(g.node("B").rank, 1);
@@ -36,7 +36,7 @@ describe("rank", function() {
   it("uses an edge's minLen attribute to determine rank", function() {
     var g = dot.toGraph("digraph { A -> B [minLen=2] }");
 
-    rank().run(g);
+    rank(g);
 
     assert.equal(g.node("A").rank, 0);
     assert.equal(g.node("B").rank, 2);
