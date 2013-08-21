@@ -38,4 +38,4 @@ score: dagre.js lib/dot-grammar.js
 	$(NODE) score/score.js
 
 clean:
-	rm -f dagre.js package.json dagre.min.js
+	rm -f dagre.js dagre.min.js
