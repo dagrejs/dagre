@@ -34,7 +34,7 @@ sys.puts(JSON.stringify({
   "testling": {
     "files": ["test/**/*.js"],
     "browsers": [
-      "ie/8..latest",
+      "ie/9..latest",
       "firefox/17..latest",
       "firefox/nightly",
       "chrome/22..latest",
