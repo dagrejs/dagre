@@ -25,9 +25,9 @@ lib/dot-grammar.js: src/dot-grammar.pegjs node_modules
 node_modules: package.json
 	$(NPM) install
 
-package.json: lib/version.js package.js
+package.json: lib/version.js src/package.js
 	@rm -f $@
-	$(NODE) package.js > $@
+	$(NODE) src/package.js > $@
 
 .PHONY: test
 test: dagre.js lib/dot-grammar.js

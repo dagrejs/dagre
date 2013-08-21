@@ -1,7 +1,7 @@
 dagre = {};
 
 var sys = require('sys'),
-    version = require('./lib/version');
+    version = require('../lib/version');
 
 sys.puts(JSON.stringify({
   name: "dagre",
