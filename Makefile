@@ -12,31 +12,27 @@ JS_COMPILER_OPTS?=--no-seqs
 JS_SRC:=$(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
 JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 
-all: package.json dagre.js dagre.min.js
+all: dagre.js dagre.min.js
 
 dagre.js: Makefile browser.js node_modules lib/dot-grammar.js $(JS_SRC)
 	@rm -f $@
-	$(BROWSERIFY) browser.js > dagre.js
+	$(NODE) $(BROWSERIFY) browser.js > dagre.js
 	@chmod a-w $@
 
 dagre.min.js: dagre.js
 	@rm -f $@
-	$(JS_COMPILER) $(JS_COMPILER_OPTS) dagre.js > $@
+	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) dagre.js > $@
 	@chmod a-w $@
 
 lib/dot-grammar.js: src/dot-grammar.pegjs node_modules
-	$(PEGJS) -e 'module.exports' src/dot-grammar.pegjs $@
+	$(NODE) $(PEGJS) -e 'module.exports' src/dot-grammar.pegjs $@
 
 node_modules: package.json
 	$(NPM) install
 
-package.json: lib/version.js src/package.js
-	@rm -f $@
-	$(NODE) src/package.js > $@
-
 .PHONY: test
 test: dagre.js $(JS_TEST)
-	$(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
+	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
 
 .PHONY: score
 score: dagre.js
