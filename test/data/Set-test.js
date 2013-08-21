@@ -11,6 +11,14 @@ describe("data/Set", function() {
     set.add("c");
   });
 
+  describe("constructor with initial keys", function() {
+    it("adds the initial keys to the set", function() {
+      set = new Set(["foo", "bar", "baz", "foo"]);
+      assert.equal(set.size(), 3);
+      assert.deepEqual(set.keys().sort(), ["foo", "bar", "baz"].sort());
+    });
+  });
+
   describe("size", function() {
     it("returns the size of the set", function() {
       assert.equal(set.size(), 3);
