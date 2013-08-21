@@ -9,8 +9,7 @@ JS_COMPILER_OPTS?=--no-seqs
 
 all: package.json dagre.js dagre.min.js
 
-.INTERMEDIATE dagre.js: lib/dot-grammar.js
-dagre.js: Makefile index.js node_modules
+dagre.js: Makefile index.js node_modules lib/dot-grammar.js
 	@rm -f $@
 	$(BROWSERIFY) browser.js > dagre.js
 	@chmod a-w $@
@@ -21,7 +20,7 @@ dagre.min.js: dagre.js
 	@chmod a-w $@
 
 lib/dot-grammar.js: src/dot-grammar.pegjs node_modules
-	$(PEGJS) -e dot_parser src/dot-grammar.pegjs $@
+	$(PEGJS) -e 'module.exports' src/dot-grammar.pegjs $@
 
 node_modules: package.json
 	$(NPM) install
@@ -31,13 +30,11 @@ package.json: lib/version.js package.js
 	$(NODE) package.js > $@
 
 .PHONY: test
-.INTERMEDIATE test: lib/dot-grammar.js
-test: dagre.js
+test: dagre.js lib/dot-grammar.js
 	$(MOCHA) $(MOCHA_OPTS)
 
 .PHONY: score
-.INTERMEDIATE score: lib/dot-grammar.js
-score: dagre.js
+score: dagre.js lib/dot-grammar.js
 	$(NODE) score/score.js
 
 clean:

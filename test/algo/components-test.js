@@ -1,8 +1,7 @@
 var common = require("../common"),
     assert = require("chai").assert,
-    assert2 = require("assert"),
-    graph = common.requireSrc("./lib/graph"),
-    components = common.requireSrc("./lib/algo/components");
+    graph = require("../../lib/graph"),
+    components = require("../../lib/algo/components");
 
 describe("algo/components", function() {
   it("returns all nodes in a connected graph", function() {
@@ -23,7 +22,7 @@ describe("algo/components", function() {
     g.addEdge("C", 4, 5);
 
     var cmpts = components(g).sort(function(x, y) { return y.length - x.length; });
-    assert2.deepEqual(cmpts.map(function(cmpt) { return cmpt.sort(); }),
+    assert.deepEqual(cmpts.map(function(cmpt) { return cmpt.sort(); }),
                      [[1, 2, 3], [4, 5], [6]]);
   });
 });

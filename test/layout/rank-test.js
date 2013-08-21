@@ -1,7 +1,7 @@
 var common = require("../common"),
     assert = require("chai").assert,
-    dot = common.requireSrc("./lib/dot"),
-    rank = common.requireSrc("./lib/layout/rank");
+    dot = require("../../lib/dot"),
+    rank = require("../../lib/layout/rank");
 
 describe("rank", function() {
   it("assigns rank 0 to a node in a singleton graph", function() {

@@ -1,7 +1,7 @@
 var common = require("./common"),
     assert = require("chai").assert,
-    util = common.requireSrc("./lib/util"),
-    graph = common.requireSrc("./lib/graph");
+    util = require("../lib/util"),
+    graph = require("../lib/graph");
 
 describe("util.sum", function() {
   it("returns the sum of all elements in the array", function() {

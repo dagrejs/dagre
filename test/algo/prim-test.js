@@ -1,7 +1,7 @@
 var common = require("../common"),
     assert = require("chai").assert,
-    graph = common.requireSrc("./lib/graph"),
-    prim = common.requireSrc("./lib/algo/prim");
+    graph = require("../../lib/graph"),
+    prim = require("../../lib/algo/prim");
 
 describe("algo/prim", function() {
   it("returns a deterministic minimal spanning tree", function() {

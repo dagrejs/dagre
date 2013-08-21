@@ -1,6 +1,6 @@
 var common = require("./common"),
     assert = require("chai").assert,
-    dot = common.requireSrc("./lib/dot");
+    dot = require("../lib/dot");
 
 describe("dot.toGraph", function() {
   it("allows an empty label", function() {
