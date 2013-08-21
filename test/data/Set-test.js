@@ -1,6 +1,6 @@
 var common = require("../common"),
     assert = require("chai").assert,
-    Set = require("../../lib/data/set");
+    Set = require("../../lib/data/Set");
 
 describe("data/Set", function() {
   var set;
