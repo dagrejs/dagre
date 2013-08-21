@@ -3,7 +3,7 @@ var common = require("../common"),
     dot = require("../../lib/dot"),
     rank = require("../../lib/layout/rank");
 
-describe("rank", function() {
+describe("layout/rank", function() {
   it("assigns rank 0 to a node in a singleton graph", function() {
     var g = dot.toGraph("digraph { A }");
 
