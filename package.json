@@ -28,8 +28,7 @@
   "license": "MIT",
   "testling": {
     "files": [
-      "test/*.js",
-      "test/layout/*.js"
+      "test/**/*.js"
     ],
     "browsers": [
       "ie/8..latest",

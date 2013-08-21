@@ -32,7 +32,7 @@ sys.puts(JSON.stringify({
   },
   license: "MIT",
   "testling": {
-    "files": ["test/*.js", "test/layout/*.js"],
+    "files": ["test/**/*.js"],
     "browsers": [
       "ie/8..latest",
       "firefox/17..latest",
