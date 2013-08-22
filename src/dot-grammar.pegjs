@@ -42,6 +42,9 @@ THE SOFTWARE.
 }
 
 start
+    = graphStmt+
+
+graphStmt
     = _* (strict _)? type:graphType _* id:(id)? _* '{' _* stmts:stmtList? _* '}' _* {
         return {type: type, id: id, stmts: stmts};
       }
