@@ -1,11 +1,11 @@
 var common = require("../common"),
     assert = require("chai").assert,
-    graph = require("../../lib/graph"),
+    Graph = require("../../lib/Graph"),
     components = require("../../lib/algo/components");
 
 describe("algo/components", function() {
   it("returns all nodes in a connected graph", function() {
-    var g = graph();
+    var g = new Graph();
     [1, 2, 3].forEach(function(u) { g.addNode(u); });
     g.addEdge("A", 1, 2);
     g.addEdge("B", 2, 3);
@@ -15,7 +15,7 @@ describe("algo/components", function() {
   });
 
   it("returns maximal subsets of connected nodes", function() {
-    var g = graph();
+    var g = new Graph();
     [1, 2, 3, 4, 5, 6].forEach(function(u) { g.addNode(u); });
     g.addEdge("A", 1, 2);
     g.addEdge("B", 2, 3);

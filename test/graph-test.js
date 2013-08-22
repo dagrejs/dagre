@@ -1,12 +1,12 @@
 var common = require("./common"),
     assert = require("chai").assert,
-    graph = require("../lib/graph");
+    Graph = require("../lib/graph");
 
 describe("graph", function() {
   var g;
 
   beforeEach(function() {
-    g = graph();
+    g = new Graph();
   });
 
   describe("empty graph", function() {
@@ -215,7 +215,7 @@ describe("graph", function() {
 
   describe("subgraph", function() {
     it("returns a graph containing a subset of nodes", function() {
-      var g = graph();
+      var g = new Graph();
       [1,2,3].forEach(function(u) { g.addNode(u); });
       g.addEdge("a", 1, 2);
       g.addEdge("b", 2, 3);
@@ -226,7 +226,7 @@ describe("graph", function() {
     });
 
     it("includes each node's value in the subgraph", function() {
-      var g = graph();
+      var g = new Graph();
       [1,2,3].forEach(function(u) { g.addNode(u, "V" + u); });
       g.addEdge("a", 1, 2);
       g.addEdge("b", 2, 3);
@@ -237,7 +237,7 @@ describe("graph", function() {
     });
 
     it("includes each edge's value in the subgraph", function() {
-      var g = graph();
+      var g = new Graph();
       [1,2,3].forEach(function(u) { g.addNode(u); });
       g.addEdge("a", 1, 2, "VA");
       g.addEdge("b", 2, 3);
