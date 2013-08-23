@@ -12,7 +12,7 @@ JS_COMPILER_OPTS?=--no-seqs
 JS_SRC:=$(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
 JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 
-all: dagre.js dagre.min.js
+all: dagre.js dagre.min.js test
 
 dagre.js: Makefile browser.js node_modules lib/dot-grammar.js lib/version.js $(JS_SRC)
 	@rm -f $@
