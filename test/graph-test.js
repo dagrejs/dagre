@@ -1,6 +1,6 @@
 var common = require("./common"),
     assert = require("chai").assert,
-    Graph = require("../lib/graph");
+    Graph = require("../lib/Graph");
 
 describe("graph", function() {
   var g;
