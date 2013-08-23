@@ -14,7 +14,7 @@ JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 
 all: dagre.js dagre.min.js
 
-dagre.js: Makefile browser.js node_modules lib/dot-grammar.js $(JS_SRC)
+dagre.js: Makefile browser.js node_modules lib/dot-grammar.js lib/version.js $(JS_SRC)
 	@rm -f $@
 	$(NODE) $(BROWSERIFY) browser.js > dagre.js
 	@chmod a-w $@
@@ -23,6 +23,9 @@ dagre.min.js: dagre.js
 	@rm -f $@
 	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) dagre.js > $@
 	@chmod a-w $@
+
+lib/version.js: src/version.js package.json
+	$(NODE) src/version.js > $@
 
 lib/dot-grammar.js: src/dot-grammar.pegjs node_modules
 	$(NODE) $(PEGJS) -e 'module.exports' src/dot-grammar.pegjs $@
