@@ -256,5 +256,68 @@ describe("graph", function() {
       g.toString();
     });
   });
+
+  describe("equals", function() {
+    it("returns `true` if both graphs are empty", function() {
+      assert.isTrue(new Graph().equals(new Graph()));
+    });
+
+    it("returns `true` if both graphs have the same nodes", function() {
+      var g1 = new Graph();
+      g1.addNode("A", 123);
+      g1.addNode("B", 456);
+      var g2 = g1.subgraph(["A", "B"]);
+      assert.isTrue(g1.equals(g2));
+    });
+
+    it("returns `false` if both graphs have different nodes", function() {
+      var g1 = new Graph();
+      g1.addNode("A", 123);
+      var g2 = new Graph();
+      g2.addNode("B", 456);
+      assert.isFalse(g1.equals(g2));
+    });
+
+    it("returns `false` if both graphs have different node values", function() {
+      var g1 = new Graph();
+      g1.addNode("A", 123);
+      var g2 = new Graph();
+      g2.addNode("A", 456);
+      assert.isFalse(g1.equals(g2));
+    });
+
+    it("returns `true` if both graphs have the same edges", function() {
+      var g1 = new Graph();
+      g1.addNode("A");
+      g1.addNode("B");
+      g1.addEdge("AB", "A", "B", 123);
+      var g2 = g1.subgraph(["A", "B"]);
+      assert.isTrue(g1.equals(g2));
+    });
+
+    it("returns `false` if both graphs have different edges", function() {
+      var g1 = new Graph();
+      g1.addNode("A");
+      g1.addNode("B");
+      g1.addEdge("AB", "A", "B", 123);
+      var g2 = new Graph();
+      g2.addNode("A");
+      g2.addNode("B");
+      g2.addEdge("BA", "B", "A", 123);
+      assert.isFalse(g1.equals(g2));
+    });
+
+    it("returns `false` if both graphs have different edge values", function() {
+      var g1 = new Graph();
+      g1.addNode("A");
+      g1.addNode("B");
+      g1.addEdge("AB", "A", "B", 123);
+      var g2 = new Graph();
+      g2.addNode("A");
+      g2.addNode("B");
+      g2.addEdge("AB", "A", "B", 456);
+      assert.isFalse(g1.equals(g2));
+    });
+  });
 });
 
