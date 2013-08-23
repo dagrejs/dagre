@@ -246,5 +246,15 @@ describe("graph", function() {
       assert.equal(subgraph.edge("a"), "VA");
     });
   });
+
+  describe("toString", function() {
+    it("returns a string representatoin of the graph", function() {
+      // Just make sure we don't throw an Error
+      g.addNode("a");
+      g.addNode("b");
+      g.addEdge(null, "a", "b");
+      g.toString();
+    });
+  });
 });
 
