@@ -37,9 +37,9 @@ node_modules: package.json
 test: dagre.js $(JS_TEST)
 	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
 
-.PHONY: score
-score: dagre.js
-	$(NODE) score/score.js
+.PHONY: bench
+bench: bench/bench.js
+	$(NODE) bench/bench.js
 
 clean:
 	rm -f dagre.js dagre.min.js
