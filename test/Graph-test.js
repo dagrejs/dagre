@@ -247,6 +247,29 @@ describe("graph", function() {
     });
   });
 
+  describe("order", function() {
+    it("returns the number of nodes in the graph", function() {
+      var g = new Graph();
+      g.addNode("a");
+      g.addNode("b");
+      assert.equal(g.order(), 2);
+    });
+  });
+
+  describe("size", function() {
+    it("returns the number of edges in the graph", function() {
+      var g = new Graph();
+      g.addNode("a");
+      g.addNode("b");
+
+      g.addEdge(null, "a", "b");
+      assert.equal(g.size(), 1);
+
+      g.addEdge(null, "a", "b");
+      assert.equal(g.size(), 2);
+    });
+  });
+
   describe("toString", function() {
     it("returns a string representatoin of the graph", function() {
       // Just make sure we don't throw an Error
@@ -278,6 +301,14 @@ describe("graph", function() {
       assert.isFalse(g1.equals(g2));
     });
 
+    it("returns `false` if other graph has a strict superset of nodes", function() {
+      var g1 = new Graph();
+      g1.addNode("A", 123);
+      var g2 = g1.subgraph(["A"]);
+      g2.addNode("B", "456");
+      assert.isFalse(g1.equals(g2));
+    });
+
     it("returns `false` if both graphs have different node values", function() {
       var g1 = new Graph();
       g1.addNode("A", 123);
@@ -304,6 +335,16 @@ describe("graph", function() {
       g2.addNode("A");
       g2.addNode("B");
       g2.addEdge("BA", "B", "A", 123);
+      assert.isFalse(g1.equals(g2));
+    });
+
+    it("returns `false` if other graph has a strict superset of edges", function() {
+      var g1 = new Graph();
+      g1.addNode("A");
+      g1.addNode("B");
+      g1.addEdge("AB", "A", "B", 123);
+      var g2 = g1.subgraph(["A", "B"]);
+      g2.addEdge("BA", "B", "A", 456);
       assert.isFalse(g1.equals(g2));
     });
 
