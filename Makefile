@@ -12,6 +12,8 @@ JS_COMPILER_OPTS?=--no-seqs
 JS_SRC:=$(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
 JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 
+BENCH_FILES?=$(wildcard bench/graphs/*)
+
 all: dagre.js dagre.min.js test
 
 dagre.js: Makefile browser.js node_modules lib/dot-grammar.js lib/version.js $(JS_SRC)
@@ -39,7 +41,7 @@ test: dagre.js $(JS_TEST)
 
 .PHONY: bench
 bench: bench/bench.js
-	$(NODE) bench/bench.js
+	@$(NODE) bench/bench.js $(BENCH_FILES)
 
 clean:
 	rm -f dagre.js dagre.min.js
