@@ -1,7 +1,7 @@
 var common = require("../common"),
     assert = require("chai").assert,
-    Graph = require("../../lib/Graph"),
-    components = require("../../lib/algo/components");
+    components = require("../../lib/algo/components"),
+    Graph = require("graphlib").Graph;
 
 describe("algo/components", function() {
   it("returns all nodes in a connected graph", function() {

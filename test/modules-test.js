@@ -9,10 +9,4 @@ describe("modules", function() {
       });
     });
   });
-
-  describe("Graph", function() {
-    it("exports Graph as a module", function() {
-      assert.isDefined(require("../Graph"));
-    });
-  });
 });
