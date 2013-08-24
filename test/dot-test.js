@@ -1,4 +1,6 @@
-var common = require("./common"),
+var fs = require("fs"),
+    path = require("path"),
+    common = require("./common"),
     assert = require("chai").assert,
     dot = require("../lib/dot");
 
@@ -124,6 +126,16 @@ describe("lib/dot", function() {
       assert.equal(g.node("x").prop, 123);
       assert.equal(g.node("y").prop, 123);
       assert.equal(g.node("z").prop, 456);
+    });
+
+    describe("can parse all files in test-data", function() {
+      var testDataDir = path.resolve(__dirname, "test-data");
+      fs.readdirSync(testDataDir).forEach(function(file) {
+        it(file, function() {
+          var f = fs.readFileSync(path.resolve(testDataDir, file), "UTF-8");
+          dot.toGraph(f);
+        });
+      });
     });
   });
 

@@ -1,0 +1,9 @@
+digraph {
+    A;
+    F;
+    subgraph cluster1 {
+    }
+    subgraph cluster2 {
+    }
+    A -> F;
+}

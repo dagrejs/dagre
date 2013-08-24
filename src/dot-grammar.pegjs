@@ -90,7 +90,7 @@ edgeStmt
       }
 
 subgraphStmt
-    = id:(subgraph _* (id _*)?)? '{' _* stmts:stmtList _* '}' {
+    = id:(subgraph _* (id _*)?)? '{' _* stmts:stmtList? _* '}' {
         id = id[2] || [];
         return { type: "subgraph", id: id[0], stmts: stmts };
       }
