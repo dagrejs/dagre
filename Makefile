@@ -7,6 +7,10 @@ MOCHA_OPTS?=
 JS_COMPILER=node_modules/uglify-js/bin/uglifyjs
 JS_COMPILER_OPTS?=--no-seqs
 
+MODULE=dagre
+MODULE_JS=$(MODULE).js
+MODULE_MIN_JS=$(MODULE).min.js
+
 # There does not appear to be an easy way to define recursive expansion, so
 # we do our own expansion a few levels deep.
 JS_SRC:=$(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
@@ -14,16 +18,16 @@ JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 
 BENCH_FILES?=$(wildcard bench/graphs/*)
 
-all: dagre.js dagre.min.js test
+all: $(MODULE_JS) $(MODULE_MIN_JS) test
 
-dagre.js: Makefile browser.js node_modules lib/dot-grammar.js lib/version.js $(JS_SRC)
+$(MODULE_JS): Makefile browser.js node_modules lib/dot-grammar.js lib/version.js $(JS_SRC)
 	@rm -f $@
-	$(NODE) $(BROWSERIFY) browser.js > dagre.js
+	$(NODE) $(BROWSERIFY) browser.js > $@
 	@chmod a-w $@
 
-dagre.min.js: dagre.js
+$(MODULE_MIN_JS): $(MODULE_JS)
 	@rm -f $@
-	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) dagre.js > $@
+	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) $< > $@
 	@chmod a-w $@
 
 lib/version.js: src/version.js package.json
@@ -36,12 +40,12 @@ node_modules: package.json
 	$(NPM) install
 
 .PHONY: test
-test: dagre.js $(JS_TEST)
+test: $(MODULE_JS) $(JS_TEST)
 	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
 
 .PHONY: bench
-bench: bench/bench.js
+bench: bench/bench.js $(MODULE_JS)
 	@$(NODE) bench/bench.js $(BENCH_FILES)
 
 clean:
-	rm -f dagre.js dagre.min.js
+	rm -f $(MODULE_JS) $(MODULE_MIN_JS)
