@@ -1,6 +1,6 @@
-var fs = require("fs"),
-    path = require("path"),
+var path = require("path"),
     common = require("./common"),
+    fs = common.fs,
     assert = require("chai").assert,
     dot = require("../lib/dot");
 
@@ -130,15 +130,6 @@ describe("lib/dot", function() {
 
     describe("can parse all files in test-data", function() {
       var testDataDir = path.resolve(__dirname, "test-data");
-
-      // Hack when running testling - it seems to return an empty object from fs...
-      if (!("readdirSync" in fs)) {
-        fs.readdirSync = function() {
-          console.log("!! Mocking fs module. This should only appear with testling.");
-          return [];
-        };
-      }
-
       fs.readdirSync(testDataDir).forEach(function(file) {
         it(file, function() {
           var f = fs.readFileSync(path.resolve(testDataDir, file), "UTF-8");
