@@ -21,53 +21,85 @@ var times = [];
 var skipped = 0;
 var failed = 0;
 
-var entry;
-while ((entry = benchmarkFiles.pop()) !== undefined) {
-  // If we see a directory, push all of its files to the queue and move to the next entry.
+process.on('SIGINT', function() {
+  console.log("\n\n!! Aborting...");
+  process.exit(1);
+});
+process.on('exit', function() { finish(); });
+
+// Start the loop
+handleNext();
+
+function handleNext() {
+  var entry = benchmarkFiles.pop();
+  if (entry === undefined) {
+    return;
+  }
+
   if (fs.statSync(entry).isDirectory()) {
-    fs.readdirSync(entry).forEach(function(f) {
-      benchmarkFiles.push(path.resolve(entry, f));
+    pushDirectory(entry);
+  } else {
+    processFile(entry);
+  }
+}
+
+function pushDirectory(dir) {
+  fs.readdir(dir, function(err, files) {
+    if (err) throw err;
+    files.forEach(function(file) {
+      benchmarkFiles.push(path.resolve(dir, file));
     });
-    continue;
-  }
+    handleNext();
+  });
+}
 
-  process.stdout.write(leftPad(20, entry) + ": ");
-  var f = fs.readFileSync(entry, "UTF-8");
-  try {
-    var g = dot.toGraph(f);
-    acyclic().run(g);
-    rank(g);
-    layout()._normalize(g);
-    var preLayering = order()._initOrder(g);
-    var pre = order().crossCount(g, preLayering);
-    if (pre !== 0) {
-      var start = new Date().getTime();
-      var postLayering = order().run(g);
-      var end = new Date().getTime();
-      var post = order().crossCount(g, postLayering);
-      var eff = (pre - post) / pre;
-      console.log("SUCCESS  -" +
-                  "  PRE: " + leftPad(8, pre) +
-                  "  POST: " + leftPad(8, post) +
-                  "  Efficiency: " + leftPad(8, eff.toString().substring(0, 8)) +
-                  "  Time: " + leftPad(5, (end - start)) + "ms");
-      samples.push(eff);
-      times.push(end - start);
-    } else {
-      console.log("SKIPPING - 0 CROSSINGS");
-      ++skipped;
+function processFile(file) {
+  process.stdout.write(leftPad(20, file) + ": ");
+  fs.readFile(file, function(err, data) {
+    if (err) throw err;
+    var f = data.toString("utf-8");
+    try {
+      var g = dot.toGraph(f);
+      acyclic().run(g);
+      rank(g);
+      layout()._normalize(g);
+      var preLayering = order()._initOrder(g);
+      var pre = order().crossCount(g, preLayering);
+      if (pre !== 0) {
+        var start = new Date().getTime();
+        var postLayering = order().run(g);
+        var end = new Date().getTime();
+        var post = order().crossCount(g, postLayering);
+        var eff = (pre - post) / pre;
+        console.log("SUCCESS  -" +
+                    "  PRE: " + leftPad(8, pre) +
+                    "  POST: " + leftPad(8, post) +
+                    "  Efficiency: " + leftPad(8, eff.toString().substring(0, 8)) +
+                    "  Time: " + leftPad(5, (end - start)) + "ms");
+        samples.push(eff);
+        times.push(end - start);
+      } else {
+        console.log("SKIPPING - 0 CROSSINGS");
+        ++skipped;
+      }
+    } catch (e) {
+      console.log("FAILED   - " + e.toString().split("\n")[0]);
+      ++failed;
     }
-  } catch (e) {
-    console.log("FAILED   - " + e.toString().split("\n")[0]);
-    ++failed;
-  }
-};
+    handleNext();
+  });
+}
 
-console.log("# Graphs: " + leftPad(8, samples.length + skipped + failed));
-console.log("Skipped : " + leftPad(8, skipped));
-console.log("Failed  : " + leftPad(8, failed));
-console.log("Reduction efficiency (larger is better): " + (util.sum(samples) / samples.length));
-console.log("Execution time: " + util.sum(times) + "ms (avg: " + Math.round(util.sum(times) / times.length) + "ms)");
+function finish() {
+  console.log();
+  console.log("Results");
+  console.log("-------");
+  console.log("# Graphs: " + leftPad(8, samples.length + skipped + failed));
+  console.log("Skipped : " + leftPad(8, skipped));
+  console.log("Failed  : " + leftPad(8, failed));
+  console.log("Reduction efficiency (larger is better): " + (util.sum(samples) / samples.length));
+  console.log("Execution time: " + util.sum(times) + "ms (avg: " + Math.round(util.sum(times) / times.length) + "ms)");
+}
 
 function leftPad(len, str) {
   var result = [];
