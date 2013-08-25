@@ -16,9 +16,12 @@ if (benchmarkFiles.length === 0) {
   process.exit(1);
 }
 
+var IGNORE_PATTERN = /Input graph is not acyclic/;
+
 var samples = [];
 var times = [];
 var skipped = 0;
+var ignored = 0;
 var failed = 0;
 
 process.on('SIGINT', function() {
@@ -83,8 +86,13 @@ function processFile(file) {
         ++skipped;
       }
     } catch (e) {
-      console.log("FAILED   - " + e.toString().split("\n")[0]);
-      ++failed;
+      if (e.toString().match(IGNORE_PATTERN)) {
+        console.log("IGNORING - " + e.toString().split("\n")[0]);
+        ++ignored;
+      } else {
+        console.log("FAILED   - " + e.toString().split("\n")[0]);
+        ++failed;
+      }
     }
     handleNext();
   });
@@ -94,8 +102,9 @@ function finish() {
   console.log();
   console.log("Results");
   console.log("-------");
-  console.log("# Graphs: " + leftPad(8, samples.length + skipped + failed));
+  console.log("# Graphs: " + leftPad(8, samples.length + skipped + ignored + failed));
   console.log("Skipped : " + leftPad(8, skipped));
+  console.log("Ignored : " + leftPat(8, skipped));
   console.log("Failed  : " + leftPad(8, failed));
   console.log("Reduction efficiency (larger is better): " + (util.sum(samples) / samples.length));
   console.log("Execution time: " + util.sum(times) + "ms (avg: " + Math.round(util.sum(times) / times.length) + "ms)");
