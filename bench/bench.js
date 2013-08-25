@@ -104,7 +104,7 @@ function finish() {
   console.log("-------");
   console.log("# Graphs: " + leftPad(8, samples.length + skipped + ignored + failed));
   console.log("Skipped : " + leftPad(8, skipped));
-  console.log("Ignored : " + leftPat(8, skipped));
+  console.log("Ignored : " + leftPad(8, ignored));
   console.log("Failed  : " + leftPad(8, failed));
   console.log("Reduction efficiency (larger is better): " + (util.sum(samples) / samples.length));
   console.log("Execution time: " + util.sum(times) + "ms (avg: " + Math.round(util.sum(times) / times.length) + "ms)");
