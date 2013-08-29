@@ -63,7 +63,7 @@ function processFile(file) {
     var f = data.toString("utf-8");
     try {
       var g = dot.toGraph(f);
-      acyclic().run(g);
+      acyclic(g);
       rank(g);
       layout()._normalize(g);
       var preLayering = order()._initOrder(g);
