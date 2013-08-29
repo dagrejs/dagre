@@ -17,7 +17,6 @@
     "browserify": "2.28.x",
     "chai": "1.7.x",
     "mocha": "1.12.x",
-    "pegjs": "0.7.x",
     "uglify-js": "1.2.3"
   },
   "dependencies": {

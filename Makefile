@@ -1,10 +1,11 @@
 NODE?=node
 NPM?=npm
-BROWSERIFY?=node_modules/browserify/bin/cmd.js
-PEGJS?=node_modules/pegjs/bin/pegjs
-MOCHA?=node_modules/mocha/bin/mocha
+NODE_MODULES=node_modules
+BROWSERIFY?=$(NODE_MODULES)/browserify/bin/cmd.js
+PEGJS?=$(NODE_MODULES)/pegjs/bin/pegjs
+MOCHA?=$(NODE_MODULES)/mocha/bin/mocha
 MOCHA_OPTS?=
-JS_COMPILER=node_modules/uglify-js/bin/uglifyjs
+JS_COMPILER=$(NODE_MODULES)/uglify-js/bin/uglifyjs
 JS_COMPILER_OPTS?=--no-seqs
 
 MODULE=dagre
@@ -18,9 +19,10 @@ JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 
 BENCH_FILES?=$(wildcard bench/graphs/*)
 
+.PHONY: all
 all: $(MODULE_JS) $(MODULE_MIN_JS) test
 
-$(MODULE_JS): Makefile browser.js node_modules lib/dot-grammar.js lib/version.js $(JS_SRC)
+$(MODULE_JS): Makefile browser.js $(NODE_MODULES) lib/version.js $(JS_SRC)
 	@rm -f $@
 	$(NODE) $(BROWSERIFY) browser.js > $@
 	@chmod a-w $@
@@ -33,10 +35,7 @@ $(MODULE_MIN_JS): $(MODULE_JS)
 lib/version.js: src/version.js package.json
 	$(NODE) src/version.js > $@
 
-lib/dot-grammar.js: src/dot-grammar.pegjs node_modules
-	$(NODE) $(PEGJS) -e 'module.exports' src/dot-grammar.pegjs $@
-
-node_modules: package.json
+$(NODE_MODULES): package.json
 	$(NPM) install
 
 .PHONY: test
@@ -47,5 +46,10 @@ test: $(MODULE_JS) $(JS_TEST)
 bench: bench/bench.js $(MODULE_JS)
 	@$(NODE) bench/bench.js $(BENCH_FILES)
 
+.PHONY: clean
 clean:
 	rm -f $(MODULE_JS) $(MODULE_MIN_JS)
+
+.PHONY: fullclean
+fullclean: clean
+	rm -rf $(NODE_MODULES)
