@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Directed graph rendering",
   "main": "index.js",
   "directories": {
@@ -17,6 +17,7 @@
     "browserify": "2.28.x",
     "chai": "1.7.x",
     "mocha": "1.12.x",
+    "semver": "2.1.x",
     "uglify-js": "2.4.x"
   },
   "dependencies": {

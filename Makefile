@@ -9,8 +9,9 @@ JS_COMPILER=$(NODE_MODULES)/uglify-js/bin/uglifyjs
 JS_COMPILER_OPTS?=--compress --mangle --lint
 
 MODULE=dagre
-MODULE_JS=$(MODULE).js
-MODULE_MIN_JS=$(MODULE).min.js
+DIST?=dist
+MODULE_JS=$(DIST)/$(MODULE).js
+MODULE_MIN_JS=$(DIST)/$(MODULE).min.js
 
 # There does not appear to be an easy way to define recursive expansion, so
 # we do our own expansion a few levels deep.
@@ -22,7 +23,17 @@ BENCH_FILES?=$(wildcard bench/graphs/*)
 .PHONY: all
 all: $(MODULE_JS) $(MODULE_MIN_JS) test
 
-$(MODULE_JS): Makefile browser.js $(NODE_MODULES) lib/version.js $(JS_SRC)
+.PHONY: init
+init:
+	rm -rf $(DIST)
+	mkdir -p $(DIST)
+	cp -r demo $(DIST)
+
+.PHONY: release
+release: all
+	src/release/release.sh
+
+$(MODULE_JS): init Makefile $(NODE_MODULES) browser.js lib/version.js $(JS_SRC)
 	@rm -f $@
 	$(NODE) $(BROWSERIFY) browser.js > $@
 	@chmod a-w $@
@@ -48,7 +59,8 @@ bench: bench/bench.js $(MODULE_JS)
 
 .PHONY: clean
 clean:
-	rm -f $(MODULE_JS) $(MODULE_MIN_JS)
+	rm -f lib/version.js
+	rm -rf $(DIST)
 
 .PHONY: fullclean
 fullclean: clean
