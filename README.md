@@ -22,54 +22,58 @@ Key priorities for this library are:
    in some of our examples and highly recommend it if you plan to render using
    CSS and SVG.
 
+Note that dagre is current a pre-1.0.0 library. We will do our best to
+maintain backwards compatibility for patch level increases (e.g. 0.0.1 to
+0.0.2) but make no claim to backwards compatibility across minor releases (e.g.
+0.0.1 to 0.1.0). Watch our [CHANGELOG](CHANGELOG.md) for details on changes.
+
 ## Demo
 
 Try our [interactive demo](http://cpettitt.github.com/project/dagre/latest/demo/demo.html)!
 
-If you've checked out the project, you can build the Dagre library and then try
-out the demo by opening `demo.html` in your browser. There is no need to use a
-web server for the demo.
+Or see an example of rendering the [TCP state diagram](http://cpettitt.github.com/project/dagre/latest/demo/demo-d3.html).
 
-## Building
+These demos and more can be found in the `demo` folder of the project. Simply
+open them in your browser - there is no need to start a web server.
+
+## Getting Dagre
+
+### Browser Scrips
+
+You can get the latest browser-ready scripts:
+
+* [dagre.js](http://cpettitt.github.io/project/dagre/latest/dagre.js)
+* [dagre.min.js](http://cpettitt.github.io/project/dagre/latest/dagre.min.js)
+
+### NPM Install
+
+Before installing this library you need to install the [npm package manager].
+
+To get graphlib from npm, use:
+
+    $ npm install graphlib
+
+### Build From Source
 
 Before building this library you need to install the [npm package manager].
 
-Then follow these steps in this directory:
+Check out this project and run this command from the root of the project:
 
     $ make
 
-If you want to verify the integrity of the library, use:
+This will generate `dagre.js` and `dagre.min.js` in the `dist` directory
+of the project.
 
-    $ make test
+## Resources
 
-## Contact
+* [Issue tracker](https://github.com/cpettitt/dagre/issues).
+* [Mailing list](https://groups.google.com/group/dagre).
 
-We've been manging bugs and enhancement request through our [issue
-tracker](https://github.com/cpettitt/dagre/issues).
+### Recommend Reading
 
-We also have a [google group](https://groups.google.com/group/dagre) for
-questions and discussion.
-
-## Third Party Examples
-
-Dagre has been included as a part of some very cool projects. Here are just a
-couple that stand out:
-
-[JointJS](http://www.daviddurman.com/automatic-graph-layout-with-jointjs-and-dagre.html)
-has a plugin that uses dagre for layout. JointJS focuses on rendering and
-interaction with diagrams, which synergizes well with Dagre. If you want the
-ability to move nodes and manipulate edges interactively, this is a good place
-to start!
-
-Jonathan Mace has a
-[demo](http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json) that
-makes it possible to interactively explore graphs. In his demo, you can
-highlight paths, collapse subgraphs, via detailed node information, and more!
-
-## References
-
-This work was produced by taking advantage of many papers and books. Here we
-summarize the sources used to develop Dagre.
+This work was produced by taking advantage of many papers and books. If you're
+interested in how dagre works internally here are some of the most important
+papers to read.
 
 The general skeleton for Dagre comes from *Gansner, et al., "A Technique for
 Drawing Directed Graphs"*, which gives both an excellent high level overview of
@@ -92,6 +96,22 @@ For positioning (or coordinate assignment), we derived our algorithm from
 *Brandes and Köpf, "Fast and Simple Horizontal Coordinate Assignment"*. We made
 some some adjustments to get tighter graphs when node and edges sizes vary
 greatly.
+
+## Third Party Examples
+
+Dagre has been included as a part of some very cool projects. Here are just a
+couple that stand out:
+
+[JointJS](http://www.daviddurman.com/automatic-graph-layout-with-jointjs-and-dagre.html)
+has a plugin that uses dagre for layout. JointJS focuses on rendering and
+interaction with diagrams, which synergizes well with Dagre. If you want the
+ability to move nodes and manipulate edges interactively, this is a good place
+to start!
+
+Jonathan Mace has a
+[demo](http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json) that
+makes it possible to interactively explore graphs. In his demo, you can
+highlight paths, collapse subgraphs, via detailed node information, and more!
 
 ## License
 
