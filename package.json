@@ -17,7 +17,7 @@
     "browserify": "2.28.x",
     "chai": "1.7.x",
     "mocha": "1.12.x",
-    "uglify-js": "1.2.3"
+    "uglify-js": "2.4.x"
   },
   "dependencies": {
     "graphlib": "0.0.5",

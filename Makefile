@@ -6,7 +6,7 @@ PEGJS?=$(NODE_MODULES)/pegjs/bin/pegjs
 MOCHA?=$(NODE_MODULES)/mocha/bin/mocha
 MOCHA_OPTS?=
 JS_COMPILER=$(NODE_MODULES)/uglify-js/bin/uglifyjs
-JS_COMPILER_OPTS?=--no-seqs
+JS_COMPILER_OPTS?=--compress --mangle --lint
 
 MODULE=dagre
 MODULE_JS=$(MODULE).js
@@ -29,7 +29,7 @@ $(MODULE_JS): Makefile browser.js $(NODE_MODULES) lib/version.js $(JS_SRC)
 
 $(MODULE_MIN_JS): $(MODULE_JS)
 	@rm -f $@
-	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) $< > $@
+	$(NODE) $(JS_COMPILER) $< $(JS_COMPILER_OPTS) > $@
 	@chmod a-w $@
 
 lib/version.js: src/version.js package.json
