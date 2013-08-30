@@ -20,7 +20,7 @@
     "uglify-js": "1.2.3"
   },
   "dependencies": {
-    "graphlib": "0.0.4",
+    "graphlib": "0.0.5",
     "graphlib-dot": "0.0.2"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
