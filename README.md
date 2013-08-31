@@ -18,7 +18,7 @@ Key priorities for this library are:
 
 3. **Rendering agnostic**. Dagre requires only very basic information to lay out
    graphs, such as the dimensions of nodes. You're free to render the graph using
-   whatever technology you prefer. We use [D3](https://github.com/mbostock/d3)
+   whatever technology you prefer. We use [D3][]
    in some of our examples and highly recommend it if you plan to render using
    CSS and SVG.
 
@@ -64,10 +64,149 @@ Check out this project and run this command from the root of the project:
 This will generate `dagre.js` and `dagre.min.js` in the `dist` directory
 of the project.
 
+## Using Dagre
+
+### A Note on Rendering
+
+As mentioned above, dagre's focus in on graph layout only. This means that you
+need something to actually render the graphs with the layout information from
+dagre.
+
+For a simple starting point, we suggest looking at the user contributed
+`demo/dagre-d3-simple.js` script for doing good but easy rendering. To get
+started look at `demo/sentence-tokenization.html`.
+
+Another option is to use [JointJS][]. See the link for an article about how to
+use it with Dagre. The ability to manipulate nodes and edges after they are
+layed out and renderer can be very useful!
+
+For even more control over rendering you can write a custom renderer or take
+advantage or a library like [D3][], which makes it easier to creates graphs
+with SVG. The code in `demo/dagre-d3-simple.js` uses D3, so this may be a
+good place to start.
+
+Ultimately we plan to make available some basic renderers for Dagre in the
+near future.
+
+### An Example Layout
+
+First we need to load the dagre library. In an HTML page you do this by adding
+the following snippet:
+
+```html
+<script src="http://PATH/TO/dagre.min.js"></script>
+```
+
+In node.js you use:
+
+```js
+var dagre = require("dagre");
+```
+
+
+The current version of Dagre takes an array of nodes and edges, along with some
+optional configuration, and attaches layout information to the nodes and edges
+in the `dagre` property.
+
+A node must be an object with the following properties:
+
+* `width` - how wide the node should be in pixels
+* `height` - how tall the node should be in pixels
+
+The attributes would typically come from a rendering engine that has already
+determined the space needed for a node.
+
+An edge must be an object with either references to its adjacent nodes:
+
+* `source` - a reference to the source node
+* `target` - a reference to the target node
+
+Or with the ids of its adjacent nodes:
+
+* `sourceId` - the id of the source node
+* `targetId` - the id of the target node
+
+Here's a quick example of how to set up nodes and edges:
+
+```js
+var nodes = [
+    { id: "kspacey",   label: "Kevin Spacey",  width: 144, height: 100 },
+    { id: "swilliams", label: "Saul Williams", width: 168, height: 100 },
+    { id: "bpitt",     label: "Brad Pitt",     width: 108, height: 100 },
+    { id: "hford",     label: "Harrison Ford", width: 168, height: 100 },
+    { id: "oplat",     label: "Oliver Platt",  width: 144, height: 100 },
+    { id: "kbacon",    label: "Kevin Bacon",   width: 121, height: 100 },
+
+];
+var edges = [
+    { sourceId: "kspacey",   targetId: "swilliams" },
+    { sourceId: "swilliams", targetId: "kbacon" },
+    { sourceId: "bpitt",     targetId: "kbacon" },
+    { sourceId: "hford",     targetId: "oplat" },
+    { sourceId: "oplat",     targetId: "kbacon" }
+];
+```
+
+Next we can ask dagre to do the layout for these nodes and edges. This is done
+with the following code:
+
+```js
+dagre.layout()
+     .nodes(nodes)
+     .edges(edges)
+     .run();
+```
+
+An object with layout information will be attached to each node and edge under
+the `dagre` property.
+
+The node's `dagre` object has the following properties:
+
+* **x** - the x-coordinate of the center of the node
+* **y** - the y-coordinate of the center of the node
+
+The edge's `dagre` object has a `points` property, which is an array of objects
+with the following properties:
+
+* **x** - the x-coordinate for the center of this bend in the edge
+* **y** - the y-coordinate for the center of this bend in the edge
+
+For example, the following layout information is generated for the above objects:
+
+```js
+nodes.forEach(function(u) {
+    console.log("Node " + u.dagre.id + ": " + JSON.stringify(u.dagre));
+});
+edges.forEach(function(e) {
+    console.log("Edge " + e.sourceId + " -> " + e.targetId + ": " +
+                JSON.stringify(e.dagre));
+});
+```
+
+Prints:
+
+```
+Node kspacey: {"id":"kspacey","width":144,"height":100,"rank":0,"order":0,"ul":0,"ur":0,"dl":0,"dr":0,"x":84,"y":50}
+Node swilliams: {"id":"swilliams","width":168,"height":100,"rank":2,"order":0,"ul":0,"ur":0,"dl":0,"dr":0,"x":84,"y":180}
+Node bpitt: {"id":"bpitt","width":108,"height":100,"rank":2,"order":1,"ul":188,"ur":188,"dl":188,"dr":188,"x":272,"y":180}
+Node hford: {"id":"hford","width":168,"height":100,"rank":0,"order":1,"ul":364,"ur":364,"dl":364,"dr":364,"x":448,"y":50}
+Node oplat: {"id":"oplat","width":144,"height":100,"rank":2,"order":2,"ul":364,"ur":364,"dl":364,"dr":364,"x":448,"y":180}
+Node kbacon: {"id":"kbacon","width":121,"height":100,"rank":4,"order":0,"ul":188,"ur":188,"dl":0,"dr":364,"x":272,"y":310}
+
+Edge kspacey -> swilliams: {"points":[{"x":84,"y":115,"ul":0,"ur":0,"dl":0,"dr":0}],"id":"_E0","minLen":2,"width":0,"height":0}
+Edge swilliams -> kbacon: {"points":[{"x":84,"y":245,"ul":0,"ur":0,"dl":0,"dr":0}],"id":"_E1","minLen":2,"width":0,"height":0}
+Edge bpitt -> kbacon: {"points":[{"x":272,"y":245,"ul":188,"ur":188,"dl":188,"dr":188}],"id":"_E2","minLen":2,"width":0,"height":0}
+Edge hford -> oplat: {"points":[{"x":448,"y":115,"ul":364,"ur":364,"dl":364,"dr":364}],"id":"_E3","minLen":2,"width":0,"height":0}
+Edge oplat -> kbacon: {"points":[{"x":448,"y":245,"ul":364,"ur":364,"dl":364,"dr":364}],"id":"_E4","minLen":2,"width":0,"height":0}
+```
+
+Besides just the `x` and `y` coordinates there are other debug attributes that
+are not guaranteed to be present.
+
 ## Resources
 
-* [Issue tracker](https://github.com/cpettitt/dagre/issues).
-* [Mailing list](https://groups.google.com/group/dagre).
+* [Issue tracker](https://github.com/cpettitt/dagre/issues)
+* [Mailing list](https://groups.google.com/group/dagre)
 
 ### Recommend Reading
 
@@ -102,11 +241,10 @@ greatly.
 Dagre has been included as a part of some very cool projects. Here are just a
 couple that stand out:
 
-[JointJS](http://www.daviddurman.com/automatic-graph-layout-with-jointjs-and-dagre.html)
-has a plugin that uses dagre for layout. JointJS focuses on rendering and
-interaction with diagrams, which synergizes well with Dagre. If you want the
-ability to move nodes and manipulate edges interactively, this is a good place
-to start!
+[JointJS][] has a plugin that uses dagre for layout. JointJS focuses on
+rendering and interaction with diagrams, which synergizes well with Dagre. If
+you want the ability to move nodes and manipulate edges interactively, this is
+a good place to start!
 
 Jonathan Mace has a
 [demo](http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json) that
@@ -119,3 +257,5 @@ dagre is licensed under the terms of the MIT License. See the LICENSE file
 for details.
 
 [npm package manager]: http://npmjs.org/
+[D3]: https://github.com/mbostock/d3
+[JointJS]: http://www.daviddurman.com/automatic-graph-layout-with-jointjs-and-dagre.html
