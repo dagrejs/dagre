@@ -6,7 +6,7 @@ PEGJS?=$(NODE_MODULES)/pegjs/bin/pegjs
 MOCHA?=$(NODE_MODULES)/mocha/bin/mocha
 MOCHA_OPTS?=
 JS_COMPILER=$(NODE_MODULES)/uglify-js/bin/uglifyjs
-JS_COMPILER_OPTS?=--compress --mangle --lint
+JS_COMPILER_OPTS?=--compress --mangle
 
 MODULE=dagre
 DIST?=dist
