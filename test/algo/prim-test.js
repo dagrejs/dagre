@@ -1,11 +1,11 @@
 var common = require("../common"),
     assert = require("chai").assert,
     prim = require("../../lib/algo/prim"),
-    Graph = require("graphlib").Graph;
+    Digraph = require("graphlib").Digraph;
 
 describe("algo/prim", function() {
   it("returns a deterministic minimal spanning tree", function() {
-    var g = new Graph();
+    var g = new Digraph();
     [1, 2, 3, 4].forEach(function(u) { g.addNode(u); });
     g.addEdge("12", 1, 2);
     g.addEdge("13", 1, 3);
@@ -19,7 +19,7 @@ describe("algo/prim", function() {
   });
 
   it("returns a single field for a single node graph", function() {
-    var g = new Graph();
+    var g = new Digraph();
     g.addNode(1);
     assert.deepEqual({1: []}, prim(g));
   });

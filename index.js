@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 exports.dot = require("./lib/dot");
-exports.Graph = require("graphlib").Graph;
+exports.Graph = require("graphlib").Digraph;
 exports.layout = require("./lib/layout/layout");
 exports.util = require("./lib/util");
 exports.version = require("./lib/version");

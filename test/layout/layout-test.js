@@ -1,11 +1,11 @@
 var common = require("../common"),
     assert = require("chai").assert,
     layout = require("../../lib/layout/layout"),
-    Graph = require("graphlib").Graph;
+    Digraph = require("graphlib").Digraph;
 
 describe("layout", function() {
   it("preserves edge ids for graphs with edges spanning multiple ranks", function() {
-    var g = new Graph();
+    var g = new Digraph();
     g.addNode(1);
     g.addNode(2);
     g.addNode(3);
