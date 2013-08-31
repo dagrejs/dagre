@@ -30,4 +30,19 @@ describe("layout", function() {
     var n1y = nodes[1].dagre.y;
     assert.isTrue(n0y < n1y, "nodes[0] (" + n0y + ") should be above nodes[1] (" + n1y + ")");
   });
+
+  it("can layout a graph using sourceId and targetId", function() {
+    var nodes = [{id: 1, width: 10, height: 10}, {id: 2, width: 10, height: 10}];
+    var edges = [{sourceId: 1, targetId: 2}];
+
+    layout()
+      .nodes(nodes)
+      .edges(edges)
+      .run();
+
+    // Simple check. nodes[0] should be above nodes[1].
+    var n0y = nodes[0].dagre.y;
+    var n1y = nodes[1].dagre.y;
+    assert.isTrue(n0y < n1y, "nodes[0] (" + n0y + ") should be above nodes[1] (" + n1y + ")");
+  });
 });
