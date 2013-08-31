@@ -21,13 +21,23 @@ JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 BENCH_FILES?=$(wildcard bench/graphs/*)
 
 .PHONY: all
-all: $(MODULE_JS) $(MODULE_MIN_JS) test
+all: $(MODULE_JS) $(MODULE_MIN_JS) demo test
 
 .PHONY: init
 init:
 	rm -rf $(DIST)
 	mkdir -p $(DIST)
-	cp -r demo $(DIST)
+
+# This is extremely brittle and needs to be improved
+.PHONY: demo
+demo: init
+	mkdir $(DIST)/demo
+	@sed 's|../dist/dagre.min.js|http://cpettitt.github.io/project/dagre/latest/dagre.min.js|' < demo/alignment.html > $(DIST)/demo/alignment.html
+	@cp demo/dagre-d3-simple.css $(DIST)/demo
+	@cp demo/dagre-d3-simple.js $(DIST)/demo
+	@sed 's|../dist/dagre.min.js|http://cpettitt.github.io/project/dagre/latest/dagre.min.js|' < demo/demo-d3.html > $(DIST)/demo/demo-d3.html
+	@sed 's|../dist/dagre.min.js|http://cpettitt.github.io/project/dagre/latest/dagre.min.js|' < demo/demo.html > $(DIST)/demo/demo.html
+	@sed 's|../dist/dagre.min.js|http://cpettitt.github.io/project/dagre/latest/dagre.min.js|' < demo/sentence-tokenization.html > $(DIST)/demo/sentence-tokenization.html
 
 .PHONY: release
 release: all
