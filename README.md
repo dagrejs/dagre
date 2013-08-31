@@ -203,6 +203,29 @@ Edge oplat -> kbacon: {"points":[{"x":448,"y":245,"ul":364,"ur":364,"dl":364,"dr
 Besides just the `x` and `y` coordinates there are other debug attributes that
 are not guaranteed to be present.
 
+### Configuring the Layout
+
+Here are a few methods you can call on the layout object to change layout behavior:
+
+* `debugLevel(x)` sets the level of logging verbosity to the number `x`. Currently 4 is th max.
+* `nodeSep(x)` sets the separation between adjacent nodes in the same rank to `x` pixels.
+* `edgeSep(x)` sets the separation between adjacent edges in the same rank to `x` pixels.
+* `rankSep(x)` sets the sepration between ranks in the layout to `x` pixels.
+* `rankDir(x)` sets the direction of the layout.
+    * Defaults to `"TB"` for top-to-bottom layout
+    * `"LR"` sets layout to left-to-right
+
+For example, to set node separation to 20 pixels and the rank direction to left-to-right:
+
+```js
+dagre.layout()
+     .nodes(nodes)
+     .edges(edges)
+     .nodeSep(20)
+     .rankDir("LR")
+     .run();
+```
+
 ## Resources
 
 * [Issue tracker](https://github.com/cpettitt/dagre/issues)
