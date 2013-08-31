@@ -1,3 +1,9 @@
+v0.2.0
+======
+
+This release removes the export of `Graph` from the `graphlib` library. If you
+use `Graph`, please get it directly from `graphlib`.
+
 v0.1.2
 ======
 

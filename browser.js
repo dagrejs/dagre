@@ -19,9 +19,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-global.dagre = {
-  dot: require("./lib/dot"),
-  layout: require("./lib/layout/layout"),
-  util: require("./lib/util"),
-  version: require("./lib/version")
-};
+global.dagre = require("./index");

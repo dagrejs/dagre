@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.1.3-pre",
+  "version": "0.2.0-pre",
   "description": "Directed graph rendering",
   "main": "index.js",
   "directories": {
