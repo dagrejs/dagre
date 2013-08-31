@@ -32,12 +32,12 @@ init:
 .PHONY: demo
 demo: init
 	mkdir $(DIST)/demo
-	@sed 's|../dist/dagre.min.js|http://cpettitt.github.io/project/dagre/latest/dagre.min.js|' < demo/alignment.html > $(DIST)/demo/alignment.html
+	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < demo/alignment.html > $(DIST)/demo/alignment.html
 	@cp demo/dagre-d3-simple.css $(DIST)/demo
 	@cp demo/dagre-d3-simple.js $(DIST)/demo
-	@sed 's|../dist/dagre.min.js|http://cpettitt.github.io/project/dagre/latest/dagre.min.js|' < demo/demo-d3.html > $(DIST)/demo/demo-d3.html
-	@sed 's|../dist/dagre.min.js|http://cpettitt.github.io/project/dagre/latest/dagre.min.js|' < demo/demo.html > $(DIST)/demo/demo.html
-	@sed 's|../dist/dagre.min.js|http://cpettitt.github.io/project/dagre/latest/dagre.min.js|' < demo/sentence-tokenization.html > $(DIST)/demo/sentence-tokenization.html
+	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < demo/demo-d3.html > $(DIST)/demo/demo-d3.html
+	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < demo/demo.html > $(DIST)/demo/demo.html
+	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < demo/sentence-tokenization.html > $(DIST)/demo/sentence-tokenization.html
 
 .PHONY: release
 release: all
