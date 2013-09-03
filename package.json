@@ -21,8 +21,8 @@
     "uglify-js": "2.4.x"
   },
   "dependencies": {
-    "graphlib": "0.1.x",
-    "graphlib-dot": "0.0.x"
+    "graphlib": "0.2.x",
+    "graphlib-dot": "0.0.x >=0.0.4"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
