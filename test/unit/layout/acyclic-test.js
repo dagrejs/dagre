@@ -1,7 +1,6 @@
-var common = require("../common"),
-    assert = require("chai").assert,
-    dot = require("../../lib/dot"),
-    acyclic = require("../../lib/layout/acyclic"),
+var assert = require("../assert"),
+    dot = require("../../../lib/dot"),
+    acyclic = require("../../../lib/layout/acyclic"),
     isAcyclic = require("graphlib").alg.isAcyclic,
     findCycles = require("graphlib").alg.findCycles;
 

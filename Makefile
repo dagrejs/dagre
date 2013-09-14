@@ -11,7 +11,7 @@ MODULE=dagre
 # There does not appear to be an easy way to define recursive expansion, so
 # we do our own expansion a few levels deep.
 JS_SRC:=$(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
-JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
+JS_TEST:=$(wildcard test/unit/*.js test/unit/*/*.js test/unit/*/*/*.js)
 
 DEMO_SRC=$(wildcard demo/*)
 DEMO_OUT=$(addprefix out/dist/, $(DEMO_SRC))
@@ -20,19 +20,24 @@ BENCH_FILES?=$(wildcard bench/graphs/*)
 
 OUT_DIRS=out out/dist out/dist/demo
 
-.PHONY: all release dist dist_demo test coverage clean fullclean
+.PHONY: all release dist dist-demo test test-demo test-unit coverage clean fullclean
 
 all: dist test coverage
 
 release: all
 	src/release/release.sh $(MODULE) out/dist
 
-dist: out/dist/$(MODULE).js out/dist/$(MODULE).min.js dist_demo
+dist: out/dist/$(MODULE).js out/dist/$(MODULE).min.js dist-demo
 
-dist_demo: out/dist/demo $(DEMO_OUT)
+dist-demo: out/dist/demo $(DEMO_OUT)
 
-test: out/dist/$(MODULE).js $(JS_TEST) $(JS_SRC)
+test: test-unit test-demo
+
+test-unit: out/dist/$(MODULE).js $(JS_TEST)
 	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
+
+test-demo: test/demo/demo-test.js out/dist/$(MODULE).min.js dist-demo $(wildcard demo/*)
+	phantomjs $<
 
 coverage: out/coverage.html
 
@@ -56,7 +61,7 @@ out/dist/$(MODULE).min.js: out/dist/$(MODULE).js
 	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) $< > $@
 
 out/dist/demo/%: demo/%
-	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < $< > $@
+	@sed 's|\.\./out/dist/dagre.min.js|../dagre.min.js|' < $< > $@
 
 out/coverage.html: out/dist/$(MODULE).js $(JS_TEST) $(JS_SRC)
 	$(NODE) $(MOCHA) $(JS_TEST) --require blanket -R html-cov > $@

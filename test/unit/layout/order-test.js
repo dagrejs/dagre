@@ -1,7 +1,6 @@
-var common = require("../common"),
-    assert = require("chai").assert,
-    dot = require("../../lib/dot"),
-    order = require("../../lib/layout/order");
+var assert = require("../assert"),
+    dot = require("../../../lib/dot"),
+    order = require("../../../lib/layout/order");
 
 describe("order", function() {
   it("sets order = 0 for a single node", function() {

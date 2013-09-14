@@ -1,6 +1,5 @@
-var common = require("../common"),
-    assert = require("chai").assert,
-    layout = require("../../lib/layout/layout"),
+var assert = require("../assert"),
+    layout = require("../../../lib/layout/layout"),
     Digraph = require("graphlib").Digraph;
 
 describe("layout", function() {

@@ -1,6 +1,5 @@
-var common = require("./common"),
-    assert = require("chai").assert,
-    util = require("../lib/util");
+var assert = require("./assert"),
+    util = require("../../lib/util");
 
 describe("util.sum", function() {
   it("returns the sum of all elements in the array", function() {
