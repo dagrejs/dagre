@@ -20,9 +20,9 @@ BENCH_FILES?=$(wildcard bench/graphs/*)
 
 OUT_DIRS=out out/dist out/dist/demo
 
-.PHONY: all release dist dist_demo test clean fullclean
+.PHONY: all release dist dist_demo test coverage clean fullclean
 
-all: dist test
+all: dist test coverage
 
 release: all
 	src/release/release.sh $(MODULE) out/dist
@@ -33,6 +33,8 @@ dist_demo: out/dist/demo $(DEMO_OUT)
 
 test: out/dist/$(MODULE).js $(JS_TEST) $(JS_SRC)
 	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
+
+coverage: out/coverage.html
 
 bench: bench/bench.js $(MODULE_JS)
 	@$(NODE) bench/bench.js $(BENCH_FILES)
@@ -55,6 +57,9 @@ out/dist/$(MODULE).min.js: out/dist/$(MODULE).js
 
 out/dist/demo/%: demo/%
 	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < $< > $@
+
+out/coverage.html: out/dist/$(MODULE).js $(JS_TEST) $(JS_SRC)
+	$(NODE) $(MOCHA) $(JS_TEST) --require blanket -R html-cov > $@
 
 lib/version.js: src/version.js package.json
 	$(NODE) src/version.js > $@

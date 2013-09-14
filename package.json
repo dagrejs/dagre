@@ -8,12 +8,19 @@
     "test": "test"
   },
   "scripts": {
-    "test": "make test"
+    "blanket": {
+      "pattern": "lib",
+      "data-cover-never": [
+        "node_modules",
+        "test"
+      ]
+    }
   },
   "keywords": [
     "graph"
   ],
   "devDependencies": {
+    "blanket": "1.x.x",
     "browserify": "2.28.x",
     "chai": "1.7.x",
     "mocha": "1.12.x",
