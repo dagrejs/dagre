@@ -1,77 +1,63 @@
 NODE?=node
 NPM?=npm
-NODE_MODULES=node_modules
-BROWSERIFY?=$(NODE_MODULES)/browserify/bin/cmd.js
-PEGJS?=$(NODE_MODULES)/pegjs/bin/pegjs
-MOCHA?=$(NODE_MODULES)/mocha/bin/mocha
+BROWSERIFY?=node_modules/browserify/bin/cmd.js
+MOCHA?=node_modules/mocha/bin/mocha
 MOCHA_OPTS?=
-JS_COMPILER=$(NODE_MODULES)/uglify-js/bin/uglifyjs
-JS_COMPILER_OPTS?=--compress "warnings=false" --mangle --comments
+JS_COMPILER=node_modules/uglify-js/bin/uglifyjs
+JS_COMPILER_OPTS?=--no-seqs
 
 MODULE=dagre
-DIST?=dist
-MODULE_JS=$(DIST)/$(MODULE).js
-MODULE_MIN_JS=$(DIST)/$(MODULE).min.js
 
 # There does not appear to be an easy way to define recursive expansion, so
 # we do our own expansion a few levels deep.
 JS_SRC:=$(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
 JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 
+DEMO_SRC=$(wildcard demo/*)
+DEMO_OUT=$(addprefix out/dist/, $(DEMO_SRC))
+
 BENCH_FILES?=$(wildcard bench/graphs/*)
 
-.PHONY: all
-all: $(MODULE_JS) $(MODULE_MIN_JS) demo test
+OUT_DIRS=out out/dist out/dist/demo
 
-.PHONY: init
-init:
-	rm -rf $(DIST)
-	mkdir -p $(DIST)
+.PHONY: all release dist dist_demo test clean fullclean
 
-# This is extremely brittle and needs to be improved
-.PHONY: demo
-demo: init
-	mkdir $(DIST)/demo
-	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < demo/alignment.html > $(DIST)/demo/alignment.html
-	@cp demo/dagre-d3-simple.css $(DIST)/demo
-	@cp demo/dagre-d3-simple.js $(DIST)/demo
-	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < demo/demo-d3.html > $(DIST)/demo/demo-d3.html
-	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < demo/demo.html > $(DIST)/demo/demo.html
-	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < demo/sentence-tokenization.html > $(DIST)/demo/sentence-tokenization.html
+all: dist test
 
-.PHONY: release
 release: all
-	src/release/release.sh
+	src/release/release.sh $(MODULE) out/dist
 
-$(MODULE_JS): init Makefile $(NODE_MODULES) browser.js lib/version.js $(JS_SRC)
-	@rm -f $@
-	$(NODE) $(BROWSERIFY) browser.js > $@
-	@chmod a-w $@
+dist: out/dist/$(MODULE).js out/dist/$(MODULE).min.js dist_demo
 
-$(MODULE_MIN_JS): $(MODULE_JS)
-	@rm -f $@
-	$(NODE) $(JS_COMPILER) $< $(JS_COMPILER_OPTS) > $@
-	@chmod a-w $@
+dist_demo: out/dist/demo $(DEMO_OUT)
+
+test: out/dist/$(MODULE).js $(JS_TEST) $(JS_SRC)
+	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
+
+bench: bench/bench.js $(MODULE_JS)
+	@$(NODE) bench/bench.js $(BENCH_FILES)
+
+clean:
+	rm -f lib/version.js
+	rm -rf out
+
+fullclean: clean
+	rm -rf node_modules
+
+$(OUT_DIRS):
+	mkdir -p $@
+
+out/dist/$(MODULE).js: browser.js Makefile out/dist node_modules lib/version.js $(JS_SRC)
+	$(NODE) $(BROWSERIFY) $< > $@
+
+out/dist/$(MODULE).min.js: out/dist/$(MODULE).js
+	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) $< > $@
+
+out/dist/demo/%: demo/%
+	@sed 's|../dist/dagre.min.js|../dagre.min.js|' < $< > $@
 
 lib/version.js: src/version.js package.json
 	$(NODE) src/version.js > $@
 
-$(NODE_MODULES): package.json
+node_modules: package.json
 	$(NPM) install
-
-.PHONY: test
-test: $(MODULE_JS) $(JS_TEST)
-	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
-
-.PHONY: bench
-bench: bench/bench.js $(MODULE_JS)
-	@$(NODE) bench/bench.js $(BENCH_FILES)
-
-.PHONY: clean
-clean:
-	rm -f lib/version.js
-	rm -rf $(DIST)
-
-.PHONY: fullclean
-fullclean: clean
-	rm -rf $(NODE_MODULES)
