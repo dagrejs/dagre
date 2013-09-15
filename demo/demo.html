@@ -72,6 +72,8 @@ svg {
 }
 </style>
 
+<body onLoad="tryDraw();">
+
 <h1>Dagre Interactive Demo</h1>
 
 <h2>Input</h2>
@@ -465,8 +467,4 @@ function update() {
       return "translate(" + (-d.bbox.width / 2 + x) + "," + (-d.bbox.height / 2 + y) + ")";
     });
 }
-</script>
-
-<script>
-tryDraw();
 </script>

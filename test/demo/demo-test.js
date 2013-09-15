@@ -5,7 +5,7 @@ var webpage = require("webpage"),
     stderr = system.stderr,
     // Too bad this replaces the more function fs module from nodejs...
     fs = require("fs"),
-    Set = require("graphlib").data.Set
+    Set = require("graphlib").data.Set,
     start = new Date();
 
 var red = "\033[31m";
@@ -21,21 +21,22 @@ var testCount = remaining.size();
 var failures = [];
 
 stdout.write("\n");
-stdout.write("  " + grey);
+stdout.write(grey + "  ");
 
 remaining.keys().forEach(function(url) {
+  stdout.write(".");
   var page = webpage.create();
   page.onError = function(msg, trace) {
     failures.push({ url: url, msg: msg, trace: trace });
     testDone(url);
   };
-  page.open(url, function(status) {
+  page.onLoadFinished = function(status) {
     if (status !== "success") {
       failures.push({ url: url, msg: "Could not load page" });
     }
-    stdout.write(".");
     testDone(url);
-  });
+  };
+  page.open(url, function() {});
 });
 
 function ls(dir, filter) {
