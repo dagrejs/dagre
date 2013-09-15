@@ -17,6 +17,7 @@ function htmlFile(file) { return file.match(/.*\.html/); }
 
 var remaining = Set.unionAll([ls("./demo", htmlFile),
                               ls("./out/dist/demo", htmlFile)]);
+console.log(JSON.stringify(remaining));
 var testCount = remaining.size();
 var failures = [];
 
