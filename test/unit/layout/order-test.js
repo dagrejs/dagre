@@ -1,10 +1,10 @@
 var assert = require("../assert"),
-    dot = require("../../../lib/dot"),
+    dot = require("graphlib-dot"),
     order = require("../../../lib/layout/order");
 
 describe("order", function() {
   it("sets order = 0 for a single node", function() {
-    var g = dot.toGraph("digraph { A [rank=0] }");
+    var g = dot.parse("digraph { A [rank=0] }");
 
     order().run(g);
 
@@ -12,7 +12,7 @@ describe("order", function() {
   });
 
   it("sets order = 0 for 2 connected nodes on different ranks", function() {
-    var g = dot.toGraph("digraph { A [rank=0]; B [rank=1]; A -> B }");
+    var g = dot.parse("digraph { A [rank=0]; B [rank=1]; A -> B }");
 
     order().run(g);
 
@@ -21,7 +21,7 @@ describe("order", function() {
   });
 
   it("sets order = 0 for 2 unconnected nodes on different ranks", function() {
-    var g = dot.toGraph("digraph { A [rank=0]; B [rank=1]; }");
+    var g = dot.parse("digraph { A [rank=0]; B [rank=1]; }");
 
     order().run(g);
 
@@ -30,7 +30,7 @@ describe("order", function() {
   });
 
   it("sets order = 0, 1 for 2 nodes on the same rank", function() {
-    var g = dot.toGraph("digraph { A [rank=0]; B [rank=0]; }");
+    var g = dot.parse("digraph { A [rank=0]; B [rank=0]; }");
 
     order().run(g);
 
@@ -46,7 +46,7 @@ describe("order", function() {
     it("graph1", function() {
       var str = "digraph { A [rank=0]; B [rank=0]; C [rank=1]; D [rank=1]; " +
                   "A -> D; B -> C; }";
-      var g = dot.toGraph(str);
+      var g = dot.parse(str);
 
       var layering = order().run(g);
 
@@ -56,7 +56,7 @@ describe("order", function() {
     it("graph2", function() {
       var str = "digraph { A [rank=0]; B [rank=0]; C [rank=0]; D [rank=1]; E [rank=1]; " +
                   "A -> D; B -> D; B -> E; C -> D; C -> E }";
-      var g = dot.toGraph(str);
+      var g = dot.parse(str);
 
       var layering = order().run(g);
 
@@ -68,7 +68,7 @@ describe("order", function() {
                   "D [rank=1]; E [rank=1]; F [rank=1];" +
                   "G [rank=2]; H [rank=2]; I [rank=2];" +
                   "A -> E; B -> D; C -> F; D -> I; E -> H; F -> G }";
-      var g = dot.toGraph(str);
+      var g = dot.parse(str);
 
       var layering = order().run(g);
 
@@ -79,7 +79,7 @@ describe("order", function() {
 
 describe("order().bilayerCrossCount", function() {
   it("calculates 0 crossings for an empty graph", function() {
-    var g = dot.toGraph("digraph {}");
+    var g = dot.parse("digraph {}");
     var layer1 = [];
     var layer2 = [];
 
@@ -87,7 +87,7 @@ describe("order().bilayerCrossCount", function() {
   });
 
   it("calculates 0 crossings for 2 layers with no crossings", function() {
-    var g = dot.toGraph("digraph {11 -> 21; 12 -> 22; 13 -> 23}");
+    var g = dot.parse("digraph {11 -> 21; 12 -> 22; 13 -> 23}");
     var layer1 = [11, 12, 13];
     var layer2 = [21, 22, 23];
 
@@ -96,7 +96,7 @@ describe("order().bilayerCrossCount", function() {
 
   it("calculates the correct number of crossings 1", function() {
     // Here we have 12 -> 22 crossing 13 -> 21
-    var g = dot.toGraph("digraph {11 -> 21; 12 -> 21; 12 -> 22; 13 -> 21; 13 -> 22}");
+    var g = dot.parse("digraph {11 -> 21; 12 -> 21; 12 -> 22; 13 -> 21; 13 -> 22}");
     var layer1 = [11, 12, 13];
     var layer2 = [21, 22];
 
@@ -105,7 +105,7 @@ describe("order().bilayerCrossCount", function() {
 
   it("calculates the correct number of crossings 2", function() {
     // Here we have 11 -> 22 crossing 12 -> 21 and 13 -> 21, and we have 12 -> 22 crossing 13 -> 21
-    var g = dot.toGraph("digraph {11 -> 22; 12 -> 21; 12 -> 22; 13 -> 21; 13 -> 22}");
+    var g = dot.parse("digraph {11 -> 22; 12 -> 21; 12 -> 22; 13 -> 21; 13 -> 22}");
     var layer1 = [11, 12, 13];
     var layer2 = [21, 22];
 

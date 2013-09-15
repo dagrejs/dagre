@@ -23,13 +23,13 @@
     "blanket": "1.x.x",
     "browserify": "2.28.x",
     "chai": "1.7.x",
+    "graphlib-dot": "0.4.1",
     "mocha": "1.12.x",
     "semver": "2.1.x",
     "uglify-js": "1.2.3"
   },
   "dependencies": {
-    "graphlib": "0.2.x",
-    "graphlib-dot": "0.0.x >=0.0.4"
+    "graphlib": "0.5.6"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
