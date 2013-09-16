@@ -1,0 +1,75 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Dagre D3 Renderer Demo</title>
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="../out/dist/dagre.js"></script>
+
+<style>
+svg {
+  border: 1px solid black;
+}
+
+text {
+  font-weight: 300;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+  font-size: 14px;
+}
+
+rect {
+  fill: #fff;
+}
+
+.node rect {
+  stroke-width: 2px;
+  stroke: #333;
+  fill: none;
+}
+
+.edge rect {
+  fill: #fff;
+}
+
+.edge path {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+</style>
+
+<body onLoad="draw();">
+
+<svg width=650 height=680><g transform="translate(20,20)"/></svg>
+
+<script>
+function draw() {
+  // States and transitions from RFC 793
+  var g = new dagre.Digraph();
+  var states = [ "CLOSED", "LISTEN", "SYN RCVD", "SYN SENT",
+                 "ESTAB", "FINWAIT-1", "CLOSE WAIT", "FINWAIT-2",
+                 "CLOSING", "LAST-ACK", "TIME WAIT" ];
+  states.forEach(function(state) { g.addNode(state, { label: state }); });
+  g.addEdge(null, "CLOSED",     "LISTEN",     { label: "open" });
+  g.addEdge(null, "LISTEN",     "SYN RCVD",   { label: "rcv SYN" });
+  g.addEdge(null, "LISTEN",     "SYN SENT",   { label: "send" });
+  g.addEdge(null, "LISTEN",     "CLOSED",     { label: "close" });
+  g.addEdge(null, "SYN RCVD",   "FINWAIT-1",  { label: "close" });
+  g.addEdge(null, "SYN RCVD",   "ESTAB",      { label: "rcv ACK of SYN" });
+  g.addEdge(null, "SYN SENT",   "SYN RCVD",   { label: "rcv SYN" });
+  g.addEdge(null, "SYN SENT",   "ESTAB",      { label: "rcv SYN, ACK" });
+  g.addEdge(null, "SYN SENT",   "CLOSED",     { label: "close" });
+  g.addEdge(null, "ESTAB",      "FINWAIT-1",  { label: "close" });
+  g.addEdge(null, "ESTAB",      "CLOSE WAIT", { label: "rcv FIN" });
+  g.addEdge(null, "FINWAIT-1",  "FINWAIT-2",  { label: "rcv ACK of FIN" });
+  g.addEdge(null, "FINWAIT-1",  "CLOSING",    { label: "rcv FIN" });
+  g.addEdge(null, "CLOSE WAIT", "LAST-ACK",   { label: "close" });
+  g.addEdge(null, "FINWAIT-2",  "TIME WAIT",  { label: "rcv FIN" });
+  g.addEdge(null, "CLOSING",    "TIME WAIT",  { label: "rcv ACK of FIN" });
+  g.addEdge(null, "LAST-ACK",   "CLOSED",     { label: "rcv ACK of FIN" });
+  g.addEdge(null, "TIME WAIT",  "CLOSED",     { label: "timeout=2MSL" });
+
+  var renderer = new dagre.renderer.D3();
+  graph = renderer.run(g, d3.select("svg g"));
+}
+</script>
