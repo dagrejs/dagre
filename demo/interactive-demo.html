@@ -85,7 +85,7 @@ digraph {
 <h2>Graph Visualization</h2>
 
 <svg width=800 height=600>
-  <g/>
+  <g transform="translate(20, 20)"/>
 </svg>
 
 <script>
@@ -137,7 +137,7 @@ function tryDraw() {
 
     if (result) {
       graphLink.attr("href", graphToURL());
-      var svg = d3.select("svg");
+      var svg = d3.select("svg > g");
       svg.selectAll("*").remove();
       var renderer = new dagre.renderer.D3();
       renderer.run(result, svg.append("g"));
