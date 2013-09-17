@@ -5,7 +5,15 @@
 <meta charset="utf-8">
 <title>Dagre Alignment Debugger</title>
 
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="../out/dist/dagre.min.js"></script>
+<script src="http://cpettitt.github.io/project/graphlib-dot/latest/graphlib-dot.min.js"></script>
+
 <style>
+svg {
+  border: 1px solid #999;
+}
+
 .node {
   fill-opacity: 0.2;
 }
@@ -48,11 +56,9 @@ label {
 .error {
   color: red;
 }
-
-svg {
-  border: 1px solid #999;
-}
 </style>
+
+<body onLoad="tryDraw();">
 
 <h1>Dagre Alignment Debugger</h1>
 
@@ -80,26 +86,11 @@ digraph {
 <h2>Graph Visualization</h2>
 
 <svg width=800 height=600>
-  <defs>
-    <marker id="arrowhead"
-            viewBox="0 0 10 10"
-            refX="8"
-            refY="5"
-            markerUnits="strokeWidth"
-            markerWidth="8"
-            markerHeight="5"
-            orient="auto"
-            style="fill: #333">
-      <path d="M 0 0 L 10 5 L 0 10 z"></path>
-    </marker>
-  </defs>
+  <g transform="translate(20, 20)"/>
 </svg>
 
-<script src="http://d3js.org/d3.v2.min.js"></script>
-<script src="../dist/dagre.min.js"></script>
-
 <script>
-var svg = d3.select("svg");
+var svg = d3.select("svg g");
 var svgOuter = svg.append("g");
 
 // Add zoom behavior to the SVG canvas
@@ -116,30 +107,38 @@ function instance(alignment, offset) {
     .attr("transform", "translate(5, " + (5 + offset) + ")");
 
   var nodes, edges;
-  function draw(nodeData, edgeData) {
+  function draw(graph) {
     // D3 doesn't appear to like rebinding with the same id but a new object,
     // so for now we remove everything.
     svgGroup.selectAll("*").remove();
 
     nodes = svgGroup
       .selectAll("g .node")
-      .data(nodeData, function(d) { return d.id; });
+      .data(graph.nodes());
 
     var nodeEnter = nodes
       .enter()
-      .append("g")
-        .attr("class", "node")
-        .attr("id", function(d) { return "node-" + d.id; });
+        .append("g")
+          .attr("class", "node");
     nodeEnter.append("rect");
     nodes.exit().remove();
 
+    // First find necessary delta...
+    var minX = Math.min.apply(null, graph.nodes().map(function(u) {
+      var value = graph.node(u);
+      return value[alignment] - value.width / 2;
+    }));
+
     nodes
-      .attr("transform", function(d) { return "translate(" + d.dagre[alignment] + "," + d.dagre.y + ")"; })
+      .attr("transform", function(u) {
+        var value = graph.node(u);
+        return "translate(" + (value[alignment] - minX) + "," + value.y + ")";
+      })
       .selectAll("g.node rect")
-        .attr("x", function(d) { return -d.width / 2; })
-        .attr("y", function(d) { return -d.height / 2; })
-        .attr("width", function(d) { return d.width; })
-        .attr("height", function(d) { return d.height; });
+        .attr("x", function(u) { return -graph.node(u).width / 2; })
+        .attr("y", function(u) { return -graph.node(u).height / 2; })
+        .attr("width", function(u) { return graph.node(u).width; })
+        .attr("height", function(u) { return graph.node(u).height; });
   }
 
   return {
@@ -188,44 +187,29 @@ function tryDraw() {
     inputGraph.setAttribute("class", "");
     oldInputGraphValue = inputGraph.value;
     try {
-      result = dagre.dot.toObjects(inputGraph.value);
-      result.edges.forEach(function(e) { if (!e.label) { e.label = ""; } });
+      result = graphlibDot.parse(inputGraph.value);
     } catch (e) {
       inputGraph.setAttribute("class", "error");
+      throw e;
     }
 
     if (result) {
       graphLink.attr("href", graphToURL());
 
-      result.nodes.forEach(function(node) {
-        node.inEdges = [];
-        node.outEdges = [];
-      });
-      result.edges.forEach(function(edge) {
-        edge.source.outEdges.push(edge);
-        edge.target.inEdges.push(edge);
-      });
-
       // Set widths / heights
-      result.nodes.forEach(function(node) {
-        node.width = node.width || 50;
-        node.height = node.height || 50;
+      result.eachNode(function(u, value) {
+        value.width = value.width || 50;
+        value.height = value.height || 50;
       });
 
       // Run the actual layout
       var layout = dagre.layout()
-        .nodes(result.nodes)
-        .edges(result.edges)
         .rankSep(50)
         .debugLevel(2)
-        .run();
+        .run(result);
 
-      instances.forEach(function(instance) {
-        instance.draw(result.nodes, result.edges);
-      });
+      instances.forEach(function(instance) { instance.draw(layout); });
     }
   }
 }
-
-tryDraw();
 </script>
