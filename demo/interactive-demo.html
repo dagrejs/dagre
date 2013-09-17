@@ -136,10 +136,37 @@ function tryDraw() {
     }
 
     if (result) {
+      // Save link to new graph
       graphLink.attr("href", graphToURL());
+
+      // Cleanup old graph
       var svg = d3.select("svg > g");
       svg.selectAll("*").remove();
+
       var renderer = new dagre.renderer.D3();
+
+      // Handle debugAlignment
+      renderer.postLayout(function(graph) {
+        if (debugAlignment) {
+          // First find necessary delta...
+          var minX = Math.min.apply(null, graph.nodes().map(function(u) {
+            var value = graph.node(u);
+            return value[debugAlignment] - value.width / 2;
+          }));
+
+          // Update node positions
+          graph.eachNode(function(u, value) {
+            value.x = value[debugAlignment] - minX;
+          });
+
+          // Update edge positions
+          graph.eachEdge(function(e, u, v, value) {
+            value.points.forEach(function(p) {
+              p.x = p[debugAlignment] - minX;
+            });
+          });
+        }
+      });
       renderer.run(result, svg.append("g"));
 
       // Add zoom behavior
