@@ -4,7 +4,7 @@
 <title>Dagre D3 Renderer Demo</title>
 
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script src="../out/dist/dagre.js"></script>
+<script src="../out/dist/dagre.min.js"></script>
 
 <style>
 svg {
@@ -70,6 +70,6 @@ function draw() {
   g.addEdge(null, "TIME WAIT",  "CLOSED",     { label: "timeout=2MSL" });
 
   var renderer = new dagre.renderer.D3();
-  graph = renderer.run(g, d3.select("svg g"));
+  renderer.run(g, d3.select("svg g"));
 }
 </script>
