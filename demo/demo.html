@@ -141,6 +141,13 @@ function tryDraw() {
       svg.selectAll("*").remove();
       var renderer = new dagre.renderer.D3();
       renderer.run(result, svg.append("g"));
+
+      // Add zoom behavior
+      svg.call(d3.behavior.zoom().on("zoom", function() {
+        var ev = d3.event;
+        svg.select("g")
+          .attr("transform", "translate(" + ev.translate + ") scale(" + ev.scale + ")");
+      }));
     }
   }
 }
