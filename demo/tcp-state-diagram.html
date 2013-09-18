@@ -27,6 +27,14 @@ rect {
   fill: none;
 }
 
+#node-CLOSED rect {
+  fill: #f77;
+}
+
+#node-ESTAB rect {
+  fill: #7f7;
+}
+
 .edge rect {
   fill: #fff;
 }
@@ -70,6 +78,11 @@ function draw() {
   g.addEdge(null, "TIME WAIT",  "CLOSED",     { label: "timeout=2MSL" });
 
   var renderer = new dagre.renderer.D3();
+  var oldDrawNode = renderer.drawNode();
+  renderer.drawNode(function(graph, u, svg) {
+    oldDrawNode(graph, u, svg);
+    svg.attr("id", "node-" + u);
+  });
   renderer.run(g, d3.select("svg g"));
 }
 </script>
