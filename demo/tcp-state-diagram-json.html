@@ -1,0 +1,79 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Dagre D3 Renderer Demo</title>
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script src="http://cpettitt.github.io/project/graphlib/latest/graphlib.min.js"></script>
+<script src="../out/dist/dagre.min.js"></script>
+
+<style>
+svg {
+  border: 1px solid black;
+}
+
+text {
+  font-weight: 300;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+  font-size: 14px;
+}
+
+rect {
+  fill: #fff;
+}
+
+.node rect {
+  stroke-width: 2px;
+  stroke: #333;
+  fill: none;
+}
+
+.edge rect {
+  fill: #fff;
+}
+
+.edge path {
+  fill: none;
+  stroke: #333;
+  stroke-width: 1.5px;
+}
+</style>
+
+<body onLoad="draw();">
+
+<svg width=650 height=680><g transform="translate(20,20)"/></svg>
+
+<script>
+function draw() {
+  // States and transitions from RFC 793
+  var states = [ "CLOSED", "LISTEN", "SYN RCVD", "SYN SENT",
+                 "ESTAB", "FINWAIT-1", "CLOSE WAIT", "FINWAIT-2",
+                 "CLOSING", "LAST-ACK", "TIME WAIT" ]
+           .map(function(s) {
+              return { id: s, value: { label: s } };       
+           });
+  var edges = [
+    { u: "CLOSED",     v: "LISTEN",     value: { label: "open" } },
+    { u: "LISTEN",     v: "SYN RCVD",   value: { label: "rcv SYN" } },
+    { u: "LISTEN",     v: "SYN SENT",   value: { label: "send" } },
+    { u: "LISTEN",     v: "CLOSED",     value: { label: "close" } },
+    { u: "SYN RCVD",   v: "FINWAIT-1",  value: { label: "close" } },
+    { u: "SYN RCVD",   v: "ESTAB",      value: { label: "rcv ACK of SYN" } },
+    { u: "SYN SENT",   v: "SYN RCVD",   value: { label: "rcv SYN" } },
+    { u: "SYN SENT",   v: "ESTAB",      value: { label: "rcv SYN, ACK" } },
+    { u: "SYN SENT",   v: "CLOSED",     value: { label: "close" } },
+    { u: "ESTAB",      v: "FINWAIT-1",  value: { label: "close" } },
+    { u: "ESTAB",      v: "CLOSE WAIT", value: { label: "rcv FIN" } },
+    { u: "FINWAIT-1",  v: "FINWAIT-2",  value: { label: "rcv ACK of FIN" } },
+    { u: "FINWAIT-1",  v: "CLOSING",    value: { label: "rcv FIN" } },
+    { u: "CLOSE WAIT", v: "LAST-ACK",   value: { label: "close" } },
+    { u: "FINWAIT-2",  v: "TIME WAIT",  value: { label: "rcv FIN" } },
+    { u: "CLOSING",    v: "TIME WAIT",  value: { label: "rcv ACK of FIN" } },
+    { u: "LAST-ACK",   v: "CLOSED",     value: { label: "rcv ACK of FIN" } },
+    { u: "TIME WAIT",  v: "CLOSED",     value: { label: "timeout=2MSL" } }
+  ];
+
+  var renderer = new dagre.renderer.D3();
+  renderer.run(graphlib.converter.json.decode(states, edges), d3.select("svg g"));
+}
+</script>
