@@ -24,5 +24,4 @@ exports.layout = require("./lib/layout/layout");
 exports.renderer = {
   D3: require("./lib/renderer/d3")
 };
-exports.util = require("./lib/util");
 exports.version = require("./lib/version");

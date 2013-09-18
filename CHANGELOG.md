@@ -1,3 +1,8 @@
+v0.3.0
+======
+
+* `util` is no longer exported from dagre.
+
 v0.2.0
 ======
 
