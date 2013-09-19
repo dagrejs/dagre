@@ -4,7 +4,7 @@ var path = require("path"),
     fs = require("fs"),
     dagre = require("../index"),
     util = require("../lib/util"),
-    dot = require("../lib/dot"),
+    dot = require("graphlib-dot"),
     acyclic = require("../lib/layout/acyclic"),
     rank = require("../lib/layout/rank"),
     order = require("../lib/layout/order"),
@@ -62,7 +62,7 @@ function processFile(file) {
     if (err) throw err;
     var f = data.toString("utf-8");
     try {
-      var g = dot.toGraph(f);
+      var g = dot.parse(f);
       acyclic(g);
       rank(g);
       layout()._normalize(g);

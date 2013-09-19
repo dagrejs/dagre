@@ -20,7 +20,7 @@ BENCH_FILES?=$(wildcard bench/graphs/*)
 
 OUT_DIRS=out out/dist out/dist/demo
 
-.PHONY: all release dist dist-demo test test-demo test-unit coverage clean fullclean
+.PHONY: all release dist dist-demo test test-demo test-unit coverage bench clean fullclean
 
 all: dist test coverage
 
@@ -41,8 +41,8 @@ test-demo: test/demo/demo-test.js out/dist/$(MODULE).min.js dist-demo $(wildcard
 
 coverage: out/coverage.html
 
-bench: bench/bench.js $(MODULE_JS)
-	@$(NODE) bench/bench.js $(BENCH_FILES)
+bench: bench/bench.js out/dist/$(MODULE).js
+	@$(NODE) $< $(BENCH_FILES)
 
 clean:
 	rm -f lib/version.js
