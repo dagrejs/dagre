@@ -131,8 +131,8 @@ function tryDraw() {
     try {
       result = graphlibDot.parse(inputGraph.value);
     } catch (e) {
-      throw e;
       inputGraph.setAttribute("class", "error");
+      throw e;
     }
 
     if (result) {
