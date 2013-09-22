@@ -29,7 +29,7 @@
     "uglify-js": "1.2.3"
   },
   "dependencies": {
-    "graphlib": "0.5.7"
+    "graphlib": "0.5.8"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
