@@ -1,114 +1,103 @@
 var assert = require("../assert"),
-    dot = require("graphlib-dot"),
-    order = require("../../../lib/layout/order");
+    Digraph = require("graphlib").Digraph,
+    order = require("../../../lib/layout/order"),
+    crossCount = require("../../../lib/layout/order/crossCount");
 
 describe("order", function() {
+  var g;
+
+  beforeEach(function() {
+    g = new Digraph();
+    g.graph({});
+  });
+
   it("sets order = 0 for a single node", function() {
-    var g = dot.parse("digraph { A [rank=0] }");
-
+    g.addNode(1, { rank: 0 });
     order().run(g);
-
-    assert.equal(g.node("A").order, 0);
+    assert.equal(g.node(1).order, 0);
   });
 
   it("sets order = 0 for 2 connected nodes on different ranks", function() {
-    var g = dot.parse("digraph { A [rank=0]; B [rank=1]; A -> B }");
+    g.addNode(1, { rank: 0 });
+    g.addNode(2, { rank: 1 });
+    g.addEdge(null, 1, 2);
 
     order().run(g);
 
-    assert.equal(g.node("A").order, 0);
-    assert.equal(g.node("B").order, 0);
+    assert.equal(g.node(1).order, 0);
+    assert.equal(g.node(2).order, 0);
   });
 
   it("sets order = 0 for 2 unconnected nodes on different ranks", function() {
-    var g = dot.parse("digraph { A [rank=0]; B [rank=1]; }");
+    g.addNode(1, { rank: 0 });
+    g.addNode(2, { rank: 1 });
 
     order().run(g);
 
-    assert.equal(g.node("A").order, 0);
-    assert.equal(g.node("B").order, 0);
+    assert.equal(g.node(1).order, 0);
+    assert.equal(g.node(2).order, 0);
   });
 
   it("sets order = 0, 1 for 2 nodes on the same rank", function() {
-    var g = dot.parse("digraph { A [rank=0]; B [rank=0]; }");
+    g.addNode(1, { rank: 0 });
+    g.addNode(2, { rank: 0 });
 
     order().run(g);
 
-    if (g.node("A").order === 0) {
-      assert.equal(g.node("B").order, 1);
-    } else {
-      assert.equal(g.node("A").order, 1);
-      assert.equal(g.node("B").order, 0);
-    }
+    assert.sameMembers(g.nodes().map(function(u) { return g.node(u).order; }), [0, 1]);
   });
 
   describe("finds minimial crossings", function() {
     it("graph1", function() {
-      var str = "digraph { A [rank=0]; B [rank=0]; C [rank=1]; D [rank=1]; " +
-                  "A -> D; B -> C; }";
-      var g = dot.parse(str);
+      g.addNode(1, { rank: 0 });
+      g.addNode(2, { rank: 0 });
+      g.addNode(3, { rank: 1 });
+      g.addNode(4, { rank: 1 });
+      g.addEdge(null, 1, 4);
+      g.addEdge(null, 2, 3);
 
-      var layering = order().run(g);
+      order().run(g);
 
-      assert.equal(order().crossCount(g, layering), 0);
+      assert.equal(crossCount(g), 0);
     });
 
     it("graph2", function() {
-      var str = "digraph { A [rank=0]; B [rank=0]; C [rank=0]; D [rank=1]; E [rank=1]; " +
-                  "A -> D; B -> D; B -> E; C -> D; C -> E }";
-      var g = dot.parse(str);
+      g.addNode(1, { rank: 0 });
+      g.addNode(2, { rank: 0 });
+      g.addNode(3, { rank: 0 });
+      g.addNode(4, { rank: 1 });
+      g.addNode(5, { rank: 1 });
+      g.addEdge(null, 1, 4);
+      g.addEdge(null, 2, 4);
+      g.addEdge(null, 2, 5);
+      g.addEdge(null, 3, 4);
+      g.addEdge(null, 3, 5);
 
-      var layering = order().run(g);
+      order().run(g);
 
-      assert.equal(order().crossCount(g, layering), 1);
+      assert.equal(crossCount(g), 1);
     });
 
     it("graph3", function() {
-      var str = "digraph { A [rank=0]; B [rank=0]; C [rank=0];" +
-                  "D [rank=1]; E [rank=1]; F [rank=1];" +
-                  "G [rank=2]; H [rank=2]; I [rank=2];" +
-                  "A -> E; B -> D; C -> F; D -> I; E -> H; F -> G }";
-      var g = dot.parse(str);
+      g.addNode(1, { rank: 0 });
+      g.addNode(2, { rank: 0 });
+      g.addNode(3, { rank: 0 });
+      g.addNode(4, { rank: 1 });
+      g.addNode(5, { rank: 1 });
+      g.addNode(6, { rank: 1 });
+      g.addNode(7, { rank: 2 });
+      g.addNode(8, { rank: 2 });
+      g.addNode(9, { rank: 2 });
+      g.addEdge(null, 1, 5);
+      g.addEdge(null, 2, 4);
+      g.addEdge(null, 3, 6);
+      g.addEdge(null, 4, 9);
+      g.addEdge(null, 5, 8);
+      g.addEdge(null, 6, 7);
 
-      var layering = order().run(g);
+      order().run(g);
 
-      assert.equal(order().crossCount(g, layering), 0);
+      assert.equal(crossCount(g), 0);
     });
-  });
-});
-
-describe("order().bilayerCrossCount", function() {
-  it("calculates 0 crossings for an empty graph", function() {
-    var g = dot.parse("digraph {}");
-    var layer1 = [];
-    var layer2 = [];
-
-    assert.equal(order().bilayerCrossCount(g, layer1, layer2), 0);
-  });
-
-  it("calculates 0 crossings for 2 layers with no crossings", function() {
-    var g = dot.parse("digraph {11 -> 21; 12 -> 22; 13 -> 23}");
-    var layer1 = [11, 12, 13];
-    var layer2 = [21, 22, 23];
-
-    assert.equal(order().bilayerCrossCount(g, layer1, layer2), 0);
-  });
-
-  it("calculates the correct number of crossings 1", function() {
-    // Here we have 12 -> 22 crossing 13 -> 21
-    var g = dot.parse("digraph {11 -> 21; 12 -> 21; 12 -> 22; 13 -> 21; 13 -> 22}");
-    var layer1 = [11, 12, 13];
-    var layer2 = [21, 22];
-
-    assert.equal(order().bilayerCrossCount(g, layer1, layer2), 1);
-  });
-
-  it("calculates the correct number of crossings 2", function() {
-    // Here we have 11 -> 22 crossing 12 -> 21 and 13 -> 21, and we have 12 -> 22 crossing 13 -> 21
-    var g = dot.parse("digraph {11 -> 22; 12 -> 21; 12 -> 22; 13 -> 21; 13 -> 22}");
-    var layer1 = [11, 12, 13];
-    var layer2 = [21, 22];
-
-    assert.equal(order().bilayerCrossCount(g, layer1, layer2), 3);
   });
 });

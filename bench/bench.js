@@ -63,16 +63,12 @@ function processFile(file) {
     var f = data.toString("utf-8");
     try {
       var g = dot.parse(f);
-      acyclic(g);
-      rank(g);
-      layout()._normalize(g);
-      var preLayering = order()._initOrder(g);
-      var pre = order().crossCount(g, preLayering);
-      if (pre !== 0) {
-        var start = new Date().getTime();
-        var postLayering = order().run(g);
-        var end = new Date().getTime();
-        var post = order().crossCount(g, postLayering);
+      var start = new Date().getTime();
+      var g2 = layout().run(g);
+      var end = new Date().getTime();
+      var pre = g2.graph().orderInitCC;
+      if (pre > 0) {
+        var post = g2.graph().orderCC;
         var eff = (pre - post) / pre;
         console.log("SUCCESS  -" +
                     "  PRE: " + leftPad(8, pre) +
