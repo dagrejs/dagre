@@ -40,9 +40,9 @@ You can get the latest browser-ready scripts:
 
 Before installing this library you need to install the [npm package manager].
 
-To get graphlib from npm, use:
+To get dagre from npm, use:
 
-    $ npm install graphlib
+    $ npm install dagre
 
 ### Build From Source
 
@@ -88,7 +88,7 @@ var dagre = require("dagre");
 We use [graphlib](https://github.com/cpettitt/graphlib) to create graphs in
 dagre, so its probably worth taking a look at its
 [API](http://cpettitt.github.io/project/graphlib/latest/doc/index.html).
-Graphlib comes bundled with dagre-d3. In this section, we'll show you how to
+Graphlib comes bundled with dagre. In this section, we'll show you how to
 create a simple graph.
 
 A node must be an object with the following properties:
