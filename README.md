@@ -1,4 +1,4 @@
-# dagre - Directed graph rendering
+# dagre - Graph layout for JavaScript
 
 [![Build Status](https://secure.travis-ci.org/cpettitt/dagre.png)](http://travis-ci.org/cpettitt/dagre)
 
