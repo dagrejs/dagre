@@ -20,8 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 exports.Digraph = require("graphlib").Digraph;
+exports.Graph = require("graphlib").Graph;
 exports.layout = require("./lib/layout/layout");
-exports.renderer = {
-  D3: require("./lib/renderer/d3")
-};
 exports.version = require("./lib/version");
