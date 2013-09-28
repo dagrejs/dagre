@@ -15,9 +15,8 @@ describe("initLayerGraphs", function() {
     g.addNode(2, { rank: 0 });
     g.addNode(3, { rank: 0 });
 
-    initLayerGraphs(g);
+    var layerGraphs = initLayerGraphs(g);
 
-    var layerGraphs = g.graph().layerGraphs;
     assert.isDefined(layerGraphs);
     assert.lengthOf(layerGraphs, 1);
     assert.sameMembers(layerGraphs[0].nodes(), [1, 2, 3]);
@@ -31,9 +30,8 @@ describe("initLayerGraphs", function() {
     g.addNode("sg1", {});
     g.parent(2, "sg1");
 
-    initLayerGraphs(g);
+    var layerGraphs = initLayerGraphs(g);
 
-    var layerGraphs = g.graph().layerGraphs;
     assert.isDefined(layerGraphs);
     assert.lengthOf(layerGraphs, 1);
     assert.sameMembers(layerGraphs[0].nodes(), [1, 2, 3, "sg1"]);
@@ -51,9 +49,8 @@ describe("initLayerGraphs", function() {
     g.parent(2, "sg1");
     g.parent(5, "sg1");
 
-    initLayerGraphs(g);
+    var layerGraphs = initLayerGraphs(g);
 
-    var layerGraphs = g.graph().layerGraphs;
     assert.isDefined(layerGraphs);
     assert.lengthOf(layerGraphs, 2);
 
@@ -81,9 +78,8 @@ describe("initLayerGraphs", function() {
     g.parent(5, "sg1");
     g.parent("sg2", "sg1");
 
-    initLayerGraphs(g);
+    var layerGraphs = initLayerGraphs(g);
 
-    var layerGraphs = g.graph().layerGraphs;
     assert.isDefined(layerGraphs);
     assert.lengthOf(layerGraphs, 2);
 
