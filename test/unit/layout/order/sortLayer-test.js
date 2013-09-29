@@ -70,6 +70,7 @@ describe('sortLayer', function() {
     assert.equal(g.node(1).order, 0);
     assert.equal(g.node(2).order, 1);
     assert.equal(g.node(3).order, 2);
+    assert.notProperty(g.node('sg1'), 'order');
   });
 
   it('handles nested subgraphs', function() {
@@ -96,5 +97,7 @@ describe('sortLayer', function() {
     assert.equal(g.node(3).order, 2);
     assert.equal(g.node(4).order, 3);
     assert.equal(g.node(5).order, 4);
+    assert.notProperty(g.node('sg1'), 'order');
+    assert.notProperty(g.node('sg2'), 'order');
   });
 });
