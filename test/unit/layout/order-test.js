@@ -98,6 +98,17 @@ describe("order", function() {
     assert.equal(g.node(4).order, 0);
   });
 
+  it("does not assign an order to a subgraph itself", function() {
+    g.addNode(1, {rank: 0});
+    g.addNode(2, {rank: 1});
+    g.addNode("sg1", {});
+    g.parent(2, "sg1");
+
+    order().run(g);
+
+    assert.notProperty(g.node("sg1"), "order");
+  });
+
   /*
   it("keeps nodes in a subgraph adjacent in a single layer", function() {
     // To test, we set up a total order for the top rank which will cause us to
