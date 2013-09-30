@@ -93,4 +93,27 @@ describe("initLayerGraphs", function() {
     assert.sameMembers(layerGraphs[1].children("sg1"), [5, "sg2"]);
     assert.sameMembers(layerGraphs[1].children("sg2"), [4]);
   });
+
+  it("does not include subgraphs in layers where it has no nodes", function() {
+    // In this example sg1 is the parent of nodes 2 and 5, which are on ranks
+    // 0 and 2 respectively. sg1 should not be included in rank 1 where it has
+    // no nodes.
+    g.addNode(1, { rank: 0 });
+    g.addNode(2, { rank: 0 });
+    g.addNode(3, { rank: 1 });
+    g.addNode(4, { rank: 2 });
+    g.addNode(5, { rank: 2 });
+    g.addNode("sg1", {});
+    g.parent(2, "sg1");
+    g.parent(5, "sg1");
+
+    var layerGraphs = initLayerGraphs(g);
+
+    assert.isDefined(layerGraphs);
+    assert.lengthOf(layerGraphs, 3);
+
+    assert.sameMembers(layerGraphs[0].nodes(), ["sg1", 1, 2]);
+    assert.sameMembers(layerGraphs[1].nodes(), [3]);
+    assert.sameMembers(layerGraphs[2].nodes(), ["sg1", 4, 5]);
+  });
 });
