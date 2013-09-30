@@ -40,5 +40,14 @@ describe("layout/rank", function() {
     assert.equal(g.node("A").rank, 0);
     assert.equal(g.node("B").rank, 2);
   });
+
+  it("does not assign a rank to a subgraph node", function() {
+    var g = dot.parse("digraph { subgraph sg1 { A } }");
+
+    rank(g);
+
+    assert.equal(g.node("A").rank, 0);
+    assert.notProperty(g.node("sg1"), "rank");
+  });
 });
 
