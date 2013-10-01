@@ -48,56 +48,6 @@ describe("order", function() {
     assert.sameMembers(g.nodes().map(function(u) { return g.node(u).order; }), [0, 1]);
   });
 
-  it("respects constraints", function() {
-    // Note that this is the same as "graph1"
-    g.addNode(1, {rank: 0});
-    g.addNode(2, {rank: 0});
-    g.addNode(3, {rank: 1});
-    g.addNode(4, {rank: 1});
-    g.addEdge(null, 1, 4);
-    g.addEdge(null, 2, 3);
-
-    // This constraint graph tells the order function to keep node 4 to the
-    // right of node 3.
-    var cg = new Digraph();
-    cg.addNode(1);
-    cg.addNode(2);
-    cg.addNode(3);
-    cg.addNode(4);
-    cg.addEdge(null, 1, 2);
-    cg.addEdge(null, 3, 4);
-    g.graph({ constraintGraph: cg });
-
-    order().run(g);
-
-    // We should have 1 crossing since we forced an ordering that causes it.
-    assert.equal(crossCount(g), 1);
-  });
-
-  it("can generate a total order with constraints", function() {
-    g.addNode(1, {rank: 0});
-    g.addNode(2, {rank: 0});
-    g.addNode(3, {rank: 0});
-    g.addNode(4, {rank: 0});
-
-    var cg = new Digraph();
-    cg.addNode(1);
-    cg.addNode(2);
-    cg.addNode(3);
-    cg.addNode(4);
-    cg.addEdge(null, 4, 2);
-    cg.addEdge(null, 2, 3);
-    cg.addEdge(null, 3, 1);
-    g.graph({ constraintGraph: cg });
-
-    order().run(g);
-
-    assert.equal(g.node(1).order, 3);
-    assert.equal(g.node(2).order, 1);
-    assert.equal(g.node(3).order, 2);
-    assert.equal(g.node(4).order, 0);
-  });
-
   it("does not assign an order to a subgraph itself", function() {
     g.addNode(1, {rank: 0});
     g.addNode(2, {rank: 1});

@@ -1,7 +1,8 @@
 var assert = require('../../assert'),
     initLayerGraphs = require('../../../../lib/layout/order/initLayerGraphs'),
     sortLayer = require('../../../../lib/layout/order/sortLayer'),
-    CDigraph = require('graphlib').CDigraph;
+    CDigraph = require('graphlib').CDigraph,
+    Digraph = require('graphlib').Digraph;
 
 describe('sortLayer', function() {
   var g;
@@ -23,6 +24,7 @@ describe('sortLayer', function() {
     var layerGraphs = initLayerGraphs(g);
     
     sortLayer(layerGraphs[1],
+              null,
               { 1: [0], 2: [1], 3: [2] });
     
     assert.equal(g.node(1).order, 0);
@@ -42,6 +44,7 @@ describe('sortLayer', function() {
     var layerGraphs = initLayerGraphs(g);
 
     sortLayer(layerGraphs[1],
+              null,
               { 1: [0], 2: [2], 3: [0, 1, 2] });
 
     assert.equal(g.node(1).order, 0);
@@ -65,6 +68,7 @@ describe('sortLayer', function() {
     var layerGraphs = initLayerGraphs(g);
 
     sortLayer(layerGraphs[0],
+              null,
               { 1: [0, 0], 2: [2, 2], 3: [1, 2] });
 
     assert.equal(g.node(1).order, 0);
@@ -90,6 +94,7 @@ describe('sortLayer', function() {
     var layerGraphs = initLayerGraphs(g);
 
     sortLayer(layerGraphs[0],
+              null,
               { 1: [4], 2: [3], 3: [7], 4: [6], 5: [6] });
 
     assert.equal(g.node(1).order, 0);
@@ -115,6 +120,7 @@ describe('sortLayer', function() {
     g.parent(4, 'sg3');
 
     var cg = sortLayer(initLayerGraphs(g)[0],
+                       null,
                        { 1 : [1], 2: [2], 3: [3], 4: [4] });
 
     // Ordering should have sg1 < sg2 < sg3. The constraint graph should thus
@@ -144,6 +150,7 @@ describe('sortLayer', function() {
     g.parent(3, 'sg2');
 
     var cg = sortLayer(initLayerGraphs(g)[0],
+                       null,
                        { 1: [1], 2: [2], 3: [3] });
 
     // Ordering will have sg3 < sg4 and sg1 < sg2. The constraint graph should
@@ -156,5 +163,28 @@ describe('sortLayer', function() {
     assert.sameMembers(cg.successors('sg2'), []);
     assert.sameMembers(cg.successors('sg3'), ['sg4']);
     assert.sameMembers(cg.successors('sg4'), []);
+  });
+
+  it('respects the constraint graph', function() {
+    g.addNode(1, { rank: 0 });
+    g.addNode(2, { rank: 0 });
+    g.addNode('sg1', {});
+    g.parent(1, 'sg1');
+    g.addNode('sg2', {});
+    g.parent(2, 'sg2');
+
+    var layerGraphs = initLayerGraphs(g);
+
+    var cg = new Digraph();
+    cg.addNode('sg1');
+    cg.addNode('sg2');
+    cg.addEdge(null, 'sg1', 'sg2');
+
+    sortLayer(layerGraphs[0],
+              cg,
+              { 1: [2], 2: [1] });
+
+    assert.equal(g.node(1).order, 0);
+    assert.equal(g.node(2).order, 1);
   });
 });
