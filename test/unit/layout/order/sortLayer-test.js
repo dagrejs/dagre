@@ -100,4 +100,61 @@ describe('sortLayer', function() {
     assert.notProperty(g.node('sg1'), 'order');
     assert.notProperty(g.node('sg2'), 'order');
   });
+
+  it('returns a constraint graph for the next layer', function() {
+    g.addNode(1, { rank: 0 });
+    g.addNode(2, { rank: 0 });
+    g.addNode(3, { rank: 0 });
+    g.addNode(4, { rank: 0 });
+    g.addNode('sg1', {});
+    g.addNode('sg2', {});
+    g.addNode('sg3', {});
+    g.parent(1, 'sg1');
+    g.parent(2, 'sg2');
+    g.parent(3, 'sg3');
+    g.parent(4, 'sg3');
+
+    var cg = sortLayer(initLayerGraphs(g)[0],
+                       { 1 : [1], 2: [2], 3: [3], 4: [4] });
+
+    // Ordering should have sg1 < sg2 < sg3. The constraint graph should thus
+    // have sg1 -> sg2 -> sg3;
+    assert.equal(g.node(1).order, 0);
+    assert.equal(g.node(2).order, 1);
+    assert.equal(g.node(3).order, 2);
+    assert.equal(g.node(4).order, 3);
+    assert.sameMembers(cg.nodes(), ['sg1', 'sg2', 'sg3']);
+    assert.sameMembers(cg.successors('sg1'), ['sg2']);
+    assert.sameMembers(cg.successors('sg2'), ['sg3']);
+    assert.sameMembers(cg.successors('sg3'), []);
+  });
+
+  it('returns a constraint graph a layer with nested subgraphs', function() {
+    g.addNode(1, { rank: 0 });
+    g.addNode(2, { rank: 0 });
+    g.addNode(3, { rank: 0 });
+    g.addNode('sg1', {});
+    g.addNode('sg2', {});
+    g.addNode('sg3', {});
+    g.addNode('sg4', {});
+    g.parent('sg3', 'sg1');
+    g.parent('sg4', 'sg1');
+    g.parent(1, 'sg3');
+    g.parent(2, 'sg4');
+    g.parent(3, 'sg2');
+
+    var cg = sortLayer(initLayerGraphs(g)[0],
+                       { 1: [1], 2: [2], 3: [3] });
+
+    // Ordering will have sg3 < sg4 and sg1 < sg2. The constraint graph should
+    // thus have sg3 -> sg4 and sg1 -> sg2.
+    assert.equal(g.node(1).order, 0);
+    assert.equal(g.node(2).order, 1);
+    assert.equal(g.node(3).order, 2);
+    assert.sameMembers(cg.nodes(), ['sg1', 'sg2', 'sg3', 'sg4']);
+    assert.sameMembers(cg.successors('sg1'), ['sg2']);
+    assert.sameMembers(cg.successors('sg2'), []);
+    assert.sameMembers(cg.successors('sg3'), ['sg4']);
+    assert.sameMembers(cg.successors('sg4'), []);
+  });
 });
