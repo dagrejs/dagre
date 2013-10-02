@@ -1,68 +1,41 @@
-NODE?=node
-NPM?=npm
-BROWSERIFY?=node_modules/browserify/bin/cmd.js
-MOCHA?=node_modules/mocha/bin/mocha
-MOCHA_OPTS?=
-JSHINT?=node_modules/jshint/bin/jshint
-JS_COMPILER=node_modules/uglify-js/bin/uglifyjs
-JS_COMPILER_OPTS?=--no-seqs
+# This Makefile acts as a simple wrapper over grunt. It ensures that all NPM
+# dependencies are up-to-date. This Makefile requires grunt-cli, npm, and node
+# to be installed.
+#
+# Once npm is installed, install grunt-cli globally with:
+#
+#      npm install grunt-cli -g
+#
 
-MODULE=dagre
+GRUNT=grunt
+NODE=node
+NPM=npm
 
-# There does not appear to be an easy way to define recursive expansion, so
-# we do our own expansion a few levels deep.
-JS_SRC:=$(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
-JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
+.PHONY: default release dist test bench watch clean fullclean
 
-BENCH_FILES?=$(wildcard bench/graphs/*)
+default: node_modules
+	$(GRUNT) default
 
-OUT_DIRS=out out/dist
+release: node_modules
+	$(GRUNT) release
 
-.PHONY: all release dist test coverage bench clean fullclean
+dist: node_modules
+	$(GRUNT) dist
 
-all: dist test coverage
+test: node_modules
+	$(GRUNT) test
 
-release: all
-	src/release/release.sh $(MODULE) out/dist
+bench: node_modules
+	$(GRUNT) bench
 
-dist: out/dist/$(MODULE).js out/dist/$(MODULE).min.js
+watch: node_modules
+	$(GRUNT) watch
 
-test: test-unit coverage
-
-jshint: $(JS_SRC)
-	$(NODE) $(JSHINT) $(JS_SRC)
-
-coverage: out/coverage.html
-
-test-unit: init $(JS_TEST)
-	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
-
-bench: bench/bench.js out/dist/$(MODULE).js
-	@$(NODE) $< $(BENCH_FILES)
-
-init: Makefile node_modules lib/version.js
-
-clean:
-	rm -f lib/version.js
-	rm -rf out
+clean: node_modules
+	$(GRUNT) clean
 
 fullclean: clean
 	rm -rf node_modules
-
-$(OUT_DIRS):
-	mkdir -p $@
-
-out/dist/$(MODULE).js: browser.js init out/dist $(JS_SRC)
-	$(NODE) $(BROWSERIFY) $< > $@
-
-out/dist/$(MODULE).min.js: out/dist/$(MODULE).js
-	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) $< > $@
-
-out/coverage.html: init $(JS_TEST) $(JS_SRC)
-	$(NODE) $(MOCHA) $(JS_TEST) --require blanket -R html-cov > $@
-
-lib/version.js: src/version.js package.json
-	$(NODE) src/version.js > $@
 
 node_modules: package.json
 	$(NPM) install

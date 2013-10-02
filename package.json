@@ -32,7 +32,8 @@
     "mocha": "1.12.x",
     "semver": "2.1.x",
     "uglify-js": "1.2.3",
-    "browserify": "~2.33.1"
+    "browserify": "~2.33.1",
+    "grunt-contrib-watch": "~0.5.3"
   },
   "dependencies": {
     "graphlib": "0.5.9"

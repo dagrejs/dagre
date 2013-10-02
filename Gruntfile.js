@@ -19,7 +19,7 @@ module.exports = function(grunt) {
         trailing: true,
         laxbreak: true
       },
-      all: ['Gruntfile.js', 'lib/**/*.js', 'test/**/*.js']
+      all: ['Gruntfile.js', 'bench/**/*.js', 'lib/**/*.js', 'test/**/*.js']
     },
     mochacov: {
       test: {
@@ -43,6 +43,15 @@ module.exports = function(grunt) {
           'out/dist/<%= pkg.name %>.min.js': ['out/dist/<%= pkg.name %>.js']
         }
       }
+    },
+    watch: {
+      src: {
+        files: ['lib/**/*.js', 'test/**/*.js'],
+        tasks: ['test', 'jshint'],
+        options: {
+          spawn: false
+        }
+      }
     }
   });
 
@@ -50,6 +59,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha-cov');
 
   // Initialization
