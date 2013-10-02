@@ -1,5 +1,5 @@
-var assert = require('../../assert'),
-    initOrder = require('../../../lib/order/initOrder'),
+var assert = require('../assert'),
+    initOrder = require('../../lib/order/initOrder'),
     CDigraph = require('graphlib').CDigraph;
 
 describe('initOrder', function() {

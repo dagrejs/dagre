@@ -1,8 +1,8 @@
-var assert = require("../assert"),
+var assert = require("./assert"),
     CDigraph = require("graphlib").CDigraph,
     Digraph = require("graphlib").Digraph,
-    order = require("../../lib/order"),
-    crossCount = require("../../lib/order/crossCount");
+    order = require("../lib/order"),
+    crossCount = require("../lib/order/crossCount");
 
 describe("order", function() {
   var g;

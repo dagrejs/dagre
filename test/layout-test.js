@@ -1,5 +1,5 @@
-var assert = require("../assert"),
-    layout = require("../..").layout,
+var assert = require("./assert"),
+    layout = require("..").layout,
     decode = require("graphlib").converter.json.decode,
     Digraph = require("graphlib").Digraph;
 
