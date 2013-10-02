@@ -3,6 +3,7 @@ NPM?=npm
 BROWSERIFY?=node_modules/browserify/bin/cmd.js
 MOCHA?=node_modules/mocha/bin/mocha
 MOCHA_OPTS?=
+JSHINT?=node_modules/jshint/bin/jshint
 JS_COMPILER=node_modules/uglify-js/bin/uglifyjs
 JS_COMPILER_OPTS?=--no-seqs
 
@@ -28,6 +29,9 @@ dist: out/dist/$(MODULE).js out/dist/$(MODULE).min.js
 
 test: out/dist/$(MODULE).js $(JS_TEST)
 	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
+
+jshint: $(JS_SRC)
+	$(NODE) $(JSHINT) $(JS_SRC)
 
 coverage: out/coverage.html
 

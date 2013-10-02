@@ -24,6 +24,7 @@
     "browserify": "2.28.x",
     "chai": "1.7.x",
     "graphlib-dot": "0.4.1",
+    "jshint": "2.1.x",
     "mocha": "1.12.x",
     "semver": "2.1.x",
     "uglify-js": "1.2.3"
