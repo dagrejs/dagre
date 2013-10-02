@@ -2,8 +2,6 @@
 
 [![Build Status](https://secure.travis-ci.org/cpettitt/dagre.png)](http://travis-ci.org/cpettitt/dagre)
 
-[![browser support](https://ci.testling.com/cpettitt/dagre.png)](https://ci.testling.com/cpettitt/dagre)
-
 Dagre is a JavaScript library that makes it easy to lay out directed graphs on
 the client-side.
 
