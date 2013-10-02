@@ -21,5 +21,5 @@ THE SOFTWARE.
 */
 exports.Digraph = require("graphlib").Digraph;
 exports.Graph = require("graphlib").Graph;
-exports.layout = require("./lib/layout/layout");
+exports.layout = require("./lib/layout");
 exports.version = require("./lib/version");

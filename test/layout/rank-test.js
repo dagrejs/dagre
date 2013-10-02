@@ -1,6 +1,6 @@
 var assert = require("../assert"),
     dot = require("graphlib-dot"),
-    rank = require("../../lib/layout/rank");
+    rank = require("../../lib/rank");
 
 describe("layout/rank", function() {
   it("assigns rank 0 to a node in a singleton graph", function() {

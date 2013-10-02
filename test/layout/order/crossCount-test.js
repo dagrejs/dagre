@@ -1,6 +1,6 @@
 var assert = require("../../assert"),
     Digraph = require("graphlib").Digraph,
-    crossCount = require("../../../lib/layout/order/crossCount");
+    crossCount = require("../../../lib/order/crossCount");
 
 describe("crossCount", function() {
   var g;
