@@ -4,11 +4,7 @@ var path = require("path"),
     fs = require("fs"),
     dagre = require("../index"),
     util = require("../lib/util"),
-    dot = require("graphlib-dot"),
-    acyclic = require("../lib/layout/acyclic"),
-    rank = require("../lib/layout/rank"),
-    order = require("../lib/layout/order"),
-    layout = require("../lib/layout/layout");
+    dot = require("graphlib-dot");
 
 var benchmarkFiles = process.argv.slice(2);
 if (benchmarkFiles.length === 0) {
@@ -64,7 +60,7 @@ function processFile(file) {
     try {
       var g = dot.parse(f);
       var start = new Date().getTime();
-      var g2 = layout().run(g);
+      var g2 = dagre.layout().run(g);
       var end = new Date().getTime();
       var pre = g2.graph().orderInitCC;
       if (pre > 0) {
