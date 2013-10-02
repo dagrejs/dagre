@@ -27,16 +27,20 @@ release: all
 
 dist: out/dist/$(MODULE).js out/dist/$(MODULE).min.js
 
-test: out/dist/$(MODULE).js $(JS_TEST)
-	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
+test: test-unit coverage
 
 jshint: $(JS_SRC)
 	$(NODE) $(JSHINT) $(JS_SRC)
 
 coverage: out/coverage.html
 
+test-unit: init $(JS_TEST)
+	$(NODE) $(MOCHA) $(MOCHA_OPTS) $(JS_TEST)
+
 bench: bench/bench.js out/dist/$(MODULE).js
 	@$(NODE) $< $(BENCH_FILES)
+
+init: Makefile node_modules lib/version.js
 
 clean:
 	rm -f lib/version.js
@@ -48,13 +52,13 @@ fullclean: clean
 $(OUT_DIRS):
 	mkdir -p $@
 
-out/dist/$(MODULE).js: browser.js Makefile out/dist node_modules lib/version.js $(JS_SRC)
+out/dist/$(MODULE).js: browser.js init out/dist $(JS_SRC)
 	$(NODE) $(BROWSERIFY) $< > $@
 
 out/dist/$(MODULE).min.js: out/dist/$(MODULE).js
 	$(NODE) $(JS_COMPILER) $(JS_COMPILER_OPTS) $< > $@
 
-out/coverage.html: out/dist/$(MODULE).js $(JS_TEST) $(JS_SRC)
+out/coverage.html: init $(JS_TEST) $(JS_SRC)
 	$(NODE) $(MOCHA) $(JS_TEST) --require blanket -R html-cov > $@
 
 lib/version.js: src/version.js package.json
