@@ -24,16 +24,17 @@ module.exports = function(grunt) {
     mochacov: {
       test: {
         options: {
-          reporter: 'dot'
+          reporter: 'dot',
+          files: ['test/**/*.js']
         }
       },
       coverage: {
         options: {
           reporter: 'html-cov',
-          output: 'out/coverage.html'
+          output: 'out/coverage.html',
+          files: ['test/**/*.js']
         }
-      },
-      all: ['test/**/*.js']
+      }
     },
     moduleName: pkg.name,
     uglify: {
