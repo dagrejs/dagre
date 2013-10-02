@@ -1,6 +1,6 @@
 var assert = require("../../assert"),
     CDigraph = require("graphlib").CDigraph,
-    initLayerGraphs = require("../../../../lib/layout/order/initLayerGraphs");
+    initLayerGraphs = require("../../../lib/layout/order/initLayerGraphs");
 
 describe("initLayerGraphs", function() {
   var g;

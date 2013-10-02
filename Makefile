@@ -11,7 +11,7 @@ MODULE=dagre
 # There does not appear to be an easy way to define recursive expansion, so
 # we do our own expansion a few levels deep.
 JS_SRC:=$(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
-JS_TEST:=$(wildcard test/unit/*.js test/unit/*/*.js test/unit/*/*/*.js)
+JS_TEST:=$(wildcard test/*.js test/*/*.js test/*/*/*.js)
 
 BENCH_FILES?=$(wildcard bench/graphs/*)
 
