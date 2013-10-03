@@ -21,7 +21,8 @@ module.exports = function(grunt) {
         trailing: true,
         laxbreak: true
       },
-      all: ['Gruntfile.js', 'bench/**/*.js', 'lib/**/*.js', 'test/**/*.js']
+      src: ['Gruntfile.js', 'lib/**/*.js', 'test/**/*.js'],
+      bench: ['bench/**/*.js']
     },
     mochacov: {
       test: {
@@ -49,7 +50,14 @@ module.exports = function(grunt) {
     watch: {
       src: {
         files: ['lib/**/*.js', 'test/**/*.js', '!lib/version.js'],
-        tasks: ['test', 'jshint'],
+        tasks: ['test', 'jshint:src:'],
+        options: {
+          spawn: false
+        }
+      },
+      bench: {
+        files: ['bench/**/*.js'],
+        tasks: ['jshint:bench'],
         options: {
           spawn: false
         }
