@@ -89,12 +89,13 @@ module.exports = function(grunt) {
 
   grunt.registerTask('clean', 'Deletes temporary files and dist files', function() {
     deleteFile('lib/version.js');
-    deleteFile('build');
-    deleteFile('dist');
+    deleteDir('build');
+    deleteDir('dist');
   });
 
   // Supporting targets (should be private...)
   grunt.registerTask('_init', function() {
+    grunt.file.mkdir('build');
     grunt.file.write('lib/version.js', 'module.exports = \'' + pkg.version + '\';');
   });
 
@@ -128,6 +129,12 @@ module.exports = function(grunt) {
   function deleteFile(file) {
     if (grunt.file.isFile(file)) {
       grunt.file.delete(file);
+    }
+  }
+
+  function deleteDir(dir) {
+    if (grunt.file.isDir(dir)) {
+      grunt.file.delete(dir);
     }
   }
 };
