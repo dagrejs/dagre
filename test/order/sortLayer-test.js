@@ -1,6 +1,6 @@
-var assert = require('../../assert'),
-    initLayerGraphs = require('../../../lib/order/initLayerGraphs'),
-    sortLayer = require('../../../lib/order/sortLayer'),
+var assert = require('../assert'),
+    initLayerGraphs = require('../../lib/order/initLayerGraphs'),
+    sortLayer = require('../../lib/order/sortLayer'),
     CDigraph = require('graphlib').CDigraph,
     Digraph = require('graphlib').Digraph;
 
