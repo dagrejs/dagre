@@ -72,7 +72,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha-cov');
 
-  // Initialization
+  // Optional configuration
+  if (grunt.option('debug-brk')) {
+    grunt.config('mochacov.test.options.debug-brk', true);
+  }
 
   // Main invocable targets
   grunt.registerTask('default', ['dist', 'test']);
