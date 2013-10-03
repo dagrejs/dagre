@@ -11,7 +11,7 @@ GRUNT=grunt
 NODE=node
 NPM=npm
 
-GRUNT_CMDS = default release build dist test bench watch clean
+GRUNT_CMDS = default release build dist test jshint bench watch clean
 
 .PHONY: $(GRUNT_CMDS) fullclean
 
