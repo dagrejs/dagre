@@ -48,7 +48,7 @@ Before building this library you need to install the [npm package manager].
 
 Check out this project and run this command from the root of the project:
 
-    $ make
+    $ make dist
 
 This will generate `dagre.js` and `dagre.min.js` in the `dist` directory
 of the project.

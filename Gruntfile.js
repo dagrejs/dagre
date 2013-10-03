@@ -3,10 +3,12 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: pkg,
+    moduleJs: '<%= pkg.name %>.js',
+    moduleMinJs: '<%= pkg.name %>.min.js',
     browserify: {
-      dist: {
+      build: {
         files: {
-          'out/dist/<%= pkg.name %>.js': ['browser.js']
+          'build/<%= moduleJs %>': ['browser.js']
         }
       }
     },
@@ -31,22 +33,22 @@ module.exports = function(grunt) {
       coverage: {
         options: {
           reporter: 'html-cov',
-          output: 'out/coverage.html',
+          output: 'build/coverage.html',
           files: ['test/**/*.js']
         }
       }
     },
     moduleName: pkg.name,
     uglify: {
-      dist: {
+      build: {
         files: {
-          'out/dist/<%= pkg.name %>.min.js': ['out/dist/<%= pkg.name %>.js']
+          'build/<%= moduleMinJs %>': ['build/<%= moduleJs %>']
         }
       }
     },
     watch: {
       src: {
-        files: ['lib/**/*.js', 'test/**/*.js'],
+        files: ['lib/**/*.js', 'test/**/*.js', '!lib/version.js'],
         tasks: ['test', 'jshint'],
         options: {
           spawn: false
@@ -67,7 +69,9 @@ module.exports = function(grunt) {
   // Main invocable targets
   grunt.registerTask('default', ['dist', 'test']);
 
-  grunt.registerTask('dist', ['_init', 'browserify', 'uglify']);
+  grunt.registerTask('build', ['_init', 'browserify', 'uglify']);
+
+  grunt.registerTask('dist', ['build', '_dist']);
 
   grunt.registerTask('test', ['_init', 'mochacov:test', 'mochacov:coverage']);
 
@@ -76,13 +80,13 @@ module.exports = function(grunt) {
   grunt.registerTask('release', ['dist', '_release']);
 
   grunt.registerTask('clean', 'Deletes temporary files and dist files', function() {
-    grunt.file.delete('lib/version.js');
-    grunt.file.delete('out');
+    deleteFile('lib/version.js');
+    deleteFile('build');
+    deleteFile('dist');
   });
 
   // Supporting targets (should be private...)
   grunt.registerTask('_init', function() {
-    grunt.file.mkdir('out/dist');
     grunt.file.write('lib/version.js', 'module.exports = \'' + pkg.version + '\';');
   });
 
@@ -97,13 +101,26 @@ module.exports = function(grunt) {
     child.stderr.pipe(process.stderr);
   });
 
+  grunt.registerTask('_dist', function() {
+    grunt.file.mkdir('dist');
+    grunt.file.copy('build/' + grunt.config('moduleJs'), 'dist/' + grunt.config('moduleJs'));
+    grunt.file.copy('build/' + grunt.config('moduleMinJs'), 'dist/' + grunt.config('moduleMinJs'));
+  });
+
   grunt.registerTask('_release', function() {
     var done = this.async();
     var child = grunt.util.spawn({
       cmd: 'src/release/release.sh',
-      args: [grunt.config('moduleName'), 'out/dist']
+      args: [grunt.config('moduleName'), 'dist']
     }, done);
     child.stdout.pipe(process.stdout);
     child.stderr.pipe(process.stderr);
   });
+
+  function deleteFile(file) {
+    if (grunt.file.isFile(file)) {
+      grunt.file.delete(file);
+    }
+  }
 };
+

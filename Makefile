@@ -11,28 +11,12 @@ GRUNT=grunt
 NODE=node
 NPM=npm
 
-.PHONY: default release dist test bench watch clean fullclean
+GRUNT_CMDS = default release build dist test bench watch clean
 
-default: node_modules
-	$(GRUNT) default
+.PHONY: $(GRUNT_CMDS) fullclean
 
-release: node_modules
-	$(GRUNT) release
-
-dist: node_modules
-	$(GRUNT) dist
-
-test: node_modules
-	$(GRUNT) test
-
-bench: node_modules
-	$(GRUNT) bench
-
-watch: node_modules
-	$(GRUNT) watch
-
-clean: node_modules
-	$(GRUNT) clean
+$(GRUNT_CMDS): node_modules
+	$(GRUNT) $@
 
 fullclean: clean
 	rm -rf node_modules
