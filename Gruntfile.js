@@ -63,14 +63,30 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-cov');
 
   // Initialization
-  grunt.file.mkdir('out/dist');
-  grunt.file.write('lib/version.js', 'module.exports = \'' + pkg.version + '\';');
 
   // Main invocable targets
   grunt.registerTask('default', ['dist', 'test']);
-  grunt.registerTask('dist', ['browserify', 'uglify']);
-  grunt.registerTask('test', ['mochacov:test', 'mochacov:coverage']);
-  grunt.registerTask('bench', function() {
+
+  grunt.registerTask('dist', ['_init', 'browserify', 'uglify']);
+
+  grunt.registerTask('test', ['_init', 'mochacov:test', 'mochacov:coverage']);
+
+  grunt.registerTask('bench', ['_init', '_bench']);
+
+  grunt.registerTask('release', ['dist', '_release']);
+
+  grunt.registerTask('clean', 'Deletes temporary files and dist files', function() {
+    grunt.file.delete('lib/version.js');
+    grunt.file.delete('out');
+  });
+
+  // Supporting targets (should be private...)
+  grunt.registerTask('_init', function() {
+    grunt.file.mkdir('out/dist');
+    grunt.file.write('lib/version.js', 'module.exports = \'' + pkg.version + '\';');
+  });
+
+  grunt.registerTask('_bench', function() {
     var done = this.async();
     var args = ['bench/bench.js'].concat(grunt.file.expand('bench/graphs/*'));
     var child = grunt.util.spawn({
@@ -80,7 +96,8 @@ module.exports = function(grunt) {
     child.stdout.pipe(process.stdout);
     child.stderr.pipe(process.stderr);
   });
-  grunt.registerTask('release', function() {
+
+  grunt.registerTask('_release', function() {
     var done = this.async();
     var child = grunt.util.spawn({
       cmd: 'src/release/release.sh',
@@ -88,9 +105,5 @@ module.exports = function(grunt) {
     }, done);
     child.stdout.pipe(process.stdout);
     child.stderr.pipe(process.stderr);
-  });
-  grunt.registerTask('clean', 'Deletes temporary files and dist files', function() {
-    grunt.file.delete('lib/version.js');
-    grunt.file.delete('out');
   });
 };
