@@ -13,7 +13,7 @@ describe("order", function() {
 
   it("sets order = 0 for a single node", function() {
     g.addNode(1, { rank: 0 });
-    order().run(g);
+    order(g);
     assert.equal(g.node(1).order, 0);
   });
 
@@ -22,7 +22,7 @@ describe("order", function() {
     g.addNode(2, { rank: 1 });
     g.addEdge(null, 1, 2);
 
-    order().run(g);
+    order(g);
 
     assert.equal(g.node(1).order, 0);
     assert.equal(g.node(2).order, 0);
@@ -32,7 +32,7 @@ describe("order", function() {
     g.addNode(1, { rank: 0 });
     g.addNode(2, { rank: 1 });
 
-    order().run(g);
+    order(g);
 
     assert.equal(g.node(1).order, 0);
     assert.equal(g.node(2).order, 0);
@@ -42,7 +42,7 @@ describe("order", function() {
     g.addNode(1, { rank: 0 });
     g.addNode(2, { rank: 0 });
 
-    order().run(g);
+    order(g);
 
     assert.sameMembers(g.nodes().map(function(u) { return g.node(u).order; }), [0, 1]);
   });
@@ -53,7 +53,7 @@ describe("order", function() {
     g.addNode("sg1", {});
     g.parent(2, "sg1");
 
-    order().run(g);
+    order(g);
 
     assert.notProperty(g.node("sg1"), "order");
   });
@@ -107,7 +107,7 @@ describe("order", function() {
       g.addEdge(null, 1, 4);
       g.addEdge(null, 2, 3);
 
-      order().run(g);
+      order(g);
 
       assert.equal(crossCount(g), 0);
     });
@@ -124,7 +124,7 @@ describe("order", function() {
       g.addEdge(null, 3, 4);
       g.addEdge(null, 3, 5);
 
-      order().run(g);
+      order(g);
 
       assert.equal(crossCount(g), 1);
     });
@@ -146,7 +146,7 @@ describe("order", function() {
       g.addEdge(null, 5, 8);
       g.addEdge(null, 6, 7);
 
-      order().run(g);
+      order(g);
 
       assert.equal(crossCount(g), 0);
     });
