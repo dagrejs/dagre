@@ -1,5 +1,4 @@
-var common = require("./common"),
-    assert = require("chai").assert,
+var assert = require("./assert"),
     util = require("../lib/util");
 
 describe("util.sum", function() {

@@ -1,13 +1,12 @@
-var common = require("../common"),
-    assert = require("chai").assert,
-    dot = require("../../lib/dot"),
-    acyclic = require("../../lib/layout/acyclic"),
+var assert = require("./assert"),
+    dot = require("graphlib-dot"),
+    acyclic = require("../lib/acyclic"),
     isAcyclic = require("graphlib").alg.isAcyclic,
     findCycles = require("graphlib").alg.findCycles;
 
 describe("acyclic", function() {
   it("does not change acyclic graphs", function() {
-    var g = dot.toGraph("digraph { A -> B; C }");
+    var g = dot.parse("digraph { A -> B; C }");
     acyclic(g);
     assert.deepEqual(g.nodes().sort(), ["A", "B", "C"]);
     assert.deepEqual(g.successors("A"), ["B"]);
@@ -15,7 +14,7 @@ describe("acyclic", function() {
   });
 
   it("reverses edges to make the graph acyclic", function() {
-    var g = dot.toGraph("digraph { A -> B [id=\"AB\"]; B -> A [id=\"BA\"] }");
+    var g = dot.parse("digraph { A -> B [id=\"AB\"]; B -> A [id=\"BA\"] }");
     assert.isFalse(isAcyclic(g));
     acyclic(g);
     assert.deepEqual(g.nodes().sort(), ["A", "B"]);
@@ -26,7 +25,7 @@ describe("acyclic", function() {
   });
 
   it("is a reversible process", function() {
-    var g = dot.toGraph("digraph { A -> B [id=\"AB\"]; B -> A [id=\"BA\"] }");
+    var g = dot.parse("digraph { A -> B [id=\"AB\"]; B -> A [id=\"BA\"] }");
     acyclic(g);
     acyclic.undo(g);
     assert.deepEqual(g.nodes().sort(), ["A", "B"]);
@@ -37,7 +36,7 @@ describe("acyclic", function() {
   });
 
   it("works for multiple cycles", function() {
-    var g = dot.toGraph("digraph { A -> B -> A; B -> C -> D -> E -> C; G -> C; G -> H -> G; H -> I -> J }");
+    var g = dot.parse("digraph { A -> B -> A; B -> C -> D -> E -> C; G -> C; G -> H -> G; H -> I -> J }");
     assert.isFalse(isAcyclic(g));
     acyclic(g);
     assertAcyclic(g);

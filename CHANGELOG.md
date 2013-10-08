@@ -1,3 +1,16 @@
+v0.3.0
+======
+
+**Backwards incompatible** changes:
+
+* Dagre now takes a `dagre.Digraph` or `dagre.Graph` as input for layout. See
+  [README.md](README.md) for details.
+* `util` is no longer exported from dagre.
+
+Backwards compatible changes:
+
+* Dagre can now perform layout for undirected graphs (dagre.Graph).
+
 v0.2.0
 ======
 

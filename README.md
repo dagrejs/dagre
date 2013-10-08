@@ -1,8 +1,6 @@
-# dagre - Directed graph rendering
+# dagre - Graph layout for JavaScript
 
 [![Build Status](https://secure.travis-ci.org/cpettitt/dagre.png)](http://travis-ci.org/cpettitt/dagre)
-
-[![browser support](https://ci.testling.com/cpettitt/dagre.png)](https://ci.testling.com/cpettitt/dagre)
 
 Dagre is a JavaScript library that makes it easy to lay out directed graphs on
 the client-side.
@@ -27,15 +25,6 @@ maintain backwards compatibility for patch level increases (e.g. 0.0.1 to
 0.0.2) but make no claim to backwards compatibility across minor releases (e.g.
 0.0.1 to 0.1.0). Watch our [CHANGELOG](CHANGELOG.md) for details on changes.
 
-## Demo
-
-Try our [interactive demo](http://cpettitt.github.com/project/dagre/latest/demo/demo.html)!
-
-Or see an example of rendering the [TCP state diagram](http://cpettitt.github.com/project/dagre/latest/demo/demo-d3.html).
-
-These demos and more can be found in the `demo` folder of the project. Simply
-open them in your browser - there is no need to start a web server.
-
 ## Getting Dagre
 
 ### Browser Scrips
@@ -49,9 +38,9 @@ You can get the latest browser-ready scripts:
 
 Before installing this library you need to install the [npm package manager].
 
-To get graphlib from npm, use:
+To get dagre from npm, use:
 
-    $ npm install graphlib
+    $ npm install dagre
 
 ### Build From Source
 
@@ -59,7 +48,7 @@ Before building this library you need to install the [npm package manager].
 
 Check out this project and run this command from the root of the project:
 
-    $ make
+    $ make dist
 
 This will generate `dagre.js` and `dagre.min.js` in the `dist` directory
 of the project.
@@ -72,21 +61,12 @@ As mentioned above, dagre's focus in on graph layout only. This means that you
 need something to actually render the graphs with the layout information from
 dagre.
 
-For a simple starting point, we suggest looking at the user contributed
-`demo/dagre-d3-simple.js` script for doing good but easy rendering. To get
-started look at `demo/sentence-tokenization.html`.
+There are a couple of options for rendering:
 
-Another option is to use [JointJS][]. See the link for an article about how to
-use it with Dagre. The ability to manipulate nodes and edges after they are
-layed out and renderer can be very useful!
-
-For even more control over rendering you can write a custom renderer or take
-advantage or a library like [D3][], which makes it easier to creates graphs
-with SVG. The code in `demo/dagre-d3-simple.js` uses D3, so this may be a
-good place to start.
-
-Ultimately we plan to make available some basic renderers for Dagre in the
-near future.
+* [dagre-d3](https://github.com/cpettitt/dagre-d3) is a D3-based renderer for
+  dagre.
+* [JointJS][] is a renderer that provides facilities for editing a graph after
+  it has been rendered.
 
 ### An Example Layout
 
@@ -103,10 +83,11 @@ In node.js you use:
 var dagre = require("dagre");
 ```
 
-
-The current version of Dagre takes an array of nodes and edges, along with some
-optional configuration, and attaches layout information to the nodes and edges
-in the `dagre` property.
+We use [graphlib](https://github.com/cpettitt/graphlib) to create graphs in
+dagre, so its probably worth taking a look at its
+[API](http://cpettitt.github.io/project/graphlib/latest/doc/index.html).
+Graphlib comes bundled with dagre. In this section, we'll show you how to
+create a simple graph.
 
 A node must be an object with the following properties:
 
@@ -116,45 +97,38 @@ A node must be an object with the following properties:
 The attributes would typically come from a rendering engine that has already
 determined the space needed for a node.
 
-An edge must be an object with either references to its adjacent nodes:
-
-* `source` - a reference to the source node
-* `target` - a reference to the target node
-
-Or with the ids of its adjacent nodes:
-
-* `sourceId` - the id of the source node
-* `targetId` - the id of the target node
-
 Here's a quick example of how to set up nodes and edges:
 
 ```js
-var nodes = [
-    { id: "kspacey",   label: "Kevin Spacey",  width: 144, height: 100 },
-    { id: "swilliams", label: "Saul Williams", width: 168, height: 100 },
-    { id: "bpitt",     label: "Brad Pitt",     width: 108, height: 100 },
-    { id: "hford",     label: "Harrison Ford", width: 168, height: 100 },
-    { id: "oplat",     label: "Oliver Platt",  width: 144, height: 100 },
-    { id: "kbacon",    label: "Kevin Bacon",   width: 121, height: 100 },
+// Create a new directed graph
+var g = new dagre.Digraph();
 
-];
-var edges = [
-    { sourceId: "kspacey",   targetId: "swilliams" },
-    { sourceId: "swilliams", targetId: "kbacon" },
-    { sourceId: "bpitt",     targetId: "kbacon" },
-    { sourceId: "hford",     targetId: "oplat" },
-    { sourceId: "oplat",     targetId: "kbacon" }
-];
+// Add nodes to the graph. The first argument is the node id. The second is
+// metadata about the node. In this case we're going to add labels to each of
+// our nodes.
+g.addNode("kspacey",    { label: "Kevin Spacey",  width: 144, height: 100 });
+g.addNode("swilliams",  { label: "Saul Williams", width: 160, height: 100 });
+g.addNode("bpitt",      { label: "Brad Pitt",     width: 108, height: 100 });
+g.addNode("hford",      { label: "Harrison Ford", width: 168, height: 100 });
+g.addNode("lwilson",    { label: "Luke Wilson",   width: 144, height: 100 });
+g.addNode("kbacon",     { label: "Kevin Bacon",   width: 121, height: 100 });
+
+// Add edges to the graph. The first argument is the edge id. Here we use null
+// to indicate that an arbitrary edge id can be assigned automatically. The
+// second argument is the source of the edge. The third argument is the target
+// of the edge.
+g.addEdge(null, "kspacey",   "swilliams");
+g.addEdge(null, "swilliams", "kbacon");
+g.addEdge(null, "bpitt",     "kbacon");
+g.addEdge(null, "hford",     "lwilson");
+g.addEdge(null, "lwilson",   "kbacon");
 ```
 
 Next we can ask dagre to do the layout for these nodes and edges. This is done
 with the following code:
 
 ```js
-dagre.layout()
-     .nodes(nodes)
-     .edges(edges)
-     .run();
+var layout = dagre.layout().run(g);
 ```
 
 An object with layout information will be attached to each node and edge under
@@ -174,12 +148,11 @@ with the following properties:
 For example, the following layout information is generated for the above objects:
 
 ```js
-nodes.forEach(function(u) {
-    console.log("Node " + u.dagre.id + ": " + JSON.stringify(u.dagre));
+layout.eachNode(function(u, value) {
+    console.log("Node " + u + ": " + JSON.stringify(value));
 });
-edges.forEach(function(e) {
-    console.log("Edge " + e.sourceId + " -> " + e.targetId + ": " +
-                JSON.stringify(e.dagre));
+layout.eachEdge(function(e, u, v, value) {
+    console.log("Edge " + u + " -> " + v + ": " + JSON.stringify(value));
 });
 ```
 
@@ -190,14 +163,14 @@ Node kspacey: {"id":"kspacey","width":144,"height":100,"rank":0,"order":0,"ul":0
 Node swilliams: {"id":"swilliams","width":168,"height":100,"rank":2,"order":0,"ul":0,"ur":0,"dl":0,"dr":0,"x":84,"y":180}
 Node bpitt: {"id":"bpitt","width":108,"height":100,"rank":2,"order":1,"ul":188,"ur":188,"dl":188,"dr":188,"x":272,"y":180}
 Node hford: {"id":"hford","width":168,"height":100,"rank":0,"order":1,"ul":364,"ur":364,"dl":364,"dr":364,"x":448,"y":50}
-Node oplat: {"id":"oplat","width":144,"height":100,"rank":2,"order":2,"ul":364,"ur":364,"dl":364,"dr":364,"x":448,"y":180}
+Node lwilson: {"id":"lwilson","width":144,"height":100,"rank":2,"order":2,"ul":364,"ur":364,"dl":364,"dr":364,"x":448,"y":180}
 Node kbacon: {"id":"kbacon","width":121,"height":100,"rank":4,"order":0,"ul":188,"ur":188,"dl":0,"dr":364,"x":272,"y":310}
 
 Edge kspacey -> swilliams: {"points":[{"x":84,"y":115,"ul":0,"ur":0,"dl":0,"dr":0}],"id":"_E0","minLen":2,"width":0,"height":0}
 Edge swilliams -> kbacon: {"points":[{"x":84,"y":245,"ul":0,"ur":0,"dl":0,"dr":0}],"id":"_E1","minLen":2,"width":0,"height":0}
 Edge bpitt -> kbacon: {"points":[{"x":272,"y":245,"ul":188,"ur":188,"dl":188,"dr":188}],"id":"_E2","minLen":2,"width":0,"height":0}
-Edge hford -> oplat: {"points":[{"x":448,"y":115,"ul":364,"ur":364,"dl":364,"dr":364}],"id":"_E3","minLen":2,"width":0,"height":0}
-Edge oplat -> kbacon: {"points":[{"x":448,"y":245,"ul":364,"ur":364,"dl":364,"dr":364}],"id":"_E4","minLen":2,"width":0,"height":0}
+Edge hford -> lwilson: {"points":[{"x":448,"y":115,"ul":364,"ur":364,"dl":364,"dr":364}],"id":"_E3","minLen":2,"width":0,"height":0}
+Edge lwilson -> kbacon: {"points":[{"x":448,"y":245,"ul":364,"ur":364,"dl":364,"dr":364}],"id":"_E4","minLen":2,"width":0,"height":0}
 ```
 
 Besides just the `x` and `y` coordinates there are other debug attributes that
@@ -218,12 +191,10 @@ Here are a few methods you can call on the layout object to change layout behavi
 For example, to set node separation to 20 pixels and the rank direction to left-to-right:
 
 ```js
-dagre.layout()
-     .nodes(nodes)
-     .edges(edges)
-     .nodeSep(20)
-     .rankDir("LR")
-     .run();
+var layout = dagre.layout()
+                  .nodeSep(20)
+                  .rankDir("LR")
+                  .run(g);
 ```
 
 ## Resources

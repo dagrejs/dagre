@@ -1,52 +1,47 @@
 {
   "name": "dagre",
-  "version": "0.2.1-pre",
-  "description": "Directed graph rendering",
+  "version": "0.3.1-pre",
+  "description": "Graph layout for JavaScript",
   "main": "index.js",
   "directories": {
     "src": "src",
     "test": "test"
   },
   "scripts": {
-    "test": "make test"
+    "blanket": {
+      "pattern": "lib",
+      "data-cover-never": [
+        "node_modules",
+        "test"
+      ]
+    }
   },
   "keywords": [
     "graph"
   ],
   "devDependencies": {
-    "browserify": "2.28.x",
+    "blanket": "1.x.x",
     "chai": "1.7.x",
+    "graphlib-dot": "0.4.1",
+    "jshint": "2.1.x",
+    "grunt": "~0.4.1",
+    "grunt-browserify": "~1.2.8",
+    "grunt-contrib-jshint": "~0.6.4",
+    "grunt-contrib-uglify": "~0.2.4",
+    "grunt-mocha-cov": "0.0.7",
     "mocha": "1.12.x",
     "semver": "2.1.x",
-    "uglify-js": "2.4.x"
+    "uglify-js": "1.2.3",
+    "browserify": "~2.33.1",
+    "grunt-contrib-watch": "~0.5.3"
   },
   "dependencies": {
-    "graphlib": "0.2.x",
-    "graphlib-dot": "0.0.x >=0.0.4"
+    "graphlib": "0.5.11"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/cpettitt/dagre.git"
   },
-  "license": "MIT",
-  "testling": {
-    "files": [
-      "test/**/*.js"
-    ],
-    "browsers": [
-      "ie/9..latest",
-      "firefox/17..latest",
-      "firefox/nightly",
-      "chrome/22..latest",
-      "chrome/canary",
-      "opera/12..latest",
-      "opera/next",
-      "safari/5.1..latest",
-      "ipad/6.0..latest",
-      "iphone/6.0..latest",
-      "android-browser/4.2..latest"
-    ],
-    "harness": "mocha"
-  }
+  "license": "MIT"
 }
