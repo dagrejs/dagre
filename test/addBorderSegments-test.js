@@ -28,7 +28,7 @@ describe('addBorderSegments', function() {
     g.addNode(4, { rank: 0, order: 3 });
 
     addBorderSegments(g);
-    var us = nodesInOrder(g);
+    var us = nodesInOrder(g, 0);
     assert.equal(us[0], 1);
     assertLeftBorderSegment(g, us[1], 'sg1', 0);
     assert.equal(us[2], 2);
@@ -44,7 +44,7 @@ describe('addBorderSegments', function() {
     g.parent(2, 'sg1');
 
     addBorderSegments(g);
-    var us = nodesInOrder(g);
+    var us = nodesInOrder(g, 0);
     assert.equal(us[0], 1);
     assertLeftBorderSegment(g, us[1], 'sg1', 0);
     assert.equal(us[2], 2);
@@ -65,7 +65,7 @@ describe('addBorderSegments', function() {
     g.addNode(5, { rank: 0, order: 4 });
 
     addBorderSegments(g);
-    var us = nodesInOrder(g);
+    var us = nodesInOrder(g, 0);
     assert.equal(us[0], 1);
     assertLeftBorderSegment(g, us[1], 'sg1', 0);
     assertLeftBorderSegment(g, us[2], 'sg2', 0);
@@ -75,6 +75,27 @@ describe('addBorderSegments', function() {
     assert.equal(us[6], 4);
     assertRightBorderSegment(g, us[7], 'sg1', 0);
     assert.equal(us[8], 5);
+  });
+
+  it('handles subgraphs across layers', function() {
+    g.addNode('sg1', {});
+    g.addNode(1, { rank: 0, order: 0 });
+    g.parent(1, 'sg1');
+    g.addNode(2, { rank: 1, order: 0 });
+    g.parent(2, 'sg1');
+
+    addBorderSegments(g);
+
+    var rank0 = nodesInOrder(g, 0);
+    assertLeftBorderSegment(g, rank0[0], 'sg1', 0);
+    assertRightBorderSegment(g, rank0[2], 'sg1', 0);
+
+    var rank1 = nodesInOrder(g, 1);
+    assertLeftBorderSegment(g, rank1[0], 'sg1', 1);
+    assertRightBorderSegment(g, rank1[2], 'sg1', 1);
+
+    assert.sameMembers(g.successors(rank0[0]), [ rank1[0] ]);
+    assert.sameMembers(g.successors(rank0[2]), [ rank1[2] ]);
   });
 });
 
@@ -93,9 +114,10 @@ function assertBorderSegment(g, u, sg, rank) {
   assert.equal(g.node(u).rank, rank);
 }
 
-function nodesInOrder(g) {
+function nodesInOrder(g, rank) {
   return g.nodes()
           .filter(function(x) { return !g.children(x).length; })
+          .filter(function(x) { return g.node(x).rank === rank; })
           .sort(function(x, y) {
             return g.node(x).order - g.node(y).order;
           });
