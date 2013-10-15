@@ -49,5 +49,32 @@ describe("layout/rank", function() {
     assert.equal(g.node("A").rank, 0);
     assert.notProperty(g.node("sg1"), "rank");
   });
+
+  it("ranks the 'min' node before any others", function() {
+    var g = dot.parse("digraph { A; B [prefRank = \"min\"]; C; }");
+
+    rank(g);
+
+    assert(g.node("B").rank < g.node("A").rank, "rank of B not less than rank of A");
+    assert(g.node("B").rank < g.node("C").rank, "rank of B not less than rank of C");
+  });
+
+  it("ranks the 'max' node after any others", function() {
+    var g = dot.parse("digraph { A; B [prefRank = \"max\"]; C; }");
+
+    rank(g);
+
+    assert(g.node("B").rank > g.node("A").rank, "rank of B not greater than rank of A");
+    assert(g.node("B").rank > g.node("C").rank, "rank of B not greater than rank of C");
+  });
+
+  it("gives the same rank to nodes with the same preference", function() {
+    var g = dot.parse("digraph { A [prefRank = 1]; B [prefRank = 1]; C [prefRank = 2]; D [prefRank = 2]; A -> B; D -> C; }");
+
+    rank(g);
+
+    assert.equal(g.node("A").rank, g.node("B").rank);
+    assert.equal(g.node("C").rank, g.node("D").rank);
+  });
 });
 
