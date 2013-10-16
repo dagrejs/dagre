@@ -22,6 +22,7 @@
   "devDependencies": {
     "blanket": "1.x.x",
     "chai": "1.7.x",
+    "cp-data": "1.x.x",
     "graphlib-dot": "0.4.1",
     "jshint": "2.1.x",
     "grunt": "~0.4.1",
@@ -36,7 +37,7 @@
     "grunt-contrib-watch": "~0.5.3"
   },
   "dependencies": {
-    "graphlib": "0.5.11"
+    "graphlib": "0.7.0"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
