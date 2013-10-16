@@ -50,12 +50,21 @@ describe("layout/rank", function() {
     assert.notProperty(g.node("sg1"), "rank");
   });
 
-  it("ranks the 'min' node before any others", function() {
-    var g = dot.parse("digraph { A; B [prefRank = \"min\"]; C; }");
+  it("ranks the 'min' node before any adjacent nodes", function() {
+    var g = dot.parse("digraph { A; B [prefRank=min]; C; A -> B -> C }");
 
     rank(g);
 
     assert.isTrue(g.node("B").rank < g.node("A").rank, "rank of B not less than rank of A");
+    assert.isTrue(g.node("B").rank < g.node("C").rank, "rank of B not less than rank of C");
+  });
+
+  it("ranks an unconnected 'min' node at the level of source nodes", function() {
+    var g = dot.parse("digraph { A; B [prefRank=min]; C; A -> C }");
+
+    rank(g);
+
+    assert.equal(g.node("B").rank, g.node("A").rank);
     assert.isTrue(g.node("B").rank < g.node("C").rank, "rank of B not less than rank of C");
   });
 
@@ -68,13 +77,22 @@ describe("layout/rank", function() {
     assert.isTrue(g.node("A").rank - minLen >= g.node("B").rank);
   });
 
-  it("ranks the 'max' node after any others", function() {
-    var g = dot.parse("digraph { A; B [prefRank = \"max\"]; C; }");
+  it("ranks the 'max' node before any adjacent nodes", function() {
+    var g = dot.parse("digraph { A; B [prefRank=max]; A -> B -> C }");
 
     rank(g);
 
     assert.isTrue(g.node("B").rank > g.node("A").rank, "rank of B not greater than rank of A");
     assert.isTrue(g.node("B").rank > g.node("C").rank, "rank of B not greater than rank of C");
+  });
+
+  it("ranks an unconnected 'max' node at the level of sinks nodes", function() {
+    var g = dot.parse("digraph { A; B [prefRank=max]; A -> C }");
+
+    rank(g);
+
+    assert.isTrue(g.node("B").rank > g.node("A").rank, "rank of B not greater than rank of A");
+    assert.equal(g.node("B").rank, g.node("C").rank);
   });
 
   it("ensures that minLen is respected for nodes added to the max rank", function() {
@@ -84,6 +102,14 @@ describe("layout/rank", function() {
     rank(g);
 
     assert.isTrue(g.node("A").rank - minLen >= g.node("B").rank);
+  });
+
+  it("ensures that 'max' nodes are on the same rank as source nodes", function() {
+    var g = dot.parse("digraph { A [prefRank=max]; B }");
+
+    rank(g);
+
+    assert.equal(g.node("A").rank, g.node("B").rank);
   });
 
   it("gives the same rank to nodes with the same preference", function() {
