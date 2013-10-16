@@ -23,7 +23,7 @@
     "blanket": "1.x.x",
     "chai": "1.7.x",
     "cp-data": "1.x.x",
-    "graphlib-dot": "0.4.1",
+    "graphlib-dot": "0.4.8",
     "jshint": "2.1.x",
     "grunt": "~0.4.1",
     "grunt-browserify": "~1.2.8",

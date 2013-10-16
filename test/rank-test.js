@@ -76,5 +76,14 @@ describe("layout/rank", function() {
     assert.equal(g.node("A").rank, g.node("B").rank);
     assert.equal(g.node("C").rank, g.node("D").rank);
   });
+
+  it("does not introduce cycles when constraining ranks", function() {
+    var g = dot.parse("digraph { A; B [prefRank = 1]; C [prefRank=1]; A -> B; C -> A; }");
+
+    // This will throw an error if a cycle is formed
+    rank(g);
+
+    assert.equal(g.node("B").rank, g.node("C").rank);
+  });
 });
 
