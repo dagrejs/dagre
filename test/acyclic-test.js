@@ -71,20 +71,6 @@ describe("acyclic", function() {
     acyclic(g);
     assertAcyclic(g);
   });
-
-  it("reverses edges to 'min' nodes", function() {
-    var g = dot.parse("digraph { A [prefRank = \"min\"]; B -> A }");
-    acyclic(g);
-    assert.deepEqual(g.successors("A"), ["B"]);
-    assertAcyclic(g);
-  });
-
-  it("reverses edges from 'max' nodes", function() {
-    var g = dot.parse("digraph { B [prefRank = \"max\"]; B -> A }");
-    acyclic(g);
-    assert.deepEqual(g.successors("A"), ["B"]);
-    assertAcyclic(g);
-  });
 });
 
 function assertAcyclic(g) {
