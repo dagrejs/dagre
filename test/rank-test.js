@@ -55,8 +55,17 @@ describe("layout/rank", function() {
 
     rank(g);
 
-    assert(g.node("B").rank < g.node("A").rank, "rank of B not less than rank of A");
-    assert(g.node("B").rank < g.node("C").rank, "rank of B not less than rank of C");
+    assert.isTrue(g.node("B").rank < g.node("A").rank, "rank of B not less than rank of A");
+    assert.isTrue(g.node("B").rank < g.node("C").rank, "rank of B not less than rank of C");
+  });
+
+  it("ensures that minLen is respected for nodes added to the min rank", function() {
+    var minLen = 2;
+    var g = dot.parse("digraph { B [prefRank=min]; A -> B [minLen=" + minLen + "] }");
+
+    rank(g);
+
+    assert.isTrue(g.node("A").rank - minLen >= g.node("B").rank);
   });
 
   it("ranks the 'max' node after any others", function() {
@@ -64,8 +73,17 @@ describe("layout/rank", function() {
 
     rank(g);
 
-    assert(g.node("B").rank > g.node("A").rank, "rank of B not greater than rank of A");
-    assert(g.node("B").rank > g.node("C").rank, "rank of B not greater than rank of C");
+    assert.isTrue(g.node("B").rank > g.node("A").rank, "rank of B not greater than rank of A");
+    assert.isTrue(g.node("B").rank > g.node("C").rank, "rank of B not greater than rank of C");
+  });
+
+  it("ensures that minLen is respected for nodes added to the max rank", function() {
+    var minLen = 2;
+    var g = dot.parse("digraph { A [prefRank=max]; A -> B [minLen=" + minLen + "] }");
+
+    rank(g);
+
+    assert.isTrue(g.node("A").rank - minLen >= g.node("B").rank);
   });
 
   it("gives the same rank to nodes with the same preference", function() {
