@@ -3,38 +3,21 @@
   "version": "0.3.2-pre",
   "description": "Graph layout for JavaScript",
   "main": "index.js",
-  "directories": {
-    "src": "src",
-    "test": "test"
-  },
-  "scripts": {
-    "blanket": {
-      "pattern": "lib",
-      "data-cover-never": [
-        "node_modules",
-        "test"
-      ]
-    }
-  },
   "keywords": [
-    "graph"
+    "graph",
+    "layout"
   ],
   "devDependencies": {
-    "blanket": "1.x.x",
-    "chai": "1.7.x",
+    "brfs": "0.0.8",
+    "browserify": "~2.33.1",
+    "chai": "1.8.x",
     "cp-data": "1.x.x",
     "graphlib-dot": "0.4.8",
     "jshint": "2.1.x",
-    "grunt": "~0.4.1",
-    "grunt-browserify": "~1.2.8",
-    "grunt-contrib-jshint": "~0.6.4",
-    "grunt-contrib-uglify": "~0.2.4",
-    "grunt-mocha-cov": "0.0.7",
+    "istanbul": "~0.1.44",
     "mocha": "1.12.x",
     "semver": "2.1.x",
-    "uglify-js": "1.2.3",
-    "browserify": "~2.33.1",
-    "grunt-contrib-watch": "~0.5.3"
+    "uglify-js": "1.2.3"
   },
   "dependencies": {
     "graphlib": "0.7.0"
