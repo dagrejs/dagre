@@ -1,6 +1,7 @@
 var assert = require("./assert"),
     dot = require("graphlib-dot"),
-    rank = require("../lib/rank");
+    rank = require("../lib/rank"),
+    acyclic = require("../lib/acyclic");
 
 describe("layout/rank", function() {
   it("assigns rank 0 to a node in a singleton graph", function() {
@@ -130,7 +131,7 @@ describe("layout/rank", function() {
     assert.equal(g.node("B").rank, g.node("C").rank);
   });
 
-  it("returns a graph with edges all points to the same or successive ranks", function() {
+  it("returns a graph with edges all pointing to the same or successive ranks", function() {
     // This should put B above A and without any other action would leave the
     // out edge from B point to an earlier rank.
     var g = dot.parse("digraph { A -> B; B [prefRank=min]; }");
@@ -140,6 +141,41 @@ describe("layout/rank", function() {
     assert.isTrue(g.node("B").rank < g.node("A").rank);
     assert.sameMembers(g.successors("B"), ["A"]);
     assert.sameMembers(g.successors("A"), []);
+  });
+
+  it("properly maintains the reversed edge state when reorienting edges", function() {
+    // Here we simulate the reversal of an edge (done by the acyclic phase) to
+    // get an acyclic graph. We then constrain the rank of C which will cause
+    // back edges. We check that edges are oriented correctly after undo the
+    // acylic transform.
+    var g = dot.parse("digraph { A -> B -> C; C [prefRank=min]; A -> C [reversed=true] }");
+
+    rank(g);
+
+    assert.isTrue(g.node("C").rank < g.node("A").rank);
+    assert.isTrue(g.node("C").rank < g.node("B").rank);
+
+    acyclic.undo(g);
+
+    assert.sameMembers(g.successors("A"), ["B"]);
+    assert.sameMembers(g.successors("B"), ["C"]);
+    assert.sameMembers(g.successors("C"), ["A"]);
+  });
+
+  it("handles edge reversal correctly when collapsing nodes yields a cycle", function() {
+    // A and A2 get collapsed into a single node and the same happens for B and
+    // B2. This yields a cycle between the A rank and the B rank and one of the
+    // edges must be reversed. However, we want to be sure that the edge is
+    // correct oriented when it comes out of the rank function.
+    var g = dot.parse("digraph { { node [prefRank=A] A A2 } { node [prefRank=B] B B2 } A -> B B2 -> A2 }");
+
+    rank(g);
+    acyclic.undo(g);
+
+    assert.sameMembers(g.successors("A"), ["B"]);
+    assert.sameMembers(g.successors("A2"), []);
+    assert.sameMembers(g.successors("B"), []);
+    assert.sameMembers(g.successors("B2"), ["A2"]);
   });
 });
 
