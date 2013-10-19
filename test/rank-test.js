@@ -3,7 +3,35 @@ var assert = require("./assert"),
     rank = require("../lib/rank"),
     acyclic = require("../lib/acyclic");
 
-describe("layout/rank", function() {
+describe("rank", function() {
+  describe("default", function() {
+    rankTests(function(g) { rank(g); });
+  });
+
+  describe("network simplex", function() {
+    rankTests(function(g) { rank(g, true); });
+
+    it("shortens two edges rather than one", function() {
+      // An example where the network simplex algorithm makes a difference.
+      // The node "mover" could be in rank 1 or 2, but rank 2 minimizes the
+      // weighted edge length sum because it shrinks 2 out-edges while lengthening
+      // 1 in-edge.
+      // Note that non-network simplex ranking doesn't have to get this
+      // one wrong, but it happens to do so because of the initial feasible
+      // tree it builds.  That's true in general.  Network simplex ranking
+      // may provide a better answer because it repeatedly builds feasible
+      // trees until it finds one without negative cut values.
+      var g = dot.parse("digraph { n1 -> n2 -> n3 -> n4;  n1 -> n5 -> n6 -> n7; " +
+                                  "n1 -> mover;  mover -> n4;  mover -> n7; }");
+
+      rank(g, true);
+
+      assert.equal(g.node("mover").rank, 2);
+    });
+  });
+});
+
+function rankTests(rank) {
   it("assigns rank 0 to a node in a singleton graph", function() {
     var g = dot.parse("digraph { A }");
 
@@ -177,5 +205,5 @@ describe("layout/rank", function() {
     assert.sameMembers(g.successors("B"), []);
     assert.sameMembers(g.successors("B2"), ["A2"]);
   });
-});
+}
 
