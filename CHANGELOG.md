@@ -1,3 +1,8 @@
+v0.3.1
+======
+
+* Added support for rank constraints.
+
 v0.3.0
 ======
 

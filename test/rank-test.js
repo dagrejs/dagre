@@ -129,5 +129,17 @@ describe("layout/rank", function() {
 
     assert.equal(g.node("B").rank, g.node("C").rank);
   });
+
+  it("returns a graph with edges all points to the same or successive ranks", function() {
+    // This should put B above A and without any other action would leave the
+    // out edge from B point to an earlier rank.
+    var g = dot.parse("digraph { A -> B; B [prefRank=min]; }");
+
+    rank(g);
+
+    assert.isTrue(g.node("B").rank < g.node("A").rank);
+    assert.sameMembers(g.successors("B"), ["A"]);
+    assert.sameMembers(g.successors("A"), []);
+  });
 });
 
