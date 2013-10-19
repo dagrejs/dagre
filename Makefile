@@ -68,3 +68,4 @@ fullclean: clean
 
 node_modules: package.json
 	$(NPM) install
+	touch node_modules
