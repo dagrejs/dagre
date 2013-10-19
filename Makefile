@@ -26,11 +26,14 @@ TEST_COV = build/coverage
 
 all: build test
 
+lib/version.js: package.json
+	node src/version.js > $@
+
 build: build/$(MODULE_JS) build/$(MODULE_MIN_JS)
 
 build/$(MODULE_JS): browser.js node_modules $(SRC_FILES)
 	mkdir -p $(@D)
-	$(BROWSERIFY) -t brfs $(BROWSERIFY_OPTS) $< > $@
+	$(BROWSERIFY) $(BROWSERIFY_OPTS) $< > $@
 
 build/$(MODULE_MIN_JS): build/$(MODULE_JS)
 	$(UGLIFY) $(UGLIFY_OPTS) $< > $@

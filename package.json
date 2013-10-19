@@ -8,7 +8,6 @@
     "layout"
   ],
   "devDependencies": {
-    "brfs": "0.0.8",
     "browserify": "~2.33.1",
     "chai": "1.8.x",
     "cp-data": "1.x.x",
