@@ -14,8 +14,8 @@ MODULE_JS = $(MODULE).js
 MODULE_MIN_JS = $(MODULE).min.js
 
 # Various files
-SRC_FILES = $(wildcard lib/*.js lib/*/*.js lib/*/*/*.js)
-TEST_FILES= $(wildcard test/unit/*.js test/unit/**/*.js)
+SRC_FILES = index.js $(shell find lib -type f -name '*.js')
+TEST_FILES= $(shell find test -type f -name '*.js')
 
 TEST_COV = build/coverage
 
@@ -48,7 +48,7 @@ $(TEST_COV): $(TEST_FILES) $(SRC_FILES) node_modules
 
 lint: build/lint
 
-build/lint: browser.js index.js $(SRC_FILES) $(TEST_FILES)
+build/lint: browser.js $(SRC_FILES) $(TEST_FILES)
 	mkdir -p $(@D)
 	$(JSHINT) $?
 	touch $@
