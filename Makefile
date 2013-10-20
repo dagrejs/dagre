@@ -48,7 +48,10 @@ test: $(TEST_COV) lint
 
 $(TEST_COV): $(TEST_FILES) $(SRC_FILES) node_modules
 	rm -rf $@
-	$(ISTANBUL) cover $(MOCHA) --dir $@ -- $(MOCHA_OPTS) $(TEST_FILES)
+	$(MOCHA) $(MOCHA_OPTS) $(TEST_FILES)
+# Instanbul instrumentation appears to mess up stack traces, so we run it after
+# ensuring the tests are passing
+	$(ISTANBUL) cover $(MOCHA) --dir $@ -- $(MOCHA_OPTS) $(TEST_FILES) >/dev/null
 
 lint: build/lint
 
