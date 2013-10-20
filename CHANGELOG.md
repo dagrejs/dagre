@@ -1,3 +1,10 @@
+v0.3.2
+======
+
+* Made cp-data a runtime dependency. It was incorrectly specified as a dev
+  dependency, which could case result in the error `cannot find module
+  cp-data`.
+
 v0.3.1
 ======
 
