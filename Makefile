@@ -1,4 +1,5 @@
 # Binaries we use
+NODE = node
 NPM = npm
 
 BROWSERIFY = ./node_modules/browserify/bin/cmd.js
@@ -14,7 +15,7 @@ MODULE_JS = $(MODULE).js
 MODULE_MIN_JS = $(MODULE).min.js
 
 # Various files
-SRC_FILES = index.js $(shell find lib -type f -name '*.js')
+SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js')
 TEST_FILES= $(shell find test -type f -name '*.js')
 
 TEST_COV = build/coverage
@@ -27,7 +28,7 @@ TEST_COV = build/coverage
 all: build test
 
 lib/version.js: package.json
-	node src/version.js > $@
+	$(NODE) src/version.js > $@
 
 build: build/$(MODULE_JS) build/$(MODULE_MIN_JS)
 
@@ -65,6 +66,7 @@ clean:
 
 fullclean: clean
 	rm -rf ./node_modules
+	rm -f lib/version.js
 
 node_modules: package.json
 	$(NPM) install
