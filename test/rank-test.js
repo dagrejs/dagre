@@ -5,7 +5,7 @@ var assert = require("./assert"),
 
 describe("layout/rank", function() {
   it("assigns rank 0 to a node in a singleton graph", function() {
-    var g = dot.parse("digraph { A }");
+    var g = parse("digraph { A }");
 
     rank(g);
 
@@ -13,7 +13,7 @@ describe("layout/rank", function() {
   });
 
   it("assigns successive ranks to succesors", function() {
-    var g = dot.parse("digraph { A -> B }");
+    var g = parse("digraph { A -> B }");
 
     rank(g);
 
@@ -24,7 +24,7 @@ describe("layout/rank", function() {
   it("assigns the minimum rank that satisfies all in-edges", function() {
     // Note that C has in-edges from A and B, so it should be placed at a rank
     // below both of them.
-    var g = dot.parse("digraph { A -> B; B -> C; A -> C }");
+    var g = parse("digraph { A -> B; B -> C; A -> C }");
 
     rank(g);
 
@@ -34,7 +34,7 @@ describe("layout/rank", function() {
   });
 
   it("uses an edge's minLen attribute to determine rank", function() {
-    var g = dot.parse("digraph { A -> B [minLen=2] }");
+    var g = parse("digraph { A -> B [minLen=2] }");
 
     rank(g);
 
@@ -43,7 +43,7 @@ describe("layout/rank", function() {
   });
 
   it("does not assign a rank to a subgraph node", function() {
-    var g = dot.parse("digraph { subgraph sg1 { A } }");
+    var g = parse("digraph { subgraph sg1 { A } }");
 
     rank(g);
 
@@ -52,7 +52,7 @@ describe("layout/rank", function() {
   });
 
   it("ranks the 'min' node before any adjacent nodes", function() {
-    var g = dot.parse("digraph { A; B [prefRank=min]; C; A -> B -> C }");
+    var g = parse("digraph { A; B [prefRank=min]; C; A -> B -> C }");
 
     rank(g);
 
@@ -61,7 +61,7 @@ describe("layout/rank", function() {
   });
 
   it("ranks an unconnected 'min' node at the level of source nodes", function() {
-    var g = dot.parse("digraph { A; B [prefRank=min]; C; A -> C }");
+    var g = parse("digraph { A; B [prefRank=min]; C; A -> C }");
 
     rank(g);
 
@@ -71,7 +71,7 @@ describe("layout/rank", function() {
 
   it("ensures that minLen is respected for nodes added to the min rank", function() {
     var minLen = 2;
-    var g = dot.parse("digraph { B [prefRank=min]; A -> B [minLen=" + minLen + "] }");
+    var g = parse("digraph { B [prefRank=min]; A -> B [minLen=" + minLen + "] }");
 
     rank(g);
 
@@ -79,7 +79,7 @@ describe("layout/rank", function() {
   });
 
   it("ranks the 'max' node before any adjacent nodes", function() {
-    var g = dot.parse("digraph { A; B [prefRank=max]; A -> B -> C }");
+    var g = parse("digraph { A; B [prefRank=max]; A -> B -> C }");
 
     rank(g);
 
@@ -88,7 +88,7 @@ describe("layout/rank", function() {
   });
 
   it("ranks an unconnected 'max' node at the level of sinks nodes", function() {
-    var g = dot.parse("digraph { A; B [prefRank=max]; A -> C }");
+    var g = parse("digraph { A; B [prefRank=max]; A -> C }");
 
     rank(g);
 
@@ -98,7 +98,7 @@ describe("layout/rank", function() {
 
   it("ensures that minLen is respected for nodes added to the max rank", function() {
     var minLen = 2;
-    var g = dot.parse("digraph { A [prefRank=max]; A -> B [minLen=" + minLen + "] }");
+    var g = parse("digraph { A [prefRank=max]; A -> B [minLen=" + minLen + "] }");
 
     rank(g);
 
@@ -106,7 +106,7 @@ describe("layout/rank", function() {
   });
 
   it("ensures that 'max' nodes are on the same rank as source nodes", function() {
-    var g = dot.parse("digraph { A [prefRank=max]; B }");
+    var g = parse("digraph { A [prefRank=max]; B }");
 
     rank(g);
 
@@ -114,7 +114,7 @@ describe("layout/rank", function() {
   });
 
   it("gives the same rank to nodes with the same preference", function() {
-    var g = dot.parse("digraph { A [prefRank = 1]; B [prefRank = 1]; C [prefRank = 2]; D [prefRank = 2]; A -> B; D -> C; }");
+    var g = parse("digraph { A [prefRank = 1]; B [prefRank = 1]; C [prefRank = 2]; D [prefRank = 2]; A -> B; D -> C; }");
 
     rank(g);
 
@@ -123,7 +123,7 @@ describe("layout/rank", function() {
   });
 
   it("does not introduce cycles when constraining ranks", function() {
-    var g = dot.parse("digraph { A; B [prefRank = 1]; C [prefRank=1]; A -> B; C -> A; }");
+    var g = parse("digraph { A; B [prefRank = 1]; C [prefRank=1]; A -> B; C -> A; }");
 
     // This will throw an error if a cycle is formed
     rank(g);
@@ -134,7 +134,7 @@ describe("layout/rank", function() {
   it("returns a graph with edges all pointing to the same or successive ranks", function() {
     // This should put B above A and without any other action would leave the
     // out edge from B point to an earlier rank.
-    var g = dot.parse("digraph { A -> B; B [prefRank=min]; }");
+    var g = parse("digraph { A -> B; B [prefRank=min]; }");
 
     rank(g);
 
@@ -148,7 +148,7 @@ describe("layout/rank", function() {
     // get an acyclic graph. We then constrain the rank of C which will cause
     // back edges. We check that edges are oriented correctly after undo the
     // acylic transform.
-    var g = dot.parse("digraph { A -> B -> C; C [prefRank=min]; A -> C [reversed=true] }");
+    var g = parse("digraph { A -> B -> C; C [prefRank=min]; A -> C [reversed=true] }");
 
     rank(g);
 
@@ -167,7 +167,7 @@ describe("layout/rank", function() {
     // B2. This yields a cycle between the A rank and the B rank and one of the
     // edges must be reversed. However, we want to be sure that the edge is
     // correct oriented when it comes out of the rank function.
-    var g = dot.parse("digraph { { node [prefRank=A] A A2 } { node [prefRank=B] B B2 } A -> B B2 -> A2 }");
+    var g = parse("digraph { { node [prefRank=A] A A2 } { node [prefRank=B] B B2 } A -> B B2 -> A2 }");
 
     rank(g);
     acyclic.undo(g);
@@ -179,3 +179,19 @@ describe("layout/rank", function() {
   });
 });
 
+/*
+ * Parses the given DOT string into a graph and performs some intialization
+ * required for using the rank algorithm.
+ */
+function parse(str) {
+  var g = dot.parse(str);
+
+  // The rank algorithm requires that edges have a `minLen` attribute
+  g.eachEdge(function(e, u, v, value) {
+    if (!("minLen" in value)) {
+      value.minLen = 1;
+    }
+  });
+
+  return g;
+}
