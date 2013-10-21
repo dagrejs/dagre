@@ -205,6 +205,23 @@ function rankTests(rank) {
     assert.sameMembers(g.successors("B"), []);
     assert.sameMembers(g.successors("B2"), ["A2"]);
   });
+
+  it("yields same result with network simplex and without", function() {
+    // The primary purpose of this test is to exercise more of the network
+    // simplex code resulting in better code coverage.
+    var g = parse("digraph { n1 -> n3; n1 -> n4; n1 -> n5; n1 -> n6; n1 -> n7; " +
+                  "n2 -> n3; n2 -> n4; n2 -> n5; n2 -> n6; n2 -> n7; }");
+
+    rank(g);
+
+    assert.equal(g.node("n1").rank, 0);
+    assert.equal(g.node("n2").rank, 0);
+    assert.equal(g.node("n3").rank, 1);
+    assert.equal(g.node("n4").rank, 1);
+    assert.equal(g.node("n5").rank, 1);
+    assert.equal(g.node("n6").rank, 1);
+    assert.equal(g.node("n7").rank, 1);
+  });
 }
 
 /*
