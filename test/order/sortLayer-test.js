@@ -1,8 +1,8 @@
 var assert = require('../assert'),
-    initLayerGraphs = require('../../lib/order/initLayerGraphs'),
+//    initLayerGraphs = require('../../lib/order/initLayerGraphs'),
     sortLayer = require('../../lib/order/sortLayer'),
-    CDigraph = require('graphlib').CDigraph,
-    Digraph = require('graphlib').Digraph;
+    CDigraph = require('graphlib').CDigraph;
+//    Digraph = require('graphlib').Digraph;
 
 describe('sortLayer', function() {
   var g;
@@ -17,13 +17,13 @@ describe('sortLayer', function() {
     // and expect the ordering algorithm to put them in the correct order
     // using the barycenter algorithm.
 
-    g.addNode(1, { rank: 1, order: 2 });
-    g.addNode(2, { rank: 1, order: 1 });
-    g.addNode(3, { rank: 1, order: 0 });
+    g.addNode(1, { rank: 0, order: 2 });
+    g.addNode(2, { rank: 0, order: 1 });
+    g.addNode(3, { rank: 0, order: 0 });
 
     var layerGraphs = initLayerGraphs(g);
     
-    sortLayer(layerGraphs[1],
+    sortLayer(layerGraphs[0],
               null,
               { 1: [0], 2: [1], 3: [2] });
     
@@ -37,13 +37,13 @@ describe('sortLayer', function() {
     // barycenters for the movable nodes. In this test we add multiple weights
     // to node 3 so that it should come before node 2.
 
-    g.addNode(1, { rank: 1, order: 2 });
-    g.addNode(2, { rank: 1, order: 1 });
-    g.addNode(3, { rank: 1, order: 0 });
+    g.addNode(1, { rank: 0, order: 2 });
+    g.addNode(2, { rank: 0, order: 1 });
+    g.addNode(3, { rank: 0, order: 0 });
 
     var layerGraphs = initLayerGraphs(g);
 
-    sortLayer(layerGraphs[1],
+    sortLayer(layerGraphs[0],
               null,
               { 1: [0], 2: [2], 3: [0, 1, 2] });
 
@@ -52,6 +52,7 @@ describe('sortLayer', function() {
     assert.equal(g.node(3).order, 1);
   });
 
+/*
   it('handles a single subgraph', function() {
     // We expect that nodes 1 and 2 will be adjacent since they are in the
     // same subgraph, even though they'd otherwise be at opposite ends of the
@@ -187,4 +188,10 @@ describe('sortLayer', function() {
     assert.equal(g.node(1).order, 0);
     assert.equal(g.node(2).order, 1);
   });
+*/
 });
+
+// Stub until we support ordering clusters
+function initLayerGraphs(g) {
+  return [g];
+}
