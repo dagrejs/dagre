@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.3.3-pre",
+  "version": "0.3.3",
   "description": "Graph layout for JavaScript",
   "main": "index.js",
   "keywords": [

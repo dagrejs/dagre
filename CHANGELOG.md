@@ -1,3 +1,8 @@
+v0.3.3
+======
+
+* Temporarily disable cluster orderer, yielding much better ordering results.
+
 v0.3.2
 ======
 
