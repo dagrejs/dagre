@@ -74,6 +74,8 @@ echo Published to npm
 # Update patch level version + commit
 # -----------------------------------
 node src/release/bump-version.js
+# Rebuild lib/version.js
+make lib/version.js
 git ci package.json -m "Bump version and set as pre-release"
 git push origin
 echo Updated patch version
