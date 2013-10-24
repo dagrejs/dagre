@@ -89,7 +89,7 @@ describe('initCutValues', function() {
   }
 
   function addRevTreeEdge(e, u, v) {
-    t.addEdge(e, v, u, {});
+    t.addEdge(e, v, u, { reversed: true });
     addGraphEdge(e, u, v);
   }
 
