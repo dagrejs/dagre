@@ -73,6 +73,30 @@ describe('initCutValues', function() {
     assertCutValue('eg', 1);
     assertCutValue('fg', 0);
   });
+  
+  it('sets correct cut values for graphviz example variant  with graph back-edge', function() {
+    // This comes from the graphviz paper
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].forEach(function(u) { addNode(u); });
+    addTreeEdge(    'ab', 'a', 'b');
+    addRevTreeEdge( 'cb', 'c', 'b');
+    addTreeEdge(    'cd', 'c', 'd');
+    addTreeEdge(    'dh', 'd', 'h');
+    addRevTreeEdge( 'gh', 'g', 'h');
+    addRevTreeEdge( 'eg', 'e', 'g');
+    addRevTreeEdge( 'fg', 'f', 'g');
+    addGraphEdge(   'ae', 'a', 'e');
+    addGraphEdge(   'af', 'a', 'f');
+    setRoot('a');
+
+    initCutValues(g, t);
+    assertCutValue('ab', 3);
+    assertCutValue('cb', -1);
+    assertCutValue('cd', 3);
+    assertCutValue('dh', 3);
+    assertCutValue('eg', 0);
+    assertCutValue('fg', 0);
+    assertCutValue('gh', -1);
+  });
 
   function addNode(u) {
     g.addNode(u, {});
