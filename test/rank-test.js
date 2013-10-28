@@ -133,7 +133,7 @@ function rankTests(rank) {
     assert.isTrue(g.node('A').rank - minLen >= g.node('B').rank);
   });
 
-  it('ensures that \'max\' nodes are on the same rank as source nodes', function() {
+  it('ensures that \'aax\' nodes are on the same rank as source nodes', function() {
     var g = parse('digraph { A [prefRank=max]; B }');
 
     rank(g);
@@ -142,7 +142,7 @@ function rankTests(rank) {
   });
 
   it('gives the same rank to nodes with the same preference', function() {
-    var g = parse('digraph { A [prefRank = 1]; B [prefRank = 1]; C [prefRank = 2]; D [prefRank = 2]; A -> B; D -> C; }');
+    var g = parse('digraph { A [prefRank=same_1]; B [prefRank=same_1]; C [prefRank=same_2]; D [prefRank=same_2]; A -> B; D -> C; }');
 
     rank(g);
 
@@ -150,8 +150,26 @@ function rankTests(rank) {
     assert.equal(g.node('C').rank, g.node('D').rank);
   });
 
+  it('does not apply rank constraints that are not min, max, same_*', function() {
+    var g = parse('digraph { A [prefRank=foo]; B [prefRank=foo]; A -> B }');
+
+    // Disable console.error since we're intentionally triggering it
+    var oldError = console.error;
+    var errors = [];
+    try {
+      console.error = function(x) { errors.push(x); };
+      rank(g);
+      assert.equal(g.node('A').rank, 0);
+      assert.equal(g.node('B').rank, 1);
+      assert.isTrue(errors.length >= 1);
+      assert.equal(errors[0], 'Unsupported rank type: foo');
+    } finally {
+      console.error = oldError;
+    }
+  });
+
   it('does not introduce cycles when constraining ranks', function() {
-    var g = parse('digraph { A; B [prefRank = 1]; C [prefRank=1]; A -> B; C -> A; }');
+    var g = parse('digraph { A; B [prefRank=same_1]; C [prefRank=same_1]; A -> B; C -> A; }');
 
     // This will throw an error if a cycle is formed
     rank(g);
@@ -195,7 +213,7 @@ function rankTests(rank) {
     // B2. This yields a cycle between the A rank and the B rank and one of the
     // edges must be reversed. However, we want to be sure that the edge is
     // correct oriented when it comes out of the rank function.
-    var g = parse('digraph { { node [prefRank=A] A A2 } { node [prefRank=B] B B2 } A -> B B2 -> A2 }');
+    var g = parse('digraph { { node [prefRank=same_A] A A2 } { node [prefRank=same_B] B B2 } A -> B B2 -> A2 }');
 
     rank(g);
     acyclic.undo(g);

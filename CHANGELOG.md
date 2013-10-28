@@ -1,3 +1,10 @@
+v0.3.4
+======
+
+* Rank constraint values may be one of 'min', 'max', or a value that starts
+  with 'same\_'. The latter groups all nodes with the same value into the same
+  rank.
+
 v0.3.3
 ======
 
