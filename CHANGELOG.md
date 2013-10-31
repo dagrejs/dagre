@@ -1,6 +1,8 @@
 v0.3.4
 ======
 
+* Fix a bug in instrumentation that caused dagre to throw an exception when
+  used with IE.
 * Rank constraint values may be one of 'min', 'max', or a value that starts
   with 'same\_'. The latter groups all nodes with the same value into the same
   rank.
