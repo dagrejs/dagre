@@ -1,3 +1,8 @@
+v0.3.6
+======
+
+* Fix a bug where some dummy edges were leaked to the layout graph
+
 v0.3.5
 ======
 

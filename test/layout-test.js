@@ -57,4 +57,15 @@ describe("layout", function() {
 
     assert.sameMembers(outputGraph.edges(), ["foo"]);
   });
+
+  it("does not add dummy edges", function() {
+    var inputGraph = new Digraph();
+    inputGraph.addNode(1);
+    inputGraph.addNode(2);
+    inputGraph.addEdge("foo", 1, 2, { minLen: 4 });
+
+    var outputGraph = layout().run(inputGraph);
+
+    assert.sameMembers(outputGraph.edges(), ["foo"]);
+  });
 });
