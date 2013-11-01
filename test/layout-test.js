@@ -24,7 +24,7 @@ describe("layout", function() {
 
     var g = layout()
       .run(decode(nodes, edges));
-    
+
     // Simple check. node 1 should be above node 2.
     var n1y = g.node(1).y;
     var n2y = g.node(2).y;
@@ -43,5 +43,18 @@ describe("layout", function() {
     var n1y = g.node(1).y;
     var n2y = g.node(2).y;
     assert.notEqual(n1y, n2y);
+  });
+
+  it("preserves edge ids", function() {
+    // This is a test that covers a bug we found where the original edge id was
+    // being lost when the final graph was constructed during layout.
+    var inputGraph = new Digraph();
+    inputGraph.addNode(1);
+    inputGraph.addNode(2);
+    inputGraph.addEdge("foo", 1, 2);
+
+    var outputGraph = layout().run(inputGraph);
+
+    assert.sameMembers(outputGraph.edges(), ["foo"]);
   });
 });

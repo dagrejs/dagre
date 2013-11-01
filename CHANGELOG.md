@@ -1,3 +1,8 @@
+v0.3.5
+======
+
+* Fix a bug where edge ids were lost during layout
+
 v0.3.4
 ======
 
