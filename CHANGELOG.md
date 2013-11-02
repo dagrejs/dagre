@@ -1,3 +1,8 @@
+v0.3.7
+======
+
+* Add bounding box information to output graph
+
 v0.3.6
 ======
 

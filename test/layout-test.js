@@ -68,4 +68,16 @@ describe("layout", function() {
 
     assert.sameMembers(outputGraph.edges(), ["foo"]);
   });
+
+  it("includes bounding box information", function() {
+    var inputGraph = new Digraph();
+    inputGraph.addNode(1, { width: 50, height: 20 });
+    inputGraph.addNode(2, { width: 100, height: 30 });
+    inputGraph.addEdge(null, 1, 2, {});
+
+    var outputGraph = layout().run(inputGraph);
+
+    assert.equal(outputGraph.graph().bbox.width, 100);
+    assert.equal(outputGraph.graph().bbox.height, 20 + 30 + layout().rankSep());
+  });
 });
