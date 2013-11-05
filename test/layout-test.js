@@ -1,23 +1,23 @@
-var assert = require("./assert"),
-    layout = require("..").layout,
-    decode = require("graphlib").converter.json.decode,
-    Graph = require("graphlib").Graph;
-    Digraph = require("graphlib").Digraph;
+var assert = require('./assert'),
+    layout = require('..').layout,
+    decode = require('graphlib').converter.json.decode,
+    Graph = require('graphlib').Graph;
+    Digraph = require('graphlib').Digraph;
 
-describe("layout", function() {
-  it("preserves edge ids for graphs with edges spanning multiple ranks", function() {
+describe('layout', function() {
+  it('preserves edge ids for graphs with edges spanning multiple ranks', function() {
     var g = new Digraph();
     g.addNode(1);
     g.addNode(2);
     g.addNode(3);
-    g.addEdge("1->2", 1, 2);
-    g.addEdge("2->3", 2, 3);
-    g.addEdge("1->3", 1, 3);
+    g.addEdge('1->2', 1, 2);
+    g.addEdge('2->3', 2, 3);
+    g.addEdge('1->3', 1, 3);
     layout.apply(g);
-    assert.include(g.edges(), "1->3");
+    assert.include(g.edges(), '1->3');
   });
 
-  it("preforms simple layout for Digraph without error", function() {
+  it('preforms simple layout for Digraph without error', function() {
     var nodes = [{id: 1, value: {width: 10, height: 10}},
                  {id: 2, value: {width: 10, height: 10}}];
     var edges = [{u: 1, v: 2}];
@@ -28,10 +28,10 @@ describe("layout", function() {
     // Simple check. node 1 should be above node 2.
     var n1y = g.node(1).y;
     var n2y = g.node(2).y;
-    assert.isTrue(n1y < n2y, "node(1).y (" + n1y + ") should be above node(2).y (" + n2y + ")");
+    assert.isTrue(n1y < n2y, 'node(1).y (' + n1y + ') should be above node(2).y (' + n2y + ')');
   });
 
-  it("performs simple layout for Graph without error", function() {
+  it('performs simple layout for Graph without error', function() {
     var nodes = [{id: 1, value: {width: 10, height: 10}},
                  {id: 2, value: {width: 10, height: 10}}];
     var edges = [{u: 1, v: 2}];
@@ -45,31 +45,31 @@ describe("layout", function() {
     assert.notEqual(n1y, n2y);
   });
 
-  it("preserves edge ids", function() {
+  it('preserves edge ids', function() {
     // This is a test that covers a bug we found where the original edge id was
     // being lost when the final graph was constructed during layout.
     var inputGraph = new Digraph();
     inputGraph.addNode(1);
     inputGraph.addNode(2);
-    inputGraph.addEdge("foo", 1, 2);
+    inputGraph.addEdge('foo', 1, 2);
 
     var outputGraph = layout().run(inputGraph);
 
-    assert.sameMembers(outputGraph.edges(), ["foo"]);
+    assert.sameMembers(outputGraph.edges(), ['foo']);
   });
 
-  it("does not add dummy edges", function() {
+  it('does not add dummy edges', function() {
     var inputGraph = new Digraph();
     inputGraph.addNode(1);
     inputGraph.addNode(2);
-    inputGraph.addEdge("foo", 1, 2, { minLen: 4 });
+    inputGraph.addEdge('foo', 1, 2, { minLen: 4 });
 
     var outputGraph = layout().run(inputGraph);
 
-    assert.sameMembers(outputGraph.edges(), ["foo"]);
+    assert.sameMembers(outputGraph.edges(), ['foo']);
   });
 
-  it("includes bounding box information", function() {
+  it('includes bounding box information', function() {
     var inputGraph = new Digraph();
     inputGraph.addNode(1, { width: 50, height: 20 });
     inputGraph.addNode(2, { width: 100, height: 30 });
