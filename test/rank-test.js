@@ -190,11 +190,9 @@ function rankTests(rank) {
   });
 
   it('properly maintains the reversed edge state when reorienting edges', function() {
-    // Here we simulate the reversal of an edge (done by the acyclic phase) to
-    // get an acyclic graph. We then constrain the rank of C which will cause
-    // back edges. We check that edges are oriented correctly after undo the
-    // acylic transform.
-    var g = parse('digraph { A -> B -> C; C [prefRank=min]; A -> C [reversed=true] }');
+    // Here we construct a cyclic graph and ensure that the edges are oriented
+    // correctly after undoing the acyclic phase.
+    var g = parse('digraph { A -> B -> C -> A; C [prefRank=min]; }');
 
     rank(g);
 

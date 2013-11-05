@@ -1,3 +1,8 @@
+v0.3.8
+======
+
+* Correctly preserve edge direction in cyclic graphs
+
 v0.3.7
 ======
 

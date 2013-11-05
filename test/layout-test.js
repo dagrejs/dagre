@@ -58,6 +58,21 @@ describe('layout', function() {
     assert.sameMembers(outputGraph.edges(), ['foo']);
   });
 
+  it('preserves edge direction', function() {
+    var inputGraph = new Digraph();
+    inputGraph.addNode(1);
+    inputGraph.addNode(2);
+    inputGraph.addEdge('A', 1, 2, {});
+    inputGraph.addEdge('B', 2, 1, {});
+
+    var outputGraph = layout().run(inputGraph);
+
+    assert.equal(outputGraph.source('A'), 1);
+    assert.equal(outputGraph.target('A'), 2);
+    assert.equal(outputGraph.source('B'), 2);
+    assert.equal(outputGraph.target('B'), 1);
+  });
+
   it('does not add dummy edges', function() {
     var inputGraph = new Digraph();
     inputGraph.addNode(1);
