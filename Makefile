@@ -9,6 +9,9 @@ MOCHA = ./node_modules/mocha/bin/_mocha
 PHANTOMJS = ./node_modules/phantomjs/bin/phantomjs
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 
+# Options
+MOCHA_OPTS=-R spec
+
 # Module def
 MODULE = dagre
 MODULE_JS = $(MODULE).js
@@ -16,7 +19,8 @@ MODULE_MIN_JS = $(MODULE).min.js
 
 # Various files
 SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js')
-TEST_FILES= $(shell find test -type f -name '*.js')
+TEST_FILES = $(shell find test -type f -name '*.js')
+SMOKE_GRAPH_FILES = $(wildcard test/smoke/*)
 
 TEST_COV = build/coverage
 
@@ -46,7 +50,7 @@ dist: build/$(MODULE_JS) build/$(MODULE_MIN_JS) | test
 
 test: $(TEST_COV) lint
 
-$(TEST_COV): $(TEST_FILES) $(SRC_FILES) node_modules
+$(TEST_COV): $(TEST_FILES) $(SMOKE_GRAPH_FILES) $(SRC_FILES) node_modules
 	rm -rf $@
 	$(MOCHA) $(MOCHA_OPTS) $(TEST_FILES)
 # Instanbul instrumentation appears to mess up stack traces, so we run it after
