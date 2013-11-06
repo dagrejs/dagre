@@ -10,7 +10,7 @@ describe('smoke tests', function() {
                     .filter(function(x) { return x.slice(-4) === '.dot'; })
                     .map(function(x) { return path.join(smokeDir, x); });
   fileNames.forEach(function(fileName) {
-    var file = fs.readFileSync(fileName, { encoding: 'utf-8' }),
+    var file = fs.readFileSync(fileName, { encoding: 'UTF-8' }),
         g = dot.parse(file);
 
     describe('layout for ' + fileName, function() {
