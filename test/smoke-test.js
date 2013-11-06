@@ -49,6 +49,28 @@ describe('smoke tests', function() {
         });
       });
 
+      it('respects rankSep', function() {
+        // For each edge we check that the difference between the y value for
+        // incident nodes is equal to or greater than ranksep. We make an
+        // exception for self edges.
+
+        var sep = 50;
+        var out = layout().rankSep(sep).run(g);
+
+        out.eachEdge(function(e, u, v) {
+            if (u !== v) {
+              var uY = out.node(u).y,
+                  vY = out.node(v).y,
+                  uHeight = Number(out.node(u).height),
+                  vHeight = Number(out.node(v).height),
+                  actualSep = Math.abs(vY - uY) - (uHeight + vHeight) / 2;
+              assert.isTrue(actualSep >= sep,
+                            'Distance between ' + u + ' and ' + v + ' should be ' + sep +
+                            ' but was ' + actualSep);
+            }
+          });
+      });
+
       it('has valid dimensions', function() {
         var bbox = layout().run(g).graph().bbox;
         assert.property(bbox, 'width');
