@@ -1,3 +1,8 @@
+v0.3.9
+======
+
+* Some fixes to how self loops and sideways edges are handled.
+
 v0.3.8
 ======
 
