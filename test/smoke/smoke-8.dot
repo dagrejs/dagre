@@ -1,0 +1,13 @@
+digraph {
+    subgraph {
+        A [width=29, height=37]
+        B [width=29, height=37]
+        A -> B
+    }
+
+    subgraph {
+        C [width=29, height=37]
+        D [width=29, height=37]
+        C -> D
+    }
+}
