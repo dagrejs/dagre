@@ -74,7 +74,6 @@ function rankTests(withSimplex) {
 
     rank.run(g, withSimplex);
 
-    assert.equal(g.node('A').rank, 0);
     assert.notProperty(g.node('sg1'), 'rank');
   });
 

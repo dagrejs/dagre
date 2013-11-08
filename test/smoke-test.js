@@ -95,7 +95,7 @@ describe('smoke tests', function() {
 
       it('has the origin at (0, 0)', function() {
         var out = layout().run(g);
-        var nodes = out.nodes().filter(util.filterNonSubgraphs(out));
+        var nodes = out.nodes();
 
         var xs = nodes.map(function(u) {
           var value = out.node(u);
