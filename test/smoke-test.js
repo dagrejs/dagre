@@ -78,6 +78,41 @@ describe('smoke tests', function() {
         assert.isFalse(Number.isNaN(bbox.width));
         assert.isFalse(Number.isNaN(bbox.height));
       });
+
+      it('ensures nodes with rank=min have the smallest y value', function() {
+        var out = layout().run(g);
+        var minY = Math.min.apply(Math, out.nodes().map(function(u) { return out.node(u).y; }));
+        g.eachNode(function(u, value) {
+          if (value.rank === 'min') {
+            assert.equal(out.node(u).y, minY, 'expected node ' + u + ' to have min Y value');
+          }
+        });
+      });
+
+      it('ensures nodes with rank=max have the greatest y value', function() {
+        var out = layout().run(g);
+        var maxY = Math.max.apply(Math, out.nodes().map(function(u) { return out.node(u).y; }));
+        g.eachNode(function(u, value) {
+          if (value.rank === 'max') {
+            assert.equal(out.node(u).y, maxY, 'expected node ' + u + ' to have max Y value');
+          }
+        });
+      });
+
+      it('ensures nodes with the rank=same_x have the same y value', function() {
+        var out = layout().run(g);
+        var rankYs = {};
+        g.eachNode(function(u, value) {
+          if (value.rank && value.rank.slice(0, 5) === 'same_') {
+            if (!(value.rank in rankYs)) {
+              rankYs[value.rank] = out.node(u).y;
+            } else {
+              assert.equal(out.node(u).y, rankYs[value.rank],
+                           'expected node ' + u + ' to have y=' + rankYs[value.rank]);
+            }
+          }
+        });
+      });
     });
   });
 });
