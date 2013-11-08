@@ -1,4 +1,4 @@
-var chai = require("chai");
+var chai = require('chai');
 chai.Assertion.includeStack = true;
 
 module.exports = chai.assert;
@@ -8,5 +8,5 @@ module.exports = chai.assert;
  * value is undefined.
  */
 chai.assert.notProperty = function(obj, prop) {
-  chai.assert(!(prop in obj), "Found prop " + prop + " in " + obj + " with value " + obj[prop]);
+  chai.assert(!(prop in obj), 'Found prop ' + prop + ' in ' + obj + ' with value ' + obj[prop]);
 };
