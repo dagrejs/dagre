@@ -1,6 +1,6 @@
-var assert = require("./assert"),
+var assert = require("../assert"),
     dot = require("graphlib-dot"),
-    acyclic = require("../lib/acyclic"),
+    acyclic = require("../../lib/rank/acyclic"),
     isAcyclic = require("graphlib").alg.isAcyclic,
     findCycles = require("graphlib").alg.findCycles;
 
