@@ -18,6 +18,7 @@ describe('nestingGraph.augment', function() {
     nestingGraph.augment(g);
     assert.property(g.node('sg1'), 'borderNodeTop');
     assert.include(g.nodes(), g.node('sg1').borderNodeTop);
+    assert.equal(g.parent(g.node('sg1').borderNodeTop), 'sg1');
   });
 
   it('adds a border node u^(+) at the bottom of each subgraph', function() {
@@ -27,6 +28,7 @@ describe('nestingGraph.augment', function() {
     nestingGraph.augment(g);
     assert.property(g.node('sg1'), 'borderNodeBottom');
     assert.include(g.nodes(), g.node('sg1').borderNodeBottom);
+    assert.equal(g.parent(g.node('sg1').borderNodeBottom), 'sg1');
   });
 
   it('adds an edge (u^(-), v) for each (u, v) in E_T with u in S and v in B', function() {
@@ -131,7 +133,7 @@ describe('nestingGraph.augment', function() {
   });
 });
 
-describe('nestingGraph.remove', function() {
+describe('nestingGraph.removeEdges', function() {
   it('removes edges added by nestingGraph.augment', function() {
     // We augment a graph similarly to the above tests and then we use remove.
     // After this process no nesting edges should remain in the graph.
@@ -143,7 +145,7 @@ describe('nestingGraph.remove', function() {
     g.addEdge('A', 1, 2, { minLen: 1 });
 
     nestingGraph.augment(g);
-    nestingGraph.remove(g);
+    nestingGraph.removeEdges(g);
     assert.sameMembers(g.edges(), ['A']);
   });
 });
