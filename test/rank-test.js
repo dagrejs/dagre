@@ -1,15 +1,14 @@
 var assert = require('./assert'),
     dot = require('graphlib-dot'),
-    rank = require('../lib/rank'),
-    acyclic = require('../lib/acyclic');
+    rank = require('../lib/rank');
 
 describe('rank', function() {
   describe('default', function() {
-    rankTests(function(g) { rank(g); });
+    rankTests(false);
   });
 
   describe('network simplex', function() {
-    rankTests(function(g) { rank(g, true); });
+    rankTests(true);
 
     it('shortens two edges rather than one', function() {
       // An example where the network simplex algorithm makes a difference.
@@ -24,18 +23,18 @@ describe('rank', function() {
       var g = parse('digraph { n1 -> n2 -> n3 -> n4;  n1 -> n5 -> n6 -> n7; ' +
                               'n1 -> mover;  mover -> n4;  mover -> n7; }');
 
-      rank(g, true);
+      rank.run(g, true);
 
       assert.equal(g.node('mover').rank, 2);
     });
   });
 });
 
-function rankTests(rank) {
+function rankTests(withSimplex) {
   it('assigns rank 0 to a node in a singleton graph', function() {
     var g = parse('digraph { A }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('A').rank, 0);
   });
@@ -43,7 +42,7 @@ function rankTests(rank) {
   it('assigns successive ranks to succesors', function() {
     var g = parse('digraph { A -> B }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('A').rank, 0);
     assert.equal(g.node('B').rank, 1);
@@ -54,7 +53,7 @@ function rankTests(rank) {
     // below both of them.
     var g = parse('digraph { A -> B; B -> C; A -> C }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('A').rank, 0);
     assert.equal(g.node('B').rank, 1);
@@ -64,7 +63,7 @@ function rankTests(rank) {
   it('uses an edge\'s minLen attribute to determine rank', function() {
     var g = parse('digraph { A -> B [minLen=2] }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('A').rank, 0);
     assert.equal(g.node('B').rank, 2);
@@ -73,7 +72,7 @@ function rankTests(rank) {
   it('does not assign a rank to a subgraph node', function() {
     var g = parse('digraph { subgraph sg1 { A } }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('A').rank, 0);
     assert.notProperty(g.node('sg1'), 'rank');
@@ -82,7 +81,7 @@ function rankTests(rank) {
   it('ranks the \'min\' node before any adjacent nodes', function() {
     var g = parse('digraph { A; B [prefRank=min]; C; A -> B -> C }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.isTrue(g.node('B').rank < g.node('A').rank, 'rank of B not less than rank of A');
     assert.isTrue(g.node('B').rank < g.node('C').rank, 'rank of B not less than rank of C');
@@ -91,7 +90,7 @@ function rankTests(rank) {
   it('ranks an unconnected \'min\' node at the level of source nodes', function() {
     var g = parse('digraph { A; B [prefRank=min]; C; A -> C }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('B').rank, g.node('A').rank);
     assert.isTrue(g.node('B').rank < g.node('C').rank, 'rank of B not less than rank of C');
@@ -101,7 +100,7 @@ function rankTests(rank) {
     var minLen = 2;
     var g = parse('digraph { B [prefRank=min]; A -> B [minLen=' + minLen + '] }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.isTrue(g.node('A').rank - minLen >= g.node('B').rank);
   });
@@ -109,7 +108,7 @@ function rankTests(rank) {
   it('ranks the \'max\' node before any adjacent nodes', function() {
     var g = parse('digraph { A; B [prefRank=max]; A -> B -> C }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.isTrue(g.node('B').rank > g.node('A').rank, 'rank of B not greater than rank of A');
     assert.isTrue(g.node('B').rank > g.node('C').rank, 'rank of B not greater than rank of C');
@@ -118,7 +117,7 @@ function rankTests(rank) {
   it('ranks an unconnected \'max\' node at the level of sinks nodes', function() {
     var g = parse('digraph { A; B [prefRank=max]; A -> C }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.isTrue(g.node('B').rank > g.node('A').rank, 'rank of B not greater than rank of A');
     assert.equal(g.node('B').rank, g.node('C').rank);
@@ -128,7 +127,7 @@ function rankTests(rank) {
     var minLen = 2;
     var g = parse('digraph { A [prefRank=max]; A -> B [minLen=' + minLen + '] }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.isTrue(g.node('A').rank - minLen >= g.node('B').rank);
   });
@@ -136,7 +135,7 @@ function rankTests(rank) {
   it('ensures that \'aax\' nodes are on the same rank as source nodes', function() {
     var g = parse('digraph { A [prefRank=max]; B }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('A').rank, g.node('B').rank);
   });
@@ -144,7 +143,7 @@ function rankTests(rank) {
   it('gives the same rank to nodes with the same preference', function() {
     var g = parse('digraph { A [prefRank=same_1]; B [prefRank=same_1]; C [prefRank=same_2]; D [prefRank=same_2]; A -> B; D -> C; }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('A').rank, g.node('B').rank);
     assert.equal(g.node('C').rank, g.node('D').rank);
@@ -158,7 +157,7 @@ function rankTests(rank) {
     var errors = [];
     try {
       console.error = function(x) { errors.push(x); };
-      rank(g);
+      rank.run(g, withSimplex);
       assert.equal(g.node('A').rank, 0);
       assert.equal(g.node('B').rank, 1);
       assert.isTrue(errors.length >= 1);
@@ -172,7 +171,7 @@ function rankTests(rank) {
     var g = parse('digraph { A; B [prefRank=same_1]; C [prefRank=same_1]; A -> B; C -> A; }');
 
     // This will throw an error if a cycle is formed
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('B').rank, g.node('C').rank);
   });
@@ -182,7 +181,7 @@ function rankTests(rank) {
     // out edge from B point to an earlier rank.
     var g = parse('digraph { A -> B; B [prefRank=min]; }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.isTrue(g.node('B').rank < g.node('A').rank);
     assert.sameMembers(g.successors('B'), ['A']);
@@ -194,12 +193,12 @@ function rankTests(rank) {
     // correctly after undoing the acyclic phase.
     var g = parse('digraph { A -> B -> C -> A; C [prefRank=min]; }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.isTrue(g.node('C').rank < g.node('A').rank);
     assert.isTrue(g.node('C').rank < g.node('B').rank);
 
-    acyclic.undo(g);
+    rank.restoreEdges(g);
 
     assert.sameMembers(g.successors('A'), ['B']);
     assert.sameMembers(g.successors('B'), ['C']);
@@ -213,13 +212,38 @@ function rankTests(rank) {
     // correct oriented when it comes out of the rank function.
     var g = parse('digraph { { node [prefRank=same_A] A A2 } { node [prefRank=same_B] B B2 } A -> B B2 -> A2 }');
 
-    rank(g);
-    acyclic.undo(g);
+    rank.run(g, withSimplex);
+    rank.restoreEdges(g);
 
     assert.sameMembers(g.successors('A'), ['B']);
     assert.sameMembers(g.successors('A2'), []);
     assert.sameMembers(g.successors('B'), []);
     assert.sameMembers(g.successors('B2'), ['A2']);
+  });
+
+  it('restores self loops when restoring edges', function() {
+    var g = parse('digraph { A -> A [id=AA, foo=original]; }');
+    rank.run(g, withSimplex);
+    rank.restoreEdges(g);
+
+    assert.sameMembers(g.edges(), ['AA']);
+    assert.propertyVal(g.edge('AA'), 'foo', 'original');
+  });
+
+  it('avoids collision when restoring self loops', function() {
+    // When restoring edges we need to take care that we move any colliding
+    // edge ids out of the way. These ids could have been generated by the
+    // auto-id generator. Here we explicitly force a collision to check the
+    // behavior.
+    var g = parse('digraph { A -> A [id=AA, foo=original]; }');
+    rank.run(g, withSimplex);
+    g.addEdge('AA', 'A','A', { foo: 'other' });
+    rank.restoreEdges(g);
+
+    assert.propertyVal(g.edge('AA'), 'foo', 'original');
+    var otherIds = g.edges().filter(function(e) { return e !== 'AA'; });
+    assert.lengthOf(otherIds, 1);
+    assert.propertyVal(g.edge(otherIds[0]), 'foo', 'other');
   });
 
   it('yields same result with network simplex and without', function() {
@@ -228,7 +252,7 @@ function rankTests(rank) {
     var g = parse('digraph { n1 -> n3; n1 -> n4; n1 -> n5; n1 -> n6; n1 -> n7; ' +
                   'n2 -> n3; n2 -> n4; n2 -> n5; n2 -> n6; n2 -> n7; }');
 
-    rank(g);
+    rank.run(g, withSimplex);
 
     assert.equal(g.node('n1').rank, 0);
     assert.equal(g.node('n2').rank, 0);

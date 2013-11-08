@@ -24,33 +24,20 @@ describe("acyclic", function() {
     assertAcyclic(g);
   });
 
-  it("removes self loops", function() {
+  it("warns if there are self loops", function() {
     var g = dot.parse("digraph { A -> A [id=\"AA\"]; }");
-    acyclic(g);
-    acyclic(g);
-    assertAcyclic(g);
-  });
 
-  it("restores self loops with undo", function() {
-    var g = dot.parse("digraph { A -> A [id=\"AA\", foo=original]; }");
-    acyclic(g);
-    acyclic.undo(g);
-    assert.propertyVal(g.edge("AA"), "foo", "original");
-  });
-
-  it("avoids collision when restoring self loop", function() {
-    // This test concerns avoiding collisions with edges added using the
-    // auto-id generator. Here we explicitly force this situation by adding
-    // an edge with the same id. We expect that the added edge is renamed and
-    // the self loop is restored.
-    var g = dot.parse("digraph { A -> A [id=\"AA\", foo=original]; }");
-    acyclic(g);
-    g.addEdge("AA", "A", "A", { foo: "other" });
-    acyclic.undo(g);
-    assert.propertyVal(g.edge("AA"), "foo", "original");
-    var otherIds = g.edges().filter(function(e) { return e !== "AA"; });
-    assert.lengthOf(otherIds, 1);
-    assert.propertyVal(g.edge(otherIds[0]), "foo", "other");
+    // Disable console.error since we're intentionally triggering it
+    var oldError = console.error;
+    var errors = [];
+    try {
+      console.error = function(x) { errors.push(x); };
+      acyclic(g);
+      assert.isTrue(errors.length >= 1);
+      assert.equal(errors[0], "Warning: found self loop \"AA\" for node \"A\"");
+    } finally {
+      console.error = oldError;
+    }
   });
 
   it("is a reversible process", function() {

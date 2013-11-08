@@ -1,0 +1,4 @@
+digraph {
+    A [width=29, height=37]
+    A -> A;
+}
