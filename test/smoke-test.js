@@ -1,4 +1,5 @@
 var assert = require('./assert'),
+    util = require('../lib/util'),
     dot = require('graphlib-dot'),
     layout = require('..').layout,
     path = require('path'),
@@ -69,6 +70,21 @@ describe('smoke tests', function() {
                             ' but was ' + actualSep);
             }
           });
+      });
+
+      it('has the origin at (0, 0)', function() {
+        var out = layout().run(g);
+        var nodes = out.nodes().filter(util.filterNonSubgraphs(out));
+        var minX = util.min(nodes.map(function(u) {
+          var value = out.node(u);
+          return value.x - value.width / 2;
+        }));
+        var minY = util.min(nodes.map(function(u) {
+          var value = out.node(u);
+          return value.y - value.height / 2;
+        }));
+        assert.equal(minX, 0);
+        assert.equal(minY, 0);
       });
 
       it('has valid dimensions', function() {
