@@ -1,3 +1,8 @@
+v0.3.10
+=======
+
+* Add support for 'BT' and 'RL' rankDir values.
+
 v0.3.9
 ======
 
