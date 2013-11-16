@@ -59,13 +59,13 @@ describe('smoke tests', function() {
         var out = layout().rankSep(sep).run(g);
 
         function getY(u) {
-          return (g.graph().rankDir === 'LR'
+          return (g.graph().rankDir === 'LR' || g.graph().rankDir === 'RL'
                     ? out.node(u).x
                     : out.node(u).y);
         }
 
         function getHeight(u) {
-          return Number(g.graph().rankDir === 'LR'
+          return Number(g.graph().rankDir === 'LR' || g.graph().rankDir === 'RL'
                             ? out.node(u).width
                             : out.node(u).height);
         }
@@ -77,7 +77,6 @@ describe('smoke tests', function() {
                   uHeight = getHeight(u),
                   vHeight = getHeight(v),
                   actualSep = Math.abs(vY - uY) - (uHeight + vHeight) / 2;
-              console.log(actualSep, uY, vY, uHeight, vHeight);
               assert.isTrue(actualSep >= sep,
                             'Distance between ' + u + ' and ' + v + ' should be ' + sep +
                             ' but was ' + actualSep);

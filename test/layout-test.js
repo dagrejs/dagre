@@ -36,13 +36,34 @@ describe('layout', function() {
     var inputGraph = new Digraph();
     inputGraph.addNode(1, { width: 1, height: 1 });
     inputGraph.addNode(2, { width: 1, height: 1 });
+    inputGraph.addEdge(null, 1, 2);
     inputGraph.graph({ rankDir: 'LR' });
 
     var outputGraph = layout().run(inputGraph);
 
-    assert.equal(outputGraph.node(1).x, outputGraph.node(2).x);
-    assert.notEqual(outputGraph.node(1).y, outputGraph.node(2).y);
+    var n1X = outputGraph.node(1).x;
+    var n2X = outputGraph.node(2).x;
+    assert.isTrue(n1X < n2X,
+                  'Expected node 1 (' + n1X + ') to come before node 2 (' + n2X + ')');
+    assert.equal(outputGraph.node(1).y, outputGraph.node(2).y);
   });
+
+  it('ranks nodes right-to-left with rankDir=RL', function() {
+    var inputGraph = new Digraph();
+    inputGraph.addNode(1, { width: 1, height: 1 });
+    inputGraph.addNode(2, { width: 1, height: 1 });
+    inputGraph.addEdge(null, 1, 2);
+    inputGraph.graph({ rankDir: 'RL' });
+
+    var outputGraph = layout().run(inputGraph);
+
+    var n1X = outputGraph.node(1).x;
+    var n2X = outputGraph.node(2).x;
+    assert.isTrue(n1X > n2X,
+                  'Expected node 1 (' + n1X + ') to come after node 2 (' + n2X + ')');
+    assert.equal(outputGraph.node(1).y, outputGraph.node(2).y);
+  });
+
 
   // This test is necessary until we drop layout().rankDir(...)
   it('produces the same output for rankDir=LR input', function() {
