@@ -93,5 +93,23 @@ describe('layout', function() {
       var out = layout().run(g);
       assert.equal(out.node(3).y, out.node(2).y);
     });
+
+    describe('with rankDir=BT', function() {
+      beforeEach(function() {
+        g.graph({ rankDir: 'BT' });
+      });
+
+      it('ensures nodes with rank=min have the largest y value', function() {
+        var out = layout().run(g);
+        var maxY = Math.max.apply(Math, out.nodes().map(function(u) { return out.node(u).y; }));
+        assert.propertyVal(out.node(5), 'y', maxY);
+      });
+
+      it('ensures nodes with rank=max have the smallest y value', function() {
+        var out = layout().run(g);
+        var minY = Math.min.apply(Math, out.nodes().map(function(u) { return out.node(u).y; }));
+        assert.propertyVal(out.node(6), 'y', minY);
+      });
+    });
   });
 });
