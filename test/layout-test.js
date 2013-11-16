@@ -32,6 +32,34 @@ describe('layout', function() {
     assert.equal(outputGraph.graph().bbox.height, 20 + 30 + layout().rankSep());
   });
 
+  it('ranks nodes left-to-right with rankDir=LR', function() {
+    var inputGraph = new Digraph();
+    inputGraph.addNode(1, { width: 1, height: 1 });
+    inputGraph.addNode(2, { width: 1, height: 1 });
+    inputGraph.graph({ rankDir: 'LR' });
+
+    var outputGraph = layout().run(inputGraph);
+
+    assert.equal(outputGraph.node(1).x, outputGraph.node(2).x);
+    assert.notEqual(outputGraph.node(1).y, outputGraph.node(2).y);
+  });
+
+  // This test is necessary until we drop layout().rankDir(...)
+  it('produces the same output for rankDir=LR input', function() {
+    var inputGraph = new Digraph();
+    inputGraph.addNode(1, { width: 1, height: 1 });
+    inputGraph.addNode(2, { width: 1, height: 1 });
+    var outputGraph1 = layout().rankDir('LR').run(inputGraph);
+
+    inputGraph.graph({ rankDir: 'LR' });
+    var outputGraph2 = layout().run(inputGraph);
+
+    assert.equal(outputGraph1.node(1).x, outputGraph2.node(1).x);
+    assert.equal(outputGraph1.node(2).x, outputGraph2.node(2).x);
+    assert.equal(outputGraph1.node(1).y, outputGraph2.node(1).y);
+    assert.equal(outputGraph1.node(2).y, outputGraph2.node(2).y);
+  });
+
   describe('rank constraints', function() {
     var g;
 
