@@ -20,7 +20,7 @@ describe('layout', function() {
     assert.property(outputGraph.edge('A'), 'points');
   });
 
-  it('includes bounding box information', function() {
+  it('includes width and height information', function() {
     var inputGraph = new Digraph();
     inputGraph.addNode(1, { width: 50, height: 20 });
     inputGraph.addNode(2, { width: 100, height: 30 });
@@ -28,8 +28,8 @@ describe('layout', function() {
 
     var outputGraph = layout().run(inputGraph);
 
-    assert.equal(outputGraph.graph().bbox.width, 100);
-    assert.equal(outputGraph.graph().bbox.height, 20 + 30 + layout().rankSep());
+    assert.equal(outputGraph.graph().width, 100);
+    assert.equal(outputGraph.graph().height, 20 + 30 + layout().rankSep());
   });
 
   it('ranks nodes left-to-right with rankDir=LR', function() {

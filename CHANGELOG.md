@@ -1,3 +1,9 @@
+v0.4.0
+======
+
+* Removed bbox on outputGraph.graph(). Instead dimensions are exposed as
+  outputGraph.graph().width and outputGraph.graph().height.
+
 v0.3.10
 =======
 

@@ -100,11 +100,11 @@ describe('smoke tests', function() {
       });
 
       it('has valid dimensions', function() {
-        var bbox = layout().run(g).graph().bbox;
-        assert.property(bbox, 'width');
-        assert.property(bbox, 'height');
-        assert.isFalse(Number.isNaN(bbox.width));
-        assert.isFalse(Number.isNaN(bbox.height));
+        var graphValue = layout().run(g).graph();
+        assert.property(graphValue, 'width');
+        assert.property(graphValue, 'height');
+        assert.isFalse(Number.isNaN(graphValue.width));
+        assert.isFalse(Number.isNaN(graphValue.height));
       });
     });
   });
