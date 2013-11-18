@@ -197,6 +197,18 @@ var layout = dagre.layout()
                   .run(g);
 ```
 
+### Input Graph
+
+The input graph supplied for layout can have the following attributes:
+
+Object | Attribute | Default | Description
+------ | --------- | ------- | -----------
+graph  | rankDir   | TB      | Direction for rank nodes. Can be `TB`, `BT`, `LR`, or `RL`, where T = top, B = bottom, L = left, and R = right.
+node   | height    |         | The height of the node.
+node   | width     |         | The width of the node.
+edge   | minLen    | 1       | The number of ranks to keep between the source and target of the edge.
+
+
 ### Output Graph
 
 The output graph has the following attributes:
@@ -208,7 +220,6 @@ graph  | width     | The width of the entire graph.
 node   | x         | The x-coordinate for the center of the node.
 node   | y         | The y-coordinate for the center of the node.
 edge   | points    | An array of { x, y } pairs for the control points of the edge.
-
 
 ## Resources
 
