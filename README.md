@@ -197,6 +197,19 @@ var layout = dagre.layout()
                   .run(g);
 ```
 
+### Output Graph
+
+The output graph has the following attributes:
+
+Object | Attribute | Description
+------ | --------- | -----------
+graph  | height    | The height of the entire graph.
+graph  | width     | The width of the entire graph.
+node   | x         | The x-coordinate for the center of the node.
+node   | y         | The y-coordinate for the center of the node.
+edge   | points    | An array of { x, y } pairs for the control points of the edge.
+
+
 ## Resources
 
 * [Issue tracker](https://github.com/cpettitt/dagre/issues)
