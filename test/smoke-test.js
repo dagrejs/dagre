@@ -2,14 +2,23 @@ var assert = require('./assert'),
     util = require('../lib/util'),
     dot = require('graphlib-dot'),
     layout = require('..').layout,
+    components = require('graphlib').alg.components,
+    nodesFromList = require('graphlib').filter.nodesFromList,
     path = require('path'),
     fs = require('fs');
 
 describe('smoke tests', function() {
-  var smokeDir = path.join(__dirname, 'smoke');
-  var fileNames = fs.readdirSync(smokeDir)
-                    .filter(function(x) { return x.slice(-4) === '.dot'; })
-                    .map(function(x) { return path.join(smokeDir, x); });
+  var fileNames;
+
+  if ('SMOKE_TESTS' in process.env) {
+    fileNames = process.env.SMOKE_TESTS.split(' ');
+  } else {
+    var smokeDir = path.join(__dirname, 'smoke');
+    fileNames = fs.readdirSync(smokeDir)
+                      .filter(function(x) { return x.slice(-4) === '.dot'; })
+                      .map(function(x) { return path.join(smokeDir, x); });
+  }
+
   fileNames.forEach(function(fileName) {
     var file = fs.readFileSync(fileName, 'utf8'),
         g = dot.parse(file);
@@ -105,6 +114,28 @@ describe('smoke tests', function() {
         assert.property(graphValue, 'height');
         assert.isFalse(Number.isNaN(graphValue.width));
         assert.isFalse(Number.isNaN(graphValue.height));
+      });
+
+      it('has no unnecessary edge slack', function() {
+        // We want to be sure that each node is connected to the graph by at
+        // least one tight edge. To do this we first break the graph into
+        // connected components and then scan over all edges, preserving only
+        // thoses that are tight. Our expectation is that each component will
+        // still be connected after this transform. If not, it indicates that
+        // at least one node in the component was not connected by a tight
+        // edge.
+
+        var layoutGraph = layout().run(g);
+        components(layoutGraph).forEach(function(cmpt) {
+          var subgraph = layoutGraph.filterNodes(nodesFromList(cmpt));
+          subgraph.eachEdge(function(e, u, v, value) {
+            if (value.minLen !== Math.abs(layoutGraph.node(u).rank - layoutGraph.node(v).rank)) {
+              subgraph.delEdge(e);
+            }
+          });
+
+          assert.lengthOf(components(subgraph), 1);
+        });
       });
     });
   });
