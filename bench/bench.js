@@ -59,6 +59,8 @@ function processFile(file) {
     var f = data.toString('utf-8');
     try {
       var g = dot.parse(f);
+      // Try a few restarts in the order phase
+      g.graph().orderRestarts = 1;
       var start = new Date().getTime();
       var g2 = dagre.layout().run(g);
       var end = new Date().getTime();
