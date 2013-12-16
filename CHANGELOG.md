@@ -1,3 +1,9 @@
+v0.4.2
+======
+
+* More fixes to ranker.
+* Introduce experimental orderRestarts feature, which yields reduce crossing counts. See 72128a71d4ece45d4932da44e07ba692b0da5a1c for details.
+
 v0.4.1
 ======
 
