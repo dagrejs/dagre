@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.4.3-pre",
+  "version": "0.4.3",
   "description": "Graph layout for JavaScript",
   "main": "index.js",
   "keywords": [
@@ -18,8 +18,8 @@
     "uglify-js": "1.2.3"
   },
   "dependencies": {
-    "cp-data": "1.x.x",
-    "graphlib": "0.7.0"
+    "cp-data": "1.1.2",
+    "graphlib": "0.7.2"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
