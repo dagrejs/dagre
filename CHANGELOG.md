@@ -1,3 +1,8 @@
+v0.4.4
+======
+
+* Pull in graphlib 0.7.4 / cp-data v1.1.3
+
 v0.4.3
 ======
 

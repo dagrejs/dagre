@@ -18,8 +18,8 @@
     "uglify-js": "1.2.3"
   },
   "dependencies": {
-    "cp-data": "1.1.2",
-    "graphlib": "0.7.2"
+    "cp-data": "1.1.3",
+    "graphlib": "0.7.4"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
