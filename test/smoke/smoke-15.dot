@@ -1,0 +1,8 @@
+/* A digraph that includes both self loops and rank constraints */
+digraph {
+    node [width=29, height=37]
+    A [rank=same_1]
+    B [rank=same_1]
+    A -> A;
+    A -> B;
+}

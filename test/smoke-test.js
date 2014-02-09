@@ -80,7 +80,7 @@ describe('smoke tests', function() {
         }
 
         out.eachEdge(function(e, u, v) {
-            if (u !== v) {
+            if (u !== v && g.node(u).rank !== undefined && g.node(u).rank !== g.node(v).rank) {
               var uY = getY(u),
                   vY = getY(v),
                   uHeight = getHeight(u),
@@ -142,7 +142,8 @@ describe('smoke tests', function() {
         components(layoutGraph).forEach(function(cmpt) {
           var subgraph = layoutGraph.filterNodes(nodesFromList(cmpt));
           subgraph.eachEdge(function(e, u, v, value) {
-            if (value.minLen !== Math.abs(layoutGraph.node(u).rank - layoutGraph.node(v).rank)) {
+            if (value.minLen !== Math.abs(layoutGraph.node(u).rank - layoutGraph.node(v).rank) &&
+                layoutGraph.node(u).prefRank !== layoutGraph.node(v).prefRank) {
               subgraph.delEdge(e);
             }
           });
