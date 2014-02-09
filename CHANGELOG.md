@@ -1,3 +1,8 @@
+v0.4.5
+======
+
+* Add initial support for self-loops and sideways edges
+
 v0.4.4
 ======
 
