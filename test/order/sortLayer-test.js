@@ -1,8 +1,8 @@
 var assert = require('../assert'),
-//    initLayerGraphs = require('../../lib/order/initLayerGraphs'),
+    initLayerGraphs = require('../../lib/order/initLayerGraphs'),
     sortLayer = require('../../lib/order/sortLayer'),
     CDigraph = require('graphlib').CDigraph;
-//    Digraph = require('graphlib').Digraph;
+    Digraph = require('graphlib').Digraph;
 
 describe('sortLayer', function() {
   var g;
@@ -52,7 +52,6 @@ describe('sortLayer', function() {
     assert.equal(g.node(3).order, 1);
   });
 
-/*
   it('handles a single subgraph', function() {
     // We expect that nodes 1 and 2 will be adjacent since they are in the
     // same subgraph, even though they'd otherwise be at opposite ends of the
@@ -188,10 +187,4 @@ describe('sortLayer', function() {
     assert.equal(g.node(1).order, 0);
     assert.equal(g.node(2).order, 1);
   });
-*/
 });
-
-// Stub until we support ordering clusters
-function initLayerGraphs(g) {
-  return [g];
-}
