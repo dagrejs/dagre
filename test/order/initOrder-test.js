@@ -1,5 +1,6 @@
 var assert = require('../assert'),
     initOrder = require('../../lib/order/initOrder'),
+    Digraph = require('graphlib').Digraph,
     CDigraph = require('graphlib').CDigraph;
 
 describe('initOrder', function() {
@@ -12,7 +13,7 @@ describe('initOrder', function() {
 
   it('sets order to 0 for the node in a singleton graph', function() {
     g.addNode(1, { rank: 0 });
-    initOrder(g);
+    initOrder(g, new Digraph());
     assert.equal(g.node(1).order, 0);
   });
 
@@ -20,7 +21,7 @@ describe('initOrder', function() {
     g.addNode(1, { rank: 0 });
     g.addNode(2, { rank: 1 });
     g.addNode(3, { rank: 2 });
-    initOrder(g);
+    initOrder(g, new Digraph());
     assert.equal(g.node(1).order, 0);
     assert.equal(g.node(2).order, 0);
     assert.equal(g.node(3).order, 0);
@@ -30,7 +31,7 @@ describe('initOrder', function() {
     g.addNode(1, { rank: 0 });
     g.addNode(2, { rank: 0 });
     g.addNode(3, { rank: 0 });
-    initOrder(g);
+    initOrder(g, new Digraph());
 
     // There is no guarantee about what order gets assigned to what node, but
     // we can assert that the order values 0, 1, 2 were assigned.
@@ -44,7 +45,7 @@ describe('initOrder', function() {
     g.addNode('sg1', {});
     g.parent(1, 'sg1');
     g.parent(2, 'sg1');
-    initOrder(g);
+    initOrder(g, new Digraph());
     assert.notProperty(g.node('sg1'), 'order');
   });
 });
