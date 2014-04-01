@@ -1,0 +1,77 @@
+digraph {
+    subgraph job1 {
+        A_load [width=75, height=37]
+        B_foreach [width=75, height=37]
+        C_split [width=75, height=37]
+        D_splitoutput [width=75, height=37]
+        E_splitoutput [width=75, height=37]
+        F_foreach [width=75, height=37]
+        G_cogroup [width=75, height=37]
+        
+        A -> B
+        B -> C
+        C -> D
+        C -> E
+        E -> F
+        F -> G
+        D -> G
+    }
+                            
+    subgraph job2 {
+        H_split [width=75, height=37]
+        I_splitoutput [width=75, height=37]
+        J_splitoutput [width=75, height=37]
+        K_foreach [width=75, height=37]
+        L_foreach [width=75, height=37]
+        M_filter [width=75, height=37]
+        N_filter [width=75, height=37]
+        O_join [width=75, height=37]
+        P_foreach [width=75, height=37]
+        Q_split [width=75, height=37]
+        
+        H -> I
+        H -> J
+        I -> K
+        J -> L
+        K -> M
+        L -> N
+        M -> O
+        N -> O
+        O -> P
+        P -> Q
+    }
+        
+    subgraph job3 {
+        R_splitoutput [width=75, height=37]
+        S_foreach [width=75, height=37]
+        T_cogroup [width=75, height=37]
+        U_filter [width=75, height=37]
+        V_foreach [width=75, height=37]
+        W_foreach [width=75, height=37]
+        
+        R -> S
+        S -> T
+        T -> U
+        U -> V
+        V -> W
+    }
+
+    subgraph job4 {
+        X_splitoutput [width=75, height=37]
+        Y_foreach [width=75, height=37]
+        Z_join [width=75, height=37]
+        ZA_foreach [width=75, height=37]
+        ZB_store [width=75, height=37]
+        
+        X -> Y
+        Y -> Z
+        W -> Z
+        Z -> ZA
+        ZA -> ZB
+    }
+
+    G -> H
+    Q -> R
+    Q -> X
+    W -> Z
+}
