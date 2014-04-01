@@ -1,5 +1,5 @@
 digraph {
-    subgraph job1 {
+    subgraph cluster_job1 {
         A_load [width=75, height=37]
         B_foreach [width=75, height=37]
         C_split [width=75, height=37]
@@ -8,16 +8,16 @@ digraph {
         F_foreach [width=75, height=37]
         G_cogroup [width=75, height=37]
         
-        A -> B
-        B -> C
-        C -> D
-        C -> E
-        E -> F
-        F -> G
-        D -> G
+        A_load -> B_foreach
+        B_foreach -> C_split
+        C_split -> D_splitoutput
+        C_split -> E_splitoutput
+        E_splitoutput -> F_foreach
+        F_foreach -> G_cogroup
+        D_splitoutput -> G_cogroup
     }
                             
-    subgraph job2 {
+    subgraph cluster_job2 {
         H_split [width=75, height=37]
         I_splitoutput [width=75, height=37]
         J_splitoutput [width=75, height=37]
@@ -29,19 +29,19 @@ digraph {
         P_foreach [width=75, height=37]
         Q_split [width=75, height=37]
         
-        H -> I
-        H -> J
-        I -> K
-        J -> L
-        K -> M
-        L -> N
-        M -> O
-        N -> O
-        O -> P
-        P -> Q
+        H_split -> I_splitoutput
+        H_split -> J_splitoutput
+        I_splitoutput -> K_foreach
+        J_splitoutput -> L_foreach
+        K_foreach -> M_filter
+        L_foreach -> N_filter
+        M_filter -> O_join
+        N_filter -> O_join
+        O_join -> P_foreach
+        P_foreach -> Q_split
     }
         
-    subgraph job3 {
+    subgraph cluster_job3 {
         R_splitoutput [width=75, height=37]
         S_foreach [width=75, height=37]
         T_cogroup [width=75, height=37]
@@ -49,29 +49,28 @@ digraph {
         V_foreach [width=75, height=37]
         W_foreach [width=75, height=37]
         
-        R -> S
-        S -> T
-        T -> U
-        U -> V
-        V -> W
+        R_splitoutput -> S_foreach
+        S_foreach -> T_cogroup
+        T_cogroup -> U_filter
+        U_filter -> V_foreach
+        V_foreach -> W_foreach
     }
 
-    subgraph job4 {
+    subgraph cluster_job4 {
         X_splitoutput [width=75, height=37]
         Y_foreach [width=75, height=37]
         Z_join [width=75, height=37]
         ZA_foreach [width=75, height=37]
         ZB_store [width=75, height=37]
         
-        X -> Y
-        Y -> Z
-        W -> Z
-        Z -> ZA
-        ZA -> ZB
+        X_splitoutput -> Y_foreach
+        Y_foreach -> Z_join
+        W_foreach -> Z_join
+        Z_join -> ZA_foreach
+        ZA_foreach -> ZB_store
     }
 
-    G -> H
-    Q -> R
-    Q -> X
-    W -> Z
+    G_cogroup -> H_split
+    Q_split -> R_splitoutput
+    Q_split -> X_splitoutput
 }
