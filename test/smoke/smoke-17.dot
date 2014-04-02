@@ -1,0 +1,76 @@
+digraph {
+    subgraph cluster_job1 {
+        A_load [width=75, height=37]
+        B_foreach [width=75, height=37]
+        C_split [width=75, height=37]
+        D_splitoutput [width=75, height=37]
+        E_splitoutput [width=75, height=37]
+        F_foreach [width=75, height=37]
+        G_cogroup [width=75, height=37]
+        
+        A_load -> B_foreach
+        B_foreach -> C_split
+        C_split -> D_splitoutput
+        C_split -> E_splitoutput
+        E_splitoutput -> F_foreach
+        F_foreach -> G_cogroup
+        D_splitoutput -> G_cogroup
+    }
+                            
+    subgraph cluster_job2 {
+        H_split [width=75, height=37]
+        I_splitoutput [width=75, height=37]
+        J_splitoutput [width=75, height=37]
+        K_foreach [width=75, height=37]
+        L_foreach [width=75, height=37]
+        M_filter [width=75, height=37]
+        N_filter [width=75, height=37]
+        O_join [width=75, height=37]
+        P_foreach [width=75, height=37]
+        Q_split [width=75, height=37]
+        
+        H_split -> I_splitoutput
+        H_split -> J_splitoutput
+        I_splitoutput -> K_foreach
+        J_splitoutput -> L_foreach
+        K_foreach -> M_filter
+        L_foreach -> N_filter
+        M_filter -> O_join
+        N_filter -> O_join
+        O_join -> P_foreach
+        P_foreach -> Q_split
+    }
+        
+    subgraph cluster_job3 {
+        R_splitoutput [width=75, height=37]
+        S_foreach [width=75, height=37]
+        T_cogroup [width=75, height=37]
+        U_filter [width=75, height=37]
+        V_foreach [width=75, height=37]
+        W_foreach [width=75, height=37]
+        
+        R_splitoutput -> S_foreach
+        S_foreach -> T_cogroup
+        T_cogroup -> U_filter
+        U_filter -> V_foreach
+        V_foreach -> W_foreach
+    }
+
+    subgraph cluster_job4 {
+        X_splitoutput [width=75, height=37]
+        Y_foreach [width=75, height=37]
+        Z_join [width=75, height=37]
+        ZA_foreach [width=75, height=37]
+        ZB_store [width=75, height=37]
+        
+        X_splitoutput -> Y_foreach
+        Y_foreach -> Z_join
+        W_foreach -> Z_join
+        Z_join -> ZA_foreach
+        ZA_foreach -> ZB_store
+    }
+
+    G_cogroup -> H_split
+    Q_split -> R_splitoutput
+    Q_split -> X_splitoutput
+}
