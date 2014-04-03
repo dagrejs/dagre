@@ -23,6 +23,14 @@ describe('smoke tests', function() {
     var file = fs.readFileSync(fileName, 'utf8'),
         g = dot.parse(file);
 
+    // Since dagre doesn't assign dimensions to nodes, we should do that here
+    // for each node that doesn't already have dimensions assigned.
+    g.eachNode(function(u, a) {
+      if (g.children(u).length) return;
+      if (a.width === undefined) a.width = 100;
+      if (a.height === undefined) a.height = 50;
+    });
+
     describe('layout for ' + fileName, function() {
       it('only includes nodes in the input graph', function() {
         var nodes = g.nodes();

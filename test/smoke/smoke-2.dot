@@ -1,7 +1,5 @@
 /* A graph with a trivial cycle */
 digraph {
-    A [width=29, height=37]
-    B [width=29, height=37]
     A -> B;
     B -> A;
 }

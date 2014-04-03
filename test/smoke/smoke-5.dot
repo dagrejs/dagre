@@ -1,6 +1,5 @@
 /* Test for max rank constraint */
 digraph {
-    A [width=29, height=37, rank=max]
-    B [width=29, height=37]
+    A [rank=max]
     A -> B
 }
