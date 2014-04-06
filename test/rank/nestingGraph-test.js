@@ -47,7 +47,8 @@ describe('nestingGraph.augment', function() {
 
     nestingGraph.augment(g);
     var sg1Top = g.node('sg1').borderNodeTop;
-    assert.lengthOf(g.outEdges(sg1Top, 'sg2'), 1);
+    var sg2Top = g.node('sg2').borderNodeTop;
+    assert.lengthOf(g.outEdges(sg1Top, sg2Top), 1);
   });
 
   it('adds an edge (v, u^(+)) for each (u, v) in E_T with u in S and v in B', function() {
@@ -66,7 +67,8 @@ describe('nestingGraph.augment', function() {
 
     nestingGraph.augment(g);
     var sg1Bottom = g.node('sg1').borderNodeBottom;
-    assert.lengthOf(g.outEdges('sg2', sg1Bottom), 1);
+    var sg2Bottom = g.node('sg2').borderNodeBottom;
+    assert.lengthOf(g.outEdges(sg2Bottom, sg1Bottom), 1);
   });
 
   it('does not change edge minLen for a flat graph', function() {
