@@ -1,5 +1,3 @@
 digraph {
-    A [width=29, height=37]
-    B [width=29, height=37]
     A -> B [minLen = 4];
 }

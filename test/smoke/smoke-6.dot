@@ -1,6 +1,5 @@
 /* Test for min rank constraint */
 digraph {
-    A [width=29, height=37]
-    B [width=29, height=37, rank=min]
+    B [rank=min]
     A -> B
 }
