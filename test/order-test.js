@@ -1,4 +1,5 @@
 var assert = require('./assert'),
+    testUtil = require('./util'),
     CDigraph = require('graphlib').CDigraph,
     order = require('../lib/order'),
     crossCount = require('../lib/order/crossCount');
@@ -12,35 +13,35 @@ describe('order', function() {
   });
 
   it('sets order = 0 for a single node', function() {
-    g.addNode(1, { rank: 0 });
+    testUtil.addSimpleNode(g, 'a', 0);
     order(g);
-    assert.equal(g.node(1).order, 0);
+    assert.equal(g.node('a').order, 0);
   });
 
   it('sets order = 0 for 2 connected nodes on different ranks', function() {
-    g.addNode(1, { rank: 0 });
-    g.addNode(2, { rank: 1 });
-    g.addEdge(null, 1, 2);
+    testUtil.addSimpleNode(g, 'a', 0);
+    testUtil.addSimpleNode(g, 'b', 1);
+    g.addEdge(null, 'a', 'b');
 
     order(g);
 
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 0);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 0);
   });
 
   it('sets order = 0 for 2 unconnected nodes on different ranks', function() {
-    g.addNode(1, { rank: 0 });
-    g.addNode(2, { rank: 1 });
+    testUtil.addSimpleNode(g, 'a', 0);
+    testUtil.addSimpleNode(g, 'b', 1);
 
     order(g);
 
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 0);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 0);
   });
 
   it('sets order = 0, 1 for 2 nodes on the same rank', function() {
-    g.addNode(1, { rank: 0 });
-    g.addNode(2, { rank: 0 });
+    testUtil.addSimpleNode(g, 'a', 0);
+    testUtil.addSimpleNode(g, 'b', 0);
 
     order(g);
 
@@ -48,10 +49,9 @@ describe('order', function() {
   });
 
   it('does not assign an order to a subgraph itself', function() {
-    g.addNode(1, {rank: 0});
-    g.addNode(2, {rank: 1});
-    g.addNode('sg1', {});
-    g.parent(2, 'sg1');
+    testUtil.addSimpleNode(g, 'a', 0);
+    testUtil.addSimpleNode(g, 'b', 1);
+    testUtil.addCompoundNode(g, 'sg1', ['b']);
 
     order(g);
 
@@ -100,12 +100,12 @@ describe('order', function() {
 
   describe('finds minimial crossings', function() {
     it('graph1', function() {
-      g.addNode(1, { rank: 0 });
-      g.addNode(2, { rank: 0 });
-      g.addNode(3, { rank: 1 });
-      g.addNode(4, { rank: 1 });
-      g.addEdge(null, 1, 4);
-      g.addEdge(null, 2, 3);
+      testUtil.addSimpleNode(g, 'a', 0);
+      testUtil.addSimpleNode(g, 'b', 0);
+      testUtil.addSimpleNode(g, 'c', 1);
+      testUtil.addSimpleNode(g, 'd', 1);
+      g.addEdge(null, 'a', 'd');
+      g.addEdge(null, 'b', 'c');
 
       order(g);
 
@@ -113,16 +113,17 @@ describe('order', function() {
     });
 
     it('graph2', function() {
-      g.addNode(1, { rank: 0 });
-      g.addNode(2, { rank: 0 });
-      g.addNode(3, { rank: 0 });
-      g.addNode(4, { rank: 1 });
-      g.addNode(5, { rank: 1 });
-      g.addEdge(null, 1, 4);
-      g.addEdge(null, 2, 4);
-      g.addEdge(null, 2, 5);
-      g.addEdge(null, 3, 4);
-      g.addEdge(null, 3, 5);
+      testUtil.addSimpleNode(g, 'a', 0);
+      testUtil.addSimpleNode(g, 'b', 0);
+      testUtil.addSimpleNode(g, 'c', 0);
+      testUtil.addSimpleNode(g, 'd', 1);
+      testUtil.addSimpleNode(g, 'e', 1);
+
+      g.addEdge(null, 'a', 'd');
+      g.addEdge(null, 'b', 'd');
+      g.addEdge(null, 'b', 'e');
+      g.addEdge(null, 'c', 'd');
+      g.addEdge(null, 'c', 'e');
 
       order(g);
 
@@ -130,21 +131,22 @@ describe('order', function() {
     });
 
     it('graph3', function() {
-      g.addNode(1, { rank: 0 });
-      g.addNode(2, { rank: 0 });
-      g.addNode(3, { rank: 0 });
-      g.addNode(4, { rank: 1 });
-      g.addNode(5, { rank: 1 });
-      g.addNode(6, { rank: 1 });
-      g.addNode(7, { rank: 2 });
-      g.addNode(8, { rank: 2 });
-      g.addNode(9, { rank: 2 });
-      g.addEdge(null, 1, 5);
-      g.addEdge(null, 2, 4);
-      g.addEdge(null, 3, 6);
-      g.addEdge(null, 4, 9);
-      g.addEdge(null, 5, 8);
-      g.addEdge(null, 6, 7);
+      testUtil.addSimpleNode(g, 'a', 0);
+      testUtil.addSimpleNode(g, 'b', 0);
+      testUtil.addSimpleNode(g, 'c', 0);
+      testUtil.addSimpleNode(g, 'd', 1);
+      testUtil.addSimpleNode(g, 'e', 1);
+      testUtil.addSimpleNode(g, 'f', 1);
+      testUtil.addSimpleNode(g, 'g', 2);
+      testUtil.addSimpleNode(g, 'h', 2);
+      testUtil.addSimpleNode(g, 'i', 2);
+
+      g.addEdge(null, 'a', 'e');
+      g.addEdge(null, 'b', 'd');
+      g.addEdge(null, 'c', 'f');
+      g.addEdge(null, 'd', 'i');
+      g.addEdge(null, 'e', 'h');
+      g.addEdge(null, 'f', 'g');
 
       order(g);
 

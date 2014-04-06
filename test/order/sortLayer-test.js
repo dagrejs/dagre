@@ -1,4 +1,5 @@
 var assert = require('../assert'),
+    testUtil = require('../util'),
     initLayerGraphs = require('../../lib/order/initLayerGraphs'),
     sortLayer = require('../../lib/order/sortLayer'),
     CDigraph = require('graphlib').CDigraph,
@@ -17,19 +18,19 @@ describe('sortLayer', function() {
     // and expect the ordering algorithm to put them in the correct order
     // using the barycenter algorithm.
 
-    g.addNode(1, { rank: 0, order: 2 });
-    g.addNode(2, { rank: 0, order: 1 });
-    g.addNode(3, { rank: 0, order: 0 });
+    testUtil.addSimpleNode(g, 'a', 0, 2);
+    testUtil.addSimpleNode(g, 'b', 0, 1);
+    testUtil.addSimpleNode(g, 'c', 0, 0);
 
     var layerGraphs = initLayerGraphs(g);
     
     sortLayer(layerGraphs[0],
               null,
-              { 1: [0], 2: [1], 3: [2] });
+              { a: [0], b: [1], c: [2] });
     
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 1);
-    assert.equal(g.node(3).order, 2);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 1);
+    assert.equal(g.node('c').order, 2);
   });
 
   it('handles multiple weights', function() {
@@ -37,19 +38,19 @@ describe('sortLayer', function() {
     // barycenters for the movable nodes. In this test we add multiple weights
     // to node 3 so that it should come before node 2.
 
-    g.addNode(1, { rank: 0, order: 2 });
-    g.addNode(2, { rank: 0, order: 1 });
-    g.addNode(3, { rank: 0, order: 0 });
+    testUtil.addSimpleNode(g, 'a', 0, 2);
+    testUtil.addSimpleNode(g, 'b', 0, 1);
+    testUtil.addSimpleNode(g, 'c', 0, 0);
 
     var layerGraphs = initLayerGraphs(g);
 
     sortLayer(layerGraphs[0],
               null,
-              { 1: [0], 2: [2], 3: [0, 1, 2] });
+              { a: [0], b: [2], c: [0, 1, 2] });
 
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 2);
-    assert.equal(g.node(3).order, 1);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 2);
+    assert.equal(g.node('c').order, 1);
   });
 
   it('handles a single subgraph', function() {
@@ -58,77 +59,66 @@ describe('sortLayer', function() {
     // layer. The subgraph gets a weight of 1, which means it should come
     // before node 3.
 
-    g.addNode(1, { rank: 0, order: 0 });
-    g.addNode(2, { rank: 0, order: 1 });
-    g.addNode(3, { rank: 0, order: 2 });
-    g.addNode('sg1', {});
-    g.parent(1, 'sg1');
-    g.parent(2, 'sg1');
+    testUtil.addSimpleNode(g, 'a', 0, 0);
+    testUtil.addSimpleNode(g, 'b', 0, 1);
+    testUtil.addSimpleNode(g, 'c', 0, 2);
+    testUtil.addCompoundNode(g, 'sg1', ['a', 'b']);
 
     var layerGraphs = initLayerGraphs(g);
 
     sortLayer(layerGraphs[0],
               null,
-              { 1: [0, 0], 2: [2, 2], 3: [1, 2] });
+              { a: [0, 0], b: [2, 2], c: [1, 2] });
 
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 1);
-    assert.equal(g.node(3).order, 2);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 1);
+    assert.equal(g.node('c').order, 2);
     assert.notProperty(g.node('sg1'), 'order');
   });
 
   it('handles nested subgraphs', function() {
-    g.addNode(1, { rank: 0 });
-    g.addNode(2, { rank: 0 });
-    g.addNode(3, { rank: 0 });
-    g.addNode(4, { rank: 0 });
-    g.addNode(5, { rank: 0 });
-    g.addNode('sg2', {});
-    g.parent(2, 'sg2');
-    g.parent(3, 'sg2');
-    g.addNode('sg1', {});
-    g.parent(1, 'sg1');
-    g.parent('sg2', 'sg1');
-    g.parent(4, 'sg1');
+    testUtil.addSimpleNode(g, 'a', 0);
+    testUtil.addSimpleNode(g, 'b', 0);
+    testUtil.addSimpleNode(g, 'c', 0);
+    testUtil.addSimpleNode(g, 'd', 0);
+    testUtil.addSimpleNode(g, 'e', 0);
+    testUtil.addCompoundNode(g, 'sg2', ['b', 'c']);
+    testUtil.addCompoundNode(g, 'sg1', ['a', 'sg2', 'd']);
 
     var layerGraphs = initLayerGraphs(g);
 
     sortLayer(layerGraphs[0],
               null,
-              { 1: [4], 2: [3], 3: [7], 4: [6], 5: [6] });
+              { a: [4], b: [3], c: [7], d: [6], e: [6] });
 
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 1);
-    assert.equal(g.node(3).order, 2);
-    assert.equal(g.node(4).order, 3);
-    assert.equal(g.node(5).order, 4);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 1);
+    assert.equal(g.node('c').order, 2);
+    assert.equal(g.node('d').order, 3);
+    assert.equal(g.node('e').order, 4);
     assert.notProperty(g.node('sg1'), 'order');
     assert.notProperty(g.node('sg2'), 'order');
   });
 
   it('returns a constraint graph for the next layer', function() {
-    g.addNode(1, { rank: 0 });
-    g.addNode(2, { rank: 0 });
-    g.addNode(3, { rank: 0 });
-    g.addNode(4, { rank: 0 });
-    g.addNode('sg1', {});
-    g.addNode('sg2', {});
-    g.addNode('sg3', {});
-    g.parent(1, 'sg1');
-    g.parent(2, 'sg2');
-    g.parent(3, 'sg3');
-    g.parent(4, 'sg3');
+    testUtil.addSimpleNode(g, 'a', 0);
+    testUtil.addSimpleNode(g, 'b', 0);
+    testUtil.addSimpleNode(g, 'c', 0);
+    testUtil.addSimpleNode(g, 'd', 0);
+    testUtil.addCompoundNode(g, 'sg1', ['a']);
+    testUtil.addCompoundNode(g, 'sg2', ['b']);
+    testUtil.addCompoundNode(g, 'sg3', ['c', 'd']);
 
     var cg = sortLayer(initLayerGraphs(g)[0],
                        null,
-                       { 1 : [1], 2: [2], 3: [3], 4: [4] });
+                       { a: [1], b: [2], c: [3], d: [4] });
 
     // Ordering should have sg1 < sg2 < sg3. The constraint graph should thus
     // have sg1 -> sg2 -> sg3;
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 1);
-    assert.equal(g.node(3).order, 2);
-    assert.equal(g.node(4).order, 3);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 1);
+    assert.equal(g.node('c').order, 2);
+    assert.equal(g.node('d').order, 3);
     assert.sameMembers(cg.nodes(), ['sg1', 'sg2', 'sg3']);
     assert.sameMembers(cg.successors('sg1'), ['sg2']);
     assert.sameMembers(cg.successors('sg2'), ['sg3']);
@@ -136,28 +126,23 @@ describe('sortLayer', function() {
   });
 
   it('returns a constraint graph a layer with nested subgraphs', function() {
-    g.addNode(1, { rank: 0 });
-    g.addNode(2, { rank: 0 });
-    g.addNode(3, { rank: 0 });
-    g.addNode('sg1', {});
-    g.addNode('sg2', {});
-    g.addNode('sg3', {});
-    g.addNode('sg4', {});
-    g.parent('sg3', 'sg1');
-    g.parent('sg4', 'sg1');
-    g.parent(1, 'sg3');
-    g.parent(2, 'sg4');
-    g.parent(3, 'sg2');
+    testUtil.addSimpleNode(g, 'a', 0);
+    testUtil.addSimpleNode(g, 'b', 0);
+    testUtil.addSimpleNode(g, 'c', 0);
+    testUtil.addCompoundNode(g, 'sg4', ['b']);
+    testUtil.addCompoundNode(g, 'sg3', ['a']);
+    testUtil.addCompoundNode(g, 'sg2', ['c']);
+    testUtil.addCompoundNode(g, 'sg1', ['sg3', 'sg4']);
 
     var cg = sortLayer(initLayerGraphs(g)[0],
                        null,
-                       { 1: [1], 2: [2], 3: [3] });
+                       { a: [1], b: [2], c: [3] });
 
     // Ordering will have sg3 < sg4 and sg1 < sg2. The constraint graph should
     // thus have sg3 -> sg4 and sg1 -> sg2.
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 1);
-    assert.equal(g.node(3).order, 2);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 1);
+    assert.equal(g.node('c').order, 2);
     assert.sameMembers(cg.nodes(), ['sg1', 'sg2', 'sg3', 'sg4']);
     assert.sameMembers(cg.successors('sg1'), ['sg2']);
     assert.sameMembers(cg.successors('sg2'), []);
@@ -166,12 +151,10 @@ describe('sortLayer', function() {
   });
 
   it('respects the constraint graph', function() {
-    g.addNode(1, { rank: 0 });
-    g.addNode(2, { rank: 0 });
-    g.addNode('sg1', {});
-    g.parent(1, 'sg1');
-    g.addNode('sg2', {});
-    g.parent(2, 'sg2');
+    testUtil.addSimpleNode(g, 'a', 0);
+    testUtil.addSimpleNode(g, 'b', 0);
+    testUtil.addCompoundNode(g, 'sg1', ['a']);
+    testUtil.addCompoundNode(g, 'sg2', ['b']);
 
     var layerGraphs = initLayerGraphs(g);
 
@@ -182,9 +165,9 @@ describe('sortLayer', function() {
 
     sortLayer(layerGraphs[0],
               cg,
-              { 1: [2], 2: [1] });
+              { a: [2], b: [1] });
 
-    assert.equal(g.node(1).order, 0);
-    assert.equal(g.node(2).order, 1);
+    assert.equal(g.node('a').order, 0);
+    assert.equal(g.node('b').order, 1);
   });
 });
