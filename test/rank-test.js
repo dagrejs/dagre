@@ -243,6 +243,16 @@ function rankTests(withSimplex) {
     assert.equal(g.node('b').rank, 1);
     assert.equal(g.node('a').rank, 1);
   });
+
+  it('keeps top border nodes tight to the cluster', function() {
+    // With a naive ranker we can end up with border nodes that have ranks that
+    // are much too low, leaving a lot of empty space between the top of a
+    // cluster and its first node. This situation is describe in Sander,
+    // "Layout of Compound Directed Graphs".
+    var g = parse('digraph { subgraph 1 { subgraph 2 { A } B -> A } }');
+    rank.run(g, withSimplex);
+    assert.equal(g.node('A').rank, g.node(g.node(2).borderNodeTop).rank + 1);
+  });
 }
 
 /*
