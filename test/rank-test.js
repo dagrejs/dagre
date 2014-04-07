@@ -236,6 +236,13 @@ function rankTests(withSimplex) {
     assert.equal(g.node('n6').rank, 1);
     assert.equal(g.node('n7').rank, 1);
   });
+
+  it('assigns the same rank to a root node and a node in an otherwise empty root subgraph', function() {
+    var g = parse('digraph { a; subgraph { b } }');
+    rank.run(g, withSimplex);
+    assert.equal(g.node('b').rank, 1);
+    assert.equal(g.node('a').rank, 1);
+  });
 }
 
 /*

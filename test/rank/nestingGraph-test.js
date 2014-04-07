@@ -9,6 +9,7 @@ describe('nestingGraph.augment', function() {
 
   beforeEach(function() {
     g = new CDigraph();
+    g.graph({});
   });
 
   it('adds a border node u^(-) at the top of each subgraph', function() {
@@ -140,6 +141,7 @@ describe('nestingGraph.removeEdges', function() {
     // We augment a graph similarly to the above tests and then we use remove.
     // After this process no nesting edges should remain in the graph.
     var g = new CDigraph();
+    g.graph({});
     g.addNode('sg1', {});
     g.parent(g.addNode('sg2', {}), 'sg1');
     g.parent(g.addNode(1, {}), 'sg2');
