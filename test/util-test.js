@@ -1,5 +1,6 @@
 var assert = require('./assert'),
-    util = require('../lib/util');
+    util = require('../lib/util'),
+    CDigraph = require('graphlib').CDigraph;
 
 describe('util.sum', function() {
   it('returns the sum of all elements in the array', function() {
@@ -31,5 +32,55 @@ describe('util.all', function() {
       return x > 0;
     }));
     assert.equal(lastSeen, -1);
+  });
+});
+
+describe('util.findLCA', function() {
+  it('returns null if there is no common ancestor', function() {
+    var g = new CDigraph();
+    g.addNode('a');
+    g.addNode('b');
+    g.addNode('sg1');
+    g.addNode('sg2');
+    g.parent('a', 'sg1');
+    g.parent('b', 'sg2');
+
+    assert.equal(util.findLCA(g, 'a', 'b'), null);
+  });
+
+  it('returns a parents node if both node arguments are the same', function() {
+    var g = new CDigraph();
+    g.addNode('a');
+    g.addNode('sg1');
+    g.parent('a', 'sg1');
+
+    assert.equal(util.findLCA(g, 'a', 'a'), 'sg1');
+  });
+
+  it('returns a common ancestor', function() {
+    var g = new CDigraph();
+    g.addNode('a');
+    g.addNode('b');
+    g.addNode('sg1');
+    g.parent('a', 'sg1');
+    g.parent('b', 'sg1');
+
+    assert.equal(util.findLCA(g, 'a', 'b'), 'sg1');
+  });
+
+  it('returns a common ancestor at different depths', function() {
+    // This test ensures that the LCA search only stops when the root is
+    // reached from BOTH paths. If the nodes are at different depths this
+    // becomes important.
+    var g = new CDigraph();
+    g.addNode('a');
+    g.addNode('b');
+    g.addNode('sg1');
+    g.addNode('sg2');
+    g.parent('a', 'sg1');
+    g.parent('b', 'sg2');
+    g.parent('sg2', 'sg1');
+
+    assert.equal(util.findLCA(g, 'a', 'b'), 'sg1');
   });
 });
