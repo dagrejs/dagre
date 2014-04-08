@@ -254,6 +254,14 @@ For positioning (or coordinate assignment), we derived our algorithm from
 some some adjustments to get tighter graphs when node and edges sizes vary
 greatly.
 
+For clustering, our main techniques come from *Sander, "Layout of Compound
+Directed Graphs"*. This is unequivocally the best paper I've found on how to
+lay out compound graphs and manage various difficulties that arise in the
+process. *Forster, "Applying Crossing Reduction Strategies to Layered Compound
+Graphs"* and *Forster, "A Fast and Simple Heuristic for Constrained Two-Level
+Crossing Reduction"* offer a fast algorithm for crossing minimization in the
+context of compound graphs.
+
 ## Third Party Examples
 
 Dagre has been included as a part of some very cool projects. Here are just a
