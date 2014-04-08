@@ -1,0 +1,7 @@
+// Test left-to-right rank with a subgraph
+digraph {
+    subgraph 1 {
+        A
+    }
+    rankDir=LR
+}
