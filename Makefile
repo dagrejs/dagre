@@ -25,7 +25,7 @@ SMOKE_GRAPH_FILES = $(wildcard test/smoke/*)
 TEST_COV = build/coverage
 
 # Targets
-.PHONY: = all test lint release clean fullclean
+.PHONY: all test lint release clean fullclean
 
 .DELETE_ON_ERROR:
 
