@@ -91,28 +91,6 @@ describe('nestingGraph.augment', function() {
     assert.propertyVal(g.edge('A'), 'minLen', (2 * 1 + 1) * 2);
   });
 
-  it('sets minLen appropriately for subgraph to node edges', function() {
-    g.addNode('sg1', {});
-    g.parent(g.addNode('sg2', {}), 'sg1');
-    g.parent(g.addNode(1, {}), 'sg1');
-    g.parent(g.addNode(2, {}), 'sg2');
-
-    nestingGraph.augment(g);
-    assert.lengthOf(g.inEdges(1), 1);
-    assert.propertyVal(g.edge(g.inEdges(1)[0]), 'minLen', 2);
-  });
-
-  it('sets minLen appropriately for node to subgraph edges', function() {
-    g.addNode('sg1', {});
-    g.parent(g.addNode('sg2', {}), 'sg1');
-    g.parent(g.addNode(1, {}), 'sg1');
-    g.parent(g.addNode(2, {}), 'sg2');
-
-    nestingGraph.augment(g);
-    assert.lengthOf(g.outEdges(1), 1);
-    assert.propertyVal(g.edge(g.outEdges(1)[0]), 'minLen', 2);
-  });
-
   it('sets minLen appropriately for subgraph to subgraph (-) edges', function() {
     g.addNode('sg1', {});
     g.parent(g.addNode('sg2', {}), 'sg1');
