@@ -257,7 +257,7 @@ greatly.
 ## Third Party Examples
 
 Dagre has been included as a part of some very cool projects. Here are just a
-couple that stand out:
+few that stand out:
 
 [JointJS][] has a plugin that uses dagre for layout. JointJS focuses on
 rendering and interaction with diagrams, which synergizes well with Dagre. If
@@ -268,6 +268,10 @@ Jonathan Mace has a
 [demo](http://cs.brown.edu/people/jcmace/d3/graph.html?id=small.json) that
 makes it possible to interactively explore graphs. In his demo, you can
 highlight paths, collapse subgraphs, via detailed node information, and more!
+
+[nomnoml](http://www.nomnoml.com/) is a tool for drawing UML diagrams in a
+browser. It uses a custom renderer with dagre to draw the diagrams in an
+HTML5 canvas.
 
 ## License
 
