@@ -4,5 +4,6 @@
     "quotmark": true,
     "unused": true,
     "trailing": true,
-    "laxbreak": true
+    "laxbreak": true,
+    "node": true
 }
