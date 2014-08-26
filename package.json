@@ -7,6 +7,10 @@
     "graph",
     "layout"
   ],
+  "dependencies": {
+    "cp-data": "1.1.3",
+    "graphlib": "0.7.4"
+  },
   "devDependencies": {
     "browserify": "~2.33.1",
     "chai": "1.8.x",
@@ -18,10 +22,6 @@
     "mocha": "1.12.x",
     "semver": "2.1.x",
     "uglify-js": "1.2.3"
-  },
-  "dependencies": {
-    "cp-data": "1.1.3",
-    "graphlib": "0.7.4"
   },
   "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
