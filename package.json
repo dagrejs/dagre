@@ -2,6 +2,7 @@
   "name": "dagre",
   "version": "0.4.7-pre",
   "description": "Graph layout for JavaScript",
+  "author": "Chris Pettitt <cpettitt@gmail.com>",
   "main": "index.js",
   "keywords": [
     "graph",
@@ -23,7 +24,6 @@
     "semver": "^3.0.1",
     "uglify-js": "^2.4.15"
   },
-  "author": "Chris Pettitt <chris@samsarin.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/cpettitt/dagre.git"
