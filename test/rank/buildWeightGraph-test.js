@@ -1,29 +1,29 @@
-var assert = require('../assert'),
-    Digraph = require('graphlib').Digraph,
-    buildWeightGraph = require('../../lib/rank/buildWeightGraph');
+var assert = require("../assert"),
+    Digraph = require("graphlib").Digraph,
+    buildWeightGraph = require("../../lib/rank/buildWeightGraph");
 
-describe('buildWeightGraph', function() {
+describe("buildWeightGraph", function() {
   var g;
 
   beforeEach(function() {
     g = new Digraph();
   });
 
-  it('returns an directed graph', function() {
+  it("returns an directed graph", function() {
     g.addNode(1);
 
     var result = buildWeightGraph(g);
     assert.isTrue(result.isDirected());
   });
 
-  it('returns a singleton graph for a singleton input graph', function() {
+  it("returns a singleton graph for a singleton input graph", function() {
     g.addNode(1);
 
     var result = buildWeightGraph(g);
     assert.sameMembers(result.nodes(), g.nodes());
   });
 
-  it('returns a weight of 1 for a single forward edge', function() {
+  it("returns a weight of 1 for a single forward edge", function() {
     g.addNode(1);
     g.addNode(2);
     g.addEdge(null, 1, 2, {});
@@ -33,7 +33,7 @@ describe('buildWeightGraph', function() {
     assert.equal(result.edge(result.edges()[0]).weight, 1);
   });
 
-  it('returns a weight of -1 for a single back edge', function() {
+  it("returns a weight of -1 for a single back edge", function() {
     g.addNode(1);
     g.addNode(2);
     g.addEdge(null, 1, 2, { reversed: true });
@@ -43,7 +43,7 @@ describe('buildWeightGraph', function() {
     assert.equal(result.edge(result.edges()[0]).weight, -1);
   });
 
-  it('returns a weight of n for an n count forward multi-edge', function() {
+  it("returns a weight of n for an n count forward multi-edge", function() {
     g.addNode(1);
     g.addNode(2);
 
@@ -57,7 +57,7 @@ describe('buildWeightGraph', function() {
     assert.equal(result.edge(result.edges()[0]).weight, n);
   });
 
-  it('returns a weight of -n for an n count back multi-edge', function() {
+  it("returns a weight of -n for an n count back multi-edge", function() {
     g.addNode(1);
     g.addNode(2);
 
@@ -71,7 +71,7 @@ describe('buildWeightGraph', function() {
     assert.equal(result.edge(result.edges()[0]).weight, -n);
   });
 
-  it('sets the minLen to the max minLen of edges in the original graph', function() {
+  it("sets the minLen to the max minLen of edges in the original graph", function() {
     g.addNode(1);
     g.addNode(2);
     g.addEdge(null, 1, 2, { minLen: 1 });
@@ -83,7 +83,7 @@ describe('buildWeightGraph', function() {
     assert.equal(result.edge(result.edges()[0]).minLen, 5);
   });
 
-  it('sets the minLen to a negative value if the edge is reversed', function() {
+  it("sets the minLen to a negative value if the edge is reversed", function() {
     g.addNode(1);
     g.addNode(2);
     g.addEdge(null, 1, 2, { minLen: 1, reversed: true });
@@ -94,7 +94,7 @@ describe('buildWeightGraph', function() {
     assert.equal(result.edge(result.edges()[0]).minLen, -3);
   });
 
-  it('handles multiple edges across nodes', function() {
+  it("handles multiple edges across nodes", function() {
     g.addNode(1);
     g.addNode(2);
     g.addNode(3);

@@ -1,48 +1,48 @@
-var assert = require('./assert'),
-    util = require('../lib/util'),
-    dot = require('graphlib-dot'),
-    layout = require('..').layout,
-    components = require('graphlib').alg.components,
-    nodesFromList = require('graphlib').filter.nodesFromList,
-    path = require('path'),
-    fs = require('fs');
+var assert = require("./assert"),
+    util = require("../lib/util"),
+    dot = require("graphlib-dot"),
+    layout = require("..").layout,
+    components = require("graphlib").alg.components,
+    nodesFromList = require("graphlib").filter.nodesFromList,
+    path = require("path"),
+    fs = require("fs");
 
-describe('smoke tests', function() {
+describe("smoke tests", function() {
   var fileNames;
 
-  if ('SMOKE_TESTS' in process.env) {
-    fileNames = process.env.SMOKE_TESTS.split(' ');
+  if ("SMOKE_TESTS" in process.env) {
+    fileNames = process.env.SMOKE_TESTS.split(" ");
   } else {
-    var smokeDir = path.join(__dirname, 'smoke');
+    var smokeDir = path.join(__dirname, "smoke");
     fileNames = fs.readdirSync(smokeDir)
-                      .filter(function(x) { return x.slice(-4) === '.dot'; })
+                      .filter(function(x) { return x.slice(-4) === ".dot"; })
                       .map(function(x) { return path.join(smokeDir, x); });
   }
 
   fileNames.forEach(function(fileName) {
-    var file = fs.readFileSync(fileName, 'utf8'),
+    var file = fs.readFileSync(fileName, "utf8"),
         g = dot.parse(file);
 
-    // Since dagre doesn't assign dimensions to nodes, we should do that here
-    // for each node that doesn't already have dimensions assigned.
+    // Since dagre doesn"t assign dimensions to nodes, we should do that here
+    // for each node that doesn"t already have dimensions assigned.
     g.eachNode(function(u, a) {
       if (g.children(u).length) return;
       if (a.width === undefined) a.width = 100;
       if (a.height === undefined) a.height = 50;
     });
 
-    describe('layout for ' + fileName, function() {
-      it('only includes nodes in the input graph', function() {
+    describe("layout for " + fileName, function() {
+      it("only includes nodes in the input graph", function() {
         var nodes = g.nodes();
         assert.sameMembers(layout().run(g).nodes(), nodes);
       });
 
-      it('only includes edges in the input graph', function() {
+      it("only includes edges in the input graph", function() {
         var edges = g.edges();
         assert.sameMembers(layout().run(g).edges(), edges);
       });
 
-      it('has the same incident nodes for each edge', function() {
+      it("has the same incident nodes for each edge", function() {
         function incidentNodes(g) {
           var edges = {};
           g.edges().forEach(function(e) {
@@ -55,19 +55,19 @@ describe('smoke tests', function() {
         assert.deepEqual(incidentNodes(layout().run(g)), edges);
       });
 
-      it('has valid control points for each edge', function() {
+      it("has valid control points for each edge", function() {
         layout().run(g).eachEdge(function(e, u, v, value) {
-          assert.property(value, 'points');
+          assert.property(value, "points");
           value.points.forEach(function(p) {
-            assert.property(p, 'x');
-            assert.property(p, 'y');
+            assert.property(p, "x");
+            assert.property(p, "y");
             assert.isFalse(Number.isNaN(p.x));
             assert.isFalse(Number.isNaN(p.y));
           });
         });
       });
 
-      it('respects rankSep', function() {
+      it("respects rankSep", function() {
         // For each edge we check that the difference between the y value for
         // incident nodes is equal to or greater than ranksep. We make an
         // exception for self edges.
@@ -76,13 +76,13 @@ describe('smoke tests', function() {
         var out = layout().rankSep(sep).run(g);
 
         function getY(u) {
-          return (g.graph().rankDir === 'LR' || g.graph().rankDir === 'RL'
+          return (g.graph().rankDir === "LR" || g.graph().rankDir === "RL"
                     ? out.node(u).x
                     : out.node(u).y);
         }
 
         function getHeight(u) {
-          return Number(g.graph().rankDir === 'LR' || g.graph().rankDir === 'RL'
+          return Number(g.graph().rankDir === "LR" || g.graph().rankDir === "RL"
                             ? out.node(u).width
                             : out.node(u).height);
         }
@@ -95,13 +95,13 @@ describe('smoke tests', function() {
                   vHeight = getHeight(v),
                   actualSep = Math.abs(vY - uY) - (uHeight + vHeight) / 2;
               assert.isTrue(actualSep >= sep,
-                            'Distance between ' + u + ' and ' + v + ' should be ' + sep +
-                            ' but was ' + actualSep);
+                            "Distance between " + u + " and " + v + " should be " + sep +
+                            " but was " + actualSep);
             }
           });
       });
 
-      it('has the origin at (0, 0)', function() {
+      it("has the origin at (0, 0)", function() {
         var out = layout().run(g);
         var nodes = out.nodes().filter(util.filterNonSubgraphs(out));
 
@@ -129,15 +129,15 @@ describe('smoke tests', function() {
         assert.equal(util.min(ys), 0);
       });
 
-      it('has valid dimensions', function() {
+      it("has valid dimensions", function() {
         var graphValue = layout().run(g).graph();
-        assert.property(graphValue, 'width');
-        assert.property(graphValue, 'height');
+        assert.property(graphValue, "width");
+        assert.property(graphValue, "height");
         assert.isFalse(Number.isNaN(graphValue.width));
         assert.isFalse(Number.isNaN(graphValue.height));
       });
 
-      it('has no unnecessary edge slack', function() {
+      it("has no unnecessary edge slack", function() {
         // We want to be sure that each node is connected to the graph by at
         // least one tight edge. To do this we first break the graph into
         // connected components and then scan over all edges, preserving only

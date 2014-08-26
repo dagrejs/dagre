@@ -6,7 +6,7 @@
   "immed": true,
   "newcap": true,
   "noarg": true,
-  "quotmark": true,
+  "quotmark": "double",
   "trailing": true,
   "undef": true,
   "unused": true,
