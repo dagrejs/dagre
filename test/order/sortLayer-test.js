@@ -22,11 +22,11 @@ describe("sortLayer", function() {
     g.addNode(3, { rank: 0, order: 0 });
 
     var layerGraphs = initLayerGraphs(g);
-    
+
     sortLayer(layerGraphs[0],
               null,
               { 1: [0], 2: [1], 3: [2] });
-    
+
     assert.equal(g.node(1).order, 0);
     assert.equal(g.node(2).order, 1);
     assert.equal(g.node(3).order, 2);

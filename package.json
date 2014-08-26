@@ -11,8 +11,10 @@
     "browserify": "~2.33.1",
     "chai": "1.8.x",
     "graphlib-dot": "0.4.8",
-    "istanbul": "~0.1.44",
+    "istanbul": "^0.3.0",
+    "jscs": "^1.5.9",
     "jshint": "^2.5.5",
+    "jshint-stylish": "^0.4.0",
     "mocha": "1.12.x",
     "semver": "2.1.x",
     "uglify-js": "1.2.3"

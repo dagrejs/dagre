@@ -97,7 +97,7 @@ describe("layout", function() {
       g.addEdge(null, 3, 4);
       g.addEdge(null, 6, 1);
     });
-    
+
     it("ensures nodes with rank=min have the smallest y value", function() {
       var out = layout().run(g);
       var minY = Math.min.apply(Math, out.nodes().map(function(u) { return out.node(u).y; }));

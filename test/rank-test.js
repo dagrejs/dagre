@@ -141,7 +141,11 @@ function rankTests(withSimplex) {
   });
 
   it("gives the same rank to nodes with the same preference", function() {
-    var g = parse("digraph { A [prefRank=same_1]; B [prefRank=same_1]; C [prefRank=same_2]; D [prefRank=same_2]; A -> B; D -> C; }");
+    var g = parse("digraph {" +
+                    "A [prefRank=same_1]; B [prefRank=same_1];" +
+                    "C [prefRank=same_2]; D [prefRank=same_2];" +
+                    "A -> B; D -> C;" +
+                  "}");
 
     rank.run(g, withSimplex);
 
@@ -210,7 +214,11 @@ function rankTests(withSimplex) {
     // B2. This yields a cycle between the A rank and the B rank and one of the
     // edges must be reversed. However, we want to be sure that the edge is
     // correct oriented when it comes out of the rank function.
-    var g = parse("digraph { { node [prefRank=same_A] A A2 } { node [prefRank=same_B] B B2 } A -> B B2 -> A2 }");
+    var g = parse("digraph {" +
+                    "{ node [prefRank=same_A] A A2 }" +
+                    "{ node [prefRank=same_B] B B2 }" +
+                    "A -> B; B2 -> A2" +
+                  "}");
 
     rank.run(g, withSimplex);
     rank.restoreEdges(g);

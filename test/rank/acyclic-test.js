@@ -53,7 +53,12 @@ describe("acyclic", function() {
   });
 
   it("works for multiple cycles", function() {
-    var g = dot.parse("digraph { A -> B -> A; B -> C -> D -> E -> C; G -> C; G -> H -> G; H -> I -> J }");
+    var g = dot.parse("digraph {" +
+                        "A -> B -> A;" +
+                        "B -> C -> D -> E -> C;" +
+                        "G -> C;" +
+                        "G -> H -> G;" +
+                        "H -> I -> J }");
     assert.isFalse(isAcyclic(g));
     acyclic(g);
     assertAcyclic(g);

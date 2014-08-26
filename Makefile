@@ -1,80 +1,68 @@
-# Binaries we use
-NODE = node
-NPM = npm
+MOD = dagre
 
+NPM = npm
 BROWSERIFY = ./node_modules/browserify/bin/cmd.js
 ISTANBUL = ./node_modules/istanbul/lib/cli.js
 JSHINT = ./node_modules/jshint/bin/jshint
+JSCS = ./node_modules/jscs/bin/jscs
 MOCHA = ./node_modules/mocha/bin/_mocha
-PHANTOMJS = ./node_modules/phantomjs/bin/phantomjs
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 
-# Options
-MOCHA_OPTS=-R spec
+ISTANBUL_OPTS = --dir $(COVERAGE_DIR) --report html
+JSHINT_OPTS = --reporter node_modules/jshint-stylish/stylish.js
+MOCHA_OPTS = -R dot
 
-# Module def
-MODULE = dagre
-MODULE_JS = $(MODULE).js
-MODULE_MIN_JS = $(MODULE).min.js
+BUILD_DIR = build
+COVERAGE_DIR = $(BUILD_DIR)/cov
+DIST_DIR = dist
 
-# Various files
 SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js')
-TEST_FILES = $(shell find test -type f -name '*.js')
+TEST_FILES = $(filter-out smoke-test.js, $(shell find test -type f -name '*.js'))
+BUILD_FILES = $(addprefix $(BUILD_DIR)/, \
+						$(MOD).js $(MOD).min.js)
 SMOKE_GRAPH_FILES = $(wildcard test/smoke/*)
 
-TEST_COV = build/coverage
+DIRS = $(BUILD_DIR)
 
 # Targets
-.PHONY: all test lint release clean fullclean
+.PHONY: all bench clean dist test unit-test smoke-test
 
-.DELETE_ON_ERROR:
+all: test
 
-all: build test
+bench: test
+	@src/bench.js
 
 lib/version.js: package.json
-	$(NODE) src/version.js > $@
+	@src/version.js > $@
 
-build: build/$(MODULE_JS) build/$(MODULE_MIN_JS)
+$(DIRS):
+	@mkdir -p $@
 
-build/$(MODULE_JS): browser.js node_modules $(SRC_FILES)
-	mkdir -p $(@D)
-	$(BROWSERIFY) $(BROWSERIFY_OPTS) $< > $@
+test: unit-test smoke-test
 
-build/$(MODULE_MIN_JS): build/$(MODULE_JS)
-	$(UGLIFY) $(UGLIFY_OPTS) $< > $@
+smoke-test: test/smoke-test.js $(SRC_FILES) $(SMOKE_GRAPH_FILES) node_modules
+	$(MOCHA) $(MOCHA_OPTS) $<
 
-dist: build/$(MODULE_JS) build/$(MODULE_MIN_JS) | test
-	rm -rf $@
-	mkdir -p $@
-	cp $^ dist
+unit-test: $(SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
+	@$(ISTANBUL) cover $(ISTANBUL_OPTS) $(MOCHA) --dir $(COVERAGE_DIR) -- $(MOCHA_OPTS) $(TEST_FILES) || $(MOCHA) $(MOCHA_OPTS) $(TEST_FILES)
+	@$(JSHINT) $(JSHINT_OPTS) $(filter-out node_modules, $?)
+	@$(JSCS) $(filter-out node_modules, $?)
 
-test: $(TEST_COV) lint
+$(BUILD_DIR)/$(MOD).js: browser.js | test
+	@$(BROWSERIFY) -x lodash $< > $@
 
-$(TEST_COV): $(TEST_FILES) $(SMOKE_GRAPH_FILES) $(SRC_FILES) node_modules
-	rm -rf $@
-	$(MOCHA) $(MOCHA_OPTS) $(TEST_FILES)
-# Instanbul instrumentation appears to mess up stack traces, so we run it after
-# ensuring the tests are passing
-	$(ISTANBUL) cover $(MOCHA) --dir $@ -- $(MOCHA_OPTS) $(TEST_FILES) >/dev/null
+$(BUILD_DIR)/$(MOD).min.js: $(BUILD_DIR)/$(MOD).js
+	@$(UGLIFY) $< --comments '@license' > $@
 
-lint: build/lint
-
-build/lint: browser.js $(SRC_FILES) $(TEST_FILES)
-	mkdir -p $(@D)
-	$(JSHINT) $?
-	touch $@
-	@echo
-
-release: dist
-	src/release/release.sh $(MODULE) dist
+dist: $(BUILD_FILES) | test
+	@rm -rf $@
+	@mkdir -p $@
+	cp -r $^ dist
+	cp LICENSE $@
 
 clean:
 	rm -rf build dist
 
-fullclean: clean
-	rm -rf ./node_modules
-	rm -f lib/version.js
-
 node_modules: package.json
-	$(NPM) install
-	touch node_modules
+	@$(NPM) install
+	@touch node_modules
