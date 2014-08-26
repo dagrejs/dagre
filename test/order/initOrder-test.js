@@ -1,4 +1,4 @@
-var assert = require("../assert"),
+var assert = require("../chai").assert,
     initOrder = require("../../lib/order/initOrder"),
     CDigraph = require("graphlib").CDigraph;
 

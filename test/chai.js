@@ -1,7 +1,8 @@
 var chai = require("chai");
-chai.Assertion.includeStack = true;
 
-module.exports = chai.assert;
+module.exports = chai;
+
+chai.config.includeStack = true;
 
 /*
  * Fix Chai"s `notProperty` which passes when an object has a property but its

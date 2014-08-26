@@ -1,4 +1,4 @@
-var assert = require("../assert"),
+var assert = require("../chai").assert,
     Digraph = require("graphlib").Digraph,
     crossCount = require("../../lib/order/crossCount");
 

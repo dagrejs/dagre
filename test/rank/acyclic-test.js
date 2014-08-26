@@ -1,4 +1,4 @@
-var assert = require("../assert"),
+var assert = require("../chai").assert,
     dot = require("graphlib-dot"),
     acyclic = require("../../lib/rank/acyclic"),
     isAcyclic = require("graphlib").alg.isAcyclic,

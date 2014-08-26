@@ -1,4 +1,4 @@
-var assert = require("./assert"),
+var assert = require("./chai").assert,
     util = require("../lib/util");
 
 describe("util.sum", function() {
