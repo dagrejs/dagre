@@ -1,9 +1,23 @@
 {
-    "eqeqeq": true,
-    "newcap": true,
-    "quotmark": true,
-    "unused": true,
-    "trailing": true,
-    "laxbreak": true,
-    "node": true
+  "camelcase": true,
+  "eqeqeq": true,
+  "expr": true,
+  "freeze": true,
+  "immed": true,
+  "newcap": true,
+  "noarg": true,
+  "quotmark": true,
+  "trailing": true,
+  "undef": true,
+  "unused": true,
+
+  "laxbreak": true,
+
+  "node": true,
+
+  "globals": {
+      "beforeEach": false,
+      "describe": false,
+      "it": false
+  }
 }
