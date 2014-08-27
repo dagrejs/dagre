@@ -1,35 +1,35 @@
-var assert = require("./chai").assert,
+var _ = require("lodash"),
+    expect = require("./chai").expect,
     util = require("../lib/util");
 
-describe("util.sum", function() {
-  it("returns the sum of all elements in the array", function() {
-    assert.equal(util.sum([1,2,3,4]), 10);
-  });
+describe("util", function() {
+  describe("time", function() {
+    var consoleLog;
+    beforeEach(function() { consoleLog = console.log; });
+    afterEach(function() {
+      console.log = consoleLog;
+      util.log.level = 0;
+    });
 
-  it("returns 0 if there are no elements in the array", function() {
-    assert.equal(util.sum([]), 0);
-  });
-});
+    it("does nothing if the log.level is 0", function() {
+      util.log.level = 0;
+      var capture = [];
+      console.log = function() { capture.push(_.toArray(arguments)[0]); };
+      util.time("foo", function() {});
+      expect(capture).to.be.empty;
+    });
 
-describe("util.all", function() {
-  it("returns true if f(x) holds for all x in xs", function() {
-    assert.isTrue(util.all([1,2,3,4], function(x) {
-      return x > 0;
-    }));
-  });
+    it("logs timing information if the log.level is > 0", function() {
+      util.log.level = 1;
+      var capture = [];
+      console.log = function() { capture.push(_.toArray(arguments)[0]); };
+      util.time("foo", function() {});
+      expect(capture.length).to.equal(1);
+      expect(capture[0]).to.match(/^foo time: .*ms/);
+    });
 
-  it("returns false if f(x) does not hold for all x in xs", function() {
-    assert.isFalse(util.all([1,2,3,-1], function(x) {
-      return x > 0;
-    }));
-  });
-
-  it("fails fast if f(x) does not hold for all x in xs", function() {
-    var lastSeen;
-    assert.isFalse(util.all([1,2,-1,3,4], function(x) {
-      lastSeen = x;
-      return x > 0;
-    }));
-    assert.equal(lastSeen, -1);
+    it("returns the value from the evaluated function", function() {
+      expect(util.time("foo", _.constant("bar"))).to.equal("bar");
+    });
   });
 });

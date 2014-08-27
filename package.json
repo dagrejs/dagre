@@ -8,8 +8,7 @@
     "graph",
     "layout"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "browserify": "^5.10.1",
     "chai": "^1.9.1",
@@ -18,6 +17,7 @@
     "jscs": "^1.5.9",
     "jshint": "^2.5.5",
     "jshint-stylish": "^0.4.0",
+    "lodash": "^2.4.1",
     "mocha": "^1.21.4",
     "semver": "^3.0.1",
     "uglify-js": "^2.4.15"
