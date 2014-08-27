@@ -1,5 +1,0 @@
-/* A graph with a trivial cycle */
-digraph {
-    A -> B;
-    B -> A;
-}

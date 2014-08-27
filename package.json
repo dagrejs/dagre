@@ -9,8 +9,6 @@
     "layout"
   ],
   "dependencies": {
-    "cp-data": "1.1.3",
-    "graphlib": "0.7.4"
   },
   "devDependencies": {
     "browserify": "^5.10.1",

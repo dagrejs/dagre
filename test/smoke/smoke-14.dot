@@ -1,7 +1,0 @@
-/* A digraph that includes both self loops and rank constraints */
-digraph {
-    A [rank=max]
-    B [rank=max]
-    A -> A;
-    A -> B;
-}

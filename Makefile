@@ -17,15 +17,14 @@ COVERAGE_DIR = $(BUILD_DIR)/cov
 DIST_DIR = dist
 
 SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js')
-TEST_FILES = $(filter-out smoke-test.js, $(shell find test -type f -name '*.js'))
+TEST_FILES = $(shell find test -type f -name '*.js')
 BUILD_FILES = $(addprefix $(BUILD_DIR)/, \
 						$(MOD).js $(MOD).min.js)
-SMOKE_GRAPH_FILES = $(wildcard test/smoke/*)
 
 DIRS = $(BUILD_DIR)
 
 # Targets
-.PHONY: all bench clean dist test unit-test smoke-test
+.PHONY: all bench clean dist test unit-test
 
 all: test
 
@@ -38,10 +37,7 @@ lib/version.js: package.json
 $(DIRS):
 	@mkdir -p $@
 
-test: unit-test smoke-test
-
-smoke-test: test/smoke-test.js $(SRC_FILES) $(SMOKE_GRAPH_FILES) node_modules
-	$(MOCHA) $(MOCHA_OPTS) $<
+test: unit-test 
 
 unit-test: $(SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
 	@$(ISTANBUL) cover $(ISTANBUL_OPTS) $(MOCHA) --dir $(COVERAGE_DIR) -- $(MOCHA_OPTS) $(TEST_FILES) || $(MOCHA) $(MOCHA_OPTS) $(TEST_FILES)

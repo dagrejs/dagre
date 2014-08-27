@@ -19,8 +19,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-exports.Digraph = require("graphlib").Digraph;
-exports.Graph = require("graphlib").Graph;
-exports.layout = require("./lib/layout");
-exports.version = require("./lib/version");
-exports.debug = require("./lib/debug");

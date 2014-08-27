@@ -1,4 +1,0 @@
-digraph {
-    rankDir=LR
-    A -> B
-}

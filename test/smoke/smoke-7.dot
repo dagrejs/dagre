@@ -1,7 +1,0 @@
-/* Test for same rank constraint */
-digraph {
-    B [rank=same_1]
-    C [rank=same_1]
-    A -> B
-    C -> D
-}

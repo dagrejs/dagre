@@ -1,5 +1,0 @@
-/* Test for min rank constraint */
-digraph {
-    B [rank=min]
-    A -> B
-}

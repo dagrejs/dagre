@@ -1,9 +1,0 @@
-digraph {
-    subgraph {
-        A -> B
-    }
-
-    subgraph {
-        C -> D
-    }
-}
