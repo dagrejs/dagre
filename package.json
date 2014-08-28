@@ -8,11 +8,13 @@
     "graph",
     "layout"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "graphlib": "git://github.com/cpettitt/graphlib.git#1.0.0-dev",
+    "lodash": "^2.4.1"
+  },
   "devDependencies": {
     "browserify": "^5.10.1",
     "chai": "^1.9.1",
-    "graphlib-dot": "0.4.8",
     "istanbul": "^0.3.0",
     "jscs": "^1.5.9",
     "jshint": "^2.5.5",
