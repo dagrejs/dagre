@@ -1,0 +1,52 @@
+var _ = require("lodash"),
+    expect = require("../chai").expect,
+    Digraph = require("graphlib").Digraph,
+    feasibleTree = require("../../lib/rank/feasible-tree");
+
+describe("feasibleTree", function() {
+  it("creates a tree for a trivial input graph", function() {
+    var g = new Digraph()
+      .setNode("a", { rank: 0 })
+      .setNode("b", { rank: 1 })
+      .setEdge("a", "b", { minlen: 1 });
+
+    var tree = feasibleTree(g);
+    expect(g.getNode("b").rank).to.equal(g.getNode("a").rank + 1);
+    expect(tree.neighbors("a")).to.eql(["b"]);
+  });
+
+  it("correctly shortens slack by pulling a node up", function() {
+    var g = new Digraph()
+      .setNode("a", { rank: 0 })
+      .setNode("b", { rank: 1 })
+      .setNode("c", { rank: 2 })
+      .setNode("d", { rank: 2 })
+      .setPath(["a", "b", "c"], { minlen: 1 })
+      .setEdge("a", "d", { minlen: 1 });
+
+    var tree = feasibleTree(g);
+    expect(g.getNode("b").rank).to.eql(g.getNode("a").rank + 1);
+    expect(g.getNode("c").rank).to.eql(g.getNode("b").rank + 1);
+    expect(g.getNode("d").rank).to.eql(g.getNode("a").rank + 1);
+    expect(_.sortBy(tree.neighbors("a"))).to.eql(["b", "d"]);
+    expect(_.sortBy(tree.neighbors("b"))).to.eql(["a", "c"]);
+    expect(tree.neighbors("c")).to.eql(["b"]);
+    expect(tree.neighbors("d")).to.eql(["a"]);
+  });
+
+  it("correctly shortens slack by pulling a node down", function() {
+    var g = new Digraph()
+      .setNode("a", { rank: 2 })
+      .setNode("b", { rank: 0 })
+      .setNode("c", { rank: 2 })
+      .setEdge("b", "a", { minlen: 1 })
+      .setEdge("b", "c", { minlen: 1 });
+
+    var tree = feasibleTree(g);
+    expect(g.getNode("a").rank).to.eql(g.getNode("b").rank + 1);
+    expect(g.getNode("c").rank).to.eql(g.getNode("b").rank + 1);
+    expect(_.sortBy(tree.neighbors("a"))).to.eql(["b"]);
+    expect(_.sortBy(tree.neighbors("b"))).to.eql(["a", "c"]);
+    expect(_.sortBy(tree.neighbors("c"))).to.eql(["b"]);
+  });
+});
