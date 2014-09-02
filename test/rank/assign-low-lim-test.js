@@ -6,7 +6,7 @@ var _ = require("lodash"),
 describe("rank/assignLowLim", function() {
   it("assigns low, lim, and parent for each node in a tree", function() {
     var g = new Graph()
-      .setNodes(["a", "b", "c", "d", "e"], function() { return {}; })
+      .updateNodes(["a", "b", "c", "d", "e"], function() { return {}; })
       .setPath(["a", "b", "a", "c", "d", "c", "e"]);
 
     assignLowLim(g, "a");
