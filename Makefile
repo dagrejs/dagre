@@ -45,7 +45,7 @@ unit-test: $(SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
 	@$(JSCS) $(filter-out node_modules, $?)
 
 $(BUILD_DIR)/$(MOD).js: browser.js | test
-	@$(BROWSERIFY) -x lodash $< > $@
+	@$(BROWSERIFY) $< > $@
 
 $(BUILD_DIR)/$(MOD).min.js: $(BUILD_DIR)/$(MOD).js
 	@$(UGLIFY) $< --comments '@license' > $@
