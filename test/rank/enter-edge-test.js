@@ -1,7 +1,7 @@
 var expect = require("../chai").expect,
     Graph = require("graphlib").Graph,
     Digraph = require("graphlib").Digraph,
-    assignLowLim = require("../../lib/rank/assign-low-lim"),
+    assignLowLim = require("../../lib/rank/low-lim").assign,
     enterEdge = require("../../lib/rank/enter-edge");
 
 describe("rank/leaveEdge", function() {

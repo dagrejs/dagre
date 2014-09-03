@@ -1,7 +1,7 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
     Graph = require("graphlib").Graph,
-    assignLowLim = require("../../lib/rank/assign-low-lim");
+    assignLowLim = require("../../lib/rank/low-lim").assign;
 
 describe("rank/assignLowLim", function() {
   it("assigns low, lim, and parent for each node in a tree", function() {

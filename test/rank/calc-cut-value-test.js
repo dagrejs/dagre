@@ -1,7 +1,7 @@
 var expect = require("../chai").expect,
     Digraph = require("graphlib").Digraph,
     Graph = require("graphlib").Graph,
-    assignLowLim = require("../../lib/rank/assign-low-lim"),
+    assignLowLim = require("../../lib/rank/low-lim").assign,
     calcCutValue = require("../../lib/rank/calc-cut-value");
 
 // Note: we use p for parent, c for child, gc_x for grandchild nodes, and o for
