@@ -99,56 +99,47 @@ describe("network simplex", function() {
 
   describe("enterEdge", function() {
     it("finds an edge from the head to tail component", function() {
-      var g = new Digraph()
-                .setNode("a", { rank: 0 })
-                .setNode("b", { rank: 2 })
-                .setNode("c", { rank: 3 })
-                .setDefaultEdgeLabel(function() { return { minlen: 1 }; })
-                .setPath(["a", "b", "c"])
-                .setEdge("a", "c"),
-          t = new Graph()
-                .setDefaultNodeLabel(function() { return {}; })
-                .setPath(["b", "c", "a"]);
+      g
+        .setNode("a", { rank: 0 })
+        .setNode("b", { rank: 2 })
+        .setNode("c", { rank: 3 })
+        .setPath(["a", "b", "c"])
+        .setEdge("a", "c");
+      t.setPath(["b", "c", "a"]);
       initLowLimValues(t, "c");
 
       var f = enterEdge(t, g, { v: "b", w: "c" });
-      expect(f).to.eql({ v: "a", w: "b", label: { minlen: 1 } });
+      expect(undirectedEdge(f)).to.eql(undirectedEdge({ v: "a", w: "b" }));
     });
 
     it("works when the root of the tree is in the tail component", function() {
-      var g = new Digraph()
-                .setNode("a", { rank: 0 })
-                .setNode("b", { rank: 2 })
-                .setNode("c", { rank: 3 })
-                .setDefaultEdgeLabel(function() { return { minlen: 1 }; })
-                .setPath(["a", "b", "c"])
-                .setEdge("a", "c"),
-          t = new Graph()
-                .setDefaultNodeLabel(function() { return {}; })
-                .setPath(["b", "c", "a"]);
+      g
+        .setNode("a", { rank: 0 })
+        .setNode("b", { rank: 2 })
+        .setNode("c", { rank: 3 })
+        .setPath(["a", "b", "c"])
+        .setEdge("a", "c");
+      t.setPath(["b", "c", "a"]);
       initLowLimValues(t, "b");
 
       var f = enterEdge(t, g, { v: "b", w: "c" });
-      expect(f).to.eql({ v: "a", w: "b", label: { minlen: 1 } });
+      expect(undirectedEdge(f)).to.eql(undirectedEdge({ v: "a", w: "b" }));
     });
 
     it("finds the edge with the least slack", function() {
-      var g = new Digraph()
-                .setNode("a", { rank: 0 })
-                .setNode("b", { rank: 1 })
-                .setNode("c", { rank: 3 })
-                .setNode("d", { rank: 4 })
-                .setDefaultEdgeLabel(function() { return { minlen: 1 }; })
-                .setEdge("a", "d")
-                .setPath(["a", "c", "d"])
-                .setEdge("b", "c"),
-          t = new Graph()
-                .setDefaultNodeLabel(function() { return {}; })
-                .setPath(["c", "d", "a", "b"]);
+      g
+        .setNode("a", { rank: 0 })
+        .setNode("b", { rank: 1 })
+        .setNode("c", { rank: 3 })
+        .setNode("d", { rank: 4 })
+        .setEdge("a", "d")
+        .setPath(["a", "c", "d"])
+        .setEdge("b", "c");
+      t.setPath(["c", "d", "a", "b"]);
       initLowLimValues(t, "a");
 
       var f = enterEdge(t, g, { v: "c", w: "d" });
-      expect(f).to.eql({ v: "b", w: "c", label: { minlen: 1 } });
+      expect(undirectedEdge(f)).to.eql(undirectedEdge({ v: "b", w: "c" }));
     });
   });
 
@@ -423,3 +414,7 @@ describe("network simplex", function() {
     });
   });
 });
+
+function undirectedEdge(e) {
+  return e.v < e.w ? { v: e.v, w: e.w } : { v: e.w, w: e.v };
+}
