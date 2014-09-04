@@ -3,6 +3,7 @@ var _ = require("lodash"),
     Graph = require("graphlib").Graph,
     Digraph = require("graphlib").Digraph,
     networkSimplex = require("../../lib/rank/network-simplex"),
+    longestPath = require("../../lib/rank/longest-path"),
     initLowLimValues = networkSimplex.initLowLimValues,
     initCutValues = networkSimplex.initCutValues,
     calcCutValue = networkSimplex.calcCutValue,
@@ -140,6 +141,50 @@ describe("network simplex", function() {
 
       var f = enterEdge(t, g, { v: "c", w: "d" });
       expect(undirectedEdge(f)).to.eql(undirectedEdge({ v: "b", w: "c" }));
+    });
+
+    it("finds an appropriate edge for gansner graph #1", function() {
+      g = gansnerGraph;
+      t = gansnerTree;
+      longestPath(g);
+      initLowLimValues(t, "a");
+
+      var f = enterEdge(t, g, { v: "g", w: "h" });
+      expect(undirectedEdge(f).v).to.equal("a");
+      expect(["e", "f"]).to.include(undirectedEdge(f).w);
+    });
+
+    it("finds an appropriate edge for gansner graph #2", function() {
+      g = gansnerGraph;
+      t = gansnerTree;
+      longestPath(g);
+      initLowLimValues(t, "e");
+
+      var f = enterEdge(t, g, { v: "g", w: "h" });
+      expect(undirectedEdge(f).v).to.equal("a");
+      expect(["e", "f"]).to.include(undirectedEdge(f).w);
+    });
+
+    it("finds an appropriate edge for gansner graph #3", function() {
+      g = gansnerGraph;
+      t = gansnerTree;
+      longestPath(g);
+      initLowLimValues(t, "a");
+
+      var f = enterEdge(t, g, { v: "h", w: "g" });
+      expect(undirectedEdge(f).v).to.equal("a");
+      expect(["e", "f"]).to.include(undirectedEdge(f).w);
+    });
+
+    it("finds an appropriate edge for gansner graph #4", function() {
+      g = gansnerGraph;
+      t = gansnerTree;
+      longestPath(g);
+      initLowLimValues(t, "e");
+
+      var f = enterEdge(t, g, { v: "h", w: "g" });
+      expect(undirectedEdge(f).v).to.equal("a");
+      expect(["e", "f"]).to.include(undirectedEdge(f).w);
     });
   });
 
