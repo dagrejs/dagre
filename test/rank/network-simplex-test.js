@@ -3,7 +3,7 @@ var _ = require("lodash"),
     Graph = require("graphlib").Graph,
     Digraph = require("graphlib").Digraph,
     networkSimplex = require("../../lib/rank/network-simplex"),
-    assignLowLim = networkSimplex.assignLowLim,
+    initLowLimValues = networkSimplex.initLowLimValues,
     calcCutValue = networkSimplex.calcCutValue,
     leaveEdge = networkSimplex.leaveEdge,
     enterEdge = networkSimplex.enterEdge,
@@ -91,7 +91,7 @@ describe("network simplex", function() {
           t = new Graph()
                 .setDefaultNodeLabel(function() { return {}; })
                 .setPath(["b", "c", "a"]);
-      assignLowLim(t, "c");
+      initLowLimValues(t, "c");
 
       var f = enterEdge(t, g, { v: "b", w: "c" });
       expect(f).to.eql({ v: "a", w: "b", label: { minlen: 1 } });
@@ -108,7 +108,7 @@ describe("network simplex", function() {
           t = new Graph()
                 .setDefaultNodeLabel(function() { return {}; })
                 .setPath(["b", "c", "a"]);
-      assignLowLim(t, "b");
+      initLowLimValues(t, "b");
 
       var f = enterEdge(t, g, { v: "b", w: "c" });
       expect(f).to.eql({ v: "a", w: "b", label: { minlen: 1 } });
@@ -127,20 +127,20 @@ describe("network simplex", function() {
           t = new Graph()
                 .setDefaultNodeLabel(function() { return {}; })
                 .setPath(["c", "d", "a", "b"]);
-      assignLowLim(t, "a");
+      initLowLimValues(t, "a");
 
       var f = enterEdge(t, g, { v: "c", w: "d" });
       expect(f).to.eql({ v: "b", w: "c", label: { minlen: 1 } });
     });
   });
 
-  describe("assignLowLim", function() {
+  describe("initLowLimValues", function() {
     it("assigns low, lim, and parent for each node in a tree", function() {
       var g = new Graph()
         .updateNodes(["a", "b", "c", "d", "e"], function() { return {}; })
         .setPath(["a", "b", "a", "c", "d", "c", "e"]);
 
-      assignLowLim(g, "a");
+      initLowLimValues(g, "a");
 
       var a = g.getNode("a"),
           b = g.getNode("b"),
@@ -186,7 +186,7 @@ describe("network simplex", function() {
               .setEdge("g", "h", { cutvalue: -1 })
               .setEdge("e", "g", { cutvalue: 0 })
               .setEdge("f", "g", { cutvalue: 0 });
-      assignLowLim(t, "h");
+      initLowLimValues(t, "h");
 
       exchange(t, g, { v: "g", w: "h" }, { v: "a", w: "e" });
 
@@ -213,7 +213,7 @@ describe("network simplex", function() {
                 .setPath(["c", "p"]),
           t = createTree()
                 .setPath(["p", "c"]);
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(1);
     });
@@ -223,7 +223,7 @@ describe("network simplex", function() {
                 .setPath(["p", "c"]),
           t = createTree()
                 .setPath(["p", "c"]);
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(1);
     });
@@ -234,7 +234,7 @@ describe("network simplex", function() {
           t = createTree()
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("p", "c");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(3);
     });
@@ -246,7 +246,7 @@ describe("network simplex", function() {
           t = createTree()
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("p", "c");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(-1);
     });
@@ -258,7 +258,7 @@ describe("network simplex", function() {
           t = createTree()
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("p", "c");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(-1);
     });
@@ -269,7 +269,7 @@ describe("network simplex", function() {
           t = createTree()
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("p", "c");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(3);
     });
@@ -281,7 +281,7 @@ describe("network simplex", function() {
           t = createTree()
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setPath(["c", "p", "o"]);
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(-4);
     });
@@ -293,7 +293,7 @@ describe("network simplex", function() {
           t = createTree()
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setPath(["c", "p", "o"]);
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(10);
     });
@@ -306,7 +306,7 @@ describe("network simplex", function() {
                 .setEdge("o", "gc")
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("c", "p");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(-4);
     });
@@ -319,7 +319,7 @@ describe("network simplex", function() {
                 .setEdge("o", "gc")
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("c", "p");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(10);
     });
@@ -334,7 +334,7 @@ describe("network simplex", function() {
                 .setEdge("o", "gc")
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("c", "p");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(6);
     });
@@ -349,7 +349,7 @@ describe("network simplex", function() {
                 .setEdge("o", "gc")
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("c", "p");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(-8);
     });
@@ -363,7 +363,7 @@ describe("network simplex", function() {
                 .setEdge("o", "gc")
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("c", "p");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(6);
     });
@@ -377,7 +377,7 @@ describe("network simplex", function() {
                 .setEdge("o", "gc")
                 .setEdge("gc", "c", { cutvalue: 3 })
                 .setEdge("c", "p");
-      assignLowLim(t, "p");
+      initLowLimValues(t, "p");
 
       expect(calcCutValue(t, g, "c")).to.equal(-8);
     });
@@ -393,7 +393,7 @@ describe("network simplex", function() {
         t = createTree()
               .setPath(["a", "b", "c", "d", "h", "g", "e"])
               .setEdge("g", "f");
-        assignLowLim(t, "h");
+        initLowLimValues(t, "h");
       });
 
       it("works for edge (a, b)", function() {
