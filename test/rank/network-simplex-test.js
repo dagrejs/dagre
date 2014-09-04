@@ -8,7 +8,7 @@ var _ = require("lodash"),
     calcCutValue = networkSimplex.calcCutValue,
     leaveEdge = networkSimplex.leaveEdge,
     enterEdge = networkSimplex.enterEdge,
-    exchange = networkSimplex.exchange;
+    exchangeEdges = networkSimplex.exchangeEdges;
 
 describe("network simplex", function() {
   var g, t, gansnerGraph, gansnerTree;
@@ -187,7 +187,7 @@ describe("network simplex", function() {
     });
   });
 
-  describe("exchange", function() {
+  describe("exchangeEdges", function() {
     it("exchanges edges and updates cut values and low/lim numbers", function() {
       var g = new Digraph()
               .setDefaultNodeLabel(function() { return {}; })
@@ -206,7 +206,7 @@ describe("network simplex", function() {
               .setEdge("f", "g", { cutvalue: 0 });
       initLowLimValues(t, "h");
 
-      exchange(t, g, { v: "g", w: "h" }, { v: "a", w: "e" });
+      exchangeEdges(t, g, { v: "g", w: "h" }, { v: "a", w: "e" });
 
       // check new cut values
       expect(t.getEdge("a", "b").cutvalue).to.equal(2);
