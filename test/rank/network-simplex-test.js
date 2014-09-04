@@ -49,6 +49,8 @@ describe("network simplex", function() {
     networkSimplex(g);
     expect(g.getNode("a").rank).to.equal(0);
     expect(g.getNode("b").rank).to.equal(0);
+    // We don't want the fake root for a disconnected graph to be present after ranking.
+    expect(g.nodeCount()).to.equal(2);
   });
 
   it("can assign a rank to a 2-node sconnected graph", function() {
