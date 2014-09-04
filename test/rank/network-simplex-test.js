@@ -10,6 +10,35 @@ var _ = require("lodash"),
     exchange = networkSimplex.exchange;
 
 describe("network", function() {
+  var g;
+
+  beforeEach(function() {
+    g = new Digraph()
+      .setDefaultNodeLabel(function() { return {}; })
+      .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; });
+  });
+
+  it("can assign a rank to a single node", function() {
+    g.setNode("a");
+    networkSimplex(g);
+    expect(g.getNode("a").rank).to.equal(0);
+  });
+
+  it("can assign a rank to a 2-node disconnected graph", function() {
+    g.setNode("a");
+    g.setNode("b");
+    networkSimplex(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.getNode("b").rank).to.equal(0);
+  });
+
+  it("can assign a rank to a 2-node disconnected graph", function() {
+    g.setEdge("a", "b");
+    networkSimplex(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.getNode("b").rank).to.equal(1);
+  });
+
   describe("leaveEdge", function() {
     it("returns undefined if there is no edge with a negative cutvalue", function() {
       var tree = new Graph();
