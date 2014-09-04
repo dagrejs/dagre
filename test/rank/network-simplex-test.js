@@ -397,7 +397,7 @@ describe("network simplex", function() {
 
   describe("initCutValues", function() {
     it("works for gansnerGraph", function() {
-      initLowLimValues(gansnerTree, "a");
+      initLowLimValues(gansnerTree);
       initCutValues(gansnerTree, gansnerGraph);
       expect(gansnerTree.getEdge("a", "b").cutvalue).to.equal(3);
       expect(gansnerTree.getEdge("b", "c").cutvalue).to.equal(3);
@@ -411,7 +411,7 @@ describe("network simplex", function() {
     it("works for updated gansnerGraph", function() {
       gansnerTree.removeEdge("g", "h");
       gansnerTree.setEdge("a", "e");
-      initLowLimValues(gansnerTree, "a");
+      initLowLimValues(gansnerTree);
       initCutValues(gansnerTree, gansnerGraph);
       expect(gansnerTree.getEdge("a", "b").cutvalue).to.equal(2);
       expect(gansnerTree.getEdge("b", "c").cutvalue).to.equal(2);
