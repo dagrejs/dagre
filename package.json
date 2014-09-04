@@ -13,6 +13,7 @@
     "lodash": "^2.4.1"
   },
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "browserify": "^5.10.1",
     "chai": "^1.9.1",
     "istanbul": "^0.3.0",
@@ -22,6 +23,7 @@
     "lodash": "^2.4.1",
     "mocha": "^1.21.4",
     "semver": "^3.0.1",
+    "sprintf": "^0.1.4",
     "uglify-js": "^2.4.15"
   },
   "repository": {
