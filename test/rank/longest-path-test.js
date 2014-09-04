@@ -1,53 +1,62 @@
 var expect = require("../chai").expect,
     longestPath = require("../../lib/rank/longest-path"),
+    normalize = require("../../lib/rank/normalize"),
     Digraph = require("graphlib").Digraph;
 
-describe("rank.longestPath", function() {
-  it("can assign a rank to a single node graph", function() {
-    var g = new Digraph()
-      .setNode("n1", {});
-    longestPath(g);
-    expect(g.getNode("n1").rank).to.equal(0);
+describe("longestPath", function() {
+  var g;
+
+  beforeEach(function() {
+    g = new Digraph()
+      .setDefaultNodeLabel(function() { return {}; })
+      .setDefaultEdgeLabel(function() { return { minlen: 1 }; });
   });
 
-  it("can assign a ranks to connected nodes", function() {
-    var g = new Digraph()
-      .setNode("n1", {})
-      .setNode("n2", {})
-      .setEdge("n1", "n2", { minlen: 1 });
+  it("can assign a rank to a single node graph", function() {
+    g.setNode("a");
     longestPath(g);
-    expect(g.getNode("n1").rank).to.equal(g.getNode("n2").rank - 1);
+    normalize(g);
+    expect(g.getNode("a").rank).to.equal(0);
+  });
+
+  it("can assign ranks to unconnected nodes", function() {
+    g.setNode("a");
+    g.setNode("b");
+    longestPath(g);
+    normalize(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.getNode("b").rank).to.equal(0);
+  });
+
+  it("can assign ranks to connected nodes", function() {
+    g.setEdge("a", "b");
+    longestPath(g);
+    normalize(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.getNode("b").rank).to.equal(1);
   });
 
   it("can assign ranks for a diamond", function() {
-    var g = new Digraph()
-      .setNode("n1", {})
-      .setNode("n2", {})
-      .setNode("n3", {})
-      .setNode("n4", {})
-      .setEdge("n1", "n2", { minlen: 1 })
-      .setEdge("n1", "n3", { minlen: 1 })
-      .setEdge("n2", "n4", { minlen: 1 })
-      .setEdge("n3", "n4", { minlen: 1 });
+    g.setPath(["a", "b", "d"]);
+    g.setPath(["a", "c", "d"]);
     longestPath(g);
-    expect(g.getNode("n1").rank).to.equal(g.getNode("n4").rank - 2);
-    expect(g.getNode("n2").rank).to.equal(g.getNode("n4").rank - 1);
-    expect(g.getNode("n3").rank).to.equal(g.getNode("n4").rank - 1);
+    normalize(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.getNode("b").rank).to.equal(1);
+    expect(g.getNode("c").rank).to.equal(1);
+    expect(g.getNode("d").rank).to.equal(2);
   });
 
   it("uses the minlen attribute on the edge", function() {
-    var g = new Digraph()
-      .setNode("n1", {})
-      .setNode("n2", {})
-      .setNode("n3", {})
-      .setNode("n4", {})
-      .setEdge("n1", "n2", { minlen: 1 })
-      .setEdge("n1", "n3", { minlen: 1 })
-      .setEdge("n2", "n4", { minlen: 1 })
-      .setEdge("n3", "n4", { minlen: 2 });
+    g.setPath(["a", "b", "d"]);
+    g.setEdge("a", "c");
+    g.setEdge("c", "d", { minlen: 2 });
     longestPath(g);
-    expect(g.getNode("n1").rank).to.equal(g.getNode("n4").rank - 3);
-    expect(g.getNode("n2").rank).to.equal(g.getNode("n4").rank - 1);
-    expect(g.getNode("n3").rank).to.equal(g.getNode("n4").rank - 2);
+    normalize(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    // longest path biases towards the lowest rank it can assign
+    expect(g.getNode("b").rank).to.equal(2);
+    expect(g.getNode("c").rank).to.equal(1);
+    expect(g.getNode("d").rank).to.equal(3);
   });
 });
