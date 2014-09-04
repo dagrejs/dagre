@@ -9,7 +9,8 @@ var _ = require("lodash"),
     calcCutValue = networkSimplex.calcCutValue,
     leaveEdge = networkSimplex.leaveEdge,
     enterEdge = networkSimplex.enterEdge,
-    exchangeEdges = networkSimplex.exchangeEdges;
+    exchangeEdges = networkSimplex.exchangeEdges,
+    normalize = require("../../lib/rank/normalize");
 
 describe("network simplex", function() {
   var g, t, gansnerGraph, gansnerTree;
@@ -82,6 +83,19 @@ describe("network simplex", function() {
     expect(g.getNode("b").rank).to.equal(2);
     expect(g.getNode("c").rank).to.equal(1);
     expect(g.getNode("d").rank).to.equal(3);
+  });
+
+  it("can rank the gansner graph", function() {
+    g = gansnerGraph;
+    networkSimplex(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.getNode("b").rank).to.equal(1);
+    expect(g.getNode("c").rank).to.equal(2);
+    expect(g.getNode("d").rank).to.equal(3);
+    expect(g.getNode("h").rank).to.equal(4);
+    expect(g.getNode("e").rank).to.equal(1);
+    expect(g.getNode("f").rank).to.equal(1);
+    expect(g.getNode("g").rank).to.equal(2);
   });
 
   describe("leaveEdge", function() {
@@ -227,22 +241,10 @@ describe("network simplex", function() {
 
   describe("exchangeEdges", function() {
     it("exchanges edges and updates cut values and low/lim numbers", function() {
-      var g = new Digraph()
-              .setDefaultNodeLabel(function() { return {}; })
-              .setDefaultEdgeLabel(function() { return { weight: 1 }; })
-              .setPath(["a", "b", "c", "d", "h"])
-              .setPath(["a", "e", "g", "h"])
-              .setPath(["a", "f", "g"]),
-          t = new Graph()
-              .setDefaultNodeLabel(function() { return {}; })
-              .setEdge("a", "b", { cutvalue: 3 })
-              .setEdge("b", "c", { cutvalue: 3 })
-              .setEdge("c", "d", { cutvalue: 3 })
-              .setEdge("d", "h", { cutvalue: 3 })
-              .setEdge("g", "h", { cutvalue: -1 })
-              .setEdge("e", "g", { cutvalue: 0 })
-              .setEdge("f", "g", { cutvalue: 0 });
-      initLowLimValues(t, "h");
+      g = gansnerGraph;
+      t = gansnerTree;
+      longestPath(g);
+      initLowLimValues(t);
 
       exchangeEdges(t, g, { v: "g", w: "h" }, { v: "a", w: "e" });
 
@@ -258,6 +260,26 @@ describe("network simplex", function() {
       // ensure lim numbers look right
       var lims = _.sortBy(_.map(t.nodes(), function(node) { return node.label.lim; }));
       expect(lims).to.eql(_.range(1, 9));
+    });
+
+    it("updates ranks", function() {
+      g = gansnerGraph;
+      t = gansnerTree;
+      longestPath(g);
+      initLowLimValues(t);
+
+      exchangeEdges(t, g, { v: "g", w: "h" }, { v: "a", w: "e" });
+      normalize(g);
+
+      // check new ranks
+      expect(g.getNode("a").rank).to.equal(0);
+      expect(g.getNode("b").rank).to.equal(1);
+      expect(g.getNode("c").rank).to.equal(2);
+      expect(g.getNode("d").rank).to.equal(3);
+      expect(g.getNode("e").rank).to.equal(1);
+      expect(g.getNode("f").rank).to.equal(1);
+      expect(g.getNode("g").rank).to.equal(2);
+      expect(g.getNode("h").rank).to.equal(4);
     });
   });
 
