@@ -9,7 +9,7 @@ var _ = require("lodash"),
     enterEdge = networkSimplex.enterEdge,
     exchange = networkSimplex.exchange;
 
-describe("network", function() {
+describe("network simplex", function() {
   var g;
 
   beforeEach(function() {
@@ -32,11 +32,35 @@ describe("network", function() {
     expect(g.getNode("b").rank).to.equal(0);
   });
 
-  it("can assign a rank to a 2-node disconnected graph", function() {
+  it("can assign a rank to a 2-node sconnected graph", function() {
     g.setEdge("a", "b");
     networkSimplex(g);
     expect(g.getNode("a").rank).to.equal(0);
     expect(g.getNode("b").rank).to.equal(1);
+  });
+
+  it("can assign ranks for a diamond", function() {
+    g.setPath(["a", "b", "d"]);
+    g.setPath(["a", "c", "d"]);
+    networkSimplex(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.getNode("b").rank).to.equal(1);
+    expect(g.getNode("c").rank).to.equal(1);
+    expect(g.getNode("d").rank).to.equal(2);
+  });
+
+  it("uses the minlen attribute on the edge", function() {
+    g.setPath(["a", "b", "d"]);
+    g.setEdge("a", "c");
+    g.setEdge("c", "d", { minlen: 2 });
+    networkSimplex(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    // longest path biases towards the lowest rank it can assign. Since the
+    // graph has no optimization opportunities we can assume that the longest
+    // path ranking is used.
+    expect(g.getNode("b").rank).to.equal(2);
+    expect(g.getNode("c").rank).to.equal(1);
+    expect(g.getNode("d").rank).to.equal(3);
   });
 
   describe("leaveEdge", function() {
