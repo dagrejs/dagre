@@ -1,18 +1,18 @@
 var expect = require("../chai").expect,
     Digraph = require("graphlib").Digraph,
     rankUtil = require("../../lib/rank/util"),
-    normalize = rankUtil.normalize,
+    normalizeRanks = rankUtil.normalizeRanks,
     longestPath = rankUtil.longestPath;
 
 describe("rank/util", function() {
-  describe("normalize", function() {
+  describe("normalizeRanks", function() {
     it("adjust ranks such that all are >= 0, and at least one is 0", function() {
       var g = new Digraph()
         .setNode("a", { rank: 3 })
         .setNode("b", { rank: 2 })
         .setNode("c", { rank: 4 });
 
-      normalize(g);
+      normalizeRanks(g);
 
       expect(g.getNode("a").rank).to.equal(1);
       expect(g.getNode("b").rank).to.equal(0);
@@ -24,7 +24,7 @@ describe("rank/util", function() {
         .setNode("a", { rank: -3 })
         .setNode("b", { rank: -2 });
 
-      normalize(g);
+      normalizeRanks(g);
 
       expect(g.getNode("a").rank).to.equal(0);
       expect(g.getNode("b").rank).to.equal(1);
@@ -43,7 +43,7 @@ describe("rank/util", function() {
     it("can assign a rank to a single node graph", function() {
       g.setNode("a");
       longestPath(g);
-      normalize(g);
+      normalizeRanks(g);
       expect(g.getNode("a").rank).to.equal(0);
     });
 
@@ -51,7 +51,7 @@ describe("rank/util", function() {
       g.setNode("a");
       g.setNode("b");
       longestPath(g);
-      normalize(g);
+      normalizeRanks(g);
       expect(g.getNode("a").rank).to.equal(0);
       expect(g.getNode("b").rank).to.equal(0);
     });
@@ -59,7 +59,7 @@ describe("rank/util", function() {
     it("can assign ranks to connected nodes", function() {
       g.setEdge("a", "b");
       longestPath(g);
-      normalize(g);
+      normalizeRanks(g);
       expect(g.getNode("a").rank).to.equal(0);
       expect(g.getNode("b").rank).to.equal(1);
     });
@@ -68,7 +68,7 @@ describe("rank/util", function() {
       g.setPath(["a", "b", "d"]);
       g.setPath(["a", "c", "d"]);
       longestPath(g);
-      normalize(g);
+      normalizeRanks(g);
       expect(g.getNode("a").rank).to.equal(0);
       expect(g.getNode("b").rank).to.equal(1);
       expect(g.getNode("c").rank).to.equal(1);
@@ -80,7 +80,7 @@ describe("rank/util", function() {
       g.setEdge("a", "c");
       g.setEdge("c", "d", { minlen: 2 });
       longestPath(g);
-      normalize(g);
+      normalizeRanks(g);
       expect(g.getNode("a").rank).to.equal(0);
       // longest path biases towards the lowest rank it can assign
       expect(g.getNode("b").rank).to.equal(2);

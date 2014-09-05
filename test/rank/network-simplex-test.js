@@ -10,7 +10,7 @@ var _ = require("lodash"),
     leaveEdge = networkSimplex.leaveEdge,
     enterEdge = networkSimplex.enterEdge,
     exchangeEdges = networkSimplex.exchangeEdges,
-    normalize = require("../../lib/rank/util").normalize;
+    normalizeRanks = require("../../lib/rank/util").normalizeRanks;
 
 describe("network simplex", function() {
   var g, t, gansnerGraph, gansnerTree;
@@ -259,7 +259,7 @@ describe("network simplex", function() {
       initLowLimValues(t);
 
       exchangeEdges(t, g, { v: "g", w: "h" }, { v: "a", w: "e" });
-      normalize(g);
+      normalizeRanks(g);
 
       // check new ranks
       expect(g.getNode("a").rank).to.equal(0);
@@ -476,7 +476,7 @@ describe("network simplex", function() {
 
 function ns(g) {
   networkSimplex(g);
-  normalize(g);
+  normalizeRanks(g);
 }
 
 function undirectedEdge(e) {
