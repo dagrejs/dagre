@@ -1,6 +1,6 @@
 var expect = require("../chai").expect,
     longestPath = require("../../lib/rank/longest-path"),
-    normalize = require("../../lib/rank/normalize"),
+    normalize = require("../../lib/rank/util").normalize,
     Digraph = require("graphlib").Digraph;
 
 describe("longestPath", function() {
