@@ -4,7 +4,7 @@ var Benchmark = require("benchmark"),
     sprintf = require("sprintf").sprintf;
 
 var Digraph = require("graphlib").Digraph,
-    longestPath = require("../lib/rank/longest-path"),
+    longestPath = require("../lib/rank/util").longestPath,
     feasibleTree = require("../lib/rank/feasible-tree"),
     networkSimplex = require("../lib/rank/network-simplex");
 
