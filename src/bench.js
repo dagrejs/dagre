@@ -4,9 +4,7 @@ var Benchmark = require("benchmark"),
     sprintf = require("sprintf").sprintf;
 
 var Digraph = require("graphlib").Digraph,
-    longestPath = require("../lib/rank/util").longestPath,
-    feasibleTree = require("../lib/rank/feasible-tree"),
-    networkSimplex = require("../lib/rank/network-simplex");
+    rank = require("../lib/rank");
 
 function runBenchmark(name, fn) {
   var options = {};
@@ -43,15 +41,14 @@ var g = new Digraph()
   .setPath(["a", "f", "g"]);
 
 
-runBenchmark("longestPath", function() {
-  longestPath(g);
+runBenchmark("longest-path ranker", function() {
+  rank(g, "longest-path");
 });
 
-runBenchmark("feasibleTree", function() {
-  longestPath(g);
-  feasibleTree(g);
+runBenchmark("tight-tree ranker", function() {
+  rank(g, "tight-tree");
 });
 
-runBenchmark("networkSimplex", function() {
-  networkSimplex(g);
+runBenchmark("network-simplex ranker", function() {
+  rank(g, "network-simplex");
 });

@@ -40,23 +40,13 @@ describe("network simplex", function() {
 
   it("can assign a rank to a single node", function() {
     g.setNode("a");
-    networkSimplex(g);
+    ns(g);
     expect(g.getNode("a").rank).to.equal(0);
   });
 
-  it("can assign a rank to a 2-node disconnected graph", function() {
-    g.setNode("a");
-    g.setNode("b");
-    networkSimplex(g);
-    expect(g.getNode("a").rank).to.equal(0);
-    expect(g.getNode("b").rank).to.equal(0);
-    // We don't want the fake root for a disconnected graph to be present after ranking.
-    expect(g.nodeCount()).to.equal(2);
-  });
-
-  it("can assign a rank to a 2-node sconnected graph", function() {
+  it("can assign a rank to a 2-node connected graph", function() {
     g.setEdge("a", "b");
-    networkSimplex(g);
+    ns(g);
     expect(g.getNode("a").rank).to.equal(0);
     expect(g.getNode("b").rank).to.equal(1);
   });
@@ -64,7 +54,7 @@ describe("network simplex", function() {
   it("can assign ranks for a diamond", function() {
     g.setPath(["a", "b", "d"]);
     g.setPath(["a", "c", "d"]);
-    networkSimplex(g);
+    ns(g);
     expect(g.getNode("a").rank).to.equal(0);
     expect(g.getNode("b").rank).to.equal(1);
     expect(g.getNode("c").rank).to.equal(1);
@@ -75,7 +65,7 @@ describe("network simplex", function() {
     g.setPath(["a", "b", "d"]);
     g.setEdge("a", "c");
     g.setEdge("c", "d", { minlen: 2 });
-    networkSimplex(g);
+    ns(g);
     expect(g.getNode("a").rank).to.equal(0);
     // longest path biases towards the lowest rank it can assign. Since the
     // graph has no optimization opportunities we can assume that the longest
@@ -87,7 +77,7 @@ describe("network simplex", function() {
 
   it("can rank the gansner graph", function() {
     g = gansnerGraph;
-    networkSimplex(g);
+    ns(g);
     expect(g.getNode("a").rank).to.equal(0);
     expect(g.getNode("b").rank).to.equal(1);
     expect(g.getNode("c").rank).to.equal(2);
@@ -483,6 +473,11 @@ describe("network simplex", function() {
     });
   });
 });
+
+function ns(g) {
+  networkSimplex(g);
+  normalize(g);
+}
 
 function undirectedEdge(e) {
   return e.v < e.w ? { v: e.v, w: e.w } : { v: e.w, w: e.v };
