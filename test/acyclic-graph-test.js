@@ -9,7 +9,7 @@ describe("acyclicGraph", function() {
 
   beforeEach(function() {
     g = new Digraph()
-      .setDefaultEdgeLabel(function() { return { weight: 1 }; });
+      .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; });
   });
 
   describe("makeAcyclic", function() {
@@ -33,12 +33,21 @@ describe("acyclicGraph", function() {
     });
 
     it("prefers to break cycles at low-weight edges", function() {
-      g.setDefaultEdgeLabel(function() { return { weight: 2 }; });
+      g.setDefaultEdgeLabel(function() { return { minlen: 1, weight: 2 }; });
       g.setPath(["a", "b", "c", "d", "a"]);
       g.setEdge("c", "d", { weight: 1 });
       acyclicGraph.makeAcyclic(g);
       expect(findCycles(g)).to.eql([]);
       expect(g.hasEdge("c", "d")).to.be.false;
+    });
+
+    it("aggregates 'minlen' and 'weight' attributes", function() {
+      g.setEdge("a", "b", { minlen: 2, weight: 3 });
+      g.setEdge("b", "a", { minlen: 3, weight: 4 });
+      acyclicGraph.makeAcyclic(g);
+      expect(findCycles(g)).to.eql([]);
+      expect(g.getEdge("b", "a").minlen).to.equal(5);
+      expect(g.getEdge("b", "a").weight).to.equal(7);
     });
   });
 });
