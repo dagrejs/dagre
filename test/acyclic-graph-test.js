@@ -50,6 +50,28 @@ describe("acyclicGraph", function() {
       expect(g.getEdge("b", "a").weight).to.equal(7);
     });
   });
+
+  describe("undo", function() {
+    it("does not change edges where the original graph was acyclic", function() {
+      g.setEdge("a", "b", { minlen: 2, weight: 3 });
+      acyclicGraph.makeAcyclic(g);
+      acyclicGraph.undo(g);
+      expect(g.edges(), ["v", "w"]).to.eql([
+        { v: "a", w: "b", label: { minlen: 2, weight: 3 } },
+      ]);
+    });
+
+    it("can restore previosuly reversed edges", function() {
+      g.setEdge("a", "b", { minlen: 2, weight: 3 });
+      g.setEdge("b", "a", { minlen: 3, weight: 4 });
+      acyclicGraph.makeAcyclic(g);
+      acyclicGraph.undo(g);
+      expect(_.sortBy(g.edges(), ["v", "w"])).to.eql([
+        { v: "a", w: "b", label: { minlen: 2, weight: 3 } },
+        { v: "b", w: "a", label: { minlen: 3, weight: 4 } }
+      ]);
+    });
+  });
 });
 
 function stripLabel(edge) {
