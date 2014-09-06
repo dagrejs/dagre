@@ -1,9 +1,9 @@
 var _ = require("lodash"),
     expect = require("./chai").expect,
-    normalGraph = require("../lib/normal-graph"),
+    normalize = require("../lib/normalize"),
     Digraph = require("graphlib").Digraph;
 
-describe("normalGraph", function() {
+describe("normalize", function() {
   var g;
 
   beforeEach(function() {
@@ -11,13 +11,13 @@ describe("normalGraph", function() {
       .setDefaultEdgeLabel(function() { return {}; });
   });
 
-  describe("normalize", function() {
+  describe("run", function() {
     it("does not change a short edge", function() {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 1 });
       g.setEdge("a", "b");
 
-      normalGraph.normalize(g);
+      normalize.run(g);
 
       expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: "a", w: "b" }]);
       expect(g.getNode("a").rank).to.equal(0);
@@ -29,7 +29,7 @@ describe("normalGraph", function() {
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b");
 
-      normalGraph.normalize(g);
+      normalize.run(g);
 
       expect(g.successors("a")).to.have.length(1);
       var successor = g.successors("a")[0];
@@ -41,14 +41,14 @@ describe("normalGraph", function() {
     });
   });
 
-  describe("denormalize", function() {
-    it("reverses the normalize operation", function() {
+  describe("undo", function() {
+    it("reverses the run operation", function() {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b");
 
-      normalGraph.normalize(g);
-      normalGraph.denormalize(g);
+      normalize.run(g);
+      normalize.undo(g);
 
       expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: "a", w: "b" }]);
       expect(g.getNode("a").rank).to.equal(0);
