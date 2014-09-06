@@ -1,8 +1,26 @@
 var _ = require("lodash"),
     expect = require("./chai").expect,
+    Digraph = require("graphlib").Digraph,
     util = require("../lib/util");
 
 describe("util", function() {
+  describe("buildLayerMatrix", function() {
+    it("creates a matrix based on rank and order of nodes in the graph", function() {
+      var g = new Digraph();
+      g.setNode("a", { rank: 0, order: 0 });
+      g.setNode("b", { rank: 0, order: 1 });
+      g.setNode("c", { rank: 1, order: 0 });
+      g.setNode("d", { rank: 1, order: 1 });
+      g.setNode("e", { rank: 2, order: 0 });
+
+      expect(util.buildLayerMatrix(g)).to.eql([
+        ["a", "b"],
+        ["c", "d"],
+        ["e"]
+      ]);
+    });
+  });
+
   describe("time", function() {
     var consoleLog;
     beforeEach(function() { consoleLog = console.log; });
