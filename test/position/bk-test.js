@@ -478,5 +478,44 @@ describe("position/bk", function() {
           a = pos.a;
       expect(pos).to.eql({ a: a, b: a - (25 + 5), c: a + (25 + 5) });
     });
+
+    it("shifts blocks on both sides of aligned block", function() {
+      g.getGraph().nodesep = 10;
+      g.setNode("a", { rank: 0, order: 0, width:  50 });
+      g.setNode("b", { rank: 0, order: 1, width:  60 });
+      g.setNode("c", { rank: 1, order: 0, width:  70 });
+      g.setNode("d", { rank: 1, order: 1, width:  80 });
+      g.setEdge("b", "c");
+
+      var pos = positionX(g),
+          b = pos.b,
+          c = b;
+      expect(pos).to.eql({
+        a: b - 60 / 2 - 10 - 50 / 2,
+        b: b,
+        c: c,
+        d: c + 70 / 2 + 10 + 80 / 2
+      });
+    });
+
+    it("aligns inner segments", function() {
+      g.getGraph().nodesep = 10;
+      g.setNode("a", { rank: 0, order: 0, width:  50, dummy: true });
+      g.setNode("b", { rank: 0, order: 1, width:  60 });
+      g.setNode("c", { rank: 1, order: 0, width:  70 });
+      g.setNode("d", { rank: 1, order: 1, width:  80, dummy: true });
+      g.setEdge("b", "c");
+      g.setEdge("a", "d");
+
+      var pos = positionX(g),
+          a = pos.a,
+          d = a;
+      expect(pos).to.eql({
+        a: a,
+        b: a + 50 / 2 + 10 + 60 / 2,
+        c: d - 70 / 2 - 10 - 80 / 2,
+        d: d
+      });
+    });
   });
 });
