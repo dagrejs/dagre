@@ -6,15 +6,21 @@ var _ = require("lodash"),
     addType1Conflict = bk.addType1Conflict,
     hasType1Conflict = bk.hasType1Conflict,
     verticalAlignment = bk.verticalAlignment,
+    horizontalCompaction = bk.horizontalCompaction,
     Digraph = require("graphlib").Digraph;
 
 describe("position/bk", function() {
+  var g;
+
+  beforeEach(function() {
+    g = new Digraph();
+  });
+
   describe("collectType1Conflicts", function() {
-    var g;
     var layering;
 
     beforeEach(function() {
-      g = new Digraph()
+      g
         .setDefaultEdgeLabel(function() { return {}; })
         .setNode("a", { rank: 0, order: 0 })
         .setNode("b", { rank: 0, order: 1 })
@@ -103,12 +109,6 @@ describe("position/bk", function() {
   });
 
   describe("verticalAlignment", function() {
-    var g;
-
-    beforeEach(function() {
-      g = new Digraph();
-    });
-
     it("Aligns with itself if the node has no adjacencies", function() {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 1, order: 0 });
@@ -246,6 +246,84 @@ describe("position/bk", function() {
       expect(g.getNode("c").root).to.equal("c");
       expect(g.getNode("d").align).to.equal("a");
       expect(g.getNode("d").root).to.equal("a");
+    });
+  });
+
+  describe("horizonalCompaction", function() {
+    it("places the center of a single node graph as origin (0,0)", function() {
+      g.setNode("a", { rank: 0, order: 0, align: "a", root: "a" });
+      horizontalCompaction(g, buildLayerMatrix(g));
+      expect(g.getNode("a").x).to.equal(0);
+    });
+
+    it("separates adjacent nodes by specified node separation", function() {
+      g.setNode("a", { rank: 0, order: 0, width: 100, align: "a", root: "a" });
+      g.setNode("b", { rank: 0, order: 1, width: 200, align: "b", root: "b" });
+      horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 100 });
+      expect(g.getNode("a").x).to.equal(0);
+      expect(g.getNode("b").x).to.equal(100 / 2 + 100 + 200 / 2);
+    });
+
+    it("separates adjacent edges by specified node separation", function() {
+      g.setNode("a", { rank: 0, order: 0, width: 100, align: "a", root: "a", dummy: true });
+      g.setNode("b", { rank: 0, order: 1, width: 200, align: "b", root: "b", dummy: true });
+      horizontalCompaction(g, buildLayerMatrix(g), { edgesep: 20 });
+      expect(g.getNode("a").x).to.equal(0);
+      expect(g.getNode("b").x).to.equal(100 / 2 + 20 + 200 / 2);
+    });
+
+    it("aligns the centers of nodes in the same block", function() {
+      g.setNode("a", { rank: 0, order: 0, width: 100, align: "b", root: "a" });
+      g.setNode("b", { rank: 1, order: 0, width: 200, align: "a", root: "a" });
+      horizontalCompaction(g, buildLayerMatrix(g));
+      expect(g.getNode("a").x).to.equal(0);
+      expect(g.getNode("b").x).to.equal(0);
+    });
+
+    it("separates blocks with the appropriate separation", function() {
+      g.setNode("a", { rank: 0, order: 0, width: 100, align: "b", root: "a" });
+      g.setNode("b", { rank: 1, order: 1, width: 200, align: "a", root: "a" });
+      g.setNode("c", { rank: 1, order: 0, width: 50, align: "c", root: "c" });
+      horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 75 });
+      expect(g.getNode("a").x).to.equal(50 / 2 + 75 + 200 / 2);
+      expect(g.getNode("b").x).to.equal(50 / 2 + 75 + 200 / 2);
+      expect(g.getNode("c").x).to.equal(0);
+    });
+
+    it("separates classes with the appropriate separation", function() {
+      g.setNode("a", { rank: 0, order: 0, width: 100, align: "a", root: "a" });
+      g.setNode("b", { rank: 0, order: 1, width: 200, align: "d", root: "b" });
+      g.setNode("c", { rank: 1, order: 0, width: 50,  align: "c", root: "c" });
+      g.setNode("d", { rank: 1, order: 1, width: 80,  align: "b", root: "b" });
+      horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 75 });
+      expect(g.getNode("a").x).to.equal(0);
+      expect(g.getNode("b").x).to.equal(100 / 2 + 75 + 200 / 2);
+      expect(g.getNode("c").x).to.equal(100 / 2 + 75 + 200 / 2 - 80 / 2 - 75 - 50 / 2);
+      expect(g.getNode("d").x).to.equal(100 / 2 + 75 + 200 / 2);
+    });
+
+    it("shifts classes by max sep from the adjacent block #1", function() {
+      g.setNode("a", { rank: 0, order: 0, width: 50,  align: "c", root: "a" });
+      g.setNode("b", { rank: 0, order: 1, width: 150, align: "d", root: "b" });
+      g.setNode("c", { rank: 1, order: 0, width: 60,  align: "a", root: "a" });
+      g.setNode("d", { rank: 1, order: 1, width: 70, align: "b", root: "b" });
+      horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 75 });
+      expect(g.getNode("a").x).to.equal(0);
+      expect(g.getNode("b").x).to.equal(50 / 2 + 75 + 150 / 2);
+      expect(g.getNode("c").x).to.equal(0);
+      expect(g.getNode("d").x).to.equal(50 / 2 + 75 + 150 / 2);
+    });
+
+    it("shifts classes by max sep from the adjacent block #2", function() {
+      g.setNode("a", { rank: 0, order: 0, width: 50,  align: "c", root: "a" });
+      g.setNode("b", { rank: 0, order: 1, width: 70, align: "d", root: "b" });
+      g.setNode("c", { rank: 1, order: 0, width: 60,  align: "a", root: "a" });
+      g.setNode("d", { rank: 1, order: 1, width: 150, align: "b", root: "b" });
+      horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 75 });
+      expect(g.getNode("a").x).to.equal(0);
+      expect(g.getNode("b").x).to.equal(50 / 2 + 75 + 150 / 2);
+      expect(g.getNode("c").x).to.equal(0);
+      expect(g.getNode("d").x).to.equal(50 / 2 + 75 + 150 / 2);
     });
   });
 });
