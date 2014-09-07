@@ -43,6 +43,18 @@ describe("position", function() {
     expect(g.getNode("b").y).to.equal(100 + 1000 + 80 / 2);
   });
 
+  it("use the largest height in each rank with ranksep", function() {
+    g.getGraph().ranksep = 1000;
+    g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
+    g.setNode("b", { width: 50, height:  80, rank: 0, order: 1 });
+    g.setNode("c", { width: 50, height:  90, rank: 1, order: 0 });
+    position.run(g);
+    g.setEdge("a", "c");
+    expect(g.getNode("a").y).to.equal(100 / 2);
+    expect(g.getNode("b").y).to.equal(100 / 2); // Note we used 100 and not 80 here
+    expect(g.getNode("c").y).to.equal(100 + 1000 + 90 / 2);
+  });
+
   it("respects nodesep", function() {
     g.getGraph().nodesep = 1000;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
