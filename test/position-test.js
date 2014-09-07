@@ -17,8 +17,8 @@ describe("position", function() {
   });
 
   it("shifts a single node if margins are used", function() {
-    g.getGraph().marginX = 5;
-    g.getGraph().marginY = 10;
+    g.getGraph().marginx = 5;
+    g.getGraph().marginy = 10;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     position(g);
     expect(g.getNode("a").x).to.equal(50 / 2 + 5);
@@ -26,8 +26,8 @@ describe("position", function() {
   });
 
   it("sets dimension info", function() {
-    g.getGraph().marginX = 5;
-    g.getGraph().marginY = 10;
+    g.getGraph().marginx = 5;
+    g.getGraph().marginy = 10;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     position(g);
     expect(g.getGraph().width).to.equal(50 + 5 * 2);
