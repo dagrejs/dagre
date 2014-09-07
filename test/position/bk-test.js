@@ -159,6 +159,28 @@ describe("position/bk", function() {
       });
     });
 
+    it("aligns correctly even regardless of node name / insertion order", function() {
+      // This test ensures that we're actually properly sorting nodes by
+      // position when searching for candidates. Many of these tests previously
+      // passed because the node insertion order matched the order of the nodes
+      // in the layering.
+      g.setNode("b", { rank: 0, order: 1 });
+      g.setNode("c", { rank: 1, order: 0 });
+      g.setNode("z", { rank: 0, order: 0 });
+      g.setEdge("z", "c");
+      g.setEdge("b", "c");
+
+      var layering = buildLayerMatrix(g),
+          conflicts = {};
+
+      var result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g));
+      expect(result).to.eql({
+        root:  { z: "z", b: "b", c: "z" },
+        align: { z: "c", b: "b", c: "z" }
+      });
+    });
+
+
     it("aligns with its right median when left is unavailable", function() {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 0, order: 1 });
