@@ -339,9 +339,9 @@ describe("position/bk", function() {
 
       var xs = horizontalCompaction(g, buildLayerMatrix(g), root, align);
       expect(xs.a).to.equal(0);
-      expect(xs.b).to.equal(50 / 2 + 75 + 150 / 2);
+      expect(xs.b).to.equal(60 / 2 + 75 + 150 / 2);
       expect(xs.c).to.equal(0);
-      expect(xs.d).to.equal(50 / 2 + 75 + 150 / 2);
+      expect(xs.d).to.equal(60 / 2 + 75 + 150 / 2);
     });
   });
 
@@ -458,11 +458,25 @@ describe("position/bk", function() {
       expect(positionX(g)).to.eql({ a: 0, b: 0 });
     });
 
-    it("positions nodes adjacent in a rank with appropriate separation", function() {
+    it("positions a single node block at origin even when their sizes differ", function() {
+      g.setNode("a", { rank: 0, order: 0, width:  40 });
+      g.setNode("b", { rank: 1, order: 0, width: 500 });
+      g.setNode("c", { rank: 2, order: 0, width:  20 });
+      g.setPath(["a", "b", "c"]);
+      expect(positionX(g)).to.eql({ a: 0, b: 0, c: 0 });
+    });
+
+    it("centers a node if it is a predecessor of two same sized nodes", function() {
       g.getGraph().nodesep = 10;
-      g.setNode("a", { rank: 0, order: 0, width: 50 });
-      g.setNode("b", { rank: 0, order: 1, width: 100 });
-      expect(positionX(g)).to.eql({ a: 0, b: 85 });
+      g.setNode("a", { rank: 0, order: 0, width:  20 });
+      g.setNode("b", { rank: 1, order: 0, width:  50 });
+      g.setNode("c", { rank: 1, order: 1, width:  50 });
+      g.setEdge("a", "b");
+      g.setEdge("a", "c");
+
+      var pos = positionX(g),
+          a = pos.a;
+      expect(pos).to.eql({ a: a, b: a - (25 + 5), c: a + (25 + 5) });
     });
   });
 });
