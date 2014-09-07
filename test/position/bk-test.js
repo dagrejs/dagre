@@ -7,6 +7,9 @@ var _ = require("lodash"),
     hasType1Conflict = bk.hasType1Conflict,
     verticalAlignment = bk.verticalAlignment,
     horizontalCompaction = bk.horizontalCompaction,
+    alignCoordinates = bk.alignCoordinates,
+    balance = bk.balance,
+    findSmallestWidthAlignment = bk.findSmallestWidthAlignment,
     Digraph = require("graphlib").Digraph;
 
 describe("position/bk", function() {
@@ -287,7 +290,7 @@ describe("position/bk", function() {
     it("separates blocks with the appropriate separation", function() {
       g.setNode("a", { rank: 0, order: 0, width: 100, align: "b", root: "a" });
       g.setNode("b", { rank: 1, order: 1, width: 200, align: "a", root: "a" });
-      g.setNode("c", { rank: 1, order: 0, width: 50, align: "c", root: "c" });
+      g.setNode("c", { rank: 1, order: 0, width:  50, align: "c", root: "c" });
 
       var xs = horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 75 });
       expect(xs.a).to.equal(50 / 2 + 75 + 200 / 2);
@@ -298,8 +301,8 @@ describe("position/bk", function() {
     it("separates classes with the appropriate separation", function() {
       g.setNode("a", { rank: 0, order: 0, width: 100, align: "a", root: "a" });
       g.setNode("b", { rank: 0, order: 1, width: 200, align: "d", root: "b" });
-      g.setNode("c", { rank: 1, order: 0, width: 50,  align: "c", root: "c" });
-      g.setNode("d", { rank: 1, order: 1, width: 80,  align: "b", root: "b" });
+      g.setNode("c", { rank: 1, order: 0, width:  50, align: "c", root: "c" });
+      g.setNode("d", { rank: 1, order: 1, width:  80, align: "b", root: "b" });
 
       var xs = horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 75 });
       expect(xs.a).to.equal(0);
@@ -309,10 +312,10 @@ describe("position/bk", function() {
     });
 
     it("shifts classes by max sep from the adjacent block #1", function() {
-      g.setNode("a", { rank: 0, order: 0, width: 50,  align: "c", root: "a" });
+      g.setNode("a", { rank: 0, order: 0, width:  50, align: "c", root: "a" });
       g.setNode("b", { rank: 0, order: 1, width: 150, align: "d", root: "b" });
-      g.setNode("c", { rank: 1, order: 0, width: 60,  align: "a", root: "a" });
-      g.setNode("d", { rank: 1, order: 1, width: 70, align: "b", root: "b" });
+      g.setNode("c", { rank: 1, order: 0, width:  60, align: "a", root: "a" });
+      g.setNode("d", { rank: 1, order: 1, width:  70, align: "b", root: "b" });
 
       var xs =horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 75 });
       expect(xs.a).to.equal(0);
@@ -322,9 +325,9 @@ describe("position/bk", function() {
     });
 
     it("shifts classes by max sep from the adjacent block #2", function() {
-      g.setNode("a", { rank: 0, order: 0, width: 50,  align: "c", root: "a" });
-      g.setNode("b", { rank: 0, order: 1, width: 70, align: "d", root: "b" });
-      g.setNode("c", { rank: 1, order: 0, width: 60,  align: "a", root: "a" });
+      g.setNode("a", { rank: 0, order: 0, width:  50, align: "c", root: "a" });
+      g.setNode("b", { rank: 0, order: 1, width:  70, align: "d", root: "b" });
+      g.setNode("c", { rank: 1, order: 0, width:  60, align: "a", root: "a" });
       g.setNode("d", { rank: 1, order: 1, width: 150, align: "b", root: "b" });
 
       var xs = horizontalCompaction(g, buildLayerMatrix(g), { nodesep: 75 });
@@ -332,6 +335,106 @@ describe("position/bk", function() {
       expect(xs.b).to.equal(50 / 2 + 75 + 150 / 2);
       expect(xs.c).to.equal(0);
       expect(xs.d).to.equal(50 / 2 + 75 + 150 / 2);
+    });
+  });
+
+  describe("alignCoordinates", function() {
+    it("aligns a single node", function() {
+      var xss = {
+        ul: { a:  50 },
+        ur: { a: 100 },
+        dl: { a:  50 },
+        dr: { a: 200 }
+      };
+
+      alignCoordinates(xss, xss.ul);
+
+      expect(xss.ul).to.eql({ a: 50 });
+      expect(xss.ur).to.eql({ a: 50 });
+      expect(xss.dl).to.eql({ a: 50 });
+      expect(xss.dr).to.eql({ a: 50 });
+    });
+
+    it("aligns multiple nodes", function() {
+      var xss = {
+        ul: { a:  50, b: 1000 },
+        ur: { a: 100, b:  900 },
+        dl: { a: 150, b:  800 },
+        dr: { a: 200, b:  700 }
+      };
+
+      alignCoordinates(xss, xss.ul);
+
+      expect(xss.ul).to.eql({ a:  50, b: 1000 });
+      expect(xss.ur).to.eql({ a: 200, b: 1000 });
+      expect(xss.dl).to.eql({ a:  50, b:  700 });
+      expect(xss.dr).to.eql({ a: 500, b: 1000 });
+    });
+  });
+
+  describe("findSmallestWidthAlignment", function() {
+    it("finds the alignment with the smallest width", function() {
+      g.setNode("a", { width: 50 });
+      g.setNode("b", { width: 50 });
+
+      var xss = {
+        ul: { a:  0, b: 1000 },
+        ur: { a: -5, b: 1000 },
+        dl: { a:  5, b: 2000 },
+        dr: { a:  0, b:  200 },
+      };
+
+      expect(findSmallestWidthAlignment(g, xss)).to.eql(xss.dr);
+    });
+
+    it("takes node width into account", function() {
+      g.setNode("a", { width:  50 });
+      g.setNode("b", { width:  50 });
+      g.setNode("c", { width: 200 });
+
+      var xss = {
+        ul: { a:  0, b: 100, c: 75 },
+        ur: { a:  0, b: 100, c: 80 },
+        dl: { a:  0, b: 100, c: 85 },
+        dr: { a:  0, b: 100, c: 90 },
+      };
+
+      expect(findSmallestWidthAlignment(g, xss)).to.eql(xss.ul);
+    });
+  });
+
+  describe("balance", function() {
+    it("aligns a single node to the shared median value", function() {
+      var xss = {
+        ul: { a:   0 },
+        ur: { a: 100 },
+        dl: { a: 100 },
+        dr: { a: 200 }
+      };
+
+      expect(balance(xss)).to.eql({ a: 100 });
+    });
+
+    it("aligns a single node to the average of different median values", function() {
+      var xss = {
+        ul: { a:   0 },
+        ur: { a:  75 },
+        dl: { a: 125 },
+        dr: { a: 200 }
+      };
+
+      expect(balance(xss)).to.eql({ a: 100 });
+    });
+
+    it("balances multiple nodes", function() {
+      var xss = {
+        ul: { a:   0, b: 50 },
+        ur: { a:  75, b:  0 },
+        dl: { a: 125, b: 60 },
+        dr: { a: 200, b: 75 }
+      };
+
+      expect(balance(xss)).to.eql({ a: 100, b: 55 });
     });
   });
 });
