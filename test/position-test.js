@@ -11,7 +11,7 @@ describe("position", function() {
 
   it("aligns a single node to the upper left corner when there are no margins", function() {
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
-    position.run(g);
+    position(g);
     expect(g.getNode("a").x).to.equal(50 / 2);
     expect(g.getNode("a").y).to.equal(100 / 2);
   });
@@ -20,7 +20,7 @@ describe("position", function() {
     g.getGraph().marginx = 5;
     g.getGraph().marginy = 10;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
-    position.run(g);
+    position(g);
     expect(g.getNode("a").x).to.equal(50 / 2 + 5);
     expect(g.getNode("a").y).to.equal(100 / 2 + 10);
   });
@@ -29,7 +29,7 @@ describe("position", function() {
     g.getGraph().marginx = 5;
     g.getGraph().marginy = 10;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
-    position.run(g);
+    position(g);
     expect(g.getGraph().width).to.equal(50 + 5 * 2);
     expect(g.getGraph().height).to.equal(100 + 10 * 2);
   });
@@ -39,7 +39,7 @@ describe("position", function() {
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     g.setNode("b", { width: 50, height:  80, rank: 1, order: 0 });
     g.setEdge("a", "b");
-    position.run(g);
+    position(g);
     expect(g.getNode("b").y).to.equal(100 + 1000 + 80 / 2);
   });
 
@@ -48,7 +48,7 @@ describe("position", function() {
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     g.setNode("b", { width: 50, height:  80, rank: 0, order: 1 });
     g.setNode("c", { width: 50, height:  90, rank: 1, order: 0 });
-    position.run(g);
+    position(g);
     g.setEdge("a", "c");
     expect(g.getNode("a").y).to.equal(100 / 2);
     expect(g.getNode("b").y).to.equal(100 / 2); // Note we used 100 and not 80 here
@@ -59,7 +59,7 @@ describe("position", function() {
     g.getGraph().nodesep = 1000;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     g.setNode("b", { width: 70, height:  80, rank: 0, order: 1 });
-    position.run(g);
+    position(g);
     expect(g.getNode("b").x).to.equal(50 + 1000 + 70 / 2);
   });
 });
