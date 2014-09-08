@@ -30,6 +30,18 @@ describe("layout", function() {
       b: { x: 50 + 200 + 75 / 2, y: 200 / 2 }
     });
   });
+
+  it("can layout two nodes connected by an edge", function() {
+    g.getGraph().ranksep = 300;
+    g.setNode("a", { width: 50, height: 100 });
+    g.setNode("b", { width: 75, height: 200 });
+    g.setEdge("a", "b", {});
+    layout(g);
+    expect(extractCoordinates(g)).to.eql({
+      a: { x: 75 / 2, y: 100 / 2 },
+      b: { x: 75 / 2, y: 100 + 300 + 200 / 2 }
+    });
+  });
 });
 
 function extractCoordinates(g) {
