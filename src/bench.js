@@ -4,7 +4,8 @@ var Benchmark = require("benchmark"),
     sprintf = require("sprintf").sprintf;
 
 var Digraph = require("graphlib").Digraph,
-    rank = require("../lib/rank");
+    rank = require("../lib/rank"),
+    layout = require("..").layout;
 
 function runBenchmark(name, fn) {
   var options = {};
@@ -51,4 +52,8 @@ runBenchmark("tight-tree ranker", function() {
 
 runBenchmark("network-simplex ranker", function() {
   rank(g, "network-simplex");
+});
+
+runBenchmark("layout", function() {
+  layout(g);
 });
