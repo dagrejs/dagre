@@ -197,7 +197,8 @@ describe("network simplex", function() {
   describe("initLowLimValues", function() {
     it("assigns low, lim, and parent for each node in a tree", function() {
       var g = new Graph()
-        .updateNodes(["a", "b", "c", "d", "e"], function() { return {}; })
+        .setDefaultNodeLabel(function() { return {}; })
+        .setNodes(["a", "b", "c", "d", "e"])
         .setPath(["a", "b", "a", "c", "d", "c", "e"]);
 
       initLowLimValues(g, "a");
