@@ -1,7 +1,7 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
     Graph = require("graphlib").Graph,
-    Digraph = require("graphlib").Digraph,
+    Graph = require("graphlib").Graph,
     networkSimplex = require("../../lib/rank/network-simplex"),
     longestPath = require("../../lib/rank/util").longestPath,
     initLowLimValues = networkSimplex.initLowLimValues,
@@ -16,22 +16,22 @@ describe("network simplex", function() {
   var g, t, gansnerGraph, gansnerTree;
 
   beforeEach(function() {
-    g = new Digraph()
+    g = new Graph()
       .setDefaultNodeLabel(function() { return {}; })
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; });
 
-    t = new Graph()
+    t = new Graph({ directed: false })
       .setDefaultNodeLabel(function() { return {}; })
       .setDefaultEdgeLabel(function() { return {}; });
 
-    gansnerGraph = new Digraph()
+    gansnerGraph = new Graph()
       .setDefaultNodeLabel(function() { return {}; })
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; })
       .setPath(["a", "b", "c", "d", "h"])
       .setPath(["a", "e", "g", "h"])
       .setPath(["a", "f", "g"]);
 
-    gansnerTree = new Graph()
+    gansnerTree = new Graph({ directed: false })
       .setDefaultNodeLabel(function() { return {}; })
       .setDefaultEdgeLabel(function() { return {}; })
       .setPath(["a", "b", "c", "d", "h", "g", "e"])
@@ -90,17 +90,17 @@ describe("network simplex", function() {
 
   describe("leaveEdge", function() {
     it("returns undefined if there is no edge with a negative cutvalue", function() {
-      var tree = new Graph();
+      var tree = new Graph({ directed: false });
       tree.setEdge("a", "b", { cutvalue: 1 });
       tree.setEdge("b", "c", { cutvalue: 1 });
       expect(leaveEdge(tree)).to.be.undefined;
     });
 
     it("returns an edge if one is found with a negative cutvalue", function() {
-      var tree = new Graph();
+      var tree = new Graph({ directed: false });
       tree.setEdge("a", "b", { cutvalue: 1 });
       tree.setEdge("b", "c", { cutvalue: -1 });
-      expect(leaveEdge(tree)).to.eql({ v: "b", w: "c", label: { cutvalue: -1 }});
+      expect(leaveEdge(tree)).to.eql({ v: "b", w: "c" });
     });
   });
 
@@ -209,7 +209,7 @@ describe("network simplex", function() {
           d = g.getNode("d"),
           e = g.getNode("e");
 
-      expect(_.sortBy(_.map(g.nodes(), function(node) { return node.label.lim; })))
+      expect(_.sortBy(_.map(g.nodes(), function(v) { return g.getNode(v).lim; })))
         .to.eql(_.range(1, 6));
 
       expect(a).to.eql({ low: 1, lim: 5 });
@@ -249,7 +249,7 @@ describe("network simplex", function() {
       expect(t.getEdge("g", "f").cutvalue).to.equal(0);
 
       // ensure lim numbers look right
-      var lims = _.sortBy(_.map(t.nodes(), function(node) { return node.label.lim; }));
+      var lims = _.sortBy(_.map(t.nodes(), function(v) { return t.getNode(v).lim; }));
       expect(lims).to.eql(_.range(1, 9));
     });
 

@@ -3,7 +3,7 @@
 var Benchmark = require("benchmark"),
     sprintf = require("sprintf").sprintf;
 
-var Digraph = require("graphlib").Digraph,
+var Graph = require("graphlib").Graph,
     rank = require("../lib/rank"),
     layout = require("..").layout;
 
@@ -34,7 +34,7 @@ function runBenchmark(name, fn) {
   new Benchmark(name, fn, options).run();
 }
 
-var g = new Digraph()
+var g = new Graph()
   .setDefaultNodeLabel(function() { return {}; })
   .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; })
   .setPath(["a", "b", "c", "d", "h"])

@@ -1,14 +1,14 @@
 var _ = require("lodash"),
     expect = require("./chai").expect,
     acyclic = require("../lib/acyclic"),
-    Digraph = require("graphlib").Digraph,
+    Graph = require("graphlib").Graph,
     findCycles = require("graphlib").alg.findCycles;
 
 describe("acyclic", function() {
   var g;
 
   beforeEach(function() {
-    g = new Digraph()
+    g = new Graph()
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; });
   });
 
@@ -56,9 +56,8 @@ describe("acyclic", function() {
       g.setEdge("a", "b", { minlen: 2, weight: 3 });
       acyclic.run(g);
       acyclic.undo(g);
-      expect(g.edges(), ["v", "w"]).to.eql([
-        { v: "a", w: "b", label: { minlen: 2, weight: 3 } },
-      ]);
+      expect(g.getEdge("a", "b")).to.eql({ minlen: 2, weight: 3 });
+      expect(g.edges()).to.have.length(1);
     });
 
     it("can restore previosuly reversed edges", function() {
@@ -66,10 +65,9 @@ describe("acyclic", function() {
       g.setEdge("b", "a", { minlen: 3, weight: 4 });
       acyclic.run(g);
       acyclic.undo(g);
-      expect(_.sortBy(g.edges(), ["v", "w"])).to.eql([
-        { v: "a", w: "b", label: { minlen: 2, weight: 3 } },
-        { v: "b", w: "a", label: { minlen: 3, weight: 4 } }
-      ]);
+      expect(g.getEdge("a", "b")).to.eql({ minlen: 2, weight: 3 });
+      expect(g.getEdge("b", "a")).to.eql({ minlen: 3, weight: 4 });
+      expect(g.edges()).to.have.length(2);
     });
   });
 });

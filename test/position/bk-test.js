@@ -11,13 +11,13 @@ var _ = require("lodash"),
     balance = bk.balance,
     findSmallestWidthAlignment = bk.findSmallestWidthAlignment,
     positionX = bk.positionX,
-    Digraph = require("graphlib").Digraph;
+    Graph = require("graphlib").Graph;
 
 describe("position/bk", function() {
   var g;
 
   beforeEach(function() {
-    g = new Digraph().setGraph({});
+    g = new Graph().setGraph({});
   });
 
   describe("findType1Conflicts", function() {

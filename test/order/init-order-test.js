@@ -1,6 +1,6 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
-    Digraph = require("graphlib").Digraph,
+    Graph = require("graphlib").Graph,
     initOrder = require("../../lib/order/init-order"),
     util = require("../../lib/util");
 
@@ -8,7 +8,7 @@ describe("order/initOrder", function() {
   var g;
 
   beforeEach(function() {
-    g = new Digraph()
+    g = new Graph()
       .setDefaultEdgeLabel(function() { return { weight: 1 }; });
   });
 

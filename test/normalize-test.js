@@ -1,13 +1,13 @@
 var _ = require("lodash"),
     expect = require("./chai").expect,
     normalize = require("../lib/normalize"),
-    Digraph = require("graphlib").Digraph;
+    Graph = require("graphlib").Graph;
 
 describe("normalize", function() {
   var g;
 
   beforeEach(function() {
-    g = new Digraph()
+    g = new Graph()
       .setDefaultEdgeLabel(function() { return {}; });
   });
 

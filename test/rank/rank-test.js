@@ -1,7 +1,7 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
     rank = require("../../lib/rank"),
-    Digraph = require("graphlib").Digraph;
+    Graph = require("graphlib").Graph;
 
 describe("rank", function() {
   var RANKERS = [
@@ -11,7 +11,7 @@ describe("rank", function() {
       g;
 
   beforeEach(function() {
-    g = new Digraph()
+    g = new Graph()
       .setDefaultNodeLabel(function() { return {}; })
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; })
       .setPath(["a", "b", "c", "d", "h"])
@@ -22,18 +22,18 @@ describe("rank", function() {
   _.each(RANKERS, function(ranker) {
     describe(ranker, function() {
       it("has all nodes with rank >= 0", function() {
-        var nodeIds = g.nodeIds();
+        var vs = g.nodes();
         rank(g, ranker);
-        _.each(nodeIds, function(v) {
+        _.each(vs, function(v) {
           expect(g.getNode(v).rank).to.be.gte(0);
         });
       });
 
       it("has at least one node with rank = 0", function() {
-        var nodeIds = g.nodeIds();
+        var vs = g.nodes();
         rank(g, ranker);
 
-        var rankZeroNode = _.find(nodeIds, function(v) {
+        var rankZeroNode = _.find(vs, function(v) {
           return g.getNode(v).rank === 0;
         });
 
@@ -42,21 +42,21 @@ describe("rank", function() {
 
       it("respects the minlen attribute", function() {
         rank(g, ranker);
-        _.each(g.edges(), function(edge) {
-          var vRank = g.getNode(edge.v).rank,
-              wRank = g.getNode(edge.w).rank;
-          expect(wRank - vRank).to.be.gte(edge.label.minlen);
+        _.each(g.edges(), function(e) {
+          var vRank = g.getNode(e.v).rank,
+              wRank = g.getNode(e.w).rank;
+          expect(wRank - vRank).to.be.gte(g.getEdge(e).minlen);
         });
       });
 
       it("can rank a single node graph", function() {
-        var g = new Digraph().setNode("a", {});
+        var g = new Graph().setNode("a", {});
         rank(g, ranker);
         expect(g.getNode("a").rank).to.equal(0);
       });
 
       it("can rank a disconnected graph", function() {
-        var g = new Digraph();
+        var g = new Graph();
         g.setNode("a", {});
         g.setNode("b", {});
         rank(g, ranker);

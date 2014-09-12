@@ -1,13 +1,13 @@
 var _ = require("lodash"),
     expect = require("./chai").expect,
     layout = require("..").layout,
-    Digraph = require("graphlib").Digraph;
+    Graph = require("graphlib").Graph;
 
 describe("layout", function() {
   var g;
 
   beforeEach(function() {
-    g = new Digraph().setGraph({});
+    g = new Graph().setGraph({});
   });
 
   it("can layout a single node", function() {
@@ -46,6 +46,7 @@ describe("layout", function() {
 
 function extractCoordinates(g) {
   var nodes = g.nodes();
-  return _.zipObject(_.pluck(nodes, "v"),
-                     _.map(nodes, function(node) { return _.pick(node.label, ["x", "y"]); }));
+  return _.zipObject(nodes, _.map(nodes, function(v) {
+    return _.pick(g.getNode(v), ["x", "y"]);
+  }));
 }

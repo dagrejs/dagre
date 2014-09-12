@@ -1,11 +1,11 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
-    Digraph = require("graphlib").Digraph,
+    Graph = require("graphlib").Graph,
     feasibleTree = require("../../lib/rank/feasible-tree");
 
 describe("feasibleTree", function() {
   it("creates a tree for a trivial input graph", function() {
-    var g = new Digraph()
+    var g = new Graph()
       .setNode("a", { rank: 0 })
       .setNode("b", { rank: 1 })
       .setEdge("a", "b", { minlen: 1 });
@@ -16,7 +16,7 @@ describe("feasibleTree", function() {
   });
 
   it("correctly shortens slack by pulling a node up", function() {
-    var g = new Digraph()
+    var g = new Graph()
       .setNode("a", { rank: 0 })
       .setNode("b", { rank: 1 })
       .setNode("c", { rank: 2 })
@@ -35,7 +35,7 @@ describe("feasibleTree", function() {
   });
 
   it("correctly shortens slack by pulling a node down", function() {
-    var g = new Digraph()
+    var g = new Graph()
       .setNode("a", { rank: 2 })
       .setNode("b", { rank: 0 })
       .setNode("c", { rank: 2 })

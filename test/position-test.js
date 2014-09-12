@@ -1,12 +1,12 @@
 var expect = require("./chai").expect,
     position = require("../lib/position"),
-    Digraph = require("graphlib").Digraph;
+    Graph = require("graphlib").Graph;
 
 describe("position", function() {
   var g;
 
   beforeEach(function() {
-    g = new Digraph().setGraph({});
+    g = new Graph().setGraph({});
   });
 
   it("aligns a single node to the upper left corner when there are no margins", function() {

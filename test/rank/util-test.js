@@ -1,5 +1,5 @@
 var expect = require("../chai").expect,
-    Digraph = require("graphlib").Digraph,
+    Graph = require("graphlib").Graph,
     rankUtil = require("../../lib/rank/util"),
     normalizeRanks = rankUtil.normalizeRanks,
     longestPath = rankUtil.longestPath;
@@ -7,7 +7,7 @@ var expect = require("../chai").expect,
 describe("rank/util", function() {
   describe("normalizeRanks", function() {
     it("adjust ranks such that all are >= 0, and at least one is 0", function() {
-      var g = new Digraph()
+      var g = new Graph()
         .setNode("a", { rank: 3 })
         .setNode("b", { rank: 2 })
         .setNode("c", { rank: 4 });
@@ -20,7 +20,7 @@ describe("rank/util", function() {
     });
 
     it("works for negative ranks", function() {
-      var g = new Digraph()
+      var g = new Graph()
         .setNode("a", { rank: -3 })
         .setNode("b", { rank: -2 });
 
@@ -35,7 +35,7 @@ describe("rank/util", function() {
     var g;
 
     beforeEach(function() {
-      g = new Digraph()
+      g = new Graph()
         .setDefaultNodeLabel(function() { return {}; })
         .setDefaultEdgeLabel(function() { return { minlen: 1 }; });
     });
