@@ -34,10 +34,6 @@ textarea.error {
   border: 1px solid #f33;
 }
 
-#buttonPanel {
-  text-align: center;
-}
-
 #resultPanel {
   width: 550px;
   float: left;
@@ -59,10 +55,7 @@ textarea.error {
   <h1>Dagre Debug Console</h1>
 
   <div id="inputPanel">
-    <textarea rows=25></textarea>
-    <div id="buttonPanel">
-      <button onclick="renderDot();">Render Dot</button>
-    </div>
+    <textarea rows=25 onkeyup="renderDot();"></textarea>
   </div>
 
   <div id="resultPanel">
@@ -103,7 +96,7 @@ function render(g) {
   svg.selectAll("*").remove();
   _.each(g.nodes(), function(v) {
     var node = g.getNode(v),
-        group = svg.append("g").attr("id", v).classed("node", true),
+        group = svg.append("g").attr("id", "node-" + v).classed("node", true),
         rect = group.append("rect"),
         text = group.append("text").attr("text-anchor", "left");
     text
@@ -134,7 +127,7 @@ function render(g) {
   dagre.layout(g);
 
   _.each(g.nodes(), function(v) {
-    var group = svg.select("g#" + v),
+    var group = svg.select("g#node-" + v),
         node = g.getNode(v);
     group.attr("transform", "translate(" + node.x + "," + node.y + ")");
   });
