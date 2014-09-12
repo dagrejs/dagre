@@ -1,0 +1,142 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Dagre Debug Console</title>
+
+<script src="../build/dagre.js"></script>
+<script src="../build/graphlib-dot.js"></script>
+<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
+
+<style>
+body {
+  color: #333;
+}
+
+#wrapper {
+  width: 1000px;
+  margin: 0 auto;
+}
+
+#inputPanel {
+  width: 350px;
+  float: left;
+  padding-right: 10%
+}
+
+#inputPanel textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+textarea.error {
+  color: #f33;
+  border: 1px solid #f33;
+}
+
+#buttonPanel {
+  text-align: center;
+}
+
+#resultPanel {
+  width: 550px;
+  float: left;
+}
+
+#resultPanel svg {
+  border: 1px solid #333;
+}
+</style>
+
+<style>
+.node rect {
+  stroke: #333;
+  fill: #fff;
+}
+</style>
+
+<div id="wrapper">
+  <h1>Dagre Debug Console</h1>
+
+  <div id="inputPanel">
+    <textarea rows=25></textarea>
+    <div id="buttonPanel">
+      <button onclick="renderDot();">Render Dot</button>
+    </div>
+  </div>
+
+  <div id="resultPanel">
+    <svg id="svg" width="550px" height="550px"></svg>
+  </div>
+</div>
+
+<script>
+var input = document.querySelector("#inputPanel textarea");
+function renderDot() {
+  var dotStr = input.value;
+  input.className = "";
+  try {
+    var g = graphlibDot.read(dotStr);
+    render(g);
+  } catch (e) {
+    input.className = "error";
+    throw e;
+  }
+}
+
+input.onkeydown = function(e) {
+  if (e.keyCode === 9) {
+    e.preventDefault();
+    var s = this.selectionStart;
+    this.value = this.value.substring(0,this.selectionStart) + "    " +
+                 this.value.substring(this.selectionEnd);
+    this.selectionEnd = s + 4;
+  }
+}
+
+
+var marginX = 10,
+    marginY = 10;
+
+function render(g) {
+  var svg = d3.select("svg");
+  svg.selectAll("*").remove();
+  _.each(g.nodes(), function(v) {
+    var node = g.getNode(v),
+        group = svg.append("g").attr("id", v).classed("node", true),
+        rect = group.append("rect"),
+        text = group.append("text").attr("text-anchor", "left");
+    text
+      .append("tspan")
+      .attr("dy", "1em")
+      .text(node.label || v);
+
+    var textBBox = text.node().getBBox();
+    text.attr('transform',
+              'translate(' + (-textBBox.width / 2) + ',' +
+                             (-textBBox.height / 2) + ')');
+
+    var bbox = group.node().getBBox();
+    rect
+      .attr('rx', 5)
+      .attr('ry', 5)
+      .attr('x', -(bbox.width / 2 + marginX))
+      .attr('y', -(bbox.height / 2 + marginY))
+      .attr('width', bbox.width + 2 * marginX)
+      .attr('height', bbox.height + 2 * marginY)
+      .attr('fill', '#fff');
+    bbox = group.node().getBBox();
+
+    node.width = bbox.width;
+    node.height = bbox.height;
+  });
+
+  dagre.layout(g);
+
+  _.each(g.nodes(), function(v) {
+    var group = svg.select("g#" + v),
+        node = g.getNode(v);
+    group.attr("transform", "translate(" + node.x + "," + node.y + ")");
+  });
+}
+</script>
