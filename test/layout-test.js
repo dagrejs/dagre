@@ -42,6 +42,19 @@ describe("layout", function() {
       b: { x: 75 / 2, y: 100 + 300 + 200 / 2 }
     });
   });
+
+  it("can layout out a short cycle", function() {
+    g.getGraph().ranksep = 200;
+    g.setNode("a", { width: 100, height: 100 });
+    g.setNode("b", { width: 100, height: 100 });
+    g.setEdge("a", "b", { weight: 2 });
+    g.setEdge("b", "a", {});
+    layout(g);
+    expect(extractCoordinates(g)).to.eql({
+      a: { x: 100 / 2, y: 100 / 2 },
+      b: { x: 100 / 2, y: 100 + 200 + 100 / 2}
+    });
+  });
 });
 
 function extractCoordinates(g) {
