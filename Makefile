@@ -44,7 +44,7 @@ unit-test: $(SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
 	@$(JSHINT) $(JSHINT_OPTS) $(filter-out node_modules, $?)
 	@$(JSCS) $(filter-out node_modules, $?)
 
-$(BUILD_DIR)/$(MOD).js: browser.js | test
+$(BUILD_DIR)/$(MOD).js: browser.js $(SRC_FILES) | test
 	@$(BROWSERIFY) $< > $@
 
 $(BUILD_DIR)/$(MOD).min.js: $(BUILD_DIR)/$(MOD).js
