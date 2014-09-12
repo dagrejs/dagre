@@ -46,7 +46,7 @@ describe("acyclic", function() {
       g.setEdge("b", "a", { minlen: 3, weight: 4 });
       acyclic.run(g);
       expect(findCycles(g)).to.eql([]);
-      expect(g.getEdge("b", "a").minlen).to.equal(5);
+      expect(g.getEdge("b", "a").minlen).to.equal(3);
       expect(g.getEdge("b", "a").weight).to.equal(7);
     });
   });
