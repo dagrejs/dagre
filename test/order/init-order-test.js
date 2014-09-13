@@ -1,8 +1,7 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
     Graph = require("graphlib").Graph,
-    initOrder = require("../../lib/order/init-order"),
-    util = require("../../lib/util");
+    initOrder = require("../../lib/order/init-order");
 
 describe("order/initOrder", function() {
   var g;
@@ -19,9 +18,8 @@ describe("order/initOrder", function() {
     g.setPath(["a", "b", "c"]);
     g.setEdge("b", "d");
     g.setEdge("a", "e");
-    initOrder(g);
 
-    var layering = util.buildLayerMatrix(g);
+    var layering = initOrder(g);
     expect(layering[0]).to.eql(["a"]);
     expect(_.sortBy(layering[1])).to.eql(["b", "e"]);
     expect(_.sortBy(layering[2])).to.eql(["c", "d"]);
@@ -33,9 +31,8 @@ describe("order/initOrder", function() {
     });
     g.setPath(["a", "b", "d"]);
     g.setPath(["a", "c", "d"]);
-    initOrder(g);
 
-    var layering = util.buildLayerMatrix(g);
+    var layering = initOrder(g);
     expect(layering[0]).to.eql(["a"]);
     expect(_.sortBy(layering[1])).to.eql(["b", "c"]);
     expect(_.sortBy(layering[2])).to.eql(["d"]);
