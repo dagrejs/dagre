@@ -54,6 +54,9 @@ describe("layout", function() {
       a: { x: 100 / 2, y: 100 / 2 },
       b: { x: 100 / 2, y: 100 + 200 + 100 / 2}
     });
+    // One arrow should point down, one up
+    expect(g.getEdge("a", "b").points[1].y).gt(g.getEdge("a", "b").points[0].y);
+    expect(g.getEdge("b", "a").points[0].y).gt(g.getEdge("b", "a").points[1].y);
   });
 
   it("adds rectangle intersects for edges", function() {
