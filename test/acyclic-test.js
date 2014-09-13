@@ -8,7 +8,7 @@ describe("acyclic", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph()
+    g = new Graph({ multigraph: true })
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; });
   });
 
@@ -41,13 +41,13 @@ describe("acyclic", function() {
       expect(g.hasEdge("c", "d")).to.be.false;
     });
 
-    it("aggregates 'minlen' and 'weight' attributes", function() {
+    it("creates a multi-edge where necessary", function() {
       g.setEdge("a", "b", { minlen: 2, weight: 3 });
       g.setEdge("b", "a", { minlen: 3, weight: 4 });
       acyclic.run(g);
       expect(findCycles(g)).to.eql([]);
-      expect(g.getEdge("b", "a").minlen).to.equal(3);
-      expect(g.getEdge("b", "a").weight).to.equal(7);
+      expect(g.outEdges("b", "a")).to.have.length(2);
+      expect(g.edgeCount()).to.equal(2);
     });
   });
 
