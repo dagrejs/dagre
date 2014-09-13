@@ -16,7 +16,7 @@ describe("network simplex", function() {
   var g, t, gansnerGraph, gansnerTree;
 
   beforeEach(function() {
-    g = new Graph()
+    g = new Graph({ multigraph: true })
       .setDefaultNodeLabel(function() { return {}; })
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; });
 
@@ -86,6 +86,20 @@ describe("network simplex", function() {
     expect(g.getNode("e").rank).to.equal(1);
     expect(g.getNode("f").rank).to.equal(1);
     expect(g.getNode("g").rank).to.equal(2);
+  });
+
+  it("can handle multi-edges", function() {
+    g.setPath(["a", "b", "c", "d"]);
+    g.setEdge("a", "e", { weight: 2, minlen: 1 });
+    g.setEdge("e", "d");
+    g.setEdge("b", "c", { weight: 1, minlen: 2 }, "multi");
+    ns(g);
+    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.getNode("b").rank).to.equal(1);
+    // b -> c has minlen = 1 and minlen = 2, so it should be 2 ranks apart.
+    expect(g.getNode("c").rank).to.equal(3);
+    expect(g.getNode("d").rank).to.equal(4);
+    expect(g.getNode("e").rank).to.equal(1);
   });
 
   describe("leaveEdge", function() {
