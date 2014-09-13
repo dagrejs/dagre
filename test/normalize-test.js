@@ -7,7 +7,7 @@ describe("normalize", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph();
+    g = new Graph({ multigraph: true });
   });
 
   describe("run", function() {
@@ -39,7 +39,7 @@ describe("normalize", function() {
       expect(g.getNode("b").rank).to.equal(2);
     });
 
-    it("assigns width = 0, height = 0 to dummy nodes for an edge with no label", function() {
+    it("assigns width = 0, height = 0 to dummy nodes by default", function() {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", {});
@@ -117,6 +117,32 @@ describe("normalize", function() {
 
       expect(g.getEdge("a", "b").points)
         .eqls([{ x: 5, y: 10 }, { x: 20, y: 25 }, { x: 100, y: 200 }]);
+    });
+
+    it("restores multi-edges", function() {
+      g.setNode("a", { rank: 0 });
+      g.setNode("b", { rank: 2 });
+      g.setEdge("a", "b", {}, "bar");
+      g.setEdge("a", "b", {}, "foo");
+
+      normalize.run(g);
+
+      var outEdges = _.sortBy(g.outEdges("a"), "name");
+      expect(outEdges).to.have.length(2);
+
+      var barDummy = g.getNode(outEdges[0].w);
+      barDummy.x = 5;
+      barDummy.y = 10;
+
+      var fooDummy = g.getNode(outEdges[1].w);
+      fooDummy.x = 15;
+      fooDummy.y = 20;
+
+      normalize.undo(g);
+
+      expect(g.hasEdge("a", "b")).to.be.false;
+      expect(g.getEdge("a", "b", "bar").points).eqls([{ x: 5, y: 10 }]);
+      expect(g.getEdge("a", "b", "foo").points).eqls([{ x: 15, y: 20 }]);
     });
   });
 });
