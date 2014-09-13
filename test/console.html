@@ -78,13 +78,16 @@ path.edge {
 </div>
 
 <script>
+var debugTiming = true,
+    time = debugTiming ? dagre.util.time : dagre.util.notime;
+
 var input = document.querySelector("#inputPanel textarea");
 function renderDot() {
   var dotStr = input.value;
   input.className = "";
   try {
-    var g = graphlibDot.read(dotStr);
-    render(g);
+    var g = time("DOT parsing", function() { return graphlibDot.read(dotStr); });
+    time("render", function() { render(g); });
   } catch (e) {
     input.className = "error";
     throw e;
@@ -101,12 +104,17 @@ input.onkeydown = function(e) {
   }
 }
 
-
 var marginX = 10,
     marginY = 10;
 
 function render(g) {
   var svg = d3.select("svg g");
+  time("preLayout", function() { preLayout(g, svg) });
+  dagre.layout(g, { debugTiming: debugTiming });
+  time("postLayout", function() { postLayout(g, svg); });
+}
+
+function preLayout(g, svg) {
   svg.selectAll("*").remove();
   _.each(g.nodes(), function(v) {
     var node = g.getNode(v),
@@ -137,9 +145,9 @@ function render(g) {
     node.width = bbox.width;
     node.height = bbox.height;
   });
+}
 
-  dagre.layout(g);
-
+function postLayout(g, svg) {
   _.each(g.nodes(), function(v) {
     var group = svg.select("g#node-" + v),
         node = g.getNode(v);

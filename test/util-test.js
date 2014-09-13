@@ -65,22 +65,16 @@ describe("util", function() {
 
   describe("time", function() {
     var consoleLog;
-    beforeEach(function() { consoleLog = console.log; });
+
+    beforeEach(function() {
+      consoleLog = console.log;
+    });
+
     afterEach(function() {
       console.log = consoleLog;
-      util.log.level = 0;
     });
 
-    it("does nothing if the log.level is 0", function() {
-      util.log.level = 0;
-      var capture = [];
-      console.log = function() { capture.push(_.toArray(arguments)[0]); };
-      util.time("foo", function() {});
-      expect(capture).to.be.empty;
-    });
-
-    it("logs timing information if the log.level is > 0", function() {
-      util.log.level = 1;
+    it("logs timing information", function() {
       var capture = [];
       console.log = function() { capture.push(_.toArray(arguments)[0]); };
       util.time("foo", function() {});
@@ -89,6 +83,7 @@ describe("util", function() {
     });
 
     it("returns the value from the evaluated function", function() {
+      console.log = function() {};
       expect(util.time("foo", _.constant("bar"))).to.equal("bar");
     });
   });
