@@ -4,6 +4,30 @@ var _ = require("lodash"),
     util = require("../lib/util");
 
 describe("util", function() {
+  describe("simplify", function() {
+    var g;
+
+    beforeEach(function() {
+      g = new Graph({ multigraph: true });
+    });
+
+    it("copies without change a graph with no multi-edges", function() {
+      g.setEdge("a", "b", { weight: 1, minlen: 1 });
+      var g2 = util.simplify(g);
+      expect(g2.getEdge("a", "b")).eql({ weight: 1, minlen: 1 });
+      expect(g2.edgeCount()).equals(1);
+    });
+
+    it("collapses multi-edges", function() {
+      g.setEdge("a", "b", { weight: 1, minlen: 1 });
+      g.setEdge("a", "b", { weight: 2, minlen: 2 }, "multi");
+      var g2 = util.simplify(g);
+      expect(g2.isMultigraph()).to.be.false;
+      expect(g2.getEdge("a", "b")).eql({ weight: 3, minlen: 2 });
+      expect(g2.edgeCount()).equals(1);
+    });
+  });
+
   describe("intersectRect", function() {
     function expectIntersects(rect, point) {
       var cross = util.intersectRect(rect, point);
