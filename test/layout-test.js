@@ -55,6 +55,32 @@ describe("layout", function() {
       b: { x: 100 / 2, y: 100 + 200 + 100 / 2}
     });
   });
+
+  it("adds rectangle intersects for edges", function() {
+    g.getGraph().ranksep = 200;
+    g.setNode("a", { width: 100, height: 100 });
+    g.setNode("b", { width: 100, height: 100 });
+    g.setEdge("a", "b", {});
+    layout(g);
+    var points = g.getEdge("a", "b").points;
+    expect(points).to.have.length(2);
+    expect(points[1].x).equals(points[0].x);
+    expect(points[1].y).equals(points[0].y + 200);
+  });
+
+  it("adds rectangle intersects for edges spanning multiple ranks", function() {
+    g.getGraph().ranksep = 200;
+    g.setNode("a", { width: 100, height: 100 });
+    g.setNode("b", { width: 100, height: 100 });
+    g.setEdge("a", "b", { minlen: 2 });
+    layout(g);
+    var points = g.getEdge("a", "b").points;
+    expect(points).to.have.length(3);
+    expect(points[1].x).equals(points[0].x);
+    expect(points[1].y).equals(points[0].y + 200);
+    expect(points[2].x).equals(points[1].x);
+    expect(points[2].y).equals(points[1].y + 200);
+  });
 });
 
 function extractCoordinates(g) {
