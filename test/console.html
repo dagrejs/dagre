@@ -49,6 +49,11 @@ textarea.error {
   stroke: #333;
   fill: #fff;
 }
+
+path.edge {
+  stroke: #333;
+  fill: none;
+}
 </style>
 
 <div id="wrapper">
@@ -59,7 +64,16 @@ textarea.error {
   </div>
 
   <div id="resultPanel">
-    <svg id="svg" width="550px" height="550px"></svg>
+    <svg id="svg" width="550px" height="550px">
+      <defs>
+        <marker id="arrowhead" viewBox="0 0 10 10" refx=8 refy=5
+                markerUnits="strokeWidth" markerWidth=8 markerHeight=5
+                orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z"/>
+        </marker>
+      </defs>
+      <g/>
+    </svg>
   </div>
 </div>
 
@@ -92,7 +106,7 @@ var marginX = 10,
     marginY = 10;
 
 function render(g) {
-  var svg = d3.select("svg");
+  var svg = d3.select("svg g");
   svg.selectAll("*").remove();
   _.each(g.nodes(), function(v) {
     var node = g.getNode(v),
@@ -130,6 +144,17 @@ function render(g) {
     var group = svg.select("g#node-" + v),
         node = g.getNode(v);
     group.attr("transform", "translate(" + node.x + "," + node.y + ")");
+  });
+
+  _.each(g.edges(), function(e) {
+    var points = g.getEdge(e).points,
+        path = svg.append("path")
+                .classed("edge", true)
+                .attr("marker-end", "url(#arrowhead)"),
+        line = d3.svg.line()
+                .x(function(d) { return d.x; })
+                .y(function(d) { return d.y; });
+    path.attr("d", line(points));
   });
 }
 </script>
