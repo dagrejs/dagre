@@ -35,12 +35,11 @@ function runBenchmark(name, fn) {
 }
 
 var g = new Graph()
-  .setDefaultNodeLabel(function() { return {}; })
+  .setDefaultNodeLabel(function() { return { width: 1, height: 1}; })
   .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; })
   .setPath(["a", "b", "c", "d", "h"])
   .setPath(["a", "e", "g", "h"])
   .setPath(["a", "f", "g"]);
-
 
 runBenchmark("longest-path ranker", function() {
   rank(g, "longest-path");
