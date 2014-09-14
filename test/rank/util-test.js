@@ -31,6 +31,17 @@ describe("rank/util", function() {
     });
   });
 
+  describe("removeEmptyRanks", function() {
+    it("Removes ranks without any nodes", function() {
+      var g = new Graph()
+        .setNode("a", { rank: 0 })
+        .setNode("b", { rank: 4 });
+      rankUtil.removeEmptyRanks(g);
+      expect(g.getNode("a").rank).equals(0);
+      expect(g.getNode("b").rank).equals(1);
+    });
+  });
+
   describe("longestPath", function() {
     var g;
 
