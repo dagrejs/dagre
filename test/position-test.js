@@ -80,4 +80,42 @@ describe("position", function() {
     expect(_.pick(g.getNode("b"), ["x", "y"]))
       .eqls({ x: 70 / 2 + 50 / 2 + 20 + 55 / 2, y: 60  + 30 + 100 / 2 });
   });
+
+  it("can position nodes with rankdir=LR", function() {
+    g.getGraph().rankdir = "LR";
+    g.getGraph().ranksep = 30;
+    g.getGraph().nodesep = 20;
+    g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
+    g.setNode("b", { width: 55, height:  75, rank: 0, order: 1 });
+    g.setNode("c", { width: 70, height:  60, rank: 1, order: 0 });
+    g.setEdge("a", "c");
+    position(g);
+    expect(_.pick(g.getNode("a"), ["x", "y"]))
+      .eqls({ x: 55 / 2,                        y: 100 / 2 });
+    expect(_.pick(g.getNode("b"), ["x", "y"]))
+      .eqls({ x: 55 / 2,                        y: 100 + 20 + 75 / 2 });
+    // Note that the x coordinate is the max width from the previous layer. We
+    // only compact horizontally (in the original TB layout), never vertically.
+    expect(_.pick(g.getNode("c"), ["x", "y"]))
+      .eqls({ x: 55 + 30 + 70 / 2,              y: 100 / 2 });
+  });
+
+  it("can position nodes with rankdir=RL", function() {
+    g.getGraph().rankdir = "RL";
+    g.getGraph().ranksep = 30;
+    g.getGraph().nodesep = 20;
+    g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
+    g.setNode("b", { width: 55, height:  75, rank: 0, order: 1 });
+    g.setNode("c", { width: 70, height:  60, rank: 1, order: 0 });
+    g.setEdge("a", "c");
+    position(g);
+    expect(_.pick(g.getNode("c"), ["x", "y"]))
+      .eqls({ x: 70 / 2,                        y: 100 / 2 });
+    // Note that the x coordinate is the max width from the previous layer. We
+    // only compact horizontally (in the original TB layout), never vertically.
+    expect(_.pick(g.getNode("a"), ["x", "y"]))
+      .eqls({ x: 70 + 30 + 55 / 2,              y: 100 / 2 });
+    expect(_.pick(g.getNode("b"), ["x", "y"]))
+      .eqls({ x: 70 + 30 + 55 / 2,              y: 100 + 20 + 75 / 2 });
+  });
 });
