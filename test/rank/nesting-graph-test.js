@@ -1,4 +1,5 @@
-var expect = require("../chai").expect,
+var _ = require("lodash"),
+    expect = require("../chai").expect,
     Graph = require("graphlib").Graph,
     components = require("graphlib").alg.components,
     nestingGraph = require("../../lib/rank/nesting-graph");
@@ -34,9 +35,11 @@ describe("rank/nestingGraph", function() {
       expect(g.getParent(borderTop)).to.equal("sg1");
       expect(g.getParent(borderBottom)).to.equal("sg1");
       expect(g.outEdges(borderTop, "a")).to.have.length(1);
-      expect(g.getEdge(g.outEdges(borderTop, "a")[0])).eqls({ weight: 0, minlen: 1});
+      expect(_.pick(g.getEdge(g.outEdges(borderTop, "a")[0]), ["weight", "minlen"]))
+        .eqls({ weight: 0, minlen: 1});
       expect(g.outEdges("a", borderBottom)).to.have.length(1);
-      expect(g.getEdge(g.outEdges("a", borderBottom)[0])).eqls({ weight: 0, minlen: 1});
+      expect(_.pick(g.getEdge(g.outEdges("a", borderBottom)[0]), ["weight", "minlen"]))
+        .eqls({ weight: 0, minlen: 1});
       expect(g.getNode(borderTop)).eqls({ width: 0, height: 0, dummy: true });
       expect(g.getNode(borderBottom)).eqls({ width: 0, height: 0, dummy: true });
     });
@@ -55,9 +58,10 @@ describe("rank/nestingGraph", function() {
       expect(sg2Top).to.exist;
       expect(sg2Bottom).to.exist;
       expect(g.outEdges(sg1Top, sg2Top)).to.have.length(1);
-      expect(g.getEdge(g.outEdges(sg1Top, sg2Top)[0])).eqls({ weight: 0, minlen: 1});
+      expect(_.pick(g.getEdge(g.outEdges(sg1Top, sg2Top)[0]), ["weight", "minlen"]))
+        .eqls({ weight: 0, minlen: 1});
       expect(g.outEdges(sg2Bottom, sg1Bottom)).to.have.length(1);
-      expect(g.getEdge(g.outEdges(sg2Bottom, sg1Bottom)[0]))
+      expect(_.pick(g.getEdge(g.outEdges(sg2Bottom, sg1Bottom)[0]), ["weight", "minlen"]))
         .eqls({ weight: 0, minlen: 1});
     });
 
@@ -123,6 +127,23 @@ describe("rank/nestingGraph", function() {
       g.setEdge("a", "b", { minlen: 1 });
       nestingGraph.run(g);
       expect(g.getEdge("a", "b").minlen).equals(5);
+    });
+  });
+
+  describe("cleanup", function() {
+    it("removes nesting graph edges", function() {
+      g.setParent("a", "sg1");
+      g.setEdge("a", "b", { minlen: 1 });
+      nestingGraph.run(g);
+      nestingGraph.cleanup(g);
+      expect(g.successors("a")).eqls(["b"]);
+    });
+
+    it("removes the root node", function() {
+      g.setParent("a", "sg1");
+      nestingGraph.run(g);
+      nestingGraph.cleanup(g);
+      expect(g.nodeCount()).to.equal(4); // sg1 + sg1Top + sg1Bottom + "a"
     });
   });
 });
