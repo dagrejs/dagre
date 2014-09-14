@@ -80,16 +80,20 @@ path.edge {
 var debugTiming = true,
     time = debugTiming ? dagre.util.time : dagre.util.notime;
 
-var input = document.querySelector("#inputPanel textarea");
+var lastDotStr = "",
+    input = document.querySelector("#inputPanel textarea");
 function renderDot() {
   var dotStr = input.value;
-  input.className = "";
-  try {
-    var g = time("DOT parsing", function() { return graphlibDot.read(dotStr); });
-    time("render", function() { render(g); });
-  } catch (e) {
-    input.className = "error";
-    throw e;
+  if (dotStr !== lastDotStr) {
+    lastDotStr = dotStr;
+    input.className = "";
+    try {
+      var g = time("DOT parsing", function() { return graphlibDot.read(dotStr); });
+      time("render", function() { render(g); });
+    } catch (e) {
+      input.className = "error";
+      throw e;
+    }
   }
 }
 
