@@ -66,9 +66,12 @@ describe("layout", function() {
     g.setEdge("a", "b", {});
     layout(g);
     var points = g.getEdge("a", "b").points;
-    expect(points).to.have.length(2);
-    expect(points[1].x).equals(points[0].x);
-    expect(points[1].y).equals(points[0].y + 200);
+    expect(points).to.have.length(3);
+    expect(points).eqls([
+      { x: 100 / 2, y: 100 },           // intersect with bottom of a
+      { x: 100 / 2, y: 100 + 200 / 2 }, // point for edge label
+      { x: 100 / 2, y: 100 + 200 }      // intersect with top of b
+    ]);
   });
 
   it("adds rectangle intersects for edges spanning multiple ranks", function() {
@@ -78,11 +81,14 @@ describe("layout", function() {
     g.setEdge("a", "b", { minlen: 2 });
     layout(g);
     var points = g.getEdge("a", "b").points;
-    expect(points).to.have.length(3);
-    expect(points[1].x).equals(points[0].x);
-    expect(points[1].y).equals(points[0].y + 200);
-    expect(points[2].x).equals(points[1].x);
-    expect(points[2].y).equals(points[1].y + 200);
+    expect(points).to.have.length(5);
+    expect(points).eqls([
+      { x: 100 / 2, y: 100 },           // intersect with bottom of a
+      { x: 100 / 2, y: 100 + 200 / 2 }, // bend #1
+      { x: 100 / 2, y: 100 + 400 / 2 }, // point for edge label
+      { x: 100 / 2, y: 100 + 600 / 2 }, // bend #2
+      { x: 100 / 2, y: 100 + 800 / 2 }  // intersect with top of b
+    ]);
   });
 
   it("can layout a graph with subgraphs", function() {
