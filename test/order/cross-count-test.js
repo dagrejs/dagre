@@ -37,4 +37,13 @@ describe("crossCount", function() {
     g.setPath(["a2", "b2", "c2"]);
     expect(crossCount(g, [["a1", "a2"], ["b2", "b1"], ["c1", "c2"]])).equals(2);
   });
+
+  it("works for graph #1", function() {
+    g.setPath(["a", "b", "c"]);
+    g.setPath(["d", "e", "c"]);
+    g.setPath(["a", "f", "i"]);
+    g.setEdge("a", "e");
+    expect(crossCount(g, [["a", "d"], ["b", "e", "f"], ["c", "i"]])).equals(1);
+    expect(crossCount(g, [["d", "a"], ["e", "b", "f"], ["c", "i"]])).equals(0);
+  });
 });
