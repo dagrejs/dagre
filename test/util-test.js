@@ -26,6 +26,12 @@ describe("util", function() {
       expect(g2.getEdge("a", "b")).eql({ weight: 3, minlen: 2 });
       expect(g2.edgeCount()).equals(1);
     });
+
+    it("copies the graph object", function() {
+      g.setGraph({ foo: "bar" });
+      var g2 = util.simplify(g);
+      expect(g2.getGraph()).eqls({ foo: "bar" });
+    });
   });
 
   describe("successorWeights", function() {
