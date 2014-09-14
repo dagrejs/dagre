@@ -1,47 +1,10 @@
 var expect = require("../chai").expect,
     Graph = require("graphlib").Graph,
+    normalizeRanks = require("../../lib/util").normalizeRanks,
     rankUtil = require("../../lib/rank/util"),
-    normalizeRanks = rankUtil.normalizeRanks,
     longestPath = rankUtil.longestPath;
 
 describe("rank/util", function() {
-  describe("normalizeRanks", function() {
-    it("adjust ranks such that all are >= 0, and at least one is 0", function() {
-      var g = new Graph()
-        .setNode("a", { rank: 3 })
-        .setNode("b", { rank: 2 })
-        .setNode("c", { rank: 4 });
-
-      normalizeRanks(g);
-
-      expect(g.getNode("a").rank).to.equal(1);
-      expect(g.getNode("b").rank).to.equal(0);
-      expect(g.getNode("c").rank).to.equal(2);
-    });
-
-    it("works for negative ranks", function() {
-      var g = new Graph()
-        .setNode("a", { rank: -3 })
-        .setNode("b", { rank: -2 });
-
-      normalizeRanks(g);
-
-      expect(g.getNode("a").rank).to.equal(0);
-      expect(g.getNode("b").rank).to.equal(1);
-    });
-  });
-
-  describe("removeEmptyRanks", function() {
-    it("Removes ranks without any nodes", function() {
-      var g = new Graph()
-        .setNode("a", { rank: 0 })
-        .setNode("b", { rank: 4 });
-      rankUtil.removeEmptyRanks(g);
-      expect(g.getNode("a").rank).equals(0);
-      expect(g.getNode("b").rank).equals(1);
-    });
-  });
-
   describe("longestPath", function() {
     var g;
 

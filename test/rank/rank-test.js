@@ -22,25 +22,6 @@ describe("rank", function() {
 
   _.each(RANKERS, function(ranker) {
     describe(ranker, function() {
-      it("has all nodes with rank >= 0", function() {
-        var vs = g.nodes();
-        rank(g, ranker);
-        _.each(vs, function(v) {
-          expect(g.getNode(v).rank).to.be.gte(0);
-        });
-      });
-
-      it("has at least one node with rank = 0", function() {
-        var vs = g.nodes();
-        rank(g, ranker);
-
-        var rankZeroNode = _.find(vs, function(v) {
-          return g.getNode(v).rank === 0;
-        });
-
-        expect(rankZeroNode).to.defined;
-      });
-
       it("respects the minlen attribute", function() {
         rank(g, ranker);
         _.each(g.edges(), function(e) {
@@ -54,15 +35,6 @@ describe("rank", function() {
         var g = new Graph().setGraph({}).setNode("a", {});
         rank(g, ranker);
         expect(g.getNode("a").rank).to.equal(0);
-      });
-
-      it("can rank a disconnected graph", function() {
-        var g = new Graph().setGraph({});
-        g.setNode("a", {});
-        g.setNode("b", {});
-        rank(g, ranker);
-        expect(g.getNode("a").rank).to.equal(0);
-        expect(g.getNode("b").rank).to.equal(0);
       });
     });
   });

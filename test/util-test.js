@@ -182,4 +182,42 @@ describe("util", function() {
       expect(util.time("foo", _.constant("bar"))).to.equal("bar");
     });
   });
+
+  describe("normalizeRanks", function() {
+    it("adjust ranks such that all are >= 0, and at least one is 0", function() {
+      var g = new Graph()
+        .setNode("a", { rank: 3 })
+        .setNode("b", { rank: 2 })
+        .setNode("c", { rank: 4 });
+
+      util.normalizeRanks(g);
+
+      expect(g.getNode("a").rank).to.equal(1);
+      expect(g.getNode("b").rank).to.equal(0);
+      expect(g.getNode("c").rank).to.equal(2);
+    });
+
+    it("works for negative ranks", function() {
+      var g = new Graph()
+        .setNode("a", { rank: -3 })
+        .setNode("b", { rank: -2 });
+
+      util.normalizeRanks(g);
+
+      expect(g.getNode("a").rank).to.equal(0);
+      expect(g.getNode("b").rank).to.equal(1);
+    });
+  });
+
+  describe("removeEmptyRanks", function() {
+    it("Removes ranks without any nodes", function() {
+      var g = new Graph()
+        .setNode("a", { rank: 0 })
+        .setNode("b", { rank: 4 });
+      util.removeEmptyRanks(g);
+      expect(g.getNode("a").rank).equals(0);
+      expect(g.getNode("b").rank).equals(1);
+    });
+  });
+
 });

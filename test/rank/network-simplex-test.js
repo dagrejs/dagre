@@ -10,7 +10,7 @@ var _ = require("lodash"),
     leaveEdge = networkSimplex.leaveEdge,
     enterEdge = networkSimplex.enterEdge,
     exchangeEdges = networkSimplex.exchangeEdges,
-    normalizeRanks = require("../../lib/rank/util").normalizeRanks;
+    normalizeRanks = require("../../lib/util").normalizeRanks;
 
 describe("network simplex", function() {
   var g, t, gansnerGraph, gansnerTree;

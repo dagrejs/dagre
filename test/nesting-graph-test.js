@@ -1,8 +1,8 @@
 var _ = require("lodash"),
-    expect = require("../chai").expect,
+    expect = require("./chai").expect,
     Graph = require("graphlib").Graph,
     components = require("graphlib").alg.components,
-    nestingGraph = require("../../lib/rank/nesting-graph");
+    nestingGraph = require("../lib/nesting-graph");
 
 describe("rank/nestingGraph", function() {
   var g;
