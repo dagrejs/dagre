@@ -33,4 +33,20 @@ describe("order/barycenter", function() {
     barycenter(fixed, movable, neighbors);
     expect(movable).eqls(["a1", "a2", "a3"]);
   });
+
+  it("biases to the left without reverse bias", function() {
+    var fixed = ["b1"],
+        movable = ["a2", "a1"],
+        neighbors = { a1: { b1: 1 }, a2: { b1: 1 } };
+    barycenter(fixed, movable, neighbors, false);
+    expect(movable).eqls(["a2", "a1"]);
+  });
+
+  it("biases to the right with reverse bias", function() {
+    var fixed = ["b1"],
+        movable = ["a2", "a1"],
+        neighbors = { a1: { b1: 1 }, a2: { b1: 1 } };
+    barycenter(fixed, movable, neighbors, true);
+    expect(movable).eqls(["a1", "a2"]);
+  });
 });
