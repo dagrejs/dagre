@@ -51,6 +51,17 @@ describe("normalize", function() {
       expect(g.getNode(successor).width).to.equal(0);
       expect(g.getNode(successor).height).to.equal(0);
     });
+
+    it("preserves the weight for the edge", function() {
+      g.setNode("a", { rank: 0 });
+      g.setNode("b", { rank: 2 });
+      g.setEdge("a", "b", { weight: 2 });
+
+      normalize.run(g);
+
+      expect(g.successors("a")).to.have.length(1);
+      expect(g.getEdge("a", g.successors("a")[0]).weight).to.equal(2);
+    });
   });
 
   describe("undo", function() {
