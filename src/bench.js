@@ -35,6 +35,7 @@ function runBenchmark(name, fn) {
 }
 
 var g = new Graph()
+  .setGraph({})
   .setDefaultNodeLabel(function() { return { width: 1, height: 1}; })
   .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; })
   .setPath(["a", "b", "c", "d", "h"])
