@@ -7,7 +7,7 @@ describe("normalize", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph({ multigraph: true });
+    g = new Graph({ multigraph: true, compound: true });
   });
 
   describe("run", function() {
@@ -32,7 +32,7 @@ describe("normalize", function() {
 
       expect(g.successors("a")).to.have.length(1);
       var successor = g.successors("a")[0];
-      expect(g.getNode(successor).dummy).to.be.true;
+      expect(g.getNode(successor).dummy).to.equal("edge");
       expect(g.getNode(successor).rank).to.equal(1);
       expect(g.successors(successor)).to.eql(["b"]);
       expect(g.getNode("a").rank).to.equal(0);

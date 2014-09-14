@@ -40,8 +40,8 @@ describe("rank/nestingGraph", function() {
       expect(g.outEdges("a", borderBottom)).to.have.length(1);
       expect(_.pick(g.getEdge(g.outEdges("a", borderBottom)[0]), ["weight", "minlen"]))
         .eqls({ weight: 0, minlen: 1});
-      expect(g.getNode(borderTop)).eqls({ width: 0, height: 0, dummy: true });
-      expect(g.getNode(borderBottom)).eqls({ width: 0, height: 0, dummy: true });
+      expect(g.getNode(borderTop)).eqls({ width: 0, height: 0, dummy: "border" });
+      expect(g.getNode(borderBottom)).eqls({ width: 0, height: 0, dummy: "border" });
     });
 
     it("adds edges between borders of nested subgraphs", function() {

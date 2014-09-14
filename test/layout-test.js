@@ -7,7 +7,7 @@ describe("layout", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph().setGraph({});
+    g = new Graph({ multigraph: true, compound: true }).setGraph({});
   });
 
   it("can layout a single node", function() {
@@ -83,6 +83,13 @@ describe("layout", function() {
     expect(points[1].y).equals(points[0].y + 200);
     expect(points[2].x).equals(points[1].x);
     expect(points[2].y).equals(points[1].y + 200);
+  });
+
+  it("can layout a graph with subgraphs", function() {
+    // To be expanded, this primarily ensures nothing blows up for the moment.
+    g.setNode("a", { width: 50, height: 50 });
+    g.setParent("a", "sg1");
+    layout(g);
   });
 });
 

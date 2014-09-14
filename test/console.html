@@ -117,6 +117,10 @@ function render(g) {
 
 function preLayout(g, svg) {
   _.each(g.nodes(), function(v) {
+    if (g.getChildren(v).length) {
+      return;
+    }
+
     var node = g.getNode(v),
         group = svg.append("g").attr("id", "node-" + v).classed("node", true),
         rect = group.append("rect"),

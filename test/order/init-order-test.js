@@ -7,7 +7,7 @@ describe("order/initOrder", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph()
+    g = new Graph({ compound: true })
       .setDefaultEdgeLabel(function() { return { weight: 1 }; });
   });
 
@@ -36,5 +36,14 @@ describe("order/initOrder", function() {
     expect(layering[0]).to.eql(["a"]);
     expect(_.sortBy(layering[1])).to.eql(["b", "c"]);
     expect(_.sortBy(layering[2])).to.eql(["d"]);
+  });
+
+  it("does not assign an order to subgraph nodes", function() {
+    g.setNode("a", { rank: 0 });
+    g.setNode("sg1", {});
+    g.setParent("a", "sg1");
+
+    var layering = initOrder(g);
+    expect(layering).to.eql([["a"]]);
   });
 });

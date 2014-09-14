@@ -34,7 +34,7 @@ describe("util", function() {
     });
   });
 
-  describe("asNonCompound", function() {
+  describe("asNonCompoundGraph", function() {
     var g;
 
     beforeEach(function() {
@@ -44,7 +44,7 @@ describe("util", function() {
     it("copies all nodes", function() {
       g.setNode("a", { foo: "bar" });
       g.setNode("b");
-      var g2 = util.asNonCompound(g);
+      var g2 = util.asNonCompoundGraph(g);
       expect(g2.getNode("a")).to.eql({ foo: "bar" });
       expect(g2.hasNode("b")).to.be.true;
     });
@@ -52,21 +52,21 @@ describe("util", function() {
     it("copies all edges", function() {
       g.setEdge("a", "b", { foo: "bar" });
       g.setEdge("a", "b", { foo: "baz" }, "multi");
-      var g2 = util.asNonCompound(g);
+      var g2 = util.asNonCompoundGraph(g);
       expect(g2.getEdge("a", "b")).eqls({ foo: "bar" });
       expect(g2.getEdge("a", "b", "multi")).eqls({ foo: "baz" });
     });
 
     it("does not copy compound nodes", function() {
       g.setParent("a", "sg1");
-      var g2 = util.asNonCompound(g);
+      var g2 = util.asNonCompoundGraph(g);
       expect(g2.getParent(g)).to.be.undefined;
       expect(g2.isCompound()).to.be.false;
     });
 
     it ("copies the graph object", function() {
       g.setGraph({ foo: "bar" });
-      var g2 = util.asNonCompound(g);
+      var g2 = util.asNonCompoundGraph(g);
       expect(g2.getGraph()).eqls({ foo: "bar" });
     });
   });
