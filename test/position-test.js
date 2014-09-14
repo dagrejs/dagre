@@ -7,7 +7,7 @@ describe("position", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph().setGraph({});
+    g = new Graph({ compound: true }).setGraph({});
   });
 
   it("aligns a single node to the upper left corner when there are no margins", function() {
@@ -117,5 +117,14 @@ describe("position", function() {
       .eqls({ x: 70 + 30 + 55 / 2,              y: 100 / 2 });
     expect(_.pick(g.getNode("b"), ["x", "y"]))
       .eqls({ x: 70 + 30 + 55 / 2,              y: 100 + 20 + 75 / 2 });
+  });
+
+  it("should not try to position the subgraph node itself", function() {
+    g.setNode("a", { width: 50, height: 50, rank: 0, order: 0 });
+    g.setNode("sg1", {});
+    g.setParent("a", "sg1");
+    position(g);
+    expect(g.getNode("sg1")).to.not.have.property("x");
+    expect(g.getNode("sg1")).to.not.have.property("y");
   });
 });
