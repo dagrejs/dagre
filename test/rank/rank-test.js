@@ -12,6 +12,7 @@ describe("rank", function() {
 
   beforeEach(function() {
     g = new Graph()
+      .setGraph({})
       .setDefaultNodeLabel(function() { return {}; })
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; })
       .setPath(["a", "b", "c", "d", "h"])
@@ -50,13 +51,13 @@ describe("rank", function() {
       });
 
       it("can rank a single node graph", function() {
-        var g = new Graph().setNode("a", {});
+        var g = new Graph().setGraph({}).setNode("a", {});
         rank(g, ranker);
         expect(g.getNode("a").rank).to.equal(0);
       });
 
       it("can rank a disconnected graph", function() {
-        var g = new Graph();
+        var g = new Graph().setGraph({});
         g.setNode("a", {});
         g.setNode("b", {});
         rank(g, ranker);
