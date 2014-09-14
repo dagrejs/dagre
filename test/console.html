@@ -127,19 +127,19 @@ function preLayout(g, svg) {
       .text(node.label || v);
 
     var textBBox = text.node().getBBox();
-    text.attr('transform',
-              'translate(' + (-textBBox.width / 2) + ',' +
-                             (-textBBox.height / 2) + ')');
+    text.attr("transform",
+              "translate(" + (-textBBox.width / 2) + "," +
+                             (-textBBox.height / 2) + ")");
 
     var bbox = group.node().getBBox();
     rect
-      .attr('rx', 5)
-      .attr('ry', 5)
-      .attr('x', -(bbox.width / 2 + marginX))
-      .attr('y', -(bbox.height / 2 + marginY))
-      .attr('width', bbox.width + 2 * marginX)
-      .attr('height', bbox.height + 2 * marginY)
-      .attr('fill', '#fff');
+      .attr("rx", 5)
+      .attr("ry", 5)
+      .attr("x", -(bbox.width / 2 + marginX))
+      .attr("y", -(bbox.height / 2 + marginY))
+      .attr("width", bbox.width + 2 * marginX)
+      .attr("height", bbox.height + 2 * marginY)
+      .attr("fill", "#fff");
     bbox = group.node().getBBox();
 
     node.width = bbox.width;
