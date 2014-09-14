@@ -108,6 +108,14 @@ describe("rank/nestingGraph", function() {
       expect(g.getEdge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 5 });
     });
 
+    it("does not add an edge from the root to itself", function() {
+      g.setNode("a");
+      nestingGraph.run(g);
+
+      var root = g.getGraph().nestingRoot;
+      expect(g.outEdges(root, root)).eqls([]);
+    });
+
     it("expands inter-node edges to separate SG border and nodes #1", function() {
       g.setEdge("a", "b", { minlen: 1 });
       nestingGraph.run(g);
