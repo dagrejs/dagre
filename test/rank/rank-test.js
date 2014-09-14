@@ -23,7 +23,8 @@ describe("rank", function() {
   _.each(RANKERS, function(ranker) {
     describe(ranker, function() {
       it("respects the minlen attribute", function() {
-        rank(g, ranker);
+        g.getGraph().ranker = ranker;
+        rank(g);
         _.each(g.edges(), function(e) {
           var vRank = g.getNode(e.v).rank,
               wRank = g.getNode(e.w).rank;

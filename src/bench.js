@@ -43,17 +43,21 @@ var g = new Graph()
   .setPath(["a", "f", "g"]);
 
 runBenchmark("longest-path ranker", function() {
-  rank(g, "longest-path");
+  g.getGraph().ranker = "longest-path";
+  rank(g);
 });
 
 runBenchmark("tight-tree ranker", function() {
-  rank(g, "tight-tree");
+  g.getGraph().ranker = "tight-tree";
+  rank(g);
 });
 
 runBenchmark("network-simplex ranker", function() {
-  rank(g, "network-simplex");
+  g.getGraph().ranker = "network-simplex";
+  rank(g);
 });
 
 runBenchmark("layout", function() {
+  delete g.getGraph().ranker;
   layout(g);
 });
