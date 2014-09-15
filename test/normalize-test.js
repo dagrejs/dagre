@@ -160,6 +160,23 @@ describe("normalize", function() {
       expect(g.getEdge("a", "b").y).to.equal(60);
     });
 
+    it("sets x and y coordinates for the label, if the long edge has one", function() {
+      g.setNode("a", { rank: 0 });
+      g.setNode("b", { rank: 4 });
+      g.setEdge("a", "b", { width: 10, height: 10, labelRank: 2 });
+
+      normalize.run(g);
+
+      var labelNode = g.getNode(g.successors(g.successors("a")[0])[0]);
+      labelNode.x = 50;
+      labelNode.y = 60;
+
+      normalize.undo(g);
+
+      expect(g.getEdge("a", "b").x).to.equal(50);
+      expect(g.getEdge("a", "b").y).to.equal(60);
+    });
+
     it("restores multi-edges", function() {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });

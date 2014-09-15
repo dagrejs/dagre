@@ -57,6 +57,18 @@ describe("layout", function() {
       .eqls({ x: 75 / 2, y: 100  + 150 + 70 / 2 });
   });
 
+  it("can layout a long edge with a label", function() {
+    g.getGraph().ranksep = 300;
+    g.setNode("a", { width: 50, height: 100 });
+    g.setNode("b", { width: 75, height: 200 });
+    g.setEdge("a", "b", { width: 60, height: 70, minlen: 2 });
+    layout(g);
+    expect(g.getEdge("a", "b").x).to.equal(75 / 2);
+    expect(g.getEdge("a", "b").y)
+      .to.be.gt(g.getNode("a").y)
+      .to.be.lt(g.getNode("b").y);
+  });
+
   it("can layout out a short cycle", function() {
     g.getGraph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });
