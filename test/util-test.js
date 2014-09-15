@@ -210,14 +210,24 @@ describe("util", function() {
   });
 
   describe("removeEmptyRanks", function() {
-    it("Removes ranks without any nodes", function() {
+    it("Removes border ranks without any nodes", function() {
       var g = new Graph()
+        .setGraph({ nodeRankFactor: 4 })
         .setNode("a", { rank: 0 })
         .setNode("b", { rank: 4 });
       util.removeEmptyRanks(g);
       expect(g.getNode("a").rank).equals(0);
       expect(g.getNode("b").rank).equals(1);
     });
-  });
 
+    it("Does not remove non-border ranks", function() {
+      var g = new Graph()
+        .setGraph({ nodeRankFactor: 4 })
+        .setNode("a", { rank: 0 })
+        .setNode("b", { rank: 8 });
+      util.removeEmptyRanks(g);
+      expect(g.getNode("a").rank).equals(0);
+      expect(g.getNode("b").rank).equals(2);
+    });
+  });
 });
