@@ -43,6 +43,20 @@ describe("layout", function() {
     });
   });
 
+  it("can layout an edge with a label", function() {
+    g.getGraph().ranksep = 300;
+    g.setNode("a", { width: 50, height: 100 });
+    g.setNode("b", { width: 75, height: 200 });
+    g.setEdge("a", "b", { width: 60, height: 70 });
+    layout(g);
+    expect(extractCoordinates(g)).to.eql({
+      a: { x: 75 / 2, y: 100 / 2 },
+      b: { x: 75 / 2, y: 100 + 150 + 70 + 150 + 200 / 2 }
+    });
+    expect(_.pick(g.getEdge("a", "b"), ["x", "y"]))
+      .eqls({ x: 75 / 2, y: 100  + 150 + 70 / 2 });
+  });
+
   it("can layout out a short cycle", function() {
     g.getGraph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });

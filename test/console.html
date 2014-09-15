@@ -50,6 +50,10 @@ textarea.error {
   fill: #fff;
 }
 
+.edge rect {
+  fill: #fff;
+}
+
 path.edge {
   stroke: #333;
   fill: none;
@@ -107,9 +111,6 @@ input.onkeydown = function(e) {
   }
 }
 
-var marginX = 10,
-    marginY = 10;
-
 function render(g) {
   var svg = d3.select("svg");
   svg.selectAll("g").remove();
@@ -120,39 +121,53 @@ function render(g) {
 }
 
 function preLayout(g, svg) {
+  _.each(g.edges(), function(e) {
+    var edge = g.getEdge(e);
+    if (edge.label) {
+      var group = appendLabel(svg, edge.label, edge, 0, 0);
+      group.attr("id", "edge-" + edgeObjToId(e)).classed("edge", true);
+    }
+  });
+
   _.each(g.nodes(), function(v) {
     if (g.getChildren(v).length) {
       return;
     }
-
     var node = g.getNode(v),
-        group = svg.append("g").attr("id", "node-" + v).classed("node", true),
-        rect = group.append("rect"),
-        text = group.append("text").attr("text-anchor", "left");
-    text
-      .append("tspan")
-      .attr("dy", "1em")
-      .text(node.label || v);
-
-    var textBBox = text.node().getBBox();
-    text.attr("transform",
-              "translate(" + (-textBBox.width / 2) + "," +
-                             (-textBBox.height / 2) + ")");
-
-    var bbox = group.node().getBBox();
-    rect
-      .attr("rx", 5)
-      .attr("ry", 5)
-      .attr("x", -(bbox.width / 2 + marginX))
-      .attr("y", -(bbox.height / 2 + marginY))
-      .attr("width", bbox.width + 2 * marginX)
-      .attr("height", bbox.height + 2 * marginY)
-      .attr("fill", "#fff");
-    bbox = group.node().getBBox();
-
-    node.width = bbox.width;
-    node.height = bbox.height;
+        group = appendLabel(svg, node.label || v, node, 10, 10);
+    group.attr("id", "node-" + v).classed("node", true);
   });
+}
+
+function appendLabel(target, label, graphObj, marginX, marginY) {
+  var group = target.append("g"),
+      rect = group.append("rect"),
+      text = group.append("text").attr("text-anchor", "left");
+  text
+    .append("tspan")
+    .attr("dy", "1em")
+    .text(label);
+
+  var textBBox = text.node().getBBox();
+  text.attr("transform",
+            "translate(" + (-textBBox.width / 2) + "," +
+                           (-textBBox.height / 2) + ")");
+
+  var bbox = group.node().getBBox();
+  rect
+    .attr("rx", 5)
+    .attr("ry", 5)
+    .attr("x", -(bbox.width / 2 + marginX))
+    .attr("y", -(bbox.height / 2 + marginY))
+    .attr("width", bbox.width + 2 * marginX)
+    .attr("height", bbox.height + 2 * marginY)
+    .attr("fill", "#fff");
+  bbox = group.node().getBBox();
+
+  graphObj.width = bbox.width;
+  graphObj.height = bbox.height;
+
+  return group;
 }
 
 function postLayout(g, root, svg) {
@@ -166,6 +181,14 @@ function postLayout(g, root, svg) {
                             "scale(" + d3.event.scale + ")");
   }));
 
+  _.each(g.edges(), function(e) {
+    var group = svg.select("g#edge-" + edgeObjToId(e));
+    if (!group.empty()) {
+      var edge = g.getEdge(e);
+      group.attr("transform", "translate(" + edge.x + "," + edge.y + ")");
+    }
+  });
+
   _.each(g.nodes(), function(v) {
     var group = svg.select("g#node-" + v),
         node = g.getNode(v);
@@ -174,7 +197,7 @@ function postLayout(g, root, svg) {
 
   _.each(g.edges(), function(e) {
     var points = g.getEdge(e).points,
-        path = svg.append("path")
+        path = svg.insert("path", ":first-child")
                 .classed("edge", true)
                 .attr("marker-end", "url(#arrowhead)"),
         line = d3.svg.line()
@@ -182,5 +205,10 @@ function postLayout(g, root, svg) {
                 .y(function(d) { return d.y; });
     path.attr("d", line(points));
   });
+}
+
+function edgeObjToId(e) {
+  // Not particularly safe, but good enough for our needs.
+  return e.v + "-" + e.w + "-" + e.name;
 }
 </script>
