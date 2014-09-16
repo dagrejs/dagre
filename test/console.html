@@ -205,6 +205,19 @@ function postLayout(g, root, svg) {
                 .y(function(d) { return d.y; });
     path.attr("d", line(points));
   });
+
+  function dfsChildren(v) {
+    if (g.getChildren(v).length) {
+      var node = g.getNode(v);
+      svg.insert("rect", ":first-child")
+        .classed("subgraph", true)
+        .attr("x", node.x)
+        .attr("y", node.y)
+        .attr("width", node.width)
+        .attr("height", node.height);
+    }
+  };
+  _.each(g.getChildren(), dfsChildren);
 }
 
 function edgeObjToId(e) {
