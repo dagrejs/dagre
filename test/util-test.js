@@ -207,6 +207,18 @@ describe("util", function() {
       expect(g.getNode("a").rank).to.equal(0);
       expect(g.getNode("b").rank).to.equal(1);
     });
+
+    it("does not assign a rank to subgraphs", function() {
+      var g = new Graph({ compound: true })
+        .setNode("a", { rank: 0 })
+        .setNode("sg", {})
+        .setParent("a", "sg");
+
+      util.normalizeRanks(g);
+
+      expect(g.getNode("sg")).to.not.have.property("rank");
+      expect(g.getNode("a").rank).to.equal(0);
+    });
   });
 
   describe("removeEmptyRanks", function() {
