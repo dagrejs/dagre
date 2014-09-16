@@ -50,6 +50,11 @@ textarea.error {
   fill: #fff;
 }
 
+.subgraph rect {
+  stroke: #333;
+  fill: #fff;
+}
+
 .edge rect {
   fill: #fff;
 }
@@ -207,14 +212,18 @@ function postLayout(g, root, svg) {
   });
 
   function dfsChildren(v) {
-    if (g.getChildren(v).length) {
+    var children = g.getChildren(v);
+    if (children.length) {
+      _.each(children, dfsChildren);
+
       var node = g.getNode(v);
-      svg.insert("rect", ":first-child")
-        .classed("subgraph", true)
-        .attr("x", node.x)
-        .attr("y", node.y)
-        .attr("width", node.width)
-        .attr("height", node.height);
+      svg.insert("g", ":first-child")
+         .classed("subgraph", true)
+         .attr("transform", "translate(" + (node.x - node.width / 2) + "," +
+                                       (node.y - node.height / 2) + ")")
+         .append("rect")
+           .attr("width", node.width)
+           .attr("height", node.height);
     }
   };
   _.each(g.getChildren(), dfsChildren);
