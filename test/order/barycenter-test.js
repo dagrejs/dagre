@@ -2,51 +2,50 @@ var expect = require("../chai").expect,
     barycenter = require("../../lib/order/barycenter");
 
 describe("order/barycenter", function() {
-  it("sorts based on barycenters", function() {
-    var fixed = ["b1", "b2", "b3"],
-        movable = ["a3", "a2", "a1"],
-        neighbors = { a1: { b1: 1 }, a2: { b2: 1 }, a3: { b3: 1 } };
-    barycenter(fixed, movable, neighbors);
-    expect(movable).eqls(["a1", "a2", "a3"]);
+  it("does not assign a value to nodes with no adjacencies", function() {
+    var fixed = [],
+        movable = ["a"],
+        neighbors = {};
+
+    var results = barycenter(fixed, movable, neighbors);
+    expect(results).to.not.have.property("a");
   });
 
-  it("sorts around nodes with no neighbors", function() {
-    var fixed = ["b1", "b2", "b3"],
-        movable = ["a4", "a3", "a2", "a1"],
-        neighbors = { a1: { b1: 1 }, a2: { b2: 1 }, a4: { b3: 1 } };
-    barycenter(fixed, movable, neighbors);
-    expect(movable).eqls(["a1", "a3", "a2", "a4"]);
+  it("assigns the position of the sole adjacency", function() {
+    var fixed = ["a", "b", "c"],
+        movable = ["x"],
+        neighbors = { x: { c: 1 } };
+
+    var results = barycenter(fixed, movable, neighbors);
+    expect(results.x).to.eql({ barycenter: 2, weight: 1 });
   });
 
-  it("handles multiple edges", function() {
-    var fixed = ["b1", "b2"],
-        movable = ["a3", "a2", "a1"],
-        neighbors = { a1: { b1: 1, b2: 1 }, a2: { b1: 1 }, a3: { b2: 1 } };
-    barycenter(fixed, movable, neighbors);
-    expect(movable).eqls(["a2", "a1", "a3"]);
+  it("assigns the average of multiple adjacencies", function() {
+    var fixed = ["a", "b", "c", "d", "e"],
+        movable = ["x"],
+        neighbors = { x: { c: 1, e: 1 } };
+
+    var results = barycenter(fixed, movable, neighbors);
+    expect(results.x).to.eql({ barycenter: 3, weight: 2 });
   });
 
-  it("accounts for weights", function() {
-    var fixed = ["b1", "b2"],
-        movable = ["a2", "a3", "a1"],
-        neighbors = { a1: { b1: 2, b2: 1 }, a2: { b1: 1, b2: 1 }, a3: { b1: 1, b2: 2 } };
-    barycenter(fixed, movable, neighbors);
-    expect(movable).eqls(["a1", "a2", "a3"]);
+  it("takes into account the weight of edges", function() {
+    var fixed = ["a", "b", "c", "d", "e"],
+        movable = ["x"],
+        neighbors = { x: { c: 3, e: 1 } };
+
+    var results = barycenter(fixed, movable, neighbors);
+    expect(results.x).to.eql({ barycenter: 2.5, weight: 4 });
   });
 
-  it("biases to the left without reverse bias", function() {
-    var fixed = ["b1"],
-        movable = ["a2", "a1"],
-        neighbors = { a1: { b1: 1 }, a2: { b1: 1 } };
-    barycenter(fixed, movable, neighbors, false);
-    expect(movable).eqls(["a2", "a1"]);
-  });
+  it("calculates barycenters for all nodes in the movable layer", function() {
+    var fixed = ["a", "b", "c", "d", "e"],
+        movable = ["x", "y", "z"],
+        neighbors = { x: { b: 1, c: 1 }, z: { b: 2, e: 1 } };
 
-  it("biases to the right with reverse bias", function() {
-    var fixed = ["b1"],
-        movable = ["a2", "a1"],
-        neighbors = { a1: { b1: 1 }, a2: { b1: 1 } };
-    barycenter(fixed, movable, neighbors, true);
-    expect(movable).eqls(["a1", "a2"]);
+    var results = barycenter(fixed, movable, neighbors);
+    expect(results.x).to.eql({ barycenter: 1.5, weight: 2 });
+    expect(results.y).to.be.undefined;
+    expect(results.z).to.eql({ barycenter: 2, weight: 3 });
   });
 });
