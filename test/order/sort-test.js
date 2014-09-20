@@ -56,6 +56,31 @@ describe("sort", function() {
     expect(sort(input)).eqls({
       vs: ["a", "d", "c", "b"],
       barycenter: (2 + 6 + 3) / 3,
-      weight: 3 });
+      weight: 3
+    });
+  });
+
+  it("can handle no barycenters for any nodes", function() {
+    var input = [
+      { vs: ["a"], i: 0 },
+      { vs: ["b"], i: 3 },
+      { vs: ["c"], i: 2 },
+      { vs: ["d"], i: 1 }
+    ];
+    expect(sort(input)).eqls({ vs: ["a", "d", "c", "b"] });
+  });
+
+  it("can handle a barycenter of 0", function() {
+    var input = [
+      { vs: ["a"], i: 0, barycenter: 0, weight: 1 },
+      { vs: ["b"], i: 3 },
+      { vs: ["c"], i: 2 },
+      { vs: ["d"], i: 1 }
+    ];
+    expect(sort(input)).eqls({
+      vs: ["a", "d", "c", "b"],
+      barycenter: 0,
+      weight: 1
+    });
   });
 });
