@@ -7,7 +7,7 @@ describe("normalize", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph({ multigraph: true, compound: true });
+    g = new Graph({ multigraph: true, compound: true }).setGraph({});
   });
 
   describe("run", function() {
@@ -37,6 +37,9 @@ describe("normalize", function() {
       expect(g.successors(successor)).to.eql(["b"]);
       expect(g.getNode("a").rank).to.equal(0);
       expect(g.getNode("b").rank).to.equal(2);
+
+      expect(g.getGraph().dummyChains).to.have.length(1);
+      expect(g.getGraph().dummyChains[0]).to.equal(successor);
     });
 
     it("assigns width = 0, height = 0 to dummy nodes by default", function() {
