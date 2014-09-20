@@ -4,13 +4,14 @@ var _ = require("lodash"),
     Graph = require("graphlib").Graph;
 
 describe("order/sortSubgraph", function() {
-  var g;
+  var g, cg;
 
   beforeEach(function() {
     g = new Graph({ compound: true })
       .setDefaultNodeLabel(function() { return {}; })
       .setDefaultEdgeLabel(function() { return { weight: 1 }; });
     _.each(_.range(5), function(v) { g.setNode(v, { order: v }); });
+    cg = new Graph();
   });
 
   it("sorts a flat subgraph based on barycenter", function() {
@@ -19,7 +20,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(4, "y");
     _.each(["x", "y"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable").list).eqls(["y", "x"]);
+    expect(sortSubgraph(g, "movable", cg).vs).eqls(["y", "x"]);
   });
 
   it("preserves the pos of a node (y) w/o neighbors in a flat subgraph", function() {
@@ -29,7 +30,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(4, "z");
     _.each(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable").list).eqls(["z", "y", "x"]);
+    expect(sortSubgraph(g, "movable", cg).vs).eqls(["z", "y", "x"]);
   });
 
   it("biases to the left without reverse bias", function() {
@@ -37,7 +38,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(1, "y");
     _.each(["x", "y"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable").list).eqls(["x", "y"]);
+    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "y"]);
   });
 
   it("biases to the right with reverse bias", function() {
@@ -45,7 +46,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(1, "y");
     _.each(["x", "y"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable", true).list).eqls(["y", "x"]);
+    expect(sortSubgraph(g, "movable", cg, true).vs).eqls(["y", "x"]);
   });
 
   it("aggregates stats about the subgraph", function() {
@@ -54,9 +55,9 @@ describe("order/sortSubgraph", function() {
     g.setEdge(4, "y");
     _.each(["x", "y"], function(v) { g.setParent(v, "movable"); });
 
-    var results = sortSubgraph(g, "movable");
+    var results = sortSubgraph(g, "movable", cg);
     expect(results.barycenter).to.equal(2.25);
-    expect(results.barycenterWeight).to.equal(4);
+    expect(results.weight).to.equal(4);
   });
 
   it("can sort a nested subgraph with no barycenter", function() {
@@ -69,8 +70,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(2, "y");
     _.each(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
 
-    var list = sortSubgraph(g, "movable").list;
-    expect(list).eqls(["x", "z", "a", "b", "c"]);
+    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "z", "a", "b", "c"]);
   });
 
   it("can sort a nested subgraph with a barycenter", function() {
@@ -84,7 +84,7 @@ describe("order/sortSubgraph", function() {
     g.setEdge(2, "y");
     _.each(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable").list).eqls(["x", "a", "b", "c", "z"]);
+    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "a", "b", "c", "z"]);
   });
 
   it("can sort a nested subgraph with no in-edges", function() {
@@ -98,6 +98,6 @@ describe("order/sortSubgraph", function() {
     g.setEdge(1, "z");
     _.each(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
 
-    expect(sortSubgraph(g, "movable").list).eqls(["x", "a", "b", "c", "z"]);
+    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "a", "b", "c", "z"]);
   });
 });

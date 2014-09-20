@@ -14,17 +14,18 @@ describe("order/barycenter", function() {
   it("assigns an undefined barycenter for a node with no predecessors", function() {
     g.setNode("x", {});
 
-    barycenter(g, ["x"]);
-    expect(g.getNode("x").barycenter).to.be.undefined;
-    expect(g.getNode("x").barycenterWeight).to.be.undefined;
+    var results = barycenter(g, ["x"]);
+    expect(results).to.have.length(1);
+    expect(results[0]).to.eql({ v: "x" });
   });
 
   it("assigns the position of the sole predecessors", function() {
     g.setNode("a", { order: 2 });
     g.setEdge("a", "x");
 
-    barycenter(g, ["x"]);
-    expect(g.getNode("x")).eqls({ barycenter: 2, barycenterWeight: 1 });
+    var results = barycenter(g, ["x"]);
+    expect(results).to.have.length(1);
+    expect(results[0]).eqls({ v: "x", barycenter: 2, weight: 1 });
   });
 
   it("assigns the average of multiple predecessors", function() {
@@ -33,8 +34,9 @@ describe("order/barycenter", function() {
     g.setEdge("a", "x");
     g.setEdge("b", "x");
 
-    barycenter(g, ["x"]);
-    expect(g.getNode("x")).eqls({ barycenter: 3, barycenterWeight: 2 });
+    var results = barycenter(g, ["x"]);
+    expect(results).to.have.length(1);
+    expect(results[0]).eqls({ v: "x", barycenter: 3, weight: 2 });
   });
 
   it("takes into account the weight of edges", function() {
@@ -43,8 +45,9 @@ describe("order/barycenter", function() {
     g.setEdge("a", "x", { weight: 3 });
     g.setEdge("b", "x");
 
-    barycenter(g, ["x"]);
-    expect(g.getNode("x")).eqls({ barycenter: 2.5, barycenterWeight: 4 });
+    var results = barycenter(g, ["x"]);
+    expect(results).to.have.length(1);
+    expect(results[0]).eqls({ v: "x", barycenter: 2.5, weight: 4 });
   });
 
   it("calculates barycenters for all nodes in the movable layer", function() {
@@ -57,9 +60,10 @@ describe("order/barycenter", function() {
     g.setEdge("a", "z", { weight: 2 });
     g.setEdge("c", "z");
 
-    barycenter(g, ["x", "y", "z"]);
-    expect(g.getNode("x")).eqls({ barycenter: 1.5, barycenterWeight: 2 });
-    expect(g.getNode("y").barycenter).to.be.undefined;
-    expect(g.getNode("z")).eqls({ barycenter: 2, barycenterWeight: 3 });
+    var results = barycenter(g, ["x", "y", "z"]);
+    expect(results).to.have.length(3);
+    expect(results[0]).eqls({ v: "x", barycenter: 1.5, weight: 2 });
+    expect(results[1]).eqls({ v: "y" });
+    expect(results[2]).eqls({ v: "z", barycenter: 2, weight: 3 });
   });
 });
