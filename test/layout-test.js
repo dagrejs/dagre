@@ -7,7 +7,9 @@ describe("layout", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph({ multigraph: true, compound: true }).setGraph({});
+    g = new Graph({ multigraph: true, compound: true })
+          .setGraph({})
+          .setDefaultEdgeLabel(function() { return {}; });
   });
 
   it("can layout a single node", function() {
@@ -35,7 +37,7 @@ describe("layout", function() {
     g.getGraph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
-    g.setEdge("a", "b", {});
+    g.setEdge("a", "b");
     layout(g);
     expect(extractCoordinates(g)).to.eql({
       a: { x: 75 / 2, y: 100 / 2 },
@@ -74,7 +76,7 @@ describe("layout", function() {
     g.setNode("a", { width: 100, height: 100 });
     g.setNode("b", { width: 100, height: 100 });
     g.setEdge("a", "b", { weight: 2 });
-    g.setEdge("b", "a", {});
+    g.setEdge("b", "a");
     layout(g);
     expect(extractCoordinates(g)).to.eql({
       a: { x: 100 / 2, y: 100 / 2 },
@@ -89,7 +91,7 @@ describe("layout", function() {
     g.getGraph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });
     g.setNode("b", { width: 100, height: 100 });
-    g.setEdge("a", "b", {});
+    g.setEdge("a", "b");
     layout(g);
     var points = g.getEdge("a", "b").points;
     expect(points).to.have.length(3);
@@ -122,6 +124,24 @@ describe("layout", function() {
     g.setNode("a", { width: 50, height: 50 });
     g.setParent("a", "sg1");
     layout(g);
+  });
+
+  it("minimizes the height of subgraphs", function() {
+    _.each(["a", "b", "c", "d", "x", "y"], function(v) {
+      g.setNode(v, { width: 50, height: 50 });
+    });
+    g.setPath(["a", "b", "c", "d"]);
+    g.setEdge("a", "x", { weight: 100 });
+    g.setEdge("y", "d", { weight: 100 });
+    g.setParent("x", "sg");
+    g.setParent("y", "sg");
+
+    // We did not set up an edge (x, y), and we set up high-weight edges from
+    // outside of the subgraph to nodes in the subgraph. This is to try to
+    // force nodes x and y to be on different ranks, which we want our ranker
+    // to avoid.
+    layout(g);
+    expect(g.getNode("x").y).to.equal(g.getNode("y").y);
   });
 });
 

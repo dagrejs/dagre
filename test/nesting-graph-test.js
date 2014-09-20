@@ -1,5 +1,4 @@
-var _ = require("lodash"),
-    expect = require("./chai").expect,
+var expect = require("./chai").expect,
     Graph = require("graphlib").Graph,
     components = require("graphlib").alg.components,
     nestingGraph = require("../lib/nesting-graph");
@@ -35,11 +34,9 @@ describe("rank/nestingGraph", function() {
       expect(g.getParent(borderTop)).to.equal("sg1");
       expect(g.getParent(borderBottom)).to.equal("sg1");
       expect(g.outEdges(borderTop, "a")).to.have.length(1);
-      expect(_.pick(g.getEdge(g.outEdges(borderTop, "a")[0]), ["weight", "minlen"]))
-        .eqls({ weight: 0, minlen: 1});
+      expect(g.getEdge(g.outEdges(borderTop, "a")[0]).minlen).equals(1);
       expect(g.outEdges("a", borderBottom)).to.have.length(1);
-      expect(_.pick(g.getEdge(g.outEdges("a", borderBottom)[0]), ["weight", "minlen"]))
-        .eqls({ weight: 0, minlen: 1});
+      expect(g.getEdge(g.outEdges("a", borderBottom)[0]).minlen).equals(1);
       expect(g.getNode(borderTop)).eqls({ width: 0, height: 0, dummy: "border" });
       expect(g.getNode(borderBottom)).eqls({ width: 0, height: 0, dummy: "border" });
     });
@@ -58,11 +55,24 @@ describe("rank/nestingGraph", function() {
       expect(sg2Top).to.exist;
       expect(sg2Bottom).to.exist;
       expect(g.outEdges(sg1Top, sg2Top)).to.have.length(1);
-      expect(_.pick(g.getEdge(g.outEdges(sg1Top, sg2Top)[0]), ["weight", "minlen"]))
-        .eqls({ weight: 0, minlen: 1});
+      expect(g.getEdge(g.outEdges(sg1Top, sg2Top)[0]).minlen).equals(1);
       expect(g.outEdges(sg2Bottom, sg1Bottom)).to.have.length(1);
-      expect(_.pick(g.getEdge(g.outEdges(sg2Bottom, sg1Bottom)[0]), ["weight", "minlen"]))
-        .eqls({ weight: 0, minlen: 1});
+      expect(g.getEdge(g.outEdges(sg2Bottom, sg1Bottom)[0]).minlen).equals(1);
+    });
+
+    it("adds sufficient weight to border to node edges", function() {
+      // We want to keep subgraphs tight, so we should ensure that the weight for
+      // the edge between the top (and bottom) border nodes and nodes in the
+      // subgraph have weights exceeding anything in the graph.
+      g.setParent("x", "sg");
+      g.setEdge("a", "x", { weight: 100 });
+      g.setEdge("x", "b", { weight: 200 });
+      nestingGraph.run(g);
+
+      var top = g.getNode("sg").borderTop,
+          bot = g.getNode("sg").borderBottom;
+      expect(g.getEdge(top, "x").weight).to.be.gt(300);
+      expect(g.getEdge("x", bot).weight).to.be.gt(300);
     });
 
     it("adds an edge from the root to the tops of top-level subgraphs", function() {
