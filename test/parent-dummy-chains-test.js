@@ -112,4 +112,36 @@ describe("parentDummyChains", function() {
     expect(g.getParent("d2")).equals("sg1");
     expect(g.getParent("d3")).equals("sg2");
   });
+
+  it("handles an LCA that is not the root of the graph #1", function() {
+    g.setParent("a", "sg1");
+    g.setParent("sg2", "sg1");
+    g.setNode("sg1", { minRank: 0, maxRank: 6 });
+    g.setParent("b", "sg2");
+    g.setNode("sg2", { minRank: 3, maxRank: 5 });
+    g.setNode("d1", { edgeObj: { v: "a", w: "b" }, rank: 2 });
+    g.setNode("d2", { rank: 3 });
+    g.getGraph().dummyChains = ["d1"];
+    g.setPath(["a", "d1", "d2", "b"]);
+
+    parentDummyChains(g);
+    expect(g.getParent("d1")).equals("sg1");
+    expect(g.getParent("d2")).equals("sg2");
+  });
+
+  it("handles an LCA that is not the root of the graph #2", function() {
+    g.setParent("a", "sg2");
+    g.setParent("sg2", "sg1");
+    g.setNode("sg1", { minRank: 0, maxRank: 6 });
+    g.setParent("b", "sg1");
+    g.setNode("sg2", { minRank: 1, maxRank: 3 });
+    g.setNode("d1", { edgeObj: { v: "a", w: "b" }, rank: 3 });
+    g.setNode("d2", { rank: 4 });
+    g.getGraph().dummyChains = ["d1"];
+    g.setPath(["a", "d1", "d2", "b"]);
+
+    parentDummyChains(g);
+    expect(g.getParent("d1")).equals("sg2");
+    expect(g.getParent("d2")).equals("sg1");
+  });
 });
