@@ -100,4 +100,13 @@ describe("order/sortSubgraph", function() {
 
     expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "a", "b", "c", "z"]);
   });
+
+  it("sorts border nodes to the extremes of the subgraph", function() {
+    g.setEdge(0, "x");
+    g.setEdge(1, "y");
+    g.setEdge(2, "z");
+    g.setNode("sg1", { borderLeft: "bl", borderRight: "br" });
+    _.each(["x", "y", "z", "bl", "br"], function(v) { g.setParent(v, "sg1"); });
+    expect(sortSubgraph(g, "sg1", cg).vs).eqls(["bl", "x", "y", "z", "br"]);
+  });
 });

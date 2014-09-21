@@ -97,13 +97,18 @@ describe("order/buildLayerGraph", function() {
   });
 
   it("preserves hierarchy for the movable layer", function() {
-    g.setNode("a", { rank: 1 });
-    g.setNode("b", { rank: 1 });
-    g.setNode("c", { rank: 1 });
-    g.setNode("sg", { minRank: 1, maxRank: 1 });
+    g.setNode("a", { rank: 0 });
+    g.setNode("b", { rank: 0 });
+    g.setNode("c", { rank: 0 });
+    g.setNode("sg", {
+      minRank: 0,
+      maxRank: 0,
+      borderLeft: ["bl"],
+      borderRight: ["br"]
+    });
     _.each(["a", "b"], function(v) { g.setParent(v, "sg"); });
 
-    var lg = buildLayerGraph(g, 1, "inEdges"),
+    var lg = buildLayerGraph(g, 0, "inEdges"),
         root = lg.getGraph().root;
     expect(_.sortBy(lg.getChildren(root))).eqls(["c", "sg"]);
     expect(lg.getParent("a")).equals("sg");
