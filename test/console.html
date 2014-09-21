@@ -70,6 +70,7 @@ path.edge {
 
   <div id="inputPanel">
     <textarea rows=25 onkeyup="renderDot();"></textarea>
+    <input type="checkbox" id="timing" name="timing">Enable timing instrumentation</input>
   </div>
 
   <div id="resultPanel">
@@ -86,12 +87,14 @@ path.edge {
 </div>
 
 <script>
-var debugTiming = true,
-    time = debugTiming ? dagre.util.time : dagre.util.notime;
-
-var lastDotStr = "",
+var debugTiming = false,
+    time = dagre.util.notime,
+    lastDotStr = "",
     input = document.querySelector("#inputPanel textarea");
 function renderDot() {
+  debugTiming = d3.select("#timing").property("checked"),
+  time = debugTiming ? dagre.util.time : dagre.util.notime;
+
   var dotStr = input.value;
   if (dotStr !== lastDotStr) {
     lastDotStr = dotStr;
