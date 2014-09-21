@@ -143,6 +143,25 @@ describe("layout", function() {
     layout(g);
     expect(g.getNode("x").y).to.equal(g.getNode("y").y);
   });
+
+  it("can layout subgraphs with different rankdirs", function() {
+    g.setNode("a", { width: 50, height: 50 });
+    g.setNode("sg", {});
+    g.setParent("a", "sg");
+
+    function check(rankdir) {
+      expect(g.getNode("sg").width, "width " + rankdir).gt(50);
+      expect(g.getNode("sg").height, "height " + rankdir).gt(50);
+      expect(g.getNode("sg").x, "x " + rankdir).gt(50 / 2);
+      expect(g.getNode("sg").y, "y " + rankdir).gt(50 / 2);
+    }
+
+    _.each(["tb", "bt", "lr", "rl"], function(rankdir) {
+      g.getGraph().rankdir = rankdir;
+      layout(g);
+      check(rankdir);
+    });
+  });
 });
 
 function extractCoordinates(g) {
