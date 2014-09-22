@@ -3,8 +3,9 @@ var _ = require("lodash"),
     buildLayerMatrix = require("../../lib/util").buildLayerMatrix,
     bk = require("../../lib/position/bk"),
     findType1Conflicts = bk.findType1Conflicts,
-    addType1Conflict = bk.addType1Conflict,
-    hasType1Conflict = bk.hasType1Conflict,
+    findType2Conflicts = bk.findType2Conflicts,
+    addConflict = bk.addConflict,
+    hasConflict = bk.hasConflict,
     verticalAlignment = bk.verticalAlignment,
     horizontalCompaction = bk.horizontalCompaction,
     alignCoordinates = bk.alignCoordinates,
@@ -44,14 +45,14 @@ describe("position/bk", function() {
       g.setEdge("b", "d");
 
       var conflicts = findType1Conflicts(g, layering);
-      expect(hasType1Conflict(conflicts, "a", "c")).to.be.false;
-      expect(hasType1Conflict(conflicts, "b", "d")).to.be.false;
+      expect(hasConflict(conflicts, "a", "c")).to.be.false;
+      expect(hasConflict(conflicts, "b", "d")).to.be.false;
     });
 
     it("does not mark type-0 conflicts (no dummies)", function() {
       var conflicts = findType1Conflicts(g, layering);
-      expect(hasType1Conflict(conflicts, "a", "d")).to.be.false;
-      expect(hasType1Conflict(conflicts, "b", "c")).to.be.false;
+      expect(hasConflict(conflicts, "a", "d")).to.be.false;
+      expect(hasConflict(conflicts, "b", "c")).to.be.false;
     });
 
     _.each(["a", "b", "c", "d"], function(v) {
@@ -59,8 +60,8 @@ describe("position/bk", function() {
         g.getNode(v).dummy = true;
 
         var conflicts = findType1Conflicts(g, layering);
-        expect(hasType1Conflict(conflicts, "a", "d")).to.be.false;
-        expect(hasType1Conflict(conflicts, "b", "c")).to.be.false;
+        expect(hasConflict(conflicts, "a", "d")).to.be.false;
+        expect(hasConflict(conflicts, "b", "c")).to.be.false;
       });
     });
 
@@ -74,11 +75,11 @@ describe("position/bk", function() {
 
         var conflicts = findType1Conflicts(g, layering);
         if (v === "a" || v === "d") {
-          expect(hasType1Conflict(conflicts, "a", "d")).to.be.true;
-          expect(hasType1Conflict(conflicts, "b", "c")).to.be.false;
+          expect(hasConflict(conflicts, "a", "d")).to.be.true;
+          expect(hasConflict(conflicts, "b", "c")).to.be.false;
         } else {
-          expect(hasType1Conflict(conflicts, "a", "d")).to.be.false;
-          expect(hasType1Conflict(conflicts, "b", "c")).to.be.true;
+          expect(hasConflict(conflicts, "a", "d")).to.be.false;
+          expect(hasConflict(conflicts, "b", "c")).to.be.true;
         }
       });
     });
@@ -89,26 +90,75 @@ describe("position/bk", function() {
       });
 
       var conflicts = findType1Conflicts(g, layering);
-      expect(hasType1Conflict(conflicts, "a", "d")).to.be.false;
-      expect(hasType1Conflict(conflicts, "b", "c")).to.be.false;
+      expect(hasConflict(conflicts, "a", "d")).to.be.false;
+      expect(hasConflict(conflicts, "b", "c")).to.be.false;
       findType1Conflicts(g, layering);
     });
   });
 
-  describe("hasType1Conflict", function() {
+  describe("findType2Conflicts", function() {
+    var layering;
+
+    beforeEach(function() {
+      g
+        .setDefaultEdgeLabel(function() { return {}; })
+        .setNode("a", { rank: 0, order: 0 })
+        .setNode("b", { rank: 0, order: 1 })
+        .setNode("c", { rank: 1, order: 0 })
+        .setNode("d", { rank: 1, order: 1 })
+        // Set up crossing
+        .setEdge("a", "d")
+        .setEdge("b", "c");
+
+      layering = buildLayerMatrix(g);
+    });
+
+    it("marks type-2 conflicts favoring border segments #1", function() {
+      _.each(["a", "d"], function(v) {
+        g.getNode(v).dummy = true;
+      });
+
+      _.each(["b", "c"], function(v) {
+        g.getNode(v).dummy = "border";
+      });
+
+      var conflicts = findType2Conflicts(g, layering);
+      expect(hasConflict(conflicts, "a", "d")).to.be.true;
+      expect(hasConflict(conflicts, "b", "c")).to.be.false;
+      findType1Conflicts(g, layering);
+    });
+
+    it("marks type-2 conflicts favoring border segments #2", function() {
+      _.each(["b", "c"], function(v) {
+        g.getNode(v).dummy = true;
+      });
+
+      _.each(["a", "d"], function(v) {
+        g.getNode(v).dummy = "border";
+      });
+
+      var conflicts = findType2Conflicts(g, layering);
+      expect(hasConflict(conflicts, "a", "d")).to.be.false;
+      expect(hasConflict(conflicts, "b", "c")).to.be.true;
+      findType1Conflicts(g, layering);
+    });
+
+  });
+
+  describe("hasConflict", function() {
     it("can test for a type-1 conflict regardless of edge orientation", function() {
       var conflicts = {};
-      addType1Conflict(conflicts, "b", "a");
-      expect(hasType1Conflict(conflicts, "a", "b")).to.be.true;
-      expect(hasType1Conflict(conflicts, "b", "a")).to.be.true;
+      addConflict(conflicts, "b", "a");
+      expect(hasConflict(conflicts, "a", "b")).to.be.true;
+      expect(hasConflict(conflicts, "b", "a")).to.be.true;
     });
 
     it("works for multiple conflicts with the same node", function() {
       var conflicts = {};
-      addType1Conflict(conflicts, "a", "b");
-      addType1Conflict(conflicts, "a", "c");
-      expect(hasType1Conflict(conflicts, "a", "b")).to.be.true;
-      expect(hasType1Conflict(conflicts, "a", "c")).to.be.true;
+      addConflict(conflicts, "a", "b");
+      addConflict(conflicts, "a", "c");
+      expect(hasConflict(conflicts, "a", "b")).to.be.true;
+      expect(hasConflict(conflicts, "a", "c")).to.be.true;
     });
   });
 
@@ -191,7 +241,7 @@ describe("position/bk", function() {
       var layering = buildLayerMatrix(g),
           conflicts = {};
 
-      addType1Conflict(conflicts, "a", "c");
+      addConflict(conflicts, "a", "c");
 
       var result = verticalAlignment(g, layering, conflicts, g.predecessors.bind(g));
       expect(result).to.eql({
