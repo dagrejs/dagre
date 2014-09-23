@@ -22,6 +22,7 @@ THE SOFTWARE.
 
 module.exports = {
   layout: require("./lib/layout"),
+  debug: require("./lib/debug"),
   util: {
     time: require("./lib/util").time,
     notime: require("./lib/util").notime
