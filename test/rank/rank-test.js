@@ -23,19 +23,19 @@ describe("rank", function() {
   _.each(RANKERS, function(ranker) {
     describe(ranker, function() {
       it("respects the minlen attribute", function() {
-        g.getGraph().ranker = ranker;
+        g.graph().ranker = ranker;
         rank(g);
         _.each(g.edges(), function(e) {
-          var vRank = g.getNode(e.v).rank,
-              wRank = g.getNode(e.w).rank;
-          expect(wRank - vRank).to.be.gte(g.getEdge(e).minlen);
+          var vRank = g.node(e.v).rank,
+              wRank = g.node(e.w).rank;
+          expect(wRank - vRank).to.be.gte(g.edge(e).minlen);
         });
       });
 
       it("can rank a single node graph", function() {
         var g = new Graph().setGraph({}).setNode("a", {});
         rank(g, ranker);
-        expect(g.getNode("a").rank).to.equal(0);
+        expect(g.node("a").rank).to.equal(0);
       });
     });
   });

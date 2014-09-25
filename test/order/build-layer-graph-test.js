@@ -18,9 +18,9 @@ describe("order/buildLayerGraph", function() {
 
     var lg;
     lg = buildLayerGraph(g, 1, "inEdges");
-    expect(lg.hasNode(lg.getGraph().root));
-    expect(lg.getChildren()).eqls([lg.getGraph().root]);
-    expect(lg.getChildren(lg.getGraph().root)).eqls(["a", "b"]);
+    expect(lg.hasNode(lg.graph().root));
+    expect(lg.children()).eqls([lg.graph().root]);
+    expect(lg.children(lg.graph().root)).eqls(["a", "b"]);
   });
 
   it("copies flat nodes from the layer to the graph", function() {
@@ -44,13 +44,13 @@ describe("order/buildLayerGraph", function() {
 
     var lg = buildLayerGraph(g, 2, "inEdges");
 
-    expect(lg.getNode("a").foo).equals(1);
-    g.getNode("a").foo = "updated";
-    expect(lg.getNode("a").foo).equals("updated");
+    expect(lg.node("a").foo).equals(1);
+    g.node("a").foo = "updated";
+    expect(lg.node("a").foo).equals("updated");
 
-    expect(lg.getNode("b").foo).equals(2);
-    g.getNode("b").foo = "updated";
-    expect(lg.getNode("b").foo).equals("updated");
+    expect(lg.node("b").foo).equals(2);
+    g.node("b").foo = "updated";
+    expect(lg.node("b").foo).equals("updated");
   });
 
   it("copies edges incident on rank nodes to the graph (inEdges)", function() {
@@ -64,10 +64,10 @@ describe("order/buildLayerGraph", function() {
 
     expect(buildLayerGraph(g, 1, "inEdges").edgeCount()).to.equal(0);
     expect(buildLayerGraph(g, 2, "inEdges").edgeCount()).to.equal(2);
-    expect(buildLayerGraph(g, 2, "inEdges").getEdge("a", "c")).eqls({ weight: 2 });
-    expect(buildLayerGraph(g, 2, "inEdges").getEdge("b", "c")).eqls({ weight: 3 });
+    expect(buildLayerGraph(g, 2, "inEdges").edge("a", "c")).eqls({ weight: 2 });
+    expect(buildLayerGraph(g, 2, "inEdges").edge("b", "c")).eqls({ weight: 3 });
     expect(buildLayerGraph(g, 3, "inEdges").edgeCount()).to.equal(1);
-    expect(buildLayerGraph(g, 3, "inEdges").getEdge("c", "d")).eqls({ weight: 4 });
+    expect(buildLayerGraph(g, 3, "inEdges").edge("c", "d")).eqls({ weight: 4 });
   });
 
   it("copies edges incident on rank nodes to the graph (outEdges)", function() {
@@ -80,10 +80,10 @@ describe("order/buildLayerGraph", function() {
     g.setEdge("c", "d", { weight: 4 });
 
     expect(buildLayerGraph(g, 1, "outEdges").edgeCount()).to.equal(2);
-    expect(buildLayerGraph(g, 1, "outEdges").getEdge("c", "a")).eqls({ weight: 2 });
-    expect(buildLayerGraph(g, 1, "outEdges").getEdge("c", "b")).eqls({ weight: 3 });
+    expect(buildLayerGraph(g, 1, "outEdges").edge("c", "a")).eqls({ weight: 2 });
+    expect(buildLayerGraph(g, 1, "outEdges").edge("c", "b")).eqls({ weight: 3 });
     expect(buildLayerGraph(g, 2, "outEdges").edgeCount()).to.equal(1);
-    expect(buildLayerGraph(g, 2, "outEdges").getEdge("d", "c")).eqls({ weight: 4 });
+    expect(buildLayerGraph(g, 2, "outEdges").edge("d", "c")).eqls({ weight: 4 });
     expect(buildLayerGraph(g, 3, "outEdges").edgeCount()).to.equal(0);
   });
 
@@ -93,7 +93,7 @@ describe("order/buildLayerGraph", function() {
     g.setEdge("a", "b", { weight: 2 });
     g.setEdge("a", "b", { weight: 3 }, "multi");
 
-    expect(buildLayerGraph(g, 2, "inEdges").getEdge("a", "b")).eqls({ weight: 5 });
+    expect(buildLayerGraph(g, 2, "inEdges").edge("a", "b")).eqls({ weight: 5 });
   });
 
   it("preserves hierarchy for the movable layer", function() {
@@ -109,9 +109,9 @@ describe("order/buildLayerGraph", function() {
     _.each(["a", "b"], function(v) { g.setParent(v, "sg"); });
 
     var lg = buildLayerGraph(g, 0, "inEdges"),
-        root = lg.getGraph().root;
-    expect(_.sortBy(lg.getChildren(root))).eqls(["c", "sg"]);
-    expect(lg.getParent("a")).equals("sg");
-    expect(lg.getParent("b")).equals("sg");
+        root = lg.graph().root;
+    expect(_.sortBy(lg.children(root))).eqls(["c", "sg"]);
+    expect(lg.parent("a")).equals("sg");
+    expect(lg.parent("b")).equals("sg");
   });
 });

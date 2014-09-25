@@ -11,7 +11,7 @@ describe("feasibleTree", function() {
       .setEdge("a", "b", { minlen: 1 });
 
     var tree = feasibleTree(g);
-    expect(g.getNode("b").rank).to.equal(g.getNode("a").rank + 1);
+    expect(g.node("b").rank).to.equal(g.node("a").rank + 1);
     expect(tree.neighbors("a")).to.eql(["b"]);
   });
 
@@ -25,9 +25,9 @@ describe("feasibleTree", function() {
       .setEdge("a", "d", { minlen: 1 });
 
     var tree = feasibleTree(g);
-    expect(g.getNode("b").rank).to.eql(g.getNode("a").rank + 1);
-    expect(g.getNode("c").rank).to.eql(g.getNode("b").rank + 1);
-    expect(g.getNode("d").rank).to.eql(g.getNode("a").rank + 1);
+    expect(g.node("b").rank).to.eql(g.node("a").rank + 1);
+    expect(g.node("c").rank).to.eql(g.node("b").rank + 1);
+    expect(g.node("d").rank).to.eql(g.node("a").rank + 1);
     expect(_.sortBy(tree.neighbors("a"))).to.eql(["b", "d"]);
     expect(_.sortBy(tree.neighbors("b"))).to.eql(["a", "c"]);
     expect(tree.neighbors("c")).to.eql(["b"]);
@@ -43,8 +43,8 @@ describe("feasibleTree", function() {
       .setEdge("b", "c", { minlen: 1 });
 
     var tree = feasibleTree(g);
-    expect(g.getNode("a").rank).to.eql(g.getNode("b").rank + 1);
-    expect(g.getNode("c").rank).to.eql(g.getNode("b").rank + 1);
+    expect(g.node("a").rank).to.eql(g.node("b").rank + 1);
+    expect(g.node("c").rank).to.eql(g.node("b").rank + 1);
     expect(_.sortBy(tree.neighbors("a"))).to.eql(["b"]);
     expect(_.sortBy(tree.neighbors("b"))).to.eql(["a", "c"]);
     expect(_.sortBy(tree.neighbors("c"))).to.eql(["b"]);

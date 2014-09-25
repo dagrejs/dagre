@@ -41,24 +41,24 @@ describe("network simplex", function() {
   it("can assign a rank to a single node", function() {
     g.setNode("a");
     ns(g);
-    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.node("a").rank).to.equal(0);
   });
 
   it("can assign a rank to a 2-node connected graph", function() {
     g.setEdge("a", "b");
     ns(g);
-    expect(g.getNode("a").rank).to.equal(0);
-    expect(g.getNode("b").rank).to.equal(1);
+    expect(g.node("a").rank).to.equal(0);
+    expect(g.node("b").rank).to.equal(1);
   });
 
   it("can assign ranks for a diamond", function() {
     g.setPath(["a", "b", "d"]);
     g.setPath(["a", "c", "d"]);
     ns(g);
-    expect(g.getNode("a").rank).to.equal(0);
-    expect(g.getNode("b").rank).to.equal(1);
-    expect(g.getNode("c").rank).to.equal(1);
-    expect(g.getNode("d").rank).to.equal(2);
+    expect(g.node("a").rank).to.equal(0);
+    expect(g.node("b").rank).to.equal(1);
+    expect(g.node("c").rank).to.equal(1);
+    expect(g.node("d").rank).to.equal(2);
   });
 
   it("uses the minlen attribute on the edge", function() {
@@ -66,26 +66,26 @@ describe("network simplex", function() {
     g.setEdge("a", "c");
     g.setEdge("c", "d", { minlen: 2 });
     ns(g);
-    expect(g.getNode("a").rank).to.equal(0);
+    expect(g.node("a").rank).to.equal(0);
     // longest path biases towards the lowest rank it can assign. Since the
     // graph has no optimization opportunities we can assume that the longest
     // path ranking is used.
-    expect(g.getNode("b").rank).to.equal(2);
-    expect(g.getNode("c").rank).to.equal(1);
-    expect(g.getNode("d").rank).to.equal(3);
+    expect(g.node("b").rank).to.equal(2);
+    expect(g.node("c").rank).to.equal(1);
+    expect(g.node("d").rank).to.equal(3);
   });
 
   it("can rank the gansner graph", function() {
     g = gansnerGraph;
     ns(g);
-    expect(g.getNode("a").rank).to.equal(0);
-    expect(g.getNode("b").rank).to.equal(1);
-    expect(g.getNode("c").rank).to.equal(2);
-    expect(g.getNode("d").rank).to.equal(3);
-    expect(g.getNode("h").rank).to.equal(4);
-    expect(g.getNode("e").rank).to.equal(1);
-    expect(g.getNode("f").rank).to.equal(1);
-    expect(g.getNode("g").rank).to.equal(2);
+    expect(g.node("a").rank).to.equal(0);
+    expect(g.node("b").rank).to.equal(1);
+    expect(g.node("c").rank).to.equal(2);
+    expect(g.node("d").rank).to.equal(3);
+    expect(g.node("h").rank).to.equal(4);
+    expect(g.node("e").rank).to.equal(1);
+    expect(g.node("f").rank).to.equal(1);
+    expect(g.node("g").rank).to.equal(2);
   });
 
   it("can handle multi-edges", function() {
@@ -94,12 +94,12 @@ describe("network simplex", function() {
     g.setEdge("e", "d");
     g.setEdge("b", "c", { weight: 1, minlen: 2 }, "multi");
     ns(g);
-    expect(g.getNode("a").rank).to.equal(0);
-    expect(g.getNode("b").rank).to.equal(1);
+    expect(g.node("a").rank).to.equal(0);
+    expect(g.node("b").rank).to.equal(1);
     // b -> c has minlen = 1 and minlen = 2, so it should be 2 ranks apart.
-    expect(g.getNode("c").rank).to.equal(3);
-    expect(g.getNode("d").rank).to.equal(4);
-    expect(g.getNode("e").rank).to.equal(1);
+    expect(g.node("c").rank).to.equal(3);
+    expect(g.node("d").rank).to.equal(4);
+    expect(g.node("e").rank).to.equal(1);
   });
 
   describe("leaveEdge", function() {
@@ -217,13 +217,13 @@ describe("network simplex", function() {
 
       initLowLimValues(g, "a");
 
-      var a = g.getNode("a"),
-          b = g.getNode("b"),
-          c = g.getNode("c"),
-          d = g.getNode("d"),
-          e = g.getNode("e");
+      var a = g.node("a"),
+          b = g.node("b"),
+          c = g.node("c"),
+          d = g.node("d"),
+          e = g.node("e");
 
-      expect(_.sortBy(_.map(g.nodes(), function(v) { return g.getNode(v).lim; })))
+      expect(_.sortBy(_.map(g.nodes(), function(v) { return g.node(v).lim; })))
         .to.eql(_.range(1, 6));
 
       expect(a).to.eql({ low: 1, lim: 5 });
@@ -254,16 +254,16 @@ describe("network simplex", function() {
       exchangeEdges(t, g, { v: "g", w: "h" }, { v: "a", w: "e" });
 
       // check new cut values
-      expect(t.getEdge("a", "b").cutvalue).to.equal(2);
-      expect(t.getEdge("b", "c").cutvalue).to.equal(2);
-      expect(t.getEdge("c", "d").cutvalue).to.equal(2);
-      expect(t.getEdge("d", "h").cutvalue).to.equal(2);
-      expect(t.getEdge("a", "e").cutvalue).to.equal(1);
-      expect(t.getEdge("e", "g").cutvalue).to.equal(1);
-      expect(t.getEdge("g", "f").cutvalue).to.equal(0);
+      expect(t.edge("a", "b").cutvalue).to.equal(2);
+      expect(t.edge("b", "c").cutvalue).to.equal(2);
+      expect(t.edge("c", "d").cutvalue).to.equal(2);
+      expect(t.edge("d", "h").cutvalue).to.equal(2);
+      expect(t.edge("a", "e").cutvalue).to.equal(1);
+      expect(t.edge("e", "g").cutvalue).to.equal(1);
+      expect(t.edge("g", "f").cutvalue).to.equal(0);
 
       // ensure lim numbers look right
-      var lims = _.sortBy(_.map(t.nodes(), function(v) { return t.getNode(v).lim; }));
+      var lims = _.sortBy(_.map(t.nodes(), function(v) { return t.node(v).lim; }));
       expect(lims).to.eql(_.range(1, 9));
     });
 
@@ -277,14 +277,14 @@ describe("network simplex", function() {
       normalizeRanks(g);
 
       // check new ranks
-      expect(g.getNode("a").rank).to.equal(0);
-      expect(g.getNode("b").rank).to.equal(1);
-      expect(g.getNode("c").rank).to.equal(2);
-      expect(g.getNode("d").rank).to.equal(3);
-      expect(g.getNode("e").rank).to.equal(1);
-      expect(g.getNode("f").rank).to.equal(1);
-      expect(g.getNode("g").rank).to.equal(2);
-      expect(g.getNode("h").rank).to.equal(4);
+      expect(g.node("a").rank).to.equal(0);
+      expect(g.node("b").rank).to.equal(1);
+      expect(g.node("c").rank).to.equal(2);
+      expect(g.node("d").rank).to.equal(3);
+      expect(g.node("e").rank).to.equal(1);
+      expect(g.node("f").rank).to.equal(1);
+      expect(g.node("g").rank).to.equal(2);
+      expect(g.node("h").rank).to.equal(4);
     });
   });
 
@@ -464,13 +464,13 @@ describe("network simplex", function() {
     it("works for gansnerGraph", function() {
       initLowLimValues(gansnerTree);
       initCutValues(gansnerTree, gansnerGraph);
-      expect(gansnerTree.getEdge("a", "b").cutvalue).to.equal(3);
-      expect(gansnerTree.getEdge("b", "c").cutvalue).to.equal(3);
-      expect(gansnerTree.getEdge("c", "d").cutvalue).to.equal(3);
-      expect(gansnerTree.getEdge("d", "h").cutvalue).to.equal(3);
-      expect(gansnerTree.getEdge("g", "h").cutvalue).to.equal(-1);
-      expect(gansnerTree.getEdge("e", "g").cutvalue).to.equal(0);
-      expect(gansnerTree.getEdge("f", "g").cutvalue).to.equal(0);
+      expect(gansnerTree.edge("a", "b").cutvalue).to.equal(3);
+      expect(gansnerTree.edge("b", "c").cutvalue).to.equal(3);
+      expect(gansnerTree.edge("c", "d").cutvalue).to.equal(3);
+      expect(gansnerTree.edge("d", "h").cutvalue).to.equal(3);
+      expect(gansnerTree.edge("g", "h").cutvalue).to.equal(-1);
+      expect(gansnerTree.edge("e", "g").cutvalue).to.equal(0);
+      expect(gansnerTree.edge("f", "g").cutvalue).to.equal(0);
     });
 
     it("works for updated gansnerGraph", function() {
@@ -478,13 +478,13 @@ describe("network simplex", function() {
       gansnerTree.setEdge("a", "e");
       initLowLimValues(gansnerTree);
       initCutValues(gansnerTree, gansnerGraph);
-      expect(gansnerTree.getEdge("a", "b").cutvalue).to.equal(2);
-      expect(gansnerTree.getEdge("b", "c").cutvalue).to.equal(2);
-      expect(gansnerTree.getEdge("c", "d").cutvalue).to.equal(2);
-      expect(gansnerTree.getEdge("d", "h").cutvalue).to.equal(2);
-      expect(gansnerTree.getEdge("a", "e").cutvalue).to.equal(1);
-      expect(gansnerTree.getEdge("e", "g").cutvalue).to.equal(1);
-      expect(gansnerTree.getEdge("f", "g").cutvalue).to.equal(0);
+      expect(gansnerTree.edge("a", "b").cutvalue).to.equal(2);
+      expect(gansnerTree.edge("b", "c").cutvalue).to.equal(2);
+      expect(gansnerTree.edge("c", "d").cutvalue).to.equal(2);
+      expect(gansnerTree.edge("d", "h").cutvalue).to.equal(2);
+      expect(gansnerTree.edge("a", "e").cutvalue).to.equal(1);
+      expect(gansnerTree.edge("e", "g").cutvalue).to.equal(1);
+      expect(gansnerTree.edge("f", "g").cutvalue).to.equal(0);
     });
   });
 });

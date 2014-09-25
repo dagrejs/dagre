@@ -131,7 +131,7 @@ function render(g) {
 
 function preLayout(g, svg) {
   _.each(g.edges(), function(e) {
-    var edge = g.getEdge(e);
+    var edge = g.edge(e);
     if (edge.label) {
       var group = appendLabel(svg, edge.label, edge, 0, 0);
       group.attr("id", "edge-" + edgeObjToId(e)).classed("edge", true);
@@ -139,10 +139,10 @@ function preLayout(g, svg) {
   });
 
   _.each(g.nodes(), function(v) {
-    if (g.getChildren(v).length) {
+    if (g.children(v).length) {
       return;
     }
-    var node = g.getNode(v),
+    var node = g.node(v),
         group = appendLabel(svg, node.label || v, node, 10, 10);
     group.attr("id", "node-" + v).classed("node", true);
   });
@@ -193,19 +193,19 @@ function postLayout(g, root, svg) {
   _.each(g.edges(), function(e) {
     var group = svg.select("g#edge-" + edgeObjToId(e));
     if (!group.empty()) {
-      var edge = g.getEdge(e);
+      var edge = g.edge(e);
       group.attr("transform", "translate(" + edge.x + "," + edge.y + ")");
     }
   });
 
   _.each(g.nodes(), function(v) {
     var group = svg.select("g#node-" + v),
-        node = g.getNode(v);
+        node = g.node(v);
     group.attr("transform", "translate(" + node.x + "," + node.y + ")");
   });
 
   _.each(g.edges(), function(e) {
-    var points = g.getEdge(e).points,
+    var points = g.edge(e).points,
         path = svg.insert("path", ":first-child")
                 .classed("edge", true)
                 .attr("marker-end", "url(#arrowhead)"),
@@ -216,11 +216,11 @@ function postLayout(g, root, svg) {
   });
 
   function dfsChildren(v) {
-    var children = g.getChildren(v);
+    var children = g.children(v);
     if (children.length) {
       _.each(children, dfsChildren);
 
-      var node = g.getNode(v);
+      var node = g.node(v);
       svg.insert("g", ":first-child")
          .classed("subgraph", true)
          .attr("transform", "translate(" + (node.x - node.width / 2) + "," +
@@ -230,7 +230,7 @@ function postLayout(g, root, svg) {
            .attr("height", node.height);
     }
   };
-  _.each(g.getChildren(), dfsChildren);
+  _.each(g.children(), dfsChildren);
 }
 
 function edgeObjToId(e) {

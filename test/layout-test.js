@@ -18,12 +18,12 @@ describe("layout", function() {
     expect(extractCoordinates(g)).to.eql({
       a: { x: 50 / 2, y: 100 / 2 }
     });
-    expect(g.getNode("a").x).to.equal(50 / 2);
-    expect(g.getNode("a").y).to.equal(100 / 2);
+    expect(g.node("a").x).to.equal(50 / 2);
+    expect(g.node("a").y).to.equal(100 / 2);
   });
 
   it("can layout two nodes on the same rank", function() {
-    g.getGraph().nodesep = 200;
+    g.graph().nodesep = 200;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
     layout(g);
@@ -34,7 +34,7 @@ describe("layout", function() {
   });
 
   it("can layout two nodes connected by an edge", function() {
-    g.getGraph().ranksep = 300;
+    g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
     g.setEdge("a", "b");
@@ -46,7 +46,7 @@ describe("layout", function() {
   });
 
   it("can layout an edge with a label", function() {
-    g.getGraph().ranksep = 300;
+    g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
     g.setEdge("a", "b", { width: 60, height: 70 });
@@ -55,24 +55,24 @@ describe("layout", function() {
       a: { x: 75 / 2, y: 100 / 2 },
       b: { x: 75 / 2, y: 100 + 150 + 70 + 150 + 200 / 2 }
     });
-    expect(_.pick(g.getEdge("a", "b"), ["x", "y"]))
+    expect(_.pick(g.edge("a", "b"), ["x", "y"]))
       .eqls({ x: 75 / 2, y: 100  + 150 + 70 / 2 });
   });
 
   it("can layout a long edge with a label", function() {
-    g.getGraph().ranksep = 300;
+    g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
     g.setEdge("a", "b", { width: 60, height: 70, minlen: 2 });
     layout(g);
-    expect(g.getEdge("a", "b").x).to.equal(75 / 2);
-    expect(g.getEdge("a", "b").y)
-      .to.be.gt(g.getNode("a").y)
-      .to.be.lt(g.getNode("b").y);
+    expect(g.edge("a", "b").x).to.equal(75 / 2);
+    expect(g.edge("a", "b").y)
+      .to.be.gt(g.node("a").y)
+      .to.be.lt(g.node("b").y);
   });
 
   it("can layout out a short cycle", function() {
-    g.getGraph().ranksep = 200;
+    g.graph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });
     g.setNode("b", { width: 100, height: 100 });
     g.setEdge("a", "b", { weight: 2 });
@@ -83,17 +83,17 @@ describe("layout", function() {
       b: { x: 100 / 2, y: 100 + 200 + 100 / 2}
     });
     // One arrow should point down, one up
-    expect(g.getEdge("a", "b").points[1].y).gt(g.getEdge("a", "b").points[0].y);
-    expect(g.getEdge("b", "a").points[0].y).gt(g.getEdge("b", "a").points[1].y);
+    expect(g.edge("a", "b").points[1].y).gt(g.edge("a", "b").points[0].y);
+    expect(g.edge("b", "a").points[0].y).gt(g.edge("b", "a").points[1].y);
   });
 
   it("adds rectangle intersects for edges", function() {
-    g.getGraph().ranksep = 200;
+    g.graph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });
     g.setNode("b", { width: 100, height: 100 });
     g.setEdge("a", "b");
     layout(g);
-    var points = g.getEdge("a", "b").points;
+    var points = g.edge("a", "b").points;
     expect(points).to.have.length(3);
     expect(points).eqls([
       { x: 100 / 2, y: 100 },           // intersect with bottom of a
@@ -103,12 +103,12 @@ describe("layout", function() {
   });
 
   it("adds rectangle intersects for edges spanning multiple ranks", function() {
-    g.getGraph().ranksep = 200;
+    g.graph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });
     g.setNode("b", { width: 100, height: 100 });
     g.setEdge("a", "b", { minlen: 2 });
     layout(g);
-    var points = g.getEdge("a", "b").points;
+    var points = g.edge("a", "b").points;
     expect(points).to.have.length(5);
     expect(points).eqls([
       { x: 100 / 2, y: 100 },           // intersect with bottom of a
@@ -120,12 +120,12 @@ describe("layout", function() {
   });
 
   it("can layout a self loop", function() {
-    g.getGraph().edgesep = 75;
+    g.graph().edgesep = 75;
     g.setNode("a", { width: 100, height: 100 });
     g.setEdge("a", "a", { width: 50, height: 50 });
     layout(g);
-    var nodeA = g.getNode("a"),
-        points = g.getEdge("a", "a").points;
+    var nodeA = g.node("a"),
+        points = g.edge("a", "a").points;
     expect(points).to.have.length(7);
     _.each(points, function(point) {
       expect(point.x).gt(nodeA.x);
@@ -155,7 +155,7 @@ describe("layout", function() {
     // force nodes x and y to be on different ranks, which we want our ranker
     // to avoid.
     layout(g);
-    expect(g.getNode("x").y).to.equal(g.getNode("y").y);
+    expect(g.node("x").y).to.equal(g.node("y").y);
   });
 
   it("can layout subgraphs with different rankdirs", function() {
@@ -164,14 +164,14 @@ describe("layout", function() {
     g.setParent("a", "sg");
 
     function check(rankdir) {
-      expect(g.getNode("sg").width, "width " + rankdir).gt(50);
-      expect(g.getNode("sg").height, "height " + rankdir).gt(50);
-      expect(g.getNode("sg").x, "x " + rankdir).gt(50 / 2);
-      expect(g.getNode("sg").y, "y " + rankdir).gt(50 / 2);
+      expect(g.node("sg").width, "width " + rankdir).gt(50);
+      expect(g.node("sg").height, "height " + rankdir).gt(50);
+      expect(g.node("sg").x, "x " + rankdir).gt(50 / 2);
+      expect(g.node("sg").y, "y " + rankdir).gt(50 / 2);
     }
 
     _.each(["tb", "bt", "lr", "rl"], function(rankdir) {
-      g.getGraph().rankdir = rankdir;
+      g.graph().rankdir = rankdir;
       layout(g);
       check(rankdir);
     });
@@ -181,6 +181,6 @@ describe("layout", function() {
 function extractCoordinates(g) {
   var nodes = g.nodes();
   return _.zipObject(nodes, _.map(nodes, function(v) {
-    return _.pick(g.getNode(v), ["x", "y"]);
+    return _.pick(g.node(v), ["x", "y"]);
   }));
 }

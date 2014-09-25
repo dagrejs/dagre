@@ -104,6 +104,6 @@ function checkFAS(g, fas) {
 
 function weightFn(g) {
   return function(e) {
-    return g.getEdge(e);
+    return g.edge(e);
   };
 }

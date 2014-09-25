@@ -57,7 +57,7 @@ describe("position/bk", function() {
 
     _.each(["a", "b", "c", "d"], function(v) {
       it("does not mark type-0 conflicts (" + v + " is dummy)", function() {
-        g.getNode(v).dummy = true;
+        g.node(v).dummy = true;
 
         var conflicts = findType1Conflicts(g, layering);
         expect(hasConflict(conflicts, "a", "d")).to.be.false;
@@ -69,7 +69,7 @@ describe("position/bk", function() {
       it("does mark type-1 conflicts (" + v + " is non-dummy)", function() {
         _.each(["a", "b", "c", "d"], function(w) {
           if (v !== w) {
-            g.getNode(w).dummy = true;
+            g.node(w).dummy = true;
           }
         });
 
@@ -86,7 +86,7 @@ describe("position/bk", function() {
 
     it("does not mark type-2 conflicts (all dummies)", function() {
       _.each(["a", "b", "c", "d"], function(v) {
-        g.getNode(v).dummy = true;
+        g.node(v).dummy = true;
       });
 
       var conflicts = findType1Conflicts(g, layering);
@@ -115,11 +115,11 @@ describe("position/bk", function() {
 
     it("marks type-2 conflicts favoring border segments #1", function() {
       _.each(["a", "d"], function(v) {
-        g.getNode(v).dummy = true;
+        g.node(v).dummy = true;
       });
 
       _.each(["b", "c"], function(v) {
-        g.getNode(v).dummy = "border";
+        g.node(v).dummy = "border";
       });
 
       var conflicts = findType2Conflicts(g, layering);
@@ -130,11 +130,11 @@ describe("position/bk", function() {
 
     it("marks type-2 conflicts favoring border segments #2", function() {
       _.each(["b", "c"], function(v) {
-        g.getNode(v).dummy = true;
+        g.node(v).dummy = true;
       });
 
       _.each(["a", "d"], function(v) {
-        g.getNode(v).dummy = "border";
+        g.node(v).dummy = "border";
       });
 
       var conflicts = findType2Conflicts(g, layering);
@@ -322,7 +322,7 @@ describe("position/bk", function() {
     it("separates adjacent nodes by specified node separation", function() {
       var root =  { a: "a", b: "b" },
           align = { a: "a", b: "b" };
-      g.getGraph().nodesep = 100;
+      g.graph().nodesep = 100;
       g.setNode("a", { rank: 0, order: 0, width: 100 });
       g.setNode("b", { rank: 0, order: 1, width: 200 });
 
@@ -334,7 +334,7 @@ describe("position/bk", function() {
     it("separates adjacent edges by specified node separation", function() {
       var root =  { a: "a", b: "b" },
           align = { a: "a", b: "b" };
-      g.getGraph().edgesep = 20;
+      g.graph().edgesep = 20;
       g.setNode("a", { rank: 0, order: 0, width: 100, dummy: true });
       g.setNode("b", { rank: 0, order: 1, width: 200, dummy: true });
 
@@ -357,7 +357,7 @@ describe("position/bk", function() {
     it("separates blocks with the appropriate separation", function() {
       var root =  { a: "a", b: "a", c: "c" },
           align = { a: "b", b: "a", c: "c" };
-      g.getGraph().nodesep = 75;
+      g.graph().nodesep = 75;
       g.setNode("a", { rank: 0, order: 0, width: 100 });
       g.setNode("b", { rank: 1, order: 1, width: 200 });
       g.setNode("c", { rank: 1, order: 0, width:  50 });
@@ -371,7 +371,7 @@ describe("position/bk", function() {
     it("separates classes with the appropriate separation", function() {
       var root =  { a: "a", b: "b", c: "c", d: "b" },
           align = { a: "a", b: "d", c: "c", d: "b" };
-      g.getGraph().nodesep = 75;
+      g.graph().nodesep = 75;
       g.setNode("a", { rank: 0, order: 0, width: 100 });
       g.setNode("b", { rank: 0, order: 1, width: 200 });
       g.setNode("c", { rank: 1, order: 0, width:  50 });
@@ -387,7 +387,7 @@ describe("position/bk", function() {
     it("shifts classes by max sep from the adjacent block #1", function() {
       var root =  { a: "a", b: "b", c: "a", d: "b" },
           align = { a: "c", b: "d", c: "a", d: "b" };
-      g.getGraph().nodesep = 75;
+      g.graph().nodesep = 75;
       g.setNode("a", { rank: 0, order: 0, width:  50 });
       g.setNode("b", { rank: 0, order: 1, width: 150 });
       g.setNode("c", { rank: 1, order: 0, width:  60 });
@@ -403,7 +403,7 @@ describe("position/bk", function() {
     it("shifts classes by max sep from the adjacent block #2", function() {
       var root =  { a: "a", b: "b", c: "a", d: "b" },
           align = { a: "c", b: "d", c: "a", d: "b" };
-      g.getGraph().nodesep = 75;
+      g.graph().nodesep = 75;
       g.setNode("a", { rank: 0, order: 0, width:  50 });
       g.setNode("b", { rank: 0, order: 1, width:  70 });
       g.setNode("c", { rank: 1, order: 0, width:  60 });
@@ -539,7 +539,7 @@ describe("position/bk", function() {
     });
 
     it("centers a node if it is a predecessor of two same sized nodes", function() {
-      g.getGraph().nodesep = 10;
+      g.graph().nodesep = 10;
       g.setNode("a", { rank: 0, order: 0, width:  20 });
       g.setNode("b", { rank: 1, order: 0, width:  50 });
       g.setNode("c", { rank: 1, order: 1, width:  50 });
@@ -552,7 +552,7 @@ describe("position/bk", function() {
     });
 
     it("shifts blocks on both sides of aligned block", function() {
-      g.getGraph().nodesep = 10;
+      g.graph().nodesep = 10;
       g.setNode("a", { rank: 0, order: 0, width:  50 });
       g.setNode("b", { rank: 0, order: 1, width:  60 });
       g.setNode("c", { rank: 1, order: 0, width:  70 });
@@ -571,7 +571,7 @@ describe("position/bk", function() {
     });
 
     it("aligns inner segments", function() {
-      g.getGraph().nodesep = 10;
+      g.graph().nodesep = 10;
       g.setNode("a", { rank: 0, order: 0, width:  50, dummy: true });
       g.setNode("b", { rank: 0, order: 1, width:  60 });
       g.setNode("c", { rank: 1, order: 0, width:  70 });

@@ -14,7 +14,7 @@ describe("util", function() {
     it("copies without change a graph with no multi-edges", function() {
       g.setEdge("a", "b", { weight: 1, minlen: 1 });
       var g2 = util.simplify(g);
-      expect(g2.getEdge("a", "b")).eql({ weight: 1, minlen: 1 });
+      expect(g2.edge("a", "b")).eql({ weight: 1, minlen: 1 });
       expect(g2.edgeCount()).equals(1);
     });
 
@@ -23,14 +23,14 @@ describe("util", function() {
       g.setEdge("a", "b", { weight: 2, minlen: 2 }, "multi");
       var g2 = util.simplify(g);
       expect(g2.isMultigraph()).to.be.false;
-      expect(g2.getEdge("a", "b")).eql({ weight: 3, minlen: 2 });
+      expect(g2.edge("a", "b")).eql({ weight: 3, minlen: 2 });
       expect(g2.edgeCount()).equals(1);
     });
 
     it("copies the graph object", function() {
       g.setGraph({ foo: "bar" });
       var g2 = util.simplify(g);
-      expect(g2.getGraph()).eqls({ foo: "bar" });
+      expect(g2.graph()).eqls({ foo: "bar" });
     });
   });
 
@@ -45,7 +45,7 @@ describe("util", function() {
       g.setNode("a", { foo: "bar" });
       g.setNode("b");
       var g2 = util.asNonCompoundGraph(g);
-      expect(g2.getNode("a")).to.eql({ foo: "bar" });
+      expect(g2.node("a")).to.eql({ foo: "bar" });
       expect(g2.hasNode("b")).to.be.true;
     });
 
@@ -53,21 +53,21 @@ describe("util", function() {
       g.setEdge("a", "b", { foo: "bar" });
       g.setEdge("a", "b", { foo: "baz" }, "multi");
       var g2 = util.asNonCompoundGraph(g);
-      expect(g2.getEdge("a", "b")).eqls({ foo: "bar" });
-      expect(g2.getEdge("a", "b", "multi")).eqls({ foo: "baz" });
+      expect(g2.edge("a", "b")).eqls({ foo: "bar" });
+      expect(g2.edge("a", "b", "multi")).eqls({ foo: "baz" });
     });
 
     it("does not copy compound nodes", function() {
       g.setParent("a", "sg1");
       var g2 = util.asNonCompoundGraph(g);
-      expect(g2.getParent(g)).to.be.undefined;
+      expect(g2.parent(g)).to.be.undefined;
       expect(g2.isCompound()).to.be.false;
     });
 
     it ("copies the graph object", function() {
       g.setGraph({ foo: "bar" });
       var g2 = util.asNonCompoundGraph(g);
-      expect(g2.getGraph()).eqls({ foo: "bar" });
+      expect(g2.graph()).eqls({ foo: "bar" });
     });
   });
 
@@ -192,9 +192,9 @@ describe("util", function() {
 
       util.normalizeRanks(g);
 
-      expect(g.getNode("a").rank).to.equal(1);
-      expect(g.getNode("b").rank).to.equal(0);
-      expect(g.getNode("c").rank).to.equal(2);
+      expect(g.node("a").rank).to.equal(1);
+      expect(g.node("b").rank).to.equal(0);
+      expect(g.node("c").rank).to.equal(2);
     });
 
     it("works for negative ranks", function() {
@@ -204,8 +204,8 @@ describe("util", function() {
 
       util.normalizeRanks(g);
 
-      expect(g.getNode("a").rank).to.equal(0);
-      expect(g.getNode("b").rank).to.equal(1);
+      expect(g.node("a").rank).to.equal(0);
+      expect(g.node("b").rank).to.equal(1);
     });
 
     it("does not assign a rank to subgraphs", function() {
@@ -216,8 +216,8 @@ describe("util", function() {
 
       util.normalizeRanks(g);
 
-      expect(g.getNode("sg")).to.not.have.property("rank");
-      expect(g.getNode("a").rank).to.equal(0);
+      expect(g.node("sg")).to.not.have.property("rank");
+      expect(g.node("a").rank).to.equal(0);
     });
   });
 
@@ -228,8 +228,8 @@ describe("util", function() {
         .setNode("a", { rank: 0 })
         .setNode("b", { rank: 4 });
       util.removeEmptyRanks(g);
-      expect(g.getNode("a").rank).equals(0);
-      expect(g.getNode("b").rank).equals(1);
+      expect(g.node("a").rank).equals(0);
+      expect(g.node("b").rank).equals(1);
     });
 
     it("Does not remove non-border ranks", function() {
@@ -238,8 +238,8 @@ describe("util", function() {
         .setNode("a", { rank: 0 })
         .setNode("b", { rank: 8 });
       util.removeEmptyRanks(g);
-      expect(g.getNode("a").rank).equals(0);
-      expect(g.getNode("b").rank).equals(2);
+      expect(g.node("a").rank).equals(0);
+      expect(g.node("b").rank).equals(2);
     });
   });
 });

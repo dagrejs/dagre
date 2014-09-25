@@ -27,18 +27,18 @@ describe("rank/nestingGraph", function() {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
 
-      var borderTop = g.getNode("sg1").borderTop,
-          borderBottom = g.getNode("sg1").borderBottom;
+      var borderTop = g.node("sg1").borderTop,
+          borderBottom = g.node("sg1").borderBottom;
       expect(borderTop).to.exist;
       expect(borderBottom).to.exist;
-      expect(g.getParent(borderTop)).to.equal("sg1");
-      expect(g.getParent(borderBottom)).to.equal("sg1");
+      expect(g.parent(borderTop)).to.equal("sg1");
+      expect(g.parent(borderBottom)).to.equal("sg1");
       expect(g.outEdges(borderTop, "a")).to.have.length(1);
-      expect(g.getEdge(g.outEdges(borderTop, "a")[0]).minlen).equals(1);
+      expect(g.edge(g.outEdges(borderTop, "a")[0]).minlen).equals(1);
       expect(g.outEdges("a", borderBottom)).to.have.length(1);
-      expect(g.getEdge(g.outEdges("a", borderBottom)[0]).minlen).equals(1);
-      expect(g.getNode(borderTop)).eqls({ width: 0, height: 0, dummy: "border" });
-      expect(g.getNode(borderBottom)).eqls({ width: 0, height: 0, dummy: "border" });
+      expect(g.edge(g.outEdges("a", borderBottom)[0]).minlen).equals(1);
+      expect(g.node(borderTop)).eqls({ width: 0, height: 0, dummy: "border" });
+      expect(g.node(borderBottom)).eqls({ width: 0, height: 0, dummy: "border" });
     });
 
     it("adds edges between borders of nested subgraphs", function() {
@@ -46,18 +46,18 @@ describe("rank/nestingGraph", function() {
       g.setParent("a", "sg2");
       nestingGraph.run(g);
 
-      var sg1Top = g.getNode("sg1").borderTop,
-          sg1Bottom = g.getNode("sg1").borderBottom,
-          sg2Top = g.getNode("sg2").borderTop,
-          sg2Bottom = g.getNode("sg2").borderBottom;
+      var sg1Top = g.node("sg1").borderTop,
+          sg1Bottom = g.node("sg1").borderBottom,
+          sg2Top = g.node("sg2").borderTop,
+          sg2Bottom = g.node("sg2").borderBottom;
       expect(sg1Top).to.exist;
       expect(sg1Bottom).to.exist;
       expect(sg2Top).to.exist;
       expect(sg2Bottom).to.exist;
       expect(g.outEdges(sg1Top, sg2Top)).to.have.length(1);
-      expect(g.getEdge(g.outEdges(sg1Top, sg2Top)[0]).minlen).equals(1);
+      expect(g.edge(g.outEdges(sg1Top, sg2Top)[0]).minlen).equals(1);
       expect(g.outEdges(sg2Bottom, sg1Bottom)).to.have.length(1);
-      expect(g.getEdge(g.outEdges(sg2Bottom, sg1Bottom)[0]).minlen).equals(1);
+      expect(g.edge(g.outEdges(sg2Bottom, sg1Bottom)[0]).minlen).equals(1);
     });
 
     it("adds sufficient weight to border to node edges", function() {
@@ -69,18 +69,18 @@ describe("rank/nestingGraph", function() {
       g.setEdge("x", "b", { weight: 200 });
       nestingGraph.run(g);
 
-      var top = g.getNode("sg").borderTop,
-          bot = g.getNode("sg").borderBottom;
-      expect(g.getEdge(top, "x").weight).to.be.gt(300);
-      expect(g.getEdge("x", bot).weight).to.be.gt(300);
+      var top = g.node("sg").borderTop,
+          bot = g.node("sg").borderBottom;
+      expect(g.edge(top, "x").weight).to.be.gt(300);
+      expect(g.edge("x", bot).weight).to.be.gt(300);
     });
 
     it("adds an edge from the root to the tops of top-level subgraphs", function() {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
 
-      var root = g.getGraph().nestingRoot,
-          borderTop = g.getNode("sg1").borderTop;
+      var root = g.graph().nestingRoot,
+          borderTop = g.node("sg1").borderTop;
       expect(root).to.exist;
       expect(borderTop).to.exist;
       expect(g.outEdges(root, borderTop)).to.have.length(1);
@@ -91,20 +91,20 @@ describe("rank/nestingGraph", function() {
       g.setNode("a");
       nestingGraph.run(g);
 
-      var root = g.getGraph().nestingRoot;
+      var root = g.graph().nestingRoot;
       expect(root).to.exist;
       expect(g.outEdges(root, "a")).to.have.length(1);
-      expect(g.getEdge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 1 });
+      expect(g.edge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 1 });
     });
 
     it("adds an edge from root to each node with the correct minlen #2", function() {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
 
-      var root = g.getGraph().nestingRoot;
+      var root = g.graph().nestingRoot;
       expect(root).to.exist;
       expect(g.outEdges(root, "a")).to.have.length(1);
-      expect(g.getEdge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 3 });
+      expect(g.edge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 3 });
     });
 
     it("adds an edge from root to each node with the correct minlen #3", function() {
@@ -112,31 +112,31 @@ describe("rank/nestingGraph", function() {
       g.setParent("a", "sg2");
       nestingGraph.run(g);
 
-      var root = g.getGraph().nestingRoot;
+      var root = g.graph().nestingRoot;
       expect(root).to.exist;
       expect(g.outEdges(root, "a")).to.have.length(1);
-      expect(g.getEdge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 5 });
+      expect(g.edge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 5 });
     });
 
     it("does not add an edge from the root to itself", function() {
       g.setNode("a");
       nestingGraph.run(g);
 
-      var root = g.getGraph().nestingRoot;
+      var root = g.graph().nestingRoot;
       expect(g.outEdges(root, root)).eqls([]);
     });
 
     it("expands inter-node edges to separate SG border and nodes #1", function() {
       g.setEdge("a", "b", { minlen: 1 });
       nestingGraph.run(g);
-      expect(g.getEdge("a", "b").minlen).equals(1);
+      expect(g.edge("a", "b").minlen).equals(1);
     });
 
     it("expands inter-node edges to separate SG border and nodes #2", function() {
       g.setParent("a", "sg1");
       g.setEdge("a", "b", { minlen: 1 });
       nestingGraph.run(g);
-      expect(g.getEdge("a", "b").minlen).equals(3);
+      expect(g.edge("a", "b").minlen).equals(3);
     });
 
     it("expands inter-node edges to separate SG border and nodes #3", function() {
@@ -144,7 +144,7 @@ describe("rank/nestingGraph", function() {
       g.setParent("a", "sg2");
       g.setEdge("a", "b", { minlen: 1 });
       nestingGraph.run(g);
-      expect(g.getEdge("a", "b").minlen).equals(5);
+      expect(g.edge("a", "b").minlen).equals(5);
     });
 
     it("sets minlen correctly for nested SG boder to children", function() {
@@ -164,19 +164,19 @@ describe("rank/nestingGraph", function() {
       // 6: close sg2
       // 7: close sg1
 
-      var root = g.getGraph().nestingRoot,
-          sg1Top = g.getNode("sg1").borderTop,
-          sg1Bot = g.getNode("sg1").borderBottom,
-          sg2Top = g.getNode("sg2").borderTop,
-          sg2Bot = g.getNode("sg2").borderBottom;
+      var root = g.graph().nestingRoot,
+          sg1Top = g.node("sg1").borderTop,
+          sg1Bot = g.node("sg1").borderBottom,
+          sg2Top = g.node("sg2").borderTop,
+          sg2Bot = g.node("sg2").borderBottom;
 
-      expect(g.getEdge(root, sg1Top).minlen).equals(3);
-      expect(g.getEdge(sg1Top, sg2Top).minlen).equals(1);
-      expect(g.getEdge(sg1Top, "a").minlen).equals(2);
-      expect(g.getEdge("a", sg1Bot).minlen).equals(2);
-      expect(g.getEdge(sg2Top, "b").minlen).equals(1);
-      expect(g.getEdge("b", sg2Bot).minlen).equals(1);
-      expect(g.getEdge(sg2Bot, sg1Bot).minlen).equals(1);
+      expect(g.edge(root, sg1Top).minlen).equals(3);
+      expect(g.edge(sg1Top, sg2Top).minlen).equals(1);
+      expect(g.edge(sg1Top, "a").minlen).equals(2);
+      expect(g.edge("a", sg1Bot).minlen).equals(2);
+      expect(g.edge(sg2Top, "b").minlen).equals(1);
+      expect(g.edge("b", sg2Bot).minlen).equals(1);
+      expect(g.edge(sg2Bot, sg1Bot).minlen).equals(1);
     });
   });
 

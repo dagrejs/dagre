@@ -56,7 +56,7 @@ describe("acyclic", function() {
       g.setEdge("a", "b", { minlen: 2, weight: 3 });
       acyclic.run(g);
       acyclic.undo(g);
-      expect(g.getEdge("a", "b")).to.eql({ minlen: 2, weight: 3 });
+      expect(g.edge("a", "b")).to.eql({ minlen: 2, weight: 3 });
       expect(g.edges()).to.have.length(1);
     });
 
@@ -65,8 +65,8 @@ describe("acyclic", function() {
       g.setEdge("b", "a", { minlen: 3, weight: 4 });
       acyclic.run(g);
       acyclic.undo(g);
-      expect(g.getEdge("a", "b")).to.eql({ minlen: 2, weight: 3 });
-      expect(g.getEdge("b", "a")).to.eql({ minlen: 3, weight: 4 });
+      expect(g.edge("a", "b")).to.eql({ minlen: 2, weight: 3 });
+      expect(g.edge("b", "a")).to.eql({ minlen: 3, weight: 4 });
       expect(g.edges()).to.have.length(2);
     });
   });
