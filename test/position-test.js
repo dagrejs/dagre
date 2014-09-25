@@ -7,7 +7,11 @@ describe("position", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph({ compound: true }).setGraph({});
+    g = new Graph({ compound: true }).setGraph({
+      ranksep: 50,
+      nodesep: 50,
+      edgesep: 10
+    });
   });
 
   it("aligns a single node to the upper left corner when there are no margins", function() {
