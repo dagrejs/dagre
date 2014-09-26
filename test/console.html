@@ -144,7 +144,7 @@ function preLayout(g, svg) {
     }
     var node = g.node(v),
         group = appendLabel(svg, node.label || v, node, 10, 10);
-    group.attr("id", "node-" + v).classed("node", true);
+    group.attr("id", "node-" + id(v)).classed("node", true);
   });
 }
 
@@ -199,7 +199,7 @@ function postLayout(g, root, svg) {
   });
 
   _.each(g.nodes(), function(v) {
-    var group = svg.select("g#node-" + v),
+    var group = svg.select("g#node-" + id(v)),
         node = g.node(v);
     group.attr("transform", "translate(" + node.x + "," + node.y + ")");
   });
@@ -235,6 +235,10 @@ function postLayout(g, root, svg) {
 
 function edgeObjToId(e) {
   // Not particularly safe, but good enough for our needs.
-  return e.v + "-" + e.w + "-" + e.name;
+  return id(e.v) + "-" + id(e.w) + "-" + id(e.name);
+}
+
+function id(str) {
+  return str ? str.replace(/[^a-zA-z0-9-]/g, "_") : "";
 }
 </script>
