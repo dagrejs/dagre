@@ -9,7 +9,7 @@
     "layout"
   ],
   "dependencies": {
-    "graphlib": "git://github.com/cpettitt/graphlib.git#0.8.0-dev",
+    "graphlib": "0.8.0",
     "lodash": "^2.4.1"
   },
   "devDependencies": {
