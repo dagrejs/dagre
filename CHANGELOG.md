@@ -1,3 +1,12 @@
+v0.5.0
+======
+
+Massive rewrite for a faster layout with experimental support for clustering.
+Please see the dagre wiki for details about how to use the new version. In
+addition this change pulls in a new version of graphlib that also has
+significant changes to the API. Please see the graphlib wiki at:
+https://github.com/cpettitt/graphlib/wiki.
+
 v0.4.6
 ======
 
