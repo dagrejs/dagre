@@ -7,6 +7,10 @@ addition this change pulls in a new version of graphlib that also has
 significant changes to the API. Please see the graphlib wiki at:
 https://github.com/cpettitt/graphlib/wiki.
 
+Note: this version has dropped support for rank constraints. They may be added
+back at some point, but my priority is improving speed and working out any
+issues with clustering for the moment.
+
 v0.4.6
 ======
 
