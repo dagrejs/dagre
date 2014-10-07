@@ -176,6 +176,13 @@ describe("layout", function() {
       check(rankdir);
     });
   });
+
+  it("adds dimensions to the graph", function() {
+    g.setNode("a", { width: 100, height: 50 });
+    layout(g);
+    expect(g.graph().width).equals(100);
+    expect(g.graph().height).equals(50);
+  });
 });
 
 function extractCoordinates(g) {
