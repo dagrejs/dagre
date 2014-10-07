@@ -1,3 +1,11 @@
+v0.5.1
+======
+
+Bug fixes and minor improvements:
+
+1. Add version property to the library
+2. Set graph dimensions on the input graph
+
 v0.5.0
 ======
 
