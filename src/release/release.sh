@@ -11,6 +11,7 @@ bail() {
 PROJECT=$1
 PROJECT_ROOT=`pwd`
 BOWER_DIR=/tmp/$PROJECT-bower
+PAGES_DIR=/tmp/$PROJECT-pages
 DIST_DIR=$2
 
 # Check version. Is this a release? If not abort
@@ -27,11 +28,32 @@ echo Attemping to publish version: $VERSION
 [ "`git rev-parse HEAD`" = "`git rev-parse master`" ] || [ -n "$PRE_RELEASE" ] || bail "ERROR: You must release from the master branch"
 [ -z "`git status --porcelain`" ] || bail "ERROR: Dirty index on working tree. Use git status to check"
 
-# Pull remote repos
-rm -rf $BOWER_DIR
-git clone git@github.com:cpettitt/$PROJECT-bower.git $BOWER_DIR
+# Publish to pages
+rm -rf $PAGES_DIR
+git clone git@github.com:cpettitt/cpettitt.github.com.git $PAGES_DIR
+
+TMP_TARGET=$PAGES_DIR/project/$PROJECT/latest
+rm -rf $TMP_TARGET
+mkdir -p $TMP_TARGET
+cp -r $DIST_DIR/*.js $TMP_TARGET
+
+TMP_TARGET=$PAGES_DIR/project/$PROJECT/v$VERSION
+rm -rf $TMP_TARGET
+mkdir -p $TMP_TARGET
+cp -r $DIST_DIR/*.js $TMP_TARGET
+
+cd $PAGES_DIR/project/$PROJECT
+git add -A
+git commit -m "Publishing $PROJECT v$VERSION"
+git push -f origin master
+git tag v$VERSION
+git push origin v$VERSION
+cd $PROJECT_ROOT
+echo "Published $PROJECT to pages"
 
 # Publish bower
+rm -rf $BOWER_DIR
+git clone git@github.com:cpettitt/$PROJECT-bower.git $BOWER_DIR
 rm -f $BOWER_DIR/bower.json
 rm -rf $BOWER_DIR/js
 
