@@ -1,4 +1,4 @@
-// Renders the version.js template and prints it to stdout
+#!/usr/bin/env node
 
-var version = require('../../package.json').version;
-console.log('module.exports = \'' + version + '\';');
+var package = require("../../package.json");
+console.log("module.exports = \"" + package.version + "\";");
