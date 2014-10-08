@@ -5,6 +5,7 @@ Bug fixes and minor improvements:
 
 1. Add version property to the library
 2. Set graph dimensions on the input graph
+3. Export graphlib as a property of the dagre global
 
 v0.5.0
 ======
