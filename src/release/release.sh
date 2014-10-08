@@ -46,8 +46,6 @@ cd $PAGES_DIR/project/$PROJECT
 git add -A
 git commit -m "Publishing $PROJECT v$VERSION"
 git push -f origin master
-git tag v$VERSION
-git push origin v$VERSION
 cd $PROJECT_ROOT
 echo "Published $PROJECT to pages"
 
