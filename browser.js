@@ -21,4 +21,4 @@
  * THE SOFTWARE.
  */
 global.dagre = require("./index");
-global.graphlib = require("graphlib");
+global.dagre.graphlib = require("graphlib");
