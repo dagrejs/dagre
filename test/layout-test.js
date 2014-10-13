@@ -183,6 +183,17 @@ describe("layout", function() {
     expect(g.graph().width).equals(100);
     expect(g.graph().height).equals(50);
   });
+
+  it("treats attributes with case-insensitivity", function() {
+    g.graph().nodeSep = 200; // note the capital S
+    g.setNode("a", { width: 50, height: 100 });
+    g.setNode("b", { width: 75, height: 200 });
+    layout(g);
+    expect(extractCoordinates(g)).to.eql({
+      a: { x: 50 / 2,            y: 200 / 2 },
+      b: { x: 50 + 200 + 75 / 2, y: 200 / 2 }
+    });
+  });
 });
 
 function extractCoordinates(g) {
