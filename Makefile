@@ -27,7 +27,7 @@ DIRS = $(BUILD_DIR)
 # Targets
 .PHONY: all bench clean dist test
 
-all: test
+all: dist
 
 bench: test
 	@src/bench.js
