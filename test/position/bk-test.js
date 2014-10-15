@@ -415,6 +415,57 @@ describe("position/bk", function() {
       expect(xs.c).to.equal(0);
       expect(xs.d).to.equal(60 / 2 + 75 + 150 / 2);
     });
+
+    it("handles labelpos = l", function() {
+      var root =  { a: "a", b: "b", c: "c" },
+          align = { a: "a", b: "b", c: "c" };
+      g.graph().edgesep = 50;
+      g.setNode("a", { rank: 0, order: 0, width:  100, dummy: "edge" });
+      g.setNode("b", {
+        rank: 0, order: 1, width: 200,
+        dummy: "edge-label", labelpos: "l"
+      });
+      g.setNode("c", { rank: 0, order: 2, width:  300, dummy: "edge" });
+
+      var xs = horizontalCompaction(g, buildLayerMatrix(g), root, align);
+      expect(xs.a).to.equal(0);
+      expect(xs.b).to.equal(xs.a + 100 / 2 + 50 + 200);
+      expect(xs.c).to.equal(xs.b + 0 + 50 + 300 / 2);
+    });
+
+    it("handles labelpos = c", function() {
+      var root =  { a: "a", b: "b", c: "c" },
+          align = { a: "a", b: "b", c: "c" };
+      g.graph().edgesep = 50;
+      g.setNode("a", { rank: 0, order: 0, width:  100, dummy: "edge" });
+      g.setNode("b", {
+        rank: 0, order: 1, width: 200,
+        dummy: "edge-label", labelpos: "c"
+      });
+      g.setNode("c", { rank: 0, order: 2, width:  300, dummy: "edge" });
+
+      var xs = horizontalCompaction(g, buildLayerMatrix(g), root, align);
+      expect(xs.a).to.equal(0);
+      expect(xs.b).to.equal(xs.a + 100 / 2 + 50 + 200 / 2);
+      expect(xs.c).to.equal(xs.b + 200 / 2 + 50 + 300 / 2);
+    });
+
+    it("handles labelpos = r", function() {
+      var root =  { a: "a", b: "b", c: "c" },
+          align = { a: "a", b: "b", c: "c" };
+      g.graph().edgesep = 50;
+      g.setNode("a", { rank: 0, order: 0, width:  100, dummy: "edge" });
+      g.setNode("b", {
+        rank: 0, order: 1, width: 200,
+        dummy: "edge-label", labelpos: "r"
+      });
+      g.setNode("c", { rank: 0, order: 2, width:  300, dummy: "edge" });
+
+      var xs = horizontalCompaction(g, buildLayerMatrix(g), root, align);
+      expect(xs.a).to.equal(0);
+      expect(xs.b).to.equal(xs.a + 100 / 2 + 50 + 0);
+      expect(xs.c).to.equal(xs.b + 200 + 50 + 300 / 2);
+    });
   });
 
   describe("alignCoordinates", function() {

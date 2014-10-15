@@ -6,11 +6,12 @@ describe("position", function() {
   var g;
 
   beforeEach(function() {
-    g = new Graph({ compound: true }).setGraph({
-      ranksep: 50,
-      nodesep: 50,
-      edgesep: 10
-    });
+    g = new Graph({ compound: true })
+      .setGraph({
+        ranksep: 50,
+        nodesep: 50,
+        edgesep: 10
+      });
   });
 
   it("respects ranksep", function() {

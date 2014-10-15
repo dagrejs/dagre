@@ -43,13 +43,17 @@ describe("layout", function() {
       a: { x: 75 / 2, y: 100 / 2 },
       b: { x: 75 / 2, y: 100 + 300 + 200 / 2 }
     });
+
+    // We should not get x, y coordinates if the edge has no label
+    expect(g.edge("a", "b")).to.not.have.property("x");
+    expect(g.edge("a", "b")).to.not.have.property("y");
   });
 
   it("can layout an edge with a label", function() {
     g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
-    g.setEdge("a", "b", { width: 60, height: 70 });
+    g.setEdge("a", "b", { width: 60, height: 70, labelpos: "c" });
     layout(g);
     expect(extractCoordinates(g)).to.eql({
       a: { x: 75 / 2, y: 100 / 2 },
@@ -63,7 +67,7 @@ describe("layout", function() {
     g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
-    g.setEdge("a", "b", { width: 60, height: 70, minlen: 2 });
+    g.setEdge("a", "b", { width: 60, height: 70, minlen: 2, labelpos: "c" });
     layout(g);
     expect(g.edge("a", "b").x).to.equal(75 / 2);
     expect(g.edge("a", "b").y)
