@@ -4,6 +4,7 @@ v0.5.2
 * Added support for positioning edge labels to the left or right of an edge. By
   default edges are positioned to the right. See the wiki for more details.
 * Fixed self loop layout with rankdir=LR and rankdir=RL.
+* Attribute keys are now treated as case-insensitive.
 
 v0.5.1
 ======
