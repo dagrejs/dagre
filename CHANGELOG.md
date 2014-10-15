@@ -1,3 +1,8 @@
+v0.5.2
+======
+
+* Fixed self loop layout with rankdir=LR and rankdir=RL
+
 v0.5.1
 ======
 

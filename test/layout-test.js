@@ -119,17 +119,27 @@ describe("layout", function() {
     ]);
   });
 
-  it("can layout a self loop", function() {
-    g.graph().edgesep = 75;
-    g.setNode("a", { width: 100, height: 100 });
-    g.setEdge("a", "a", { width: 50, height: 50 });
-    layout(g);
-    var nodeA = g.node("a"),
-        points = g.edge("a", "a").points;
-    expect(points).to.have.length(7);
-    _.each(points, function(point) {
-      expect(point.x).gt(nodeA.x);
-      expect(Math.abs(point.y - nodeA.y)).lte(nodeA.height / 2);
+  describe("can layout a self loop", function() {
+    _.each(["TB", "BT", "LR", "RL"], function(rankdir) {
+      it ("in rankdir = " + rankdir, function() {
+        g.graph().edgesep = 75;
+        g.graph().rankdir = rankdir;
+        g.setNode("a", { width: 100, height: 100 });
+        g.setEdge("a", "a", { width: 50, height: 50 });
+        layout(g);
+        var nodeA = g.node("a"),
+            points = g.edge("a", "a").points;
+        expect(points).to.have.length(7);
+        _.each(points, function(point) {
+          if (rankdir !== "LR" && rankdir !== "RL") {
+            expect(point.x).gt(nodeA.x);
+            expect(Math.abs(point.y - nodeA.y)).lte(nodeA.height / 2);
+          } else {
+            expect(point.y).gt(nodeA.y);
+            expect(Math.abs(point.x - nodeA.x)).lte(nodeA.width / 2);
+          }
+        });
+      });
     });
   });
 
