@@ -63,6 +63,32 @@ describe("layout", function() {
       .eqls({ x: 75 / 2, y: 100  + 150 + 70 / 2 });
   });
 
+  describe("can layout an edge with a long label, with rankdir =", function() {
+    _.each(["TB", "BT", "LR", "RL"], function(rankdir) {
+      it(rankdir, function() {
+        g.graph().nodesep = g.graph().edgesep = 10;
+        g.graph().rankdir = rankdir;
+        _.each(["a", "b", "c", "d"], function(v) {
+          g.setNode(v, { width: 10, height: 10 });
+        });
+        g.setEdge("a", "c", { width: 2000, height: 10, labelpos: "c" });
+        g.setEdge("b", "d", { width: 1, height: 1 });
+        layout(g);
+
+        var p1, p2;
+        if (rankdir === "TB" || rankdir === "BT") {
+          p1 = g.edge("a", "c");
+          p2 = g.edge("b", "d");
+        } else {
+          p1 = g.node("a");
+          p2 = g.node("c");
+        }
+
+        expect(Math.abs(p1.x - p2.x)).gt(1000);
+      });
+    });
+  });
+
   it("can layout a long edge with a label", function() {
     g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
