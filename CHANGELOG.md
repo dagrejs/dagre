@@ -1,3 +1,8 @@
+v0.5.3
+======
+
+* Fixes for edge label placement in rankdir=LR and rankdir=RL
+
 v0.5.2
 ======
 

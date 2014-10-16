@@ -146,38 +146,44 @@ describe("normalize", function() {
         .eqls([{ x: 5, y: 10 }, { x: 20, y: 25 }, { x: 100, y: 200 }]);
     });
 
-    it("sets x and y coordinates for the label, if the edge has one", function() {
+    it("sets coords and dims for the label, if the edge has one", function() {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", { width: 10, height: 10, labelRank: 1 });
+      g.setEdge("a", "b", { width: 10, height: 20, labelRank: 1 });
 
       normalize.run(g);
 
       var labelNode = g.node(g.successors("a")[0]);
       labelNode.x = 50;
       labelNode.y = 60;
+      labelNode.width = 20;
+      labelNode.height = 10;
 
       normalize.undo(g);
 
-      expect(g.edge("a", "b").x).to.equal(50);
-      expect(g.edge("a", "b").y).to.equal(60);
+      expect(_.pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
+        x: 50, y: 60, width: 20, height: 10
+      });
     });
 
-    it("sets x and y coordinates for the label, if the long edge has one", function() {
+    it("sets coords and dims for the label, if the long edge has one", function() {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 4 });
-      g.setEdge("a", "b", { width: 10, height: 10, labelRank: 2 });
+      g.setEdge("a", "b", { width: 10, height: 20, labelRank: 2 });
 
       normalize.run(g);
 
       var labelNode = g.node(g.successors(g.successors("a")[0])[0]);
       labelNode.x = 50;
       labelNode.y = 60;
+      labelNode.width = 20;
+      labelNode.height = 10;
 
       normalize.undo(g);
 
-      expect(g.edge("a", "b").x).to.equal(50);
-      expect(g.edge("a", "b").y).to.equal(60);
+      expect(_.pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
+        x: 50, y: 60, width: 20, height: 10
+      });
     });
 
     it("restores multi-edges", function() {
