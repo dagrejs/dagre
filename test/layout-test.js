@@ -89,6 +89,29 @@ describe("layout", function() {
     });
   });
 
+  describe("can apply an offset, with rankdir =", function() {
+    _.each(["TB", "BT", "LR", "RL"], function(rankdir) {
+      it(rankdir, function() {
+        g.graph().nodesep = g.graph().edgesep = 10;
+        g.graph().rankdir = rankdir;
+        _.each(["a", "b", "c", "d"], function(v) {
+          g.setNode(v, { width: 10, height: 10 });
+        });
+        g.setEdge("a", "b", { width: 10, height: 10, labelpos: "l", labeloffset: 1000 });
+        g.setEdge("c", "d", { width: 10, height: 10, labelpos: "r", labeloffset: 1000 });
+        layout(g);
+
+        if (rankdir === "TB" || rankdir === "BT") {
+          expect(g.edge("a", "b").x - g.edge("a", "b").points[0].x).equals(-1000 - 10 / 2);
+          expect(g.edge("c", "d").x - g.edge("c", "d").points[0].x).equals(1000 + 10 / 2);
+        } else {
+          expect(g.edge("a", "b").y - g.edge("a", "b").points[0].y).equals(-1000 - 10 / 2);
+          expect(g.edge("c", "d").y - g.edge("c", "d").points[0].y).equals(1000 + 10 / 2);
+        }
+      });
+    });
+  });
+
   it("can layout a long edge with a label", function() {
     g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
