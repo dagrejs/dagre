@@ -247,6 +247,37 @@ describe("layout", function() {
     expect(g.graph().height).equals(50);
   });
 
+  describe("ensures all coordinates are in the bounding box for the graph", function() {
+    _.each(["TB", "BT", "LR", "RL"], function(rankdir) {
+      describe(rankdir, function() {
+        beforeEach(function() {
+          g.graph().rankdir = rankdir;
+        });
+
+        it("node", function() {
+          g.setNode("a", { width: 100, height: 200 });
+          layout(g);
+          expect(g.node("a").x).equals(100 / 2);
+          expect(g.node("a").y).equals(200 / 2);
+        });
+
+        it("edge, labelpos = l", function() {
+          g.setNode("a", { width: 100, height: 100 });
+          g.setNode("b", { width: 100, height: 100 });
+          g.setEdge("a", "b", {
+            width: 1000, height: 2000, labelpos: "l", labeloffset: 0
+          });
+          layout(g);
+          if (rankdir === "TB" || rankdir === "BT") {
+            expect(g.edge("a", "b").x).equals(1000 / 2);
+          } else {
+            expect(g.edge("a", "b").y).equals(2000 / 2);
+          }
+        });
+      });
+    });
+  });
+
   it("treats attributes with case-insensitivity", function() {
     g.graph().nodeSep = 200; // note the capital S
     g.setNode("a", { width: 50, height: 100 });
