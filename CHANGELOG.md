@@ -1,3 +1,8 @@
+v0.5.4
+======
+
+* Tweak default for edge separation
+
 v0.5.3
 ======
 
