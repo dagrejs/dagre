@@ -2918,6 +2918,6 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":8,"./lodash":11}],31:[function(require,module,exports){
-module.exports = "0.5.5-pre";
+module.exports = "0.6.0";
 
 },{}]},{},[1]);

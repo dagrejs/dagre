@@ -58,7 +58,7 @@ $(BUILD_DIR)/$(MOD).js: browser.js $(SRC_FILES) | unit-test
 $(BUILD_DIR)/$(MOD).min.js: $(BUILD_DIR)/$(MOD).js
 	@$(UGLIFY) $< --comments '@license' > $@
 
-$(BUILD_DIR)/$(MOD).core.js: browser.js | unit-test
+$(BUILD_DIR)/$(MOD).core.js: browser.js package.json | unit-test
 	@$(BROWSERIFY) $< > $@ --no-bundle-external
 
 $(BUILD_DIR)/$(MOD).core.min.js: $(BUILD_DIR)/$(MOD).core.js

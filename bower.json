@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.5.5-pre",
+  "version": "0.6.0",
   "main": [
     "js/dagre.js",
     "js/dagre.min.js"
