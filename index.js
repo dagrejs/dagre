@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 
 module.exports = {
-  graphlib: require("graphlib"),
+  graphlib: require("./lib/graphlib"),
 
   layout: require("./lib/layout"),
   debug: require("./lib/debug"),

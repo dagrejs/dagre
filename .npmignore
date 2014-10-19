@@ -1,8 +1,8 @@
 /browser.js
 /bench
 /build
-/dist
 /Makefile
 /node_modules
 /src
 /test
+/tmp

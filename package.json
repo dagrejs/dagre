@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.5.5-pre",
+  "version": "0.6.0-pre",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "main": "index.js",
@@ -9,19 +9,25 @@
     "layout"
   ],
   "dependencies": {
-    "graphlib": "^0.8.3",
+    "graphlib": "^0.9.1",
     "lodash": "^2.4.1"
   },
   "devDependencies": {
     "benchmark": "^1.0.0",
-    "browserify": "^5.10.1",
-    "chai": "^1.9.1",
-    "istanbul": "^0.3.0",
-    "jscs": "^1.5.9",
-    "jshint": "^2.5.5",
-    "jshint-stylish": "^0.4.0",
-    "mocha": "^1.21.4",
-    "semver": "^3.0.1",
+    "browserify": "^6.1.0",
+    "chai": "^1.9.2",
+    "istanbul": "^0.3.2",
+    "jscs": "^1.7.3",
+    "jshint": "^2.5.6",
+    "jshint-stylish": "^1.0.0",
+    "karma": "^0.12.24",
+    "karma-chrome-launcher": "^0.1.5",
+    "karma-firefox-launcher": "^0.1.3",
+    "karma-mocha": "^0.1.9",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-safari-launcher": "^0.1.1",
+    "mocha": "^1.21.5",
+    "semver": "^4.1.0",
     "sprintf": "^0.1.4",
     "uglify-js": "^2.4.15"
   },

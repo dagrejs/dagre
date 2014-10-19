@@ -1,0 +1,12 @@
+{
+  "name": "dagre",
+  "version": "0.5.5-pre",
+  "main": [
+    "js/dagre.js",
+    "js/dagre.min.js"
+  ],
+  "ignore": [
+    "README.md"
+  ],
+  "dependencies": {}
+}

@@ -1,3 +1,9 @@
+v0.6.0
+======
+
+* dist scripts now included in the repo
+* repo now supports direct bower install
+
 v0.5.4
 ======
 
