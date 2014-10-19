@@ -10,7 +10,6 @@ bail() {
 # Initial config
 PROJECT=$1
 PROJECT_ROOT=`pwd`
-BOWER_DIR=/tmp/$PROJECT-bower
 PAGES_DIR=/tmp/$PROJECT-pages
 DIST_DIR=$2
 
@@ -48,27 +47,6 @@ git commit -m "Publishing $PROJECT v$VERSION"
 git push -f origin master
 cd $PROJECT_ROOT
 echo "Published $PROJECT to pages"
-
-# Publish bower
-rm -rf $BOWER_DIR
-git clone git@github.com:cpettitt/$PROJECT-bower.git $BOWER_DIR
-rm -f $BOWER_DIR/bower.json
-rm -rf $BOWER_DIR/js
-
-mkdir $BOWER_DIR/js
-
-cp $DIST_DIR/bower.json $BOWER_DIR
-cp $DIST_DIR/$PROJECT*.js $BOWER_DIR/js
-cp $DIST_DIR/LICENSE $BOWER_DIR
-
-cd $BOWER_DIR
-git add -A
-git commit -m "Publishing bower for $PROJECT v$VERSION"
-git push -f origin master
-git tag v$VERSION
-git push origin v$VERSION
-cd $PROJECT_ROOT
-echo "Published $PROJECT to bower"
 
 # Publish tag
 git tag v$VERSION
