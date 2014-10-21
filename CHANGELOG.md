@@ -1,3 +1,8 @@
+v0.6.1
+======
+
+* bower packaging fixes
+
 v0.6.0
 ======
 
