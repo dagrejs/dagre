@@ -23,7 +23,6 @@ echo Attemping to publish version: $VERSION
 [ -n "$PROJECT" ] || bail "No project name was specified."
 [ -n "$DIST_DIR" ] || bail "No dist dir was specified."
 [ -z "`git tag -l v$VERSION`" ] || bail "Version already published. Skipping publish."
-[ -n "`grep v$SHORT_VERSION CHANGELOG.md`" ] || bail "ERROR: No entry for v$VERSION in CHANGELOG.md"
 [ "`git rev-parse HEAD`" = "`git rev-parse master`" ] || [ -n "$PRE_RELEASE" ] || bail "ERROR: You must release from the master branch"
 [ -z "`git status --porcelain`" ] || bail "ERROR: Dirty index on working tree. Use git status to check"
 
