@@ -13,7 +13,6 @@ var template = {
     "README.md",
     "CHANGELOG.md",
     "Makefile",
-    "browser.js",
     "dist/" + packageJson.name + ".js",
     "dist/" + packageJson.name + ".min.js",
     "index.js",

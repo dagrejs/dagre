@@ -52,14 +52,14 @@ browser-test: $(BUILD_DIR)/$(MOD).js $(BUILD_DIR)/$(MOD).core.js
 bower.json: package.json src/release/make-bower.json.js
 	@src/release/make-bower.json.js > $@
 
-$(BUILD_DIR)/$(MOD).js: browser.js $(SRC_FILES) | unit-test
-	@$(BROWSERIFY) $< > $@
+$(BUILD_DIR)/$(MOD).js: index.js $(SRC_FILES) | unit-test
+	@$(BROWSERIFY) $< > $@ -s dagre
 
 $(BUILD_DIR)/$(MOD).min.js: $(BUILD_DIR)/$(MOD).js
 	@$(UGLIFY) $< --comments '@license' > $@
 
-$(BUILD_DIR)/$(MOD).core.js: browser.js $(SRC_FILES) | unit-test
-	@$(BROWSERIFY) $< > $@ --no-bundle-external
+$(BUILD_DIR)/$(MOD).core.js: index.js $(SRC_FILES) | unit-test
+	@$(BROWSERIFY) $< > $@ --no-bundle-external -s dagre
 
 $(BUILD_DIR)/$(MOD).core.min.js: $(BUILD_DIR)/$(MOD).core.js
 	@$(UGLIFY) $< --comments '@license' > $@
