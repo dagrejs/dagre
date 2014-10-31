@@ -1,31 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-(function (global){
-/**
- * @license
- * Copyright (c) 2012-2014 Chris Pettitt
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-global.dagre = require("./index");
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./index":2}],2:[function(require,module,exports){
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.dagre=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
 Copyright (c) 2012-2014 Chris Pettitt
 
@@ -60,7 +33,7 @@ module.exports = {
   version: require("./lib/version")
 };
 
-},{"./lib/debug":7,"./lib/graphlib":8,"./lib/layout":10,"./lib/util":30,"./lib/version":31}],3:[function(require,module,exports){
+},{"./lib/debug":6,"./lib/graphlib":7,"./lib/layout":9,"./lib/util":29,"./lib/version":30}],2:[function(require,module,exports){
 "use strict";
 
 var _ = require("./lodash"),
@@ -129,7 +102,7 @@ function undo(g) {
   });
 }
 
-},{"./greedy-fas":9,"./lodash":11}],4:[function(require,module,exports){
+},{"./greedy-fas":8,"./lodash":10}],3:[function(require,module,exports){
 var _ = require("./lodash"),
     util = require("./util");
 
@@ -169,7 +142,7 @@ function addBorderNode(g, prop, prefix, sg, sgNode, rank) {
   }
 }
 
-},{"./lodash":11,"./util":30}],5:[function(require,module,exports){
+},{"./lodash":10,"./util":29}],4:[function(require,module,exports){
 "use strict";
 
 var _ = require("./lodash");
@@ -243,7 +216,7 @@ function swapXYOne(attrs) {
   attrs.y = x;
 }
 
-},{"./lodash":11}],6:[function(require,module,exports){
+},{"./lodash":10}],5:[function(require,module,exports){
 /*
  * Simple doubly linked list implementation derived from Cormen, et al.,
  * "Introduction to Algorithms".
@@ -301,7 +274,7 @@ function filterOutLinks(k, v) {
   }
 }
 
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var _ = require("./lodash"),
     util = require("./util"),
     Graph = require("./graphlib").Graph;
@@ -337,7 +310,7 @@ function debugOrdering(g) {
   return h;
 }
 
-},{"./graphlib":8,"./lodash":11,"./util":30}],8:[function(require,module,exports){
+},{"./graphlib":7,"./lodash":10,"./util":29}],7:[function(require,module,exports){
 /* global window */
 
 var graphlib;
@@ -354,7 +327,7 @@ if (!graphlib) {
 
 module.exports = graphlib;
 
-},{"graphlib":undefined}],9:[function(require,module,exports){
+},{"graphlib":undefined}],8:[function(require,module,exports){
 var _ = require("./lodash"),
     Graph = require("./graphlib").Graph,
     List = require("./data/list");
@@ -474,7 +447,7 @@ function assignBucket(buckets, zeroIdx, entry) {
   }
 }
 
-},{"./data/list":6,"./graphlib":8,"./lodash":11}],10:[function(require,module,exports){
+},{"./data/list":5,"./graphlib":7,"./lodash":10}],9:[function(require,module,exports){
 "use strict";
 
 var _ = require("./lodash"),
@@ -868,7 +841,7 @@ function canonicalize(attrs) {
   return newAttrs;
 }
 
-},{"./acyclic":3,"./add-border-segments":4,"./coordinate-system":5,"./graphlib":8,"./lodash":11,"./nesting-graph":12,"./normalize":13,"./order":18,"./parent-dummy-chains":23,"./position":25,"./rank":27,"./util":30}],11:[function(require,module,exports){
+},{"./acyclic":2,"./add-border-segments":3,"./coordinate-system":4,"./graphlib":7,"./lodash":10,"./nesting-graph":11,"./normalize":12,"./order":17,"./parent-dummy-chains":22,"./position":24,"./rank":26,"./util":29}],10:[function(require,module,exports){
 /* global window */
 
 var lodash;
@@ -885,7 +858,7 @@ if (!lodash) {
 
 module.exports = lodash;
 
-},{"lodash":undefined}],12:[function(require,module,exports){
+},{"lodash":undefined}],11:[function(require,module,exports){
 var _ = require("./lodash"),
     util = require("./util");
 
@@ -1019,7 +992,7 @@ function cleanup(g) {
   });
 }
 
-},{"./lodash":11,"./util":30}],13:[function(require,module,exports){
+},{"./lodash":10,"./util":29}],12:[function(require,module,exports){
 "use strict";
 
 var _ = require("./lodash"),
@@ -1111,7 +1084,7 @@ function undo(g) {
   });
 }
 
-},{"./lodash":11,"./util":30}],14:[function(require,module,exports){
+},{"./lodash":10,"./util":29}],13:[function(require,module,exports){
 var _ = require("../lodash");
 
 module.exports = addSubgraphConstraints;
@@ -1166,7 +1139,7 @@ function addSubgraphConstraints(g, cg, vs) {
   */
 }
 
-},{"../lodash":11}],15:[function(require,module,exports){
+},{"../lodash":10}],14:[function(require,module,exports){
 var _ = require("../lodash");
 
 module.exports = barycenter;
@@ -1196,7 +1169,7 @@ function barycenter(g, movable) {
 }
 
 
-},{"../lodash":11}],16:[function(require,module,exports){
+},{"../lodash":10}],15:[function(require,module,exports){
 var _ = require("../lodash"),
     Graph = require("../graphlib").Graph;
 
@@ -1271,7 +1244,7 @@ function createRootNode(g) {
   return v;
 }
 
-},{"../graphlib":8,"../lodash":11}],17:[function(require,module,exports){
+},{"../graphlib":7,"../lodash":10}],16:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash");
@@ -1343,7 +1316,7 @@ function twoLayerCrossCount(g, northLayer, southLayer) {
   return cc;
 }
 
-},{"../lodash":11}],18:[function(require,module,exports){
+},{"../lodash":10}],17:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash"),
@@ -1424,7 +1397,7 @@ function assignOrder(g, layering) {
   });
 }
 
-},{"../graphlib":8,"../lodash":11,"../util":30,"./add-subgraph-constraints":14,"./build-layer-graph":16,"./cross-count":17,"./init-order":19,"./sort-subgraph":21}],19:[function(require,module,exports){
+},{"../graphlib":7,"../lodash":10,"../util":29,"./add-subgraph-constraints":13,"./build-layer-graph":15,"./cross-count":16,"./init-order":18,"./sort-subgraph":20}],18:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash");
@@ -1464,7 +1437,7 @@ function initOrder(g) {
   return layers;
 }
 
-},{"../lodash":11}],20:[function(require,module,exports){
+},{"../lodash":10}],19:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash");
@@ -1589,7 +1562,7 @@ function mergeEntries(target, source) {
   source.merged = true;
 }
 
-},{"../lodash":11}],21:[function(require,module,exports){
+},{"../lodash":10}],20:[function(require,module,exports){
 var _ = require("../lodash"),
     barycenter = require("./barycenter"),
     resolveConflicts = require("./resolve-conflicts"),
@@ -1667,7 +1640,7 @@ function mergeBarycenters(target, other) {
   }
 }
 
-},{"../lodash":11,"./barycenter":15,"./resolve-conflicts":20,"./sort":22}],22:[function(require,module,exports){
+},{"../lodash":10,"./barycenter":14,"./resolve-conflicts":19,"./sort":21}],21:[function(require,module,exports){
 var _ = require("../lodash"),
     util = require("../util");
 
@@ -1726,7 +1699,7 @@ function compareWithBias(bias) {
   };
 }
 
-},{"../lodash":11,"../util":30}],23:[function(require,module,exports){
+},{"../lodash":10,"../util":29}],22:[function(require,module,exports){
 var _ = require("./lodash");
 
 module.exports = parentDummyChains;
@@ -1814,7 +1787,7 @@ function postorder(g) {
   return result;
 }
 
-},{"./lodash":11}],24:[function(require,module,exports){
+},{"./lodash":10}],23:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash"),
@@ -2207,7 +2180,7 @@ function width(g, v) {
   return g.node(v).width;
 }
 
-},{"../lodash":11,"../util":30}],25:[function(require,module,exports){
+},{"../lodash":10,"../util":29}],24:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash"),
@@ -2239,7 +2212,7 @@ function positionY(g) {
 }
 
 
-},{"../lodash":11,"../util":30,"./bk":24}],26:[function(require,module,exports){
+},{"../lodash":10,"../util":29,"./bk":23}],25:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash"),
@@ -2330,7 +2303,7 @@ function shiftRanks(t, g, delta) {
   });
 }
 
-},{"../graphlib":8,"../lodash":11,"./util":29}],27:[function(require,module,exports){
+},{"../graphlib":7,"../lodash":10,"./util":28}],26:[function(require,module,exports){
 "use strict";
 
 var rankUtil = require("./util"),
@@ -2380,7 +2353,7 @@ function networkSimplexRanker(g) {
   networkSimplex(g);
 }
 
-},{"./feasible-tree":26,"./network-simplex":28,"./util":29}],28:[function(require,module,exports){
+},{"./feasible-tree":25,"./network-simplex":27,"./util":28}],27:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash"),
@@ -2616,7 +2589,7 @@ function isDescendant(tree, vLabel, rootLabel) {
   return rootLabel.low <= vLabel.lim && vLabel.lim <= rootLabel.lim;
 }
 
-},{"../graphlib":8,"../lodash":11,"../util":30,"./feasible-tree":26,"./util":29}],29:[function(require,module,exports){
+},{"../graphlib":7,"../lodash":10,"../util":29,"./feasible-tree":25,"./util":28}],28:[function(require,module,exports){
 "use strict";
 
 var _ = require("../lodash");
@@ -2679,7 +2652,7 @@ function slack(g, e) {
   return g.node(e.w).rank - g.node(e.v).rank - g.edge(e).minlen;
 }
 
-},{"../lodash":11}],30:[function(require,module,exports){
+},{"../lodash":10}],29:[function(require,module,exports){
 "use strict";
 
 var _ = require("./lodash"),
@@ -2917,7 +2890,8 @@ function notime(name, fn) {
   return fn();
 }
 
-},{"./graphlib":8,"./lodash":11}],31:[function(require,module,exports){
-module.exports = "0.6.2";
+},{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
+module.exports = "0.6.3";
 
-},{}]},{},[1]);
+},{}]},{},[1])(1)
+});

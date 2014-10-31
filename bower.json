@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "main": [
     "dist/dagre.core.js",
     "dist/dagre.core.min.js"
@@ -10,7 +10,6 @@
     "README.md",
     "CHANGELOG.md",
     "Makefile",
-    "browser.js",
     "dist/dagre.js",
     "dist/dagre.min.js",
     "index.js",
