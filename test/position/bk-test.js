@@ -416,6 +416,29 @@ describe("position/bk", function() {
       expect(xs.d).to.equal(60 / 2 + 75 + 150 / 2);
     });
 
+    it("cascades class shift", function() {
+      var root =  { a: "a", b: "b", c: "c", d: "d", e: "b", f: "f", g: "d" },
+          align = { a: "a", b: "e", c: "c", d: "g", e: "b", f: "f", g: "d" };
+      g.graph().nodesep = 75;
+      g.setNode("a", { rank: 0, order: 0, width: 50 });
+      g.setNode("b", { rank: 0, order: 1, width: 50 });
+      g.setNode("c", { rank: 1, order: 0, width: 50 });
+      g.setNode("d", { rank: 1, order: 1, width: 50 });
+      g.setNode("e", { rank: 1, order: 2, width: 50 });
+      g.setNode("f", { rank: 2, order: 0, width: 50 });
+      g.setNode("g", { rank: 2, order: 1, width: 50 });
+
+      var xs = horizontalCompaction(g, buildLayerMatrix(g), root, align);
+
+      // Use f as 0, everything is relative to it
+      expect(xs.a).to.equal(xs.b - 50 / 2 - 75 - 50 / 2);
+      expect(xs.b).to.equal(xs.e);
+      expect(xs.c).to.equal(xs.f);
+      expect(xs.d).to.equal(xs.c + 50 / 2 + 75 + 50 / 2);
+      expect(xs.e).to.equal(xs.d + 50 / 2 + 75 + 50 / 2);
+      expect(xs.g).to.equal(xs.f + 50 / 2 + 75 + 50 / 2);
+    });
+
     it("handles labelpos = l", function() {
       var root =  { a: "a", b: "b", c: "c" },
           align = { a: "a", b: "b", c: "c" };
