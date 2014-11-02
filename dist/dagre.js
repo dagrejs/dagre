@@ -1997,6 +1997,7 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
   // We use local variables for these parameters instead of manipulating the
   // graph because it becomes more verbose to access them in a chained manner.
   var shift = {},
+      shiftNeighbor = {},
       sink = {},
       xs = {},
       pred = {},
@@ -2013,7 +2014,7 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
 
   _.each(g.nodes(), function(v) {
     if (root[v] === v) {
-      placeBlock(g, layering, sepFn, root, align, shift, sink, pred, xs, v);
+      placeBlock(g, layering, sepFn, root, align, shift, shiftNeighbor, sink, pred, xs, v);
     }
   });
 
@@ -2024,6 +2025,12 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
       // http://www.inf.uni-konstanz.de/~brandes/publications/ for details.
       if (v === root[v] && shift[sink[root[v]]] < Number.POSITIVE_INFINITY) {
         xs[v] += shift[sink[root[v]]];
+
+        // Cascade shifts as necessary
+        var w = shiftNeighbor[sink[root[v]]];
+        if (w && shift[w] !== Number.POSITIVE_INFINITY) {
+          xs[v] += shift[w];
+        }
       }
     });
   });
@@ -2031,7 +2038,7 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
   return xs;
 }
 
-function placeBlock(g, layering, sepFn, root, align, shift, sink, pred, xs, v) {
+function placeBlock(g, layering, sepFn, root, align, shift, shiftNeighbor, sink, pred, xs, v) {
   if (_.has(xs, v)) return;
   xs[v] = 0;
 
@@ -2040,7 +2047,7 @@ function placeBlock(g, layering, sepFn, root, align, shift, sink, pred, xs, v) {
   do {
     if (pred[w]) {
       u = root[pred[w]];
-      placeBlock(g, layering, sepFn, root, align, shift, sink, pred, xs, u);
+      placeBlock(g, layering, sepFn, root, align, shift, shiftNeighbor, sink, pred, xs, u);
       if (sink[v] === v) {
         sink[v] = sink[u];
       }
@@ -2048,6 +2055,7 @@ function placeBlock(g, layering, sepFn, root, align, shift, sink, pred, xs, v) {
       var delta = sepFn(g, w, pred[w]);
       if (sink[v] !== sink[u]) {
         shift[sink[u]] = Math.min(shift[sink[u]], xs[v] - xs[u] - delta);
+        shiftNeighbor[sink[u]] = sink[v];
       } else {
         xs[v] = Math.max(xs[v], xs[u] + delta);
       }
@@ -2891,7 +2899,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.6.3";
+module.exports = "0.6.4";
 
 },{}],31:[function(require,module,exports){
 /**
