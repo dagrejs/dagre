@@ -398,7 +398,7 @@ function removeNode(g, buckets, zeroIdx, entry, collectPredecessors) {
     var weight = g.edge(edge),
         w = edge.w,
         wEntry = g.node(w);
-    wEntry.in -= weight;
+    wEntry["in"] -= weight;
     assignBucket(buckets, zeroIdx, wEntry);
   });
 
@@ -413,7 +413,7 @@ function buildState(g, weightFn) {
       maxOut = 0;
 
   _.each(g.nodes(), function(v) {
-    fasGraph.setNode(v, { v: v, in: 0, out: 0 });
+    fasGraph.setNode(v, { v: v, "in": 0, out: 0 });
   });
 
   // Aggregate weights on nodes, but also sum the weights across multi-edges
@@ -424,7 +424,7 @@ function buildState(g, weightFn) {
         edgeWeight = prevWeight + weight;
     fasGraph.setEdge(e.v, e.w, edgeWeight);
     maxOut = Math.max(maxOut, fasGraph.node(e.v).out += weight);
-    maxIn  = Math.max(maxIn,  fasGraph.node(e.w).in  += weight);
+    maxIn  = Math.max(maxIn,  fasGraph.node(e.w)["in"]  += weight);
   });
 
   var buckets = _.range(maxOut + maxIn + 3).map(function() { return new List(); });
@@ -440,10 +440,10 @@ function buildState(g, weightFn) {
 function assignBucket(buckets, zeroIdx, entry) {
   if (!entry.out) {
     buckets[0].enqueue(entry);
-  } else if (!entry.in) {
+  } else if (!entry["in"]) {
     buckets[buckets.length - 1].enqueue(entry);
   } else {
-    buckets[entry.out - entry.in + zeroIdx].enqueue(entry);
+    buckets[entry.out - entry["in"] + zeroIdx].enqueue(entry);
   }
 }
 
@@ -1474,7 +1474,7 @@ function resolveConflicts(entries, cg) {
   _.each(entries, function(entry, i) {
     var tmp = mappedEntries[entry.v] = {
       indegree: 0,
-      in: [],
+      "in": [],
       out: [],
       vs: [entry.v],
       i: i
@@ -1519,7 +1519,7 @@ function doResolveConflicts(sourceSet) {
 
   function handleOut(vEntry) {
     return function(wEntry) {
-      wEntry.in.push(vEntry);
+      wEntry["in"].push(vEntry);
       if (--wEntry.indegree === 0) {
         sourceSet.push(wEntry);
       }
@@ -1529,7 +1529,7 @@ function doResolveConflicts(sourceSet) {
   while (sourceSet.length) {
     var entry = sourceSet.pop();
     entries.push(entry);
-    _.each(entry.in.reverse(), handleIn(entry));
+    _.each(entry["in"].reverse(), handleIn(entry));
     _.each(entry.out, handleOut(entry));
   }
 
@@ -2897,7 +2897,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.7.0";
+module.exports = "0.7.1";
 
 },{}],31:[function(require,module,exports){
 /**
