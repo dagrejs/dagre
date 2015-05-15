@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.7.2-pre",
+  "version": "0.7.2",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "main": "index.js",
@@ -9,7 +9,7 @@
     "layout"
   ],
   "dependencies": {
-    "graphlib": "^1.0.1",
+    "graphlib": "^1.0.3",
     "lodash": "^2.4.1"
   },
   "devDependencies": {
