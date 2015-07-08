@@ -2825,7 +2825,7 @@ function removeEmptyRanks(g) {
   var layers = [];
   _.each(g.nodes(), function(v) {
     var rank = g.node(v).rank - offset;
-    if (!_.has(layers, rank)) {
+    if (!layers[rank]) {
       layers[rank] = [];
     }
     layers[rank].push(v);
@@ -2898,7 +2898,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.7.2";
+module.exports = "0.7.3";
 
 },{}]},{},[1])(1)
 });
