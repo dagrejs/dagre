@@ -315,7 +315,7 @@ function debugOrdering(g) {
 
 var graphlib;
 
-if (require) {
+if (typeof require === "function") {
   try {
     graphlib = require("graphlib");
   } catch (e) {}
@@ -846,7 +846,7 @@ function canonicalize(attrs) {
 
 var lodash;
 
-if (require) {
+if (typeof require === "function") {
   try {
     lodash = require("lodash");
   } catch (e) {}
@@ -2898,7 +2898,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.7.3";
+module.exports = "0.7.4";
 
 },{}],31:[function(require,module,exports){
 /**
@@ -4033,23 +4033,8 @@ function read(json) {
 }
 
 },{"./graph":46,"./lodash":49}],49:[function(require,module,exports){
-/* global window */
-
-var lodash;
-
-if (typeof require === "function") {
-  try {
-    lodash = require("lodash");
-  } catch (e) {}
-}
-
-if (!lodash) {
-  lodash = window._;
-}
-
-module.exports = lodash;
-
-},{"lodash":51}],50:[function(require,module,exports){
+module.exports=require(10)
+},{"/Users/cpettitt/projects/dagre/lib/lodash.js":10,"lodash":51}],50:[function(require,module,exports){
 module.exports = '1.0.5';
 
 },{}],51:[function(require,module,exports){

@@ -315,7 +315,7 @@ function debugOrdering(g) {
 
 var graphlib;
 
-if (require) {
+if (typeof require === "function") {
   try {
     graphlib = require("graphlib");
   } catch (e) {}
@@ -846,7 +846,7 @@ function canonicalize(attrs) {
 
 var lodash;
 
-if (require) {
+if (typeof require === "function") {
   try {
     lodash = require("lodash");
   } catch (e) {}
@@ -2898,7 +2898,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.7.3";
+module.exports = "0.7.4";
 
 },{}]},{},[1])(1)
 });
