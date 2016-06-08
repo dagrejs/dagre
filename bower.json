@@ -3,15 +3,15 @@
   "version": "0.7.4",
   "main": [
     "dist/dagre.core.js",
-    "dist/dagre.core.min.js"
+    "dist/dagre.core.min.js",
+    "dist/dagre.js",
+    "dist/dagre.min.js"
   ],
   "ignore": [
     ".*",
     "README.md",
     "CHANGELOG.md",
     "Makefile",
-    "dist/dagre.js",
-    "dist/dagre.min.js",
     "index.js",
     "karma*",
     "lib/**",
