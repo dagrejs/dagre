@@ -11,8 +11,11 @@ import networkSimplex, {
   leaveEdge
 } from '../../lib/rank/network-simplex'
 
-import {longestPath} from '../../lib/rank/util'
-import {normalizeRanks} from '../../lib/util'
+import util from '../../lib/util'
+const {normalizeRanks} = util
+
+import rankUtil from '../../lib/rank/util'
+const {longestPath} = rankUtil
 
 describe('network simplex', function () {
   var g, t, gansnerGraph, gansnerTree

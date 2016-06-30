@@ -1,8 +1,11 @@
 import {expect} from 'chai'
 import {Graph} from 'graphlib'
 
-import {normalizeRanks} from '../../lib/util'
-import {longestPath} from '../../lib/rank/util'
+import util from '../../lib/util'
+const {normalizeRanks} = util
+
+import rankUtil from '../../lib/rank/util'
+const {longestPath} = rankUtil
 
 describe('rank/util', function () {
   describe('longestPath', function () {

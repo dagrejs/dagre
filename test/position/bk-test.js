@@ -2,7 +2,8 @@ import {expect} from 'chai'
 import {Graph} from 'graphlib'
 import _ from 'lodash'
 
-import {
+import bk from '../../lib/position/bk'
+const {
   addConflict,
   alignCoordinates,
   balance,
@@ -13,9 +14,10 @@ import {
   horizontalCompaction,
   positionX,
   verticalAlignment
-} from '../../lib/position/bk'
+} = bk
 
-import {buildLayerMatrix} from '../../lib/util'
+import util from '../../lib/util'
+const {buildLayerMatrix} = util
 
 describe('position/bk', function () {
   var g
