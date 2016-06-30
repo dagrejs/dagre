@@ -1,126 +1,127 @@
-var _ = require("lodash"),
-    expect = require("../chai").expect,
-    sortSubgraph = require("../../lib/order/sort-subgraph"),
-    Graph = require("graphlib").Graph;
+import {expect} from 'chai'
+import {Graph} from 'graphlib'
+import _ from 'lodash'
 
-describe("order/sortSubgraph", function() {
-  var g, cg;
+import sortSubgraph from '../../lib/order/sort-subgraph'
 
-  beforeEach(function() {
+describe('order/sortSubgraph', function () {
+  var g, cg
+
+  beforeEach(function () {
     g = new Graph({ compound: true })
-      .setDefaultNodeLabel(function() { return {}; })
-      .setDefaultEdgeLabel(function() { return { weight: 1 }; });
-    _.each(_.range(5), function(v) { g.setNode(v, { order: v }); });
-    cg = new Graph();
-  });
+      .setDefaultNodeLabel(function () { return {} })
+      .setDefaultEdgeLabel(function () { return { weight: 1 } })
+    _.each(_.range(5), function (v) { g.setNode(v, { order: v }) })
+    cg = new Graph()
+  })
 
-  it("sorts a flat subgraph based on barycenter", function() {
-    g.setEdge(3, "x");
-    g.setEdge(1, "y", { weight: 2 });
-    g.setEdge(4, "y");
-    _.each(["x", "y"], function(v) { g.setParent(v, "movable"); });
+  it('sorts a flat subgraph based on barycenter', function () {
+    g.setEdge(3, 'x')
+    g.setEdge(1, 'y', { weight: 2 })
+    g.setEdge(4, 'y')
+    _.each(['x', 'y'], function (v) { g.setParent(v, 'movable') })
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["y", "x"]);
-  });
+    expect(sortSubgraph(g, 'movable', cg).vs).eqls(['y', 'x'])
+  })
 
-  it("preserves the pos of a node (y) w/o neighbors in a flat subgraph", function() {
-    g.setEdge(3, "x");
-    g.setNode("y");
-    g.setEdge(1, "z", { weight: 2 });
-    g.setEdge(4, "z");
-    _.each(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
+  it('preserves the pos of a node (y) w/o neighbors in a flat subgraph', function () {
+    g.setEdge(3, 'x')
+    g.setNode('y')
+    g.setEdge(1, 'z', { weight: 2 })
+    g.setEdge(4, 'z')
+    _.each(['x', 'y', 'z'], function (v) { g.setParent(v, 'movable') })
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["z", "y", "x"]);
-  });
+    expect(sortSubgraph(g, 'movable', cg).vs).eqls(['z', 'y', 'x'])
+  })
 
-  it("biases to the left without reverse bias", function() {
-    g.setEdge(1, "x");
-    g.setEdge(1, "y");
-    _.each(["x", "y"], function(v) { g.setParent(v, "movable"); });
+  it('biases to the left without reverse bias', function () {
+    g.setEdge(1, 'x')
+    g.setEdge(1, 'y')
+    _.each(['x', 'y'], function (v) { g.setParent(v, 'movable') })
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "y"]);
-  });
+    expect(sortSubgraph(g, 'movable', cg).vs).eqls(['x', 'y'])
+  })
 
-  it("biases to the right with reverse bias", function() {
-    g.setEdge(1, "x");
-    g.setEdge(1, "y");
-    _.each(["x", "y"], function(v) { g.setParent(v, "movable"); });
+  it('biases to the right with reverse bias', function () {
+    g.setEdge(1, 'x')
+    g.setEdge(1, 'y')
+    _.each(['x', 'y'], function (v) { g.setParent(v, 'movable') })
 
-    expect(sortSubgraph(g, "movable", cg, true).vs).eqls(["y", "x"]);
-  });
+    expect(sortSubgraph(g, 'movable', cg, true).vs).eqls(['y', 'x'])
+  })
 
-  it("aggregates stats about the subgraph", function() {
-    g.setEdge(3, "x");
-    g.setEdge(1, "y", { weight: 2 });
-    g.setEdge(4, "y");
-    _.each(["x", "y"], function(v) { g.setParent(v, "movable"); });
+  it('aggregates stats about the subgraph', function () {
+    g.setEdge(3, 'x')
+    g.setEdge(1, 'y', { weight: 2 })
+    g.setEdge(4, 'y')
+    _.each(['x', 'y'], function (v) { g.setParent(v, 'movable') })
 
-    var results = sortSubgraph(g, "movable", cg);
-    expect(results.barycenter).to.equal(2.25);
-    expect(results.weight).to.equal(4);
-  });
+    var results = sortSubgraph(g, 'movable', cg)
+    expect(results.barycenter).to.equal(2.25)
+    expect(results.weight).to.equal(4)
+  })
 
-  it("can sort a nested subgraph with no barycenter", function() {
-    g.setNodes(["a", "b", "c"]);
-    g.setParent("a", "y");
-    g.setParent("b", "y");
-    g.setParent("c", "y");
-    g.setEdge(0, "x");
-    g.setEdge(1, "z");
-    g.setEdge(2, "y");
-    _.each(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
+  it('can sort a nested subgraph with no barycenter', function () {
+    g.setNodes(['a', 'b', 'c'])
+    g.setParent('a', 'y')
+    g.setParent('b', 'y')
+    g.setParent('c', 'y')
+    g.setEdge(0, 'x')
+    g.setEdge(1, 'z')
+    g.setEdge(2, 'y')
+    _.each(['x', 'y', 'z'], function (v) { g.setParent(v, 'movable') })
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "z", "a", "b", "c"]);
-  });
+    expect(sortSubgraph(g, 'movable', cg).vs).eqls(['x', 'z', 'a', 'b', 'c'])
+  })
 
-  it("can sort a nested subgraph with a barycenter", function() {
-    g.setNodes(["a", "b", "c"]);
-    g.setParent("a", "y");
-    g.setParent("b", "y");
-    g.setParent("c", "y");
-    g.setEdge(0, "a", { weight: 3 });
-    g.setEdge(0, "x");
-    g.setEdge(1, "z");
-    g.setEdge(2, "y");
-    _.each(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
+  it('can sort a nested subgraph with a barycenter', function () {
+    g.setNodes(['a', 'b', 'c'])
+    g.setParent('a', 'y')
+    g.setParent('b', 'y')
+    g.setParent('c', 'y')
+    g.setEdge(0, 'a', { weight: 3 })
+    g.setEdge(0, 'x')
+    g.setEdge(1, 'z')
+    g.setEdge(2, 'y')
+    _.each(['x', 'y', 'z'], function (v) { g.setParent(v, 'movable') })
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "a", "b", "c", "z"]);
-  });
+    expect(sortSubgraph(g, 'movable', cg).vs).eqls(['x', 'a', 'b', 'c', 'z'])
+  })
 
-  it("can sort a nested subgraph with no in-edges", function() {
-    g.setNodes(["a", "b", "c"]);
-    g.setParent("a", "y");
-    g.setParent("b", "y");
-    g.setParent("c", "y");
-    g.setEdge(0, "a");
-    g.setEdge(1, "b");
-    g.setEdge(0, "x");
-    g.setEdge(1, "z");
-    _.each(["x", "y", "z"], function(v) { g.setParent(v, "movable"); });
+  it('can sort a nested subgraph with no in-edges', function () {
+    g.setNodes(['a', 'b', 'c'])
+    g.setParent('a', 'y')
+    g.setParent('b', 'y')
+    g.setParent('c', 'y')
+    g.setEdge(0, 'a')
+    g.setEdge(1, 'b')
+    g.setEdge(0, 'x')
+    g.setEdge(1, 'z')
+    _.each(['x', 'y', 'z'], function (v) { g.setParent(v, 'movable') })
 
-    expect(sortSubgraph(g, "movable", cg).vs).eqls(["x", "a", "b", "c", "z"]);
-  });
+    expect(sortSubgraph(g, 'movable', cg).vs).eqls(['x', 'a', 'b', 'c', 'z'])
+  })
 
-  it("sorts border nodes to the extremes of the subgraph", function() {
-    g.setEdge(0, "x");
-    g.setEdge(1, "y");
-    g.setEdge(2, "z");
-    g.setNode("sg1", { borderLeft: "bl", borderRight: "br" });
-    _.each(["x", "y", "z", "bl", "br"], function(v) { g.setParent(v, "sg1"); });
-    expect(sortSubgraph(g, "sg1", cg).vs).eqls(["bl", "x", "y", "z", "br"]);
-  });
+  it('sorts border nodes to the extremes of the subgraph', function () {
+    g.setEdge(0, 'x')
+    g.setEdge(1, 'y')
+    g.setEdge(2, 'z')
+    g.setNode('sg1', { borderLeft: 'bl', borderRight: 'br' })
+    _.each(['x', 'y', 'z', 'bl', 'br'], function (v) { g.setParent(v, 'sg1') })
+    expect(sortSubgraph(g, 'sg1', cg).vs).eqls(['bl', 'x', 'y', 'z', 'br'])
+  })
 
-  it("assigns a barycenter to a subgraph based on previous border nodes", function() {
-    g.setNode("bl1", { order: 0 });
-    g.setNode("br1", { order: 1 });
-    g.setEdge("bl1", "bl2");
-    g.setEdge("br1", "br2");
-    _.each(["bl2", "br2"], function(v) { g.setParent(v, "sg"); });
-    g.setNode("sg", { borderLeft: "bl2", borderRight: "br2" });
-    expect(sortSubgraph(g, "sg", cg)).eqls({
+  it('assigns a barycenter to a subgraph based on previous border nodes', function () {
+    g.setNode('bl1', { order: 0 })
+    g.setNode('br1', { order: 1 })
+    g.setEdge('bl1', 'bl2')
+    g.setEdge('br1', 'br2')
+    _.each(['bl2', 'br2'], function (v) { g.setParent(v, 'sg') })
+    g.setNode('sg', { borderLeft: 'bl2', borderRight: 'br2' })
+    expect(sortSubgraph(g, 'sg', cg)).eqls({
       barycenter: 0.5,
       weight: 2,
-      vs: ["bl2", "br2"]
-    });
-  });
-});
+      vs: ['bl2', 'br2']
+    })
+  })
+})
