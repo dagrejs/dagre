@@ -16,8 +16,7 @@ const {
   verticalAlignment
 } = bk
 
-import util from '../../lib/util'
-const {buildLayerMatrix} = util
+import {buildLayerMatrix} from '../../lib/util'
 
 describe('position/bk', function () {
   var g

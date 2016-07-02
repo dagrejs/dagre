@@ -20,7 +20,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-export {default as debug} from './lib/debug'
+import {debugOrdering} from './lib/debug'
+
+export const debug = {
+  debugOrdering
+}
+
 export {default as layout} from './lib/layout'
-export {default as util} from './lib/util'
+
+import {
+  addBorderNode,
+  addDummyNode,
+  asNonCompoundGraph,
+  buildLayerMatrix,
+  intersectRect,
+  maxRank,
+  normalizeRanks,
+  notime,
+  partition,
+  predecessorWeights,
+  removeEmptyRanks,
+  simplify,
+  successorWeights,
+  time
+} from './lib/util'
+
+export const util = {
+  addBorderNode,
+  addDummyNode,
+  asNonCompoundGraph,
+  buildLayerMatrix,
+  intersectRect,
+  maxRank,
+  normalizeRanks,
+  notime,
+  partition,
+  predecessorWeights,
+  removeEmptyRanks,
+  simplify,
+  successorWeights,
+  time
+}
+
 export {default as version} from './lib/version'

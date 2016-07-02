@@ -1,8 +1,7 @@
 import {expect} from 'chai'
 import {Graph} from 'graphlib'
 
-import util from '../../lib/util'
-const {normalizeRanks} = util
+import {normalizeRanks} from '../../lib/util'
 
 import rankUtil from '../../lib/rank/util'
 const {longestPath} = rankUtil

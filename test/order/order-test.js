@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import order from '../../lib/order'
 import crossCount from '../../lib/order/cross-count'
-import util from '../../lib/util'
+import {buildLayerMatrix} from '../../lib/util'
 
 describe('order', function () {
   var g
@@ -22,7 +22,7 @@ describe('order', function () {
     g.setEdge('b', 'd')
     g.setPath(['a', 'e', 'f'])
     order(g)
-    var layering = util.buildLayerMatrix(g)
+    var layering = buildLayerMatrix(g)
     expect(crossCount(g, layering)).to.equal(0)
   })
 
@@ -32,7 +32,7 @@ describe('order', function () {
     _.each(['b', 'f', 'e'], function (v) { g.setNode(v, { rank: 2 }) })
     _.each(['c', 'g'], function (v) { g.setNode(v, { rank: 3 }) })
     order(g)
-    var layering = util.buildLayerMatrix(g)
+    var layering = buildLayerMatrix(g)
     expect(crossCount(g, layering)).to.equal(0)
   })
 
@@ -42,7 +42,7 @@ describe('order', function () {
     _.each(['c', 'f', 'h'], function (v) { g.setNode(v, { rank: 3 }) })
     g.setNode('d', { rank: 4 })
     order(g)
-    var layering = util.buildLayerMatrix(g)
+    var layering = buildLayerMatrix(g)
     expect(crossCount(g, layering)).to.be.lte(1)
   })
 })
