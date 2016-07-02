@@ -20,14 +20,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-module.exports = {
-  graphlib: require("./lib/graphlib"),
+import {debugOrdering} from './lib/debug'
 
-  layout: require("./lib/layout"),
-  debug: require("./lib/debug"),
-  util: {
-    time: require("./lib/util").time,
-    notime: require("./lib/util").notime
-  },
-  version: require("./lib/version")
-};
+export const debug = {
+  debugOrdering
+}
+
+export {default as layout} from './lib/layout'
+
+import {
+  addBorderNode,
+  addDummyNode,
+  asNonCompoundGraph,
+  buildLayerMatrix,
+  intersectRect,
+  maxRank,
+  normalizeRanks,
+  notime,
+  partition,
+  predecessorWeights,
+  removeEmptyRanks,
+  simplify,
+  successorWeights,
+  time
+} from './lib/util'
+
+export const util = {
+  addBorderNode,
+  addDummyNode,
+  asNonCompoundGraph,
+  buildLayerMatrix,
+  intersectRect,
+  maxRank,
+  normalizeRanks,
+  notime,
+  partition,
+  predecessorWeights,
+  removeEmptyRanks,
+  simplify,
+  successorWeights,
+  time
+}
+
+export {default as version} from './lib/version'

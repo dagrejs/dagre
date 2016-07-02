@@ -1,7 +1,2 @@
-/bench
-/build
-/Makefile
 /node_modules
-/src
 /test
-/tmp

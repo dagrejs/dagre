@@ -1,219 +1,220 @@
-var _ = require("lodash"),
-    expect = require("./chai").expect,
-    normalize = require("../lib/normalize"),
-    Graph = require("graphlib").Graph;
+import {expect} from 'chai'
+import {Graph} from 'graphlib'
+import _ from 'lodash'
 
-describe("normalize", function() {
-  var g;
+import normalize from '../lib/normalize'
 
-  beforeEach(function() {
-    g = new Graph({ multigraph: true, compound: true }).setGraph({});
-  });
+describe('normalize', function () {
+  var g
 
-  describe("run", function() {
-    it("does not change a short edge", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 1 });
-      g.setEdge("a", "b", {});
+  beforeEach(function () {
+    g = new Graph({ multigraph: true, compound: true }).setGraph({})
+  })
 
-      normalize.run(g);
+  describe('run', function () {
+    it('does not change a short edge', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 1 })
+      g.setEdge('a', 'b', {})
 
-      expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: "a", w: "b" }]);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(1);
-    });
+      normalize.run(g)
 
-    it("splits a two layer edge into two segments", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", {});
+      expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: 'a', w: 'b' }])
+      expect(g.node('a').rank).to.equal(0)
+      expect(g.node('b').rank).to.equal(1)
+    })
 
-      normalize.run(g);
+    it('splits a two layer edge into two segments', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 2 })
+      g.setEdge('a', 'b', {})
 
-      expect(g.successors("a")).to.have.length(1);
-      var successor = g.successors("a")[0];
-      expect(g.node(successor).dummy).to.equal("edge");
-      expect(g.node(successor).rank).to.equal(1);
-      expect(g.successors(successor)).to.eql(["b"]);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(2);
+      normalize.run(g)
 
-      expect(g.graph().dummyChains).to.have.length(1);
-      expect(g.graph().dummyChains[0]).to.equal(successor);
-    });
+      expect(g.successors('a')).to.have.length(1)
+      var successor = g.successors('a')[0]
+      expect(g.node(successor).dummy).to.equal('edge')
+      expect(g.node(successor).rank).to.equal(1)
+      expect(g.successors(successor)).to.eql(['b'])
+      expect(g.node('a').rank).to.equal(0)
+      expect(g.node('b').rank).to.equal(2)
 
-    it("assigns width = 0, height = 0 to dummy nodes by default", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", { width: 10, height: 10 });
+      expect(g.graph().dummyChains).to.have.length(1)
+      expect(g.graph().dummyChains[0]).to.equal(successor)
+    })
 
-      normalize.run(g);
+    it('assigns width = 0, height = 0 to dummy nodes by default', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 2 })
+      g.setEdge('a', 'b', { width: 10, height: 10 })
 
-      expect(g.successors("a")).to.have.length(1);
-      var successor = g.successors("a")[0];
-      expect(g.node(successor).width).to.equal(0);
-      expect(g.node(successor).height).to.equal(0);
-    });
+      normalize.run(g)
 
-    it("assigns width and height from the edge for the node on labelRank", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 4 });
-      g.setEdge("a", "b", { width: 20, height: 10, labelRank: 2 });
+      expect(g.successors('a')).to.have.length(1)
+      var successor = g.successors('a')[0]
+      expect(g.node(successor).width).to.equal(0)
+      expect(g.node(successor).height).to.equal(0)
+    })
 
-      normalize.run(g);
+    it('assigns width and height from the edge for the node on labelRank', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 4 })
+      g.setEdge('a', 'b', { width: 20, height: 10, labelRank: 2 })
 
-      var labelV = g.successors(g.successors("a")[0])[0],
-          labelNode = g.node(labelV);
-      expect(labelNode.width).to.equal(20);
-      expect(labelNode.height).to.equal(10);
-    });
+      normalize.run(g)
 
-    it("preserves the weight for the edge", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", { weight: 2 });
+      var labelV = g.successors(g.successors('a')[0])[0]
+      var labelNode = g.node(labelV)
+      expect(labelNode.width).to.equal(20)
+      expect(labelNode.height).to.equal(10)
+    })
 
-      normalize.run(g);
+    it('preserves the weight for the edge', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 2 })
+      g.setEdge('a', 'b', { weight: 2 })
 
-      expect(g.successors("a")).to.have.length(1);
-      expect(g.edge("a", g.successors("a")[0]).weight).to.equal(2);
-    });
-  });
+      normalize.run(g)
 
-  describe("undo", function() {
-    it("reverses the run operation", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", {});
+      expect(g.successors('a')).to.have.length(1)
+      expect(g.edge('a', g.successors('a')[0]).weight).to.equal(2)
+    })
+  })
 
-      normalize.run(g);
-      normalize.undo(g);
+  describe('undo', function () {
+    it('reverses the run operation', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 2 })
+      g.setEdge('a', 'b', {})
 
-      expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: "a", w: "b" }]);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(2);
-    });
+      normalize.run(g)
+      normalize.undo(g)
 
-    it("restores previous edge labels", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", { foo: "bar" });
+      expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: 'a', w: 'b' }])
+      expect(g.node('a').rank).to.equal(0)
+      expect(g.node('b').rank).to.equal(2)
+    })
 
-      normalize.run(g);
-      normalize.undo(g);
+    it('restores previous edge labels', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 2 })
+      g.setEdge('a', 'b', { foo: 'bar' })
 
-      expect(g.edge("a", "b").foo).equals("bar");
-    });
+      normalize.run(g)
+      normalize.undo(g)
 
-    it("collects assigned coordinates into the 'points' attribute", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", {});
+      expect(g.edge('a', 'b').foo).equals('bar')
+    })
 
-      normalize.run(g);
+    it("collects assigned coordinates into the 'points' attribute", function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 2 })
+      g.setEdge('a', 'b', {})
 
-      var dummyLabel = g.node(g.neighbors("a")[0]);
-      dummyLabel.x = 5;
-      dummyLabel.y = 10;
+      normalize.run(g)
 
-      normalize.undo(g);
+      var dummyLabel = g.node(g.neighbors('a')[0])
+      dummyLabel.x = 5
+      dummyLabel.y = 10
 
-      expect(g.edge("a", "b").points).eqls([{ x: 5, y: 10 }]);
-    });
+      normalize.undo(g)
 
-    it("merges assigned coordinates into the 'points' attribute", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 4 });
-      g.setEdge("a", "b", {});
+      expect(g.edge('a', 'b').points).eqls([{ x: 5, y: 10 }])
+    })
 
-      normalize.run(g);
+    it("merges assigned coordinates into the 'points' attribute", function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 4 })
+      g.setEdge('a', 'b', {})
 
-      var aSucLabel = g.node(g.neighbors("a")[0]);
-      aSucLabel.x = 5;
-      aSucLabel.y = 10;
+      normalize.run(g)
 
-      var midLabel = g.node(g.successors(g.successors("a")[0])[0]);
-      midLabel.x = 20;
-      midLabel.y = 25;
+      var aSucLabel = g.node(g.neighbors('a')[0])
+      aSucLabel.x = 5
+      aSucLabel.y = 10
 
-      var bPredLabel = g.node(g.neighbors("b")[0]);
-      bPredLabel.x = 100;
-      bPredLabel.y = 200;
+      var midLabel = g.node(g.successors(g.successors('a')[0])[0])
+      midLabel.x = 20
+      midLabel.y = 25
 
-      normalize.undo(g);
+      var bPredLabel = g.node(g.neighbors('b')[0])
+      bPredLabel.x = 100
+      bPredLabel.y = 200
 
-      expect(g.edge("a", "b").points)
-        .eqls([{ x: 5, y: 10 }, { x: 20, y: 25 }, { x: 100, y: 200 }]);
-    });
+      normalize.undo(g)
 
-    it("sets coords and dims for the label, if the edge has one", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", { width: 10, height: 20, labelRank: 1 });
+      expect(g.edge('a', 'b').points)
+        .eqls([{ x: 5, y: 10 }, { x: 20, y: 25 }, { x: 100, y: 200 }])
+    })
 
-      normalize.run(g);
+    it('sets coords and dims for the label, if the edge has one', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 2 })
+      g.setEdge('a', 'b', { width: 10, height: 20, labelRank: 1 })
 
-      var labelNode = g.node(g.successors("a")[0]);
-      labelNode.x = 50;
-      labelNode.y = 60;
-      labelNode.width = 20;
-      labelNode.height = 10;
+      normalize.run(g)
 
-      normalize.undo(g);
+      var labelNode = g.node(g.successors('a')[0])
+      labelNode.x = 50
+      labelNode.y = 60
+      labelNode.width = 20
+      labelNode.height = 10
 
-      expect(_.pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
+      normalize.undo(g)
+
+      expect(_.pick(g.edge('a', 'b'), ['x', 'y', 'width', 'height'])).eqls({
         x: 50, y: 60, width: 20, height: 10
-      });
-    });
+      })
+    })
 
-    it("sets coords and dims for the label, if the long edge has one", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 4 });
-      g.setEdge("a", "b", { width: 10, height: 20, labelRank: 2 });
+    it('sets coords and dims for the label, if the long edge has one', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 4 })
+      g.setEdge('a', 'b', { width: 10, height: 20, labelRank: 2 })
 
-      normalize.run(g);
+      normalize.run(g)
 
-      var labelNode = g.node(g.successors(g.successors("a")[0])[0]);
-      labelNode.x = 50;
-      labelNode.y = 60;
-      labelNode.width = 20;
-      labelNode.height = 10;
+      var labelNode = g.node(g.successors(g.successors('a')[0])[0])
+      labelNode.x = 50
+      labelNode.y = 60
+      labelNode.width = 20
+      labelNode.height = 10
 
-      normalize.undo(g);
+      normalize.undo(g)
 
-      expect(_.pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
+      expect(_.pick(g.edge('a', 'b'), ['x', 'y', 'width', 'height'])).eqls({
         x: 50, y: 60, width: 20, height: 10
-      });
-    });
+      })
+    })
 
-    it("restores multi-edges", function() {
-      g.setNode("a", { rank: 0 });
-      g.setNode("b", { rank: 2 });
-      g.setEdge("a", "b", {}, "bar");
-      g.setEdge("a", "b", {}, "foo");
+    it('restores multi-edges', function () {
+      g.setNode('a', { rank: 0 })
+      g.setNode('b', { rank: 2 })
+      g.setEdge('a', 'b', {}, 'bar')
+      g.setEdge('a', 'b', {}, 'foo')
 
-      normalize.run(g);
+      normalize.run(g)
 
-      var outEdges = _.sortBy(g.outEdges("a"), "name");
-      expect(outEdges).to.have.length(2);
+      var outEdges = _.sortBy(g.outEdges('a'), 'name')
+      expect(outEdges).to.have.length(2)
 
-      var barDummy = g.node(outEdges[0].w);
-      barDummy.x = 5;
-      barDummy.y = 10;
+      var barDummy = g.node(outEdges[0].w)
+      barDummy.x = 5
+      barDummy.y = 10
 
-      var fooDummy = g.node(outEdges[1].w);
-      fooDummy.x = 15;
-      fooDummy.y = 20;
+      var fooDummy = g.node(outEdges[1].w)
+      fooDummy.x = 15
+      fooDummy.y = 20
 
-      normalize.undo(g);
+      normalize.undo(g)
 
-      expect(g.hasEdge("a", "b")).to.be.false;
-      expect(g.edge("a", "b", "bar").points).eqls([{ x: 5, y: 10 }]);
-      expect(g.edge("a", "b", "foo").points).eqls([{ x: 15, y: 20 }]);
-    });
-  });
-});
+      expect(g.hasEdge('a', 'b')).to.be.false
+      expect(g.edge('a', 'b', 'bar').points).eqls([{ x: 5, y: 10 }])
+      expect(g.edge('a', 'b', 'foo').points).eqls([{ x: 15, y: 20 }])
+    })
+  })
+})
 
-function incidentNodes(edge) {
-  return { v: edge.v, w: edge.w };
+function incidentNodes (edge) {
+  return { v: edge.v, w: edge.w }
 }
