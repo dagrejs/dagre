@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.7.5-pre",
+  "version": "0.7.5-pre.1",
   "description": "Graph layout for JavaScript",
   "scripts": {
     "lint": "npm run lint-js",
