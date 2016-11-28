@@ -1,0 +1,58 @@
+
+<link rel="stylesheet" type="text/css" href="dagre-d3-simple.css">
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="../dagre.js"></script>
+<script src="dagre-d3-simple.js"></script>
+
+<div id="attach">
+  <svg id="svg-canvas" width=800 height=600></svg>
+</div>
+
+<style>
+  .type-TK > .label > rect {
+    fill: #00ffd0;
+  }
+</style>
+
+<script>
+
+  var nodes = {
+    0: {"label": "TOP", "id": "0", "nodeclass": "type-TOP"},
+    1: {"label": "S", "id": "1", "nodeclass": "type-S"},
+    2: {"label": "NP", "id": "2", "nodeclass": "type-NP"},
+    3: {"label": "DT", "id": "3", "nodeclass": "t1ype-DT"},
+    4: {"label": "This", "id": "4", "nodeclass": "type-TK"},
+    5: {"label": "VP", "id": "5", "nodeclass": "type-VP"},
+    6: {"label": "VBZ", "id": "6", "nodeclass": "type-VBZ"},
+    7: {"label": "is", "id": "7", "nodeclass": "type-TK"},
+    8: {"label": "NP", "id": "8", "nodeclass": "type-NP"},
+    9: {"label": "DT", "id": "9", "nodeclass": "type-DT"},
+    10: {"label": "an", "id": "10", "nodeclass": "type-TK"},
+    11: {"label": "NN", "id": "11", "nodeclass": "type-NN"},
+    12: {"label": "example", "id": "12", "nodeclass": "type-TK"},
+    13: {"label": ".", "id": "13", "nodeclass": "type-."},
+    14: {"label": "sentence", "id": "14", "nodeclass": "type-TK"}
+  };
+
+  var edges =
+      [
+        {"source": 3, "target": 4, "id": "3-4"},
+        {"source": 2, "target": 3, "id": "2-3"},
+        {"source": 1, "target": 2, "id": "1-2"},
+        {"source": 6, "target": 7, "id": "6-7"},
+        {"source": 5, "target": 6, "id": "5-6"},
+        {"source": 9, "target": 10, "id": "9-10"},
+        {"source": 8, "target": 9, "id": "8-9"},
+        {"source": 11, "target": 12, "id": "11-12"},
+        {"source": 8, "target": 11, "id": "8-11"},
+        {"source": 5, "target": 8, "id": "5-8"},
+        {"source": 1, "target": 5, "id": "1-5"},
+        {"source": 13, "target": 14, "id": "13-14"},
+        {"source": 1, "target": 13, "id": "1-13"},
+        {"source": 0, "target": 1, "id": "0-1"}
+      ];
+
+  renderDagreToD3(nodes, edges, "svg");
+
+</script>

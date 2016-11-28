@@ -1,0 +1,17 @@
+<link rel="stylesheet" type="text/css" href="dagre-d3-simple.css">
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="../dagre.js"></script>
+<script src="dagre-d3-simple.js"></script>
+
+<svg id="svg-canvas" width=800 height=600></svg>
+
+<style>
+  #node-E rect {
+    fill: #acf;
+  }
+</style>
+
+<script>
+  renderDotToD3('digraph {A [label="<div style=\'padding: 10px;\'>A <span style=\'font-size:32px\'>Big</span> <span style=\'color:red;\'>HTML</span> Source!</div>"];C;E [label="A blue sink"];A -> B -> C;B -> D -> E;C -> E;A -> D [label="<div>A multi-rank <span style=\'color:blue;\'>HTML</span> edge!</div>"];}', "svg");
+</script>

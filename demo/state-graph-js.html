@@ -1,0 +1,37 @@
+<link rel="stylesheet" type="text/css" href="dagre-d3-simple.css">
+
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="../dagre.js"></script>
+<script src="dagre-d3-simple.js"></script>
+
+<svg id="svg-canvas" width=800 height=600></svg>
+
+<style>
+  #node-E rect {
+    fill: #acf;
+  }
+</style>
+
+<script>
+
+  var nodes = {
+    A: {"label": "<div style='padding: 10px;'>A <span style='font-size:32px'>Big</span> <span style='color:red;'>HTML</span> Source!</div>", "id": "A"},
+    B: {"label": "B", "id": "B"},
+    C: {"label": "C", "id": "C"},
+    D: {"label": "D", "id": "D"},
+    E: {"label": "A blue sink", "id": "E"}
+  };
+
+  var edges =
+      [
+        {"source": "A", "target": "B", "id": "AB"},
+        {"source": "A", "target": "D", "id": "AD", "label": "<div>A multi-rank <span style='color:blue;'>HTML</span> edge!</div>"},
+        {"source": "B", "target": "C", "id": "BC"},
+        {"source": "B", "target": "D", "id": "BD"},
+        {"source": "C", "target": "E", "id": "CE"},
+        {"source": "D", "target": "E", "id": "DE"}
+      ];
+
+  renderDagreToD3(nodes, edges, "svg");
+
+</script>
