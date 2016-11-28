@@ -1,3 +1,5 @@
-/build
-/node_modules
-/tmp
+build/
+node_modules/
+tmp/
+dist/
+.tags
