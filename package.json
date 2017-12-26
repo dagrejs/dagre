@@ -1,6 +1,6 @@
 {
   "name": "@dagrejs/dagre",
-  "version": "0.7.5-pre",
+  "version": "0.7.5",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "main": "index.js",
