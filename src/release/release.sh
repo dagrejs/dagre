@@ -28,7 +28,7 @@ echo Attemping to publish version: $VERSION
 
 # Publish to pages
 rm -rf $PAGES_DIR
-git clone git@github.com:cpettitt/cpettitt.github.com.git $PAGES_DIR
+git clone git@github.com:dagrejs/dagrejs.github.io.git $PAGES_DIR
 
 TMP_TARGET=$PAGES_DIR/project/$PROJECT/latest
 rm -rf $TMP_TARGET
@@ -54,7 +54,7 @@ git push origin v$VERSION
 echo Published $PROJECT v$VERSION
 
 # Publish to npm
-npm publish
+npm publish --access=public
 echo Published to npm
 
 # Update patch level version + commit
