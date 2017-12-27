@@ -1,6 +1,6 @@
 # dagre - Graph layout for JavaScript
 
-[![Build Status](https://secure.travis-ci.org/cpettitt/dagre.svg?branch=master)](http://travis-ci.org/cpettitt/dagre)
+[![Build Status](https://secure.travis-ci.org/dagrejs/dagre.svg?branch=master)](http://travis-ci.org/dagrejs/dagre)
 
 Dagre is a JavaScript library that makes it easy to lay out directed graphs on
 the client-side.
