@@ -3,6 +3,9 @@
   "version": "0.7.6-pre",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
+  "contributors": [
+    "Matthew Dahl (https://github.com/sandersky)"
+  ],
   "main": "index.js",
   "keywords": [
     "graph",
