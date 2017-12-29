@@ -1,8 +1,8 @@
 var _ = require("lodash"),
     expect = require("./chai").expect,
     acyclic = require("../lib/acyclic"),
-    Graph = require("graphlib").Graph,
-    findCycles = require("graphlib").alg.findCycles;
+    Graph = require("../lib/graphlib").Graph,
+    findCycles = require("../lib/graphlib").alg.findCycles;
 
 describe("acyclic", function() {
   var ACYCLICERS = [

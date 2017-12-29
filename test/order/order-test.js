@@ -1,6 +1,6 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
-    Graph = require("graphlib").Graph,
+    Graph = require("../../lib/graphlib").Graph,
     order = require("../../lib/order"),
     crossCount = require("../../lib/order/cross-count"),
     util = require("../../lib/util");

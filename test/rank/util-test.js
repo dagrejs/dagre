@@ -1,5 +1,5 @@
 var expect = require("../chai").expect,
-    Graph = require("graphlib").Graph,
+    Graph = require("../../lib/graphlib").Graph,
     normalizeRanks = require("../../lib/util").normalizeRanks,
     rankUtil = require("../../lib/rank/util"),
     longestPath = rankUtil.longestPath;

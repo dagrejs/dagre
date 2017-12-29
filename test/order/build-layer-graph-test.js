@@ -1,6 +1,6 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
-    Graph = require("graphlib").Graph,
+    Graph = require("../../lib/graphlib").Graph,
     buildLayerGraph = require("../../lib/order/build-layer-graph");
 
 describe("order/buildLayerGraph", function() {

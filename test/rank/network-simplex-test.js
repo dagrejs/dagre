@@ -1,7 +1,6 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
-    Graph = require("graphlib").Graph,
-    Graph = require("graphlib").Graph,
+    Graph = require("../../lib/graphlib").Graph,
     networkSimplex = require("../../lib/rank/network-simplex"),
     longestPath = require("../../lib/rank/util").longestPath,
     initLowLimValues = networkSimplex.initLowLimValues,

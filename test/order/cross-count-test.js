@@ -1,5 +1,5 @@
 var expect = require("../chai").expect,
-    Graph = require("graphlib").Graph,
+    Graph = require("../../lib/graphlib").Graph,
     crossCount = require("../../lib/order/cross-count");
 
 describe("crossCount", function() {

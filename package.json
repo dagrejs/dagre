@@ -9,7 +9,7 @@
     "layout"
   ],
   "dependencies": {
-    "graphlib": "^1.0.5",
+    "@dagrejs/graphlib": "^2.1.4",
     "lodash": "^4.11.1"
   },
   "devDependencies": {

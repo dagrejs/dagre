@@ -1,7 +1,7 @@
 var _ = require("lodash"),
     expect = require("./chai").expect,
-    Graph = require("graphlib").Graph,
-    findCycles = require("graphlib").alg.findCycles,
+    Graph = require("../lib/graphlib").Graph,
+    findCycles = require("../lib/graphlib").alg.findCycles,
     greedyFAS = require("../lib/greedy-fas");
 
 describe("greedyFAS", function() {

@@ -1,6 +1,6 @@
 var _ = require("lodash"),
     expect = require("../chai").expect,
-    Graph = require("graphlib").Graph,
+    Graph = require("../../lib/graphlib").Graph,
     addSubgraphConstraints = require("../../lib/order/add-subgraph-constraints");
 
 describe("order/addSubgraphConstraints", function() {

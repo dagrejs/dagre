@@ -12,7 +12,7 @@ var _ = require("lodash"),
     balance = bk.balance,
     findSmallestWidthAlignment = bk.findSmallestWidthAlignment,
     positionX = bk.positionX,
-    Graph = require("graphlib").Graph;
+    Graph = require("../../lib/graphlib").Graph;
 
 describe("position/bk", function() {
   var g;
