@@ -106,7 +106,7 @@ describe("order/buildLayerGraph", function() {
       borderLeft: ["bl"],
       borderRight: ["br"]
     });
-    _.each(["a", "b"], function(v) { g.setParent(v, "sg"); });
+    _.forEach(["a", "b"], function(v) { g.setParent(v, "sg"); });
 
     var lg = buildLayerGraph(g, 0, "inEdges"),
         root = lg.graph().root;

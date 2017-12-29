@@ -55,7 +55,7 @@ describe("position/bk", function() {
       expect(hasConflict(conflicts, "b", "c")).to.be.false;
     });
 
-    _.each(["a", "b", "c", "d"], function(v) {
+    _.forEach(["a", "b", "c", "d"], function(v) {
       it("does not mark type-0 conflicts (" + v + " is dummy)", function() {
         g.node(v).dummy = true;
 
@@ -65,9 +65,9 @@ describe("position/bk", function() {
       });
     });
 
-    _.each(["a", "b", "c", "d"], function(v) {
+    _.forEach(["a", "b", "c", "d"], function(v) {
       it("does mark type-1 conflicts (" + v + " is non-dummy)", function() {
-        _.each(["a", "b", "c", "d"], function(w) {
+        _.forEach(["a", "b", "c", "d"], function(w) {
           if (v !== w) {
             g.node(w).dummy = true;
           }
@@ -85,7 +85,7 @@ describe("position/bk", function() {
     });
 
     it("does not mark type-2 conflicts (all dummies)", function() {
-      _.each(["a", "b", "c", "d"], function(v) {
+      _.forEach(["a", "b", "c", "d"], function(v) {
         g.node(v).dummy = true;
       });
 
@@ -114,11 +114,11 @@ describe("position/bk", function() {
     });
 
     it("marks type-2 conflicts favoring border segments #1", function() {
-      _.each(["a", "d"], function(v) {
+      _.forEach(["a", "d"], function(v) {
         g.node(v).dummy = true;
       });
 
-      _.each(["b", "c"], function(v) {
+      _.forEach(["b", "c"], function(v) {
         g.node(v).dummy = "border";
       });
 
@@ -129,11 +129,11 @@ describe("position/bk", function() {
     });
 
     it("marks type-2 conflicts favoring border segments #2", function() {
-      _.each(["b", "c"], function(v) {
+      _.forEach(["b", "c"], function(v) {
         g.node(v).dummy = true;
       });
 
-      _.each(["a", "d"], function(v) {
+      _.forEach(["a", "d"], function(v) {
         g.node(v).dummy = "border";
       });
 

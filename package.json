@@ -10,7 +10,7 @@
   ],
   "dependencies": {
     "graphlib": "^1.0.5",
-    "lodash": "^3.10.0"
+    "lodash": "^4.11.1"
   },
   "devDependencies": {
     "benchmark": "^1.0.0",

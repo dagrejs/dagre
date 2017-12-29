@@ -20,12 +20,12 @@ describe("rank", function() {
       .setPath(["a", "f", "g"]);
   });
 
-  _.each(RANKERS, function(ranker) {
+  _.forEach(RANKERS, function(ranker) {
     describe(ranker, function() {
       it("respects the minlen attribute", function() {
         g.graph().ranker = ranker;
         rank(g);
-        _.each(g.edges(), function(e) {
+        _.forEach(g.edges(), function(e) {
           var vRank = g.node(e.v).rank,
               wRank = g.node(e.w).rank;
           expect(wRank - vRank).to.be.gte(g.edge(e).minlen);

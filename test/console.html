@@ -6,7 +6,7 @@
 <script src="../build/dagre.js"></script>
 <script src="http://cpettitt.github.io/project/graphlib-dot/latest/graphlib-dot.js"></script>
 <script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.js"></script>
 
 <style>
 body {
@@ -130,7 +130,7 @@ function render(g) {
 }
 
 function preLayout(g, svg) {
-  _.each(g.edges(), function(e) {
+  _.forEach(g.edges(), function(e) {
     var edge = g.edge(e);
     if (edge.label) {
       var group = appendLabel(svg, edge.label, edge, 0, 0);
@@ -138,7 +138,7 @@ function preLayout(g, svg) {
     }
   });
 
-  _.each(g.nodes(), function(v) {
+  _.forEach(g.nodes(), function(v) {
     if (g.children(v).length) {
       return;
     }
@@ -190,7 +190,7 @@ function postLayout(g, root, svg) {
                             "scale(" + d3.event.scale + ")");
   }));
 
-  _.each(g.edges(), function(e) {
+  _.forEach(g.edges(), function(e) {
     var group = svg.select("g#edge-" + edgeObjToId(e));
     if (!group.empty()) {
       var edge = g.edge(e);
@@ -198,13 +198,13 @@ function postLayout(g, root, svg) {
     }
   });
 
-  _.each(g.nodes(), function(v) {
+  _.forEach(g.nodes(), function(v) {
     var group = svg.select("g#node-" + id(v)),
         node = g.node(v);
     group.attr("transform", "translate(" + node.x + "," + node.y + ")");
   });
 
-  _.each(g.edges(), function(e) {
+  _.forEach(g.edges(), function(e) {
     var points = g.edge(e).points,
         path = svg.insert("path", ":first-child")
                 .classed("edge", true)
@@ -218,7 +218,7 @@ function postLayout(g, root, svg) {
   function dfsChildren(v) {
     var children = g.children(v);
     if (children.length) {
-      _.each(children, dfsChildren);
+      _.forEach(children, dfsChildren);
 
       var node = g.node(v);
       svg.insert("g", ":first-child")
@@ -230,7 +230,7 @@ function postLayout(g, root, svg) {
            .attr("height", node.height);
     }
   };
-  _.each(g.children(), dfsChildren);
+  _.forEach(g.children(), dfsChildren);
 }
 
 function edgeObjToId(e) {

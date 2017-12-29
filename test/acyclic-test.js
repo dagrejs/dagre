@@ -17,7 +17,7 @@ describe("acyclic", function() {
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; });
   });
 
-  _.each(ACYCLICERS, function(acyclicer) {
+  _.forEach(ACYCLICERS, function(acyclicer) {
     describe(acyclicer, function() {
       beforeEach(function() {
         g.setGraph({ acyclicer: acyclicer });
@@ -29,7 +29,7 @@ describe("acyclic", function() {
           g.setPath(["a", "c", "d"]);
           acyclic.run(g);
           var results = _.map(g.edges(), stripLabel);
-          expect(_.sortByAll(results, ["v", "w"])).to.eql([
+          expect(_.sortBy(results, ["v", "w"])).to.eql([
             { v: "a", w: "b" },
             { v: "a", w: "c" },
             { v: "b", w: "d" },
