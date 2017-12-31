@@ -20,7 +20,7 @@
     "test/**"
   ],
   "dependencies": {
-    "@dagrejs/graphlib": "^2.1.4",
+    "graphlib": "^2.1.4",
     "lodash": "^4.11.1"
   }
 }
