@@ -317,7 +317,7 @@ var graphlib;
 
 if (typeof require === "function") {
   try {
-    graphlib = require("@dagrejs/graphlib");
+    graphlib = require("graphlib");
   } catch (e) {}
 }
 
@@ -327,7 +327,7 @@ if (!graphlib) {
 
 module.exports = graphlib;
 
-},{"@dagrejs/graphlib":undefined}],8:[function(require,module,exports){
+},{"graphlib":undefined}],8:[function(require,module,exports){
 var _ = require("./lodash"),
     Graph = require("./graphlib").Graph,
     List = require("./data/list");
@@ -2910,7 +2910,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.8.0";
+module.exports = "0.8.1";
 
 },{}]},{},[1])(1)
 });

@@ -317,7 +317,7 @@ var graphlib;
 
 if (typeof require === "function") {
   try {
-    graphlib = require("@dagrejs/graphlib");
+    graphlib = require("graphlib");
   } catch (e) {}
 }
 
@@ -327,7 +327,7 @@ if (!graphlib) {
 
 module.exports = graphlib;
 
-},{"@dagrejs/graphlib":31}],8:[function(require,module,exports){
+},{"graphlib":31}],8:[function(require,module,exports){
 var _ = require("./lodash"),
     Graph = require("./graphlib").Graph,
     List = require("./data/list");
@@ -2910,7 +2910,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.8.0";
+module.exports = "0.8.1";
 
 },{}],31:[function(require,module,exports){
 /**
@@ -3616,26 +3616,29 @@ Graph.prototype.nodes = function() {
 };
 
 Graph.prototype.sources = function() {
-  return _.filter(this.nodes(), _.bind(function(v) {
-    return _.isEmpty(this._in[v]);
-  }, this));
+  var self = this;
+  return _.filter(this.nodes(), function(v) {
+    return _.isEmpty(self._in[v]);
+  });
 };
 
 Graph.prototype.sinks = function() {
-  return _.filter(this.nodes(), _.bind(function(v) {
-    return _.isEmpty(this._out[v]);
-  }, this));
+  var self = this;
+  return _.filter(this.nodes(), function(v) {
+    return _.isEmpty(self._out[v]);
+  });
 };
 
 Graph.prototype.setNodes = function(vs, value) {
   var args = arguments;
-  _.each(vs, _.bind(function(v) {
+  var self = this;
+  _.each(vs, function(v) {
     if (args.length > 1) {
-      this.setNode(v, value);
+      self.setNode(v, value);
     } else {
-      this.setNode(v);
+      self.setNode(v);
     }
-  }, this));
+  });
   return this;
 };
 
@@ -3677,9 +3680,9 @@ Graph.prototype.removeNode =  function(v) {
     if (this._isCompound) {
       this._removeFromParentsChildList(v);
       delete this._parent[v];
-      _.each(this.children(v), _.bind(function(child) {
-        this.setParent(child);
-      }, this));
+      _.each(this.children(v), function(child) {
+        self.setParent(child);
+      });
       delete this._children[v];
     }
     _.each(_.keys(this._in[v]), removeEdge);
@@ -3708,7 +3711,7 @@ Graph.prototype.setParent = function(v, parent) {
          ancestor = this.parent(ancestor)) {
       if (ancestor === v) {
         throw new Error("Setting " + parent+ " as parent of " + v +
-                        " would create create a cycle");
+                        " would create a cycle");
       }
     }
 
@@ -3792,19 +3795,19 @@ Graph.prototype.filterNodes = function(filter) {
 
   copy.setGraph(this.graph());
 
-  _.each(this._nodes, _.bind(function(value, v) {
+  var self = this;
+  _.each(this._nodes, function(value, v) {
     if (filter(v)) {
       copy.setNode(v, value);
     }
-  }, this));
+  });
 
-  _.each(this._edgeObjs, _.bind(function(e) {
+  _.each(this._edgeObjs, function(e) {
     if (copy.hasNode(e.v) && copy.hasNode(e.w)) {
-      copy.setEdge(e, this.edge(e));
+      copy.setEdge(e, self.edge(e));
     }
-  }, this));
+  });
 
-  var self = this;
   var parents = {};
   function findParent(v) {
     var parent = self.parent(v);
@@ -4109,7 +4112,7 @@ function read(json) {
 },{"./graph":46,"./lodash":49}],49:[function(require,module,exports){
 module.exports=require(10)
 },{"/mnt/extra/projects/dagre/lib/lodash.js":10,"lodash":51}],50:[function(require,module,exports){
-module.exports = '2.1.4';
+module.exports = '2.1.5';
 
 },{}],51:[function(require,module,exports){
 (function (global){
