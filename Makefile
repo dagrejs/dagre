@@ -10,7 +10,7 @@ MOCHA = ./node_modules/mocha/bin/_mocha
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 
 ISTANBUL_OPTS = --dir $(COVERAGE_DIR) --report html
-JSHINT_OPTS = --reporter node_modules/jshint-stylish/stylish.js
+JSHINT_OPTS = --reporter node_modules/jshint-stylish/index.js
 MOCHA_OPTS = -R dot
 
 BUILD_DIR = build
