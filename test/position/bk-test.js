@@ -429,14 +429,15 @@ describe("position/bk", function() {
       g.setNode("g", { rank: 2, order: 1, width: 50 });
 
       var xs = horizontalCompaction(g, buildLayerMatrix(g), root, align);
+      console.log("HERER :", xs);
 
       // Use f as 0, everything is relative to it
       expect(xs.a).to.equal(xs.b - 50 / 2 - 75 - 50 / 2);
       expect(xs.b).to.equal(xs.e);
-      expect(xs.c).to.equal(xs.f);
+      expect(xs.g - xs.f).to.equal(50 / 2 + 75 + 50 / 2);
+      expect(xs.e - xs.d).to.equal(50 / 2 + 75 + 50 / 2);
       expect(xs.d).to.equal(xs.c + 50 / 2 + 75 + 50 / 2);
-      expect(xs.e).to.equal(xs.d + 50 / 2 + 75 + 50 / 2);
-      expect(xs.g).to.equal(xs.f + 50 / 2 + 75 + 50 / 2);
+      expect(xs.c).to.equal(xs.f);
     });
 
     it("handles labelpos = l", function() {
