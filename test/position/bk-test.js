@@ -433,10 +433,10 @@ describe("position/bk", function() {
       // Use f as 0, everything is relative to it
       expect(xs.a).to.equal(xs.b - 50 / 2 - 75 - 50 / 2);
       expect(xs.b).to.equal(xs.e);
-      expect(xs.g - xs.f).to.equal(50 / 2 + 75 + 50 / 2);
-      expect(xs.e - xs.d).to.equal(50 / 2 + 75 + 50 / 2);
-      expect(xs.d).to.equal(xs.c + 50 / 2 + 75 + 50 / 2);
       expect(xs.c).to.equal(xs.f);
+      expect(xs.d).to.equal(xs.c + 50 / 2 + 75 + 50 / 2);
+      expect(xs.e).to.equal(xs.d + 50 / 2 + 75 + 50 / 2);
+      expect(xs.g).to.equal(xs.f + 50 / 2 + 75 + 50 / 2);
     });
 
     it("handles labelpos = l", function() {
