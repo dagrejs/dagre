@@ -429,7 +429,6 @@ describe("position/bk", function() {
       g.setNode("g", { rank: 2, order: 1, width: 50 });
 
       var xs = horizontalCompaction(g, buildLayerMatrix(g), root, align);
-      console.log("HERER :", xs);
 
       // Use f as 0, everything is relative to it
       expect(xs.a).to.equal(xs.b - 50 / 2 - 75 - 50 / 2);
