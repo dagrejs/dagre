@@ -1,4 +1,4 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.dagre=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.dagre = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
 Copyright (c) 2012-2014 Chris Pettitt
 
@@ -2001,36 +2001,47 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
   // coordinates. The second sweep removes unused space by moving blocks to the
   // greatest coordinates without violating separation.
   var xs = {},
-      blockG = buildBlockGraph(g, layering, root, reverseSep);
+      blockG = buildBlockGraph(g, layering, root, reverseSep),
+      borderType = reverseSep ? "borderLeft" : "borderRight";
 
-  // First pass, assign smallest coordinates via DFS
-  var visited = {};
-  function pass1(v) {
-    if (!_.has(visited, v)) {
-      visited[v] = true;
-      xs[v] = _.reduce(blockG.inEdges(v), function(max, e) {
-        pass1(e.v);
-        return Math.max(max, xs[e.v] + blockG.edge(e));
-      }, 0);
-    }
-  }
-  _.forEach(blockG.nodes(), pass1);
-
-  var borderType = reverseSep ? "borderLeft" : "borderRight";
-  function pass2(v) {
-    if (visited[v] !== 2) {
-      visited[v]++;
-      var node = g.node(v);
-      var min = _.reduce(blockG.outEdges(v), function(min, e) {
-        pass2(e.w);
-        return Math.min(min, xs[e.w] - blockG.edge(e));
-      }, Number.POSITIVE_INFINITY);
-      if (min !== Number.POSITIVE_INFINITY && node.borderType !== borderType) {
-        xs[v] = Math.max(xs[v], min);
+  function iterate(setXsFunc, nextNodesFunc) {
+    var stack = blockG.nodes();
+    var elem = stack.pop();
+    var visited = {};
+    while (elem) {
+      if (visited[elem]) {
+        setXsFunc(elem);
+      } else {
+        visited[elem] = true;
+        stack.push(elem);
+        stack = stack.concat(nextNodesFunc(elem));
       }
+
+      elem = stack.pop();
     }
   }
-  _.forEach(blockG.nodes(), pass2);
+
+  // First pass, assign smallest coordinates
+  function pass1(elem) {
+    xs[elem] = blockG.inEdges(elem).reduce(function(acc, e) {
+      return Math.max(acc, xs[e.v] + blockG.edge(e));
+    }, 0);
+  }
+
+  // Second pass, assign greatest coordinates
+  function pass2(elem) {
+    var min = blockG.outEdges(elem).reduce(function(acc, e) {
+      return Math.min(acc, xs[e.w] - blockG.edge(e));
+    }, Number.POSITIVE_INFINITY);
+
+    var node = g.node(elem);
+    if (min !== Number.POSITIVE_INFINITY && node.borderType !== borderType) {
+      xs[elem] = Math.max(xs[elem], min);
+    }
+  }
+
+  iterate(pass1, _.bind(blockG.predecessors, blockG));
+  iterate(pass2, _.bind(blockG.successors, blockG));
 
   // Assign x coordinates to all nodes
   _.forEach(align, function(v) {
@@ -2910,7 +2921,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.8.1";
+module.exports = "0.8.2";
 
 },{}]},{},[1])(1)
 });
