@@ -848,7 +848,34 @@ var lodash;
 
 if (typeof require === "function") {
   try {
-    lodash = require("lodash");
+    lodash = {
+      cloneDeep: require("lodash/cloneDeep"),
+      constant: require("lodash/constant"),
+      defaults: require("lodash/defaults"),
+      each: require("lodash/each"),
+      filter: require("lodash/filter"),
+      find: require("lodash/find"),
+      flatten: require("lodash/flatten"),
+      forEach: require("lodash/forEach"),
+      forIn: require("lodash/forIn"),
+      has:  require("lodash/has"),
+      isUndefined: require("lodash/isUndefined"),
+      last: require("lodash/last"),
+      map: require("lodash/map"),
+      mapValues: require("lodash/mapValues"),
+      max: require("lodash/max"),
+      merge: require("lodash/merge"),
+      min: require("lodash/min"),
+      minBy: require("lodash/minBy"),
+      now: require("lodash/now"),
+      pick: require("lodash/pick"),
+      range: require("lodash/range"),
+      reduce: require("lodash/reduce"),
+      sortBy: require("lodash/sortBy"),
+      uniqueId: require("lodash/uniqueId"),
+      values: require("lodash/values"),
+      zipObject: require("lodash/zipObject"),
+    };
   } catch (e) {}
 }
 
@@ -858,7 +885,7 @@ if (!lodash) {
 
 module.exports = lodash;
 
-},{"lodash":undefined}],11:[function(require,module,exports){
+},{"lodash/cloneDeep":undefined,"lodash/constant":undefined,"lodash/defaults":undefined,"lodash/each":undefined,"lodash/filter":undefined,"lodash/find":undefined,"lodash/flatten":undefined,"lodash/forEach":undefined,"lodash/forIn":undefined,"lodash/has":undefined,"lodash/isUndefined":undefined,"lodash/last":undefined,"lodash/map":undefined,"lodash/mapValues":undefined,"lodash/max":undefined,"lodash/merge":undefined,"lodash/min":undefined,"lodash/minBy":undefined,"lodash/now":undefined,"lodash/pick":undefined,"lodash/range":undefined,"lodash/reduce":undefined,"lodash/sortBy":undefined,"lodash/uniqueId":undefined,"lodash/values":undefined,"lodash/zipObject":undefined}],11:[function(require,module,exports){
 var _ = require("./lodash"),
     util = require("./util");
 
@@ -1282,12 +1309,9 @@ function twoLayerCrossCount(g, northLayer, southLayer) {
   var southPos = _.zipObject(southLayer,
                              _.map(southLayer, function (v, i) { return i; }));
   var southEntries = _.flatten(_.map(northLayer, function(v) {
-    return _.chain(g.outEdges(v))
-            .map(function(e) {
+    return _.sortBy(_.map(g.outEdges(v), function(e) {
               return { pos: southPos[e.w], weight: g.edge(e).weight };
-            })
-            .sortBy("pos")
-            .value();
+            }), "pos");
   }), true);
 
   // Build the accumulator tree
@@ -1533,12 +1557,11 @@ function doResolveConflicts(sourceSet) {
     _.forEach(entry.out, handleOut(entry));
   }
 
-  return _.chain(entries)
-          .filter(function(entry) { return !entry.merged; })
-          .map(function(entry) {
-            return _.pick(entry, ["vs", "i", "barycenter", "weight"]);
-          })
-          .value();
+  return _.map(_.filter(entries, function(entry) { return !entry.merged; }),
+               function(entry) {
+                 return _.pick(entry, ["vs", "i", "barycenter", "weight"]);
+               });
+
 }
 
 function mergeEntries(target, source) {
@@ -2040,8 +2063,8 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
     }
   }
 
-  iterate(pass1, _.bind(blockG.predecessors, blockG));
-  iterate(pass2, _.bind(blockG.successors, blockG));
+  iterate(pass1, blockG.predecessors.bind(blockG));
+  iterate(pass2, blockG.successors.bind(blockG));
 
   // Assign x coordinates to all nodes
   _.forEach(align, function(v) {
@@ -2149,7 +2172,7 @@ function positionX(g) {
         });
       }
 
-      var neighborFn = _.bind(vert === "u" ? g.predecessors : g.successors, g);
+      var neighborFn = (vert === "u" ? g.predecessors : g.successors).bind(g);
       var align = verticalAlignment(g, adjustedLayering, conflicts, neighborFn);
       var xs = horizontalCompaction(g, adjustedLayering,
                                     align.root, align.align,
@@ -2658,7 +2681,7 @@ function longestPath(g) {
     }
     visited[v] = true;
 
-    var rank = _.minBy(_.map(g.outEdges(v), function(e) {
+    var rank = _.min(_.map(g.outEdges(v), function(e) {
       return dfs(e.w) - g.edge(e).minlen;
     }));
 
@@ -2832,7 +2855,7 @@ function buildLayerMatrix(g) {
  * rank(v) >= 0 and at least one node w has rank(w) = 0.
  */
 function normalizeRanks(g) {
-  var min = _.minBy(_.map(g.nodes(), function(v) { return g.node(v).rank; }));
+  var min = _.min(_.map(g.nodes(), function(v) { return g.node(v).rank; }));
   _.forEach(g.nodes(), function(v) {
     var node = g.node(v);
     if (_.has(node, "rank")) {
@@ -2843,7 +2866,7 @@ function normalizeRanks(g) {
 
 function removeEmptyRanks(g) {
   // Ranks may not start at 0, so we need to offset them
-  var offset = _.minBy(_.map(g.nodes(), function(v) { return g.node(v).rank; }));
+  var offset = _.min(_.map(g.nodes(), function(v) { return g.node(v).rank; }));
 
   var layers = [];
   _.forEach(g.nodes(), function(v) {
@@ -2921,7 +2944,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.8.2";
+module.exports = "0.8.3-pre";
 
 },{}]},{},[1])(1)
 });
