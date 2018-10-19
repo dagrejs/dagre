@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.dagre = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.dagre = f()}})(function(){var define,module,exports;return (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 /*
 Copyright (c) 2012-2014 Chris Pettitt
 
@@ -36,7 +36,7 @@ module.exports = {
 },{"./lib/debug":6,"./lib/graphlib":7,"./lib/layout":9,"./lib/util":29,"./lib/version":30}],2:[function(require,module,exports){
 "use strict";
 
-var _ = require("./lodash"),
+var _ = require("./lodash_wrap"),
     greedyFAS = require("./greedy-fas");
 
 module.exports = {
@@ -102,8 +102,8 @@ function undo(g) {
   });
 }
 
-},{"./greedy-fas":8,"./lodash":10}],3:[function(require,module,exports){
-var _ = require("./lodash"),
+},{"./greedy-fas":8,"./lodash_wrap":10}],3:[function(require,module,exports){
+var _ = require("./lodash_wrap"),
     util = require("./util");
 
 module.exports = addBorderSegments;
@@ -142,10 +142,10 @@ function addBorderNode(g, prop, prefix, sg, sgNode, rank) {
   }
 }
 
-},{"./lodash":10,"./util":29}],4:[function(require,module,exports){
+},{"./lodash_wrap":10,"./util":29}],4:[function(require,module,exports){
 "use strict";
 
-var _ = require("./lodash");
+var _ = require("./lodash_wrap");
 
 module.exports = {
   adjust: adjust,
@@ -216,7 +216,7 @@ function swapXYOne(attrs) {
   attrs.y = x;
 }
 
-},{"./lodash":10}],5:[function(require,module,exports){
+},{"./lodash_wrap":10}],5:[function(require,module,exports){
 /*
  * Simple doubly linked list implementation derived from Cormen, et al.,
  * "Introduction to Algorithms".
@@ -275,7 +275,7 @@ function filterOutLinks(k, v) {
 }
 
 },{}],6:[function(require,module,exports){
-var _ = require("./lodash"),
+var _ = require("./lodash_wrap"),
     util = require("./util"),
     Graph = require("./graphlib").Graph;
 
@@ -310,7 +310,7 @@ function debugOrdering(g) {
   return h;
 }
 
-},{"./graphlib":7,"./lodash":10,"./util":29}],7:[function(require,module,exports){
+},{"./graphlib":7,"./lodash_wrap":10,"./util":29}],7:[function(require,module,exports){
 /* global window */
 
 var graphlib;
@@ -328,7 +328,7 @@ if (!graphlib) {
 module.exports = graphlib;
 
 },{"graphlib":31}],8:[function(require,module,exports){
-var _ = require("./lodash"),
+var _ = require("./lodash_wrap"),
     Graph = require("./graphlib").Graph,
     List = require("./data/list");
 
@@ -447,10 +447,10 @@ function assignBucket(buckets, zeroIdx, entry) {
   }
 }
 
-},{"./data/list":5,"./graphlib":7,"./lodash":10}],9:[function(require,module,exports){
+},{"./data/list":5,"./graphlib":7,"./lodash_wrap":10}],9:[function(require,module,exports){
 "use strict";
 
-var _ = require("./lodash"),
+var _ = require("./lodash_wrap"),
     acyclic = require("./acyclic"),
     normalize = require("./normalize"),
     rank = require("./rank"),
@@ -841,16 +841,14 @@ function canonicalize(attrs) {
   return newAttrs;
 }
 
-},{"./acyclic":2,"./add-border-segments":3,"./coordinate-system":4,"./graphlib":7,"./lodash":10,"./nesting-graph":11,"./normalize":12,"./order":17,"./parent-dummy-chains":22,"./position":24,"./rank":26,"./util":29}],10:[function(require,module,exports){
+},{"./acyclic":2,"./add-border-segments":3,"./coordinate-system":4,"./graphlib":7,"./lodash_wrap":10,"./nesting-graph":11,"./normalize":12,"./order":17,"./parent-dummy-chains":22,"./position":24,"./rank":26,"./util":29}],10:[function(require,module,exports){
 /* global window */
 
 var lodash;
 
-if (typeof require === "function") {
-  try {
-    lodash = require("lodash");
-  } catch (e) {}
-}
+try {
+  lodash = require("lodash");
+} catch (e) {}
 
 if (!lodash) {
   lodash = window._;
@@ -859,7 +857,7 @@ if (!lodash) {
 module.exports = lodash;
 
 },{"lodash":51}],11:[function(require,module,exports){
-var _ = require("./lodash"),
+var _ = require("./lodash_wrap"),
     util = require("./util");
 
 module.exports = {
@@ -992,10 +990,10 @@ function cleanup(g) {
   });
 }
 
-},{"./lodash":10,"./util":29}],12:[function(require,module,exports){
+},{"./lodash_wrap":10,"./util":29}],12:[function(require,module,exports){
 "use strict";
 
-var _ = require("./lodash"),
+var _ = require("./lodash_wrap"),
     util = require("./util");
 
 module.exports = {
@@ -1084,8 +1082,8 @@ function undo(g) {
   });
 }
 
-},{"./lodash":10,"./util":29}],13:[function(require,module,exports){
-var _ = require("../lodash");
+},{"./lodash_wrap":10,"./util":29}],13:[function(require,module,exports){
+var _ = require("../lodash_wrap");
 
 module.exports = addSubgraphConstraints;
 
@@ -1139,8 +1137,8 @@ function addSubgraphConstraints(g, cg, vs) {
   */
 }
 
-},{"../lodash":10}],14:[function(require,module,exports){
-var _ = require("../lodash");
+},{"../lodash_wrap":10}],14:[function(require,module,exports){
+var _ = require("../lodash_wrap");
 
 module.exports = barycenter;
 
@@ -1169,8 +1167,8 @@ function barycenter(g, movable) {
 }
 
 
-},{"../lodash":10}],15:[function(require,module,exports){
-var _ = require("../lodash"),
+},{"../lodash_wrap":10}],15:[function(require,module,exports){
+var _ = require("../lodash_wrap"),
     Graph = require("../graphlib").Graph;
 
 module.exports = buildLayerGraph;
@@ -1244,10 +1242,10 @@ function createRootNode(g) {
   return v;
 }
 
-},{"../graphlib":7,"../lodash":10}],16:[function(require,module,exports){
+},{"../graphlib":7,"../lodash_wrap":10}],16:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash");
+var _ = require("../lodash_wrap");
 
 module.exports = crossCount;
 
@@ -1316,10 +1314,10 @@ function twoLayerCrossCount(g, northLayer, southLayer) {
   return cc;
 }
 
-},{"../lodash":10}],17:[function(require,module,exports){
+},{"../lodash_wrap":10}],17:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash"),
+var _ = require("../lodash_wrap"),
     initOrder = require("./init-order"),
     crossCount = require("./cross-count"),
     sortSubgraph = require("./sort-subgraph"),
@@ -1397,10 +1395,10 @@ function assignOrder(g, layering) {
   });
 }
 
-},{"../graphlib":7,"../lodash":10,"../util":29,"./add-subgraph-constraints":13,"./build-layer-graph":15,"./cross-count":16,"./init-order":18,"./sort-subgraph":20}],18:[function(require,module,exports){
+},{"../graphlib":7,"../lodash_wrap":10,"../util":29,"./add-subgraph-constraints":13,"./build-layer-graph":15,"./cross-count":16,"./init-order":18,"./sort-subgraph":20}],18:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash");
+var _ = require("../lodash_wrap");
 
 module.exports = initOrder;
 
@@ -1437,10 +1435,10 @@ function initOrder(g) {
   return layers;
 }
 
-},{"../lodash":10}],19:[function(require,module,exports){
+},{"../lodash_wrap":10}],19:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash");
+var _ = require("../lodash_wrap");
 
 module.exports = resolveConflicts;
 
@@ -1562,8 +1560,8 @@ function mergeEntries(target, source) {
   source.merged = true;
 }
 
-},{"../lodash":10}],20:[function(require,module,exports){
-var _ = require("../lodash"),
+},{"../lodash_wrap":10}],20:[function(require,module,exports){
+var _ = require("../lodash_wrap"),
     barycenter = require("./barycenter"),
     resolveConflicts = require("./resolve-conflicts"),
     sort = require("./sort");
@@ -1640,8 +1638,8 @@ function mergeBarycenters(target, other) {
   }
 }
 
-},{"../lodash":10,"./barycenter":14,"./resolve-conflicts":19,"./sort":21}],21:[function(require,module,exports){
-var _ = require("../lodash"),
+},{"../lodash_wrap":10,"./barycenter":14,"./resolve-conflicts":19,"./sort":21}],21:[function(require,module,exports){
+var _ = require("../lodash_wrap"),
     util = require("../util");
 
 module.exports = sort;
@@ -1699,8 +1697,8 @@ function compareWithBias(bias) {
   };
 }
 
-},{"../lodash":10,"../util":29}],22:[function(require,module,exports){
-var _ = require("./lodash");
+},{"../lodash_wrap":10,"../util":29}],22:[function(require,module,exports){
+var _ = require("./lodash_wrap");
 
 module.exports = parentDummyChains;
 
@@ -1787,10 +1785,10 @@ function postorder(g) {
   return result;
 }
 
-},{"./lodash":10}],23:[function(require,module,exports){
+},{"./lodash_wrap":10}],23:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash"),
+var _ = require("../lodash_wrap"),
     Graph = require("../graphlib").Graph,
     util = require("../util");
 
@@ -2208,10 +2206,10 @@ function width(g, v) {
   return g.node(v).width;
 }
 
-},{"../graphlib":7,"../lodash":10,"../util":29}],24:[function(require,module,exports){
+},{"../graphlib":7,"../lodash_wrap":10,"../util":29}],24:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash"),
+var _ = require("../lodash_wrap"),
     util = require("../util"),
     positionX = require("./bk").positionX;
 
@@ -2240,10 +2238,10 @@ function positionY(g) {
 }
 
 
-},{"../lodash":10,"../util":29,"./bk":23}],25:[function(require,module,exports){
+},{"../lodash_wrap":10,"../util":29,"./bk":23}],25:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash"),
+var _ = require("../lodash_wrap"),
     Graph = require("../graphlib").Graph,
     slack = require("./util").slack;
 
@@ -2331,7 +2329,7 @@ function shiftRanks(t, g, delta) {
   });
 }
 
-},{"../graphlib":7,"../lodash":10,"./util":28}],26:[function(require,module,exports){
+},{"../graphlib":7,"../lodash_wrap":10,"./util":28}],26:[function(require,module,exports){
 "use strict";
 
 var rankUtil = require("./util"),
@@ -2384,7 +2382,7 @@ function networkSimplexRanker(g) {
 },{"./feasible-tree":25,"./network-simplex":27,"./util":28}],27:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash"),
+var _ = require("../lodash_wrap"),
     feasibleTree = require("./feasible-tree"),
     slack = require("./util").slack,
     initRank = require("./util").longestPath,
@@ -2617,10 +2615,10 @@ function isDescendant(tree, vLabel, rootLabel) {
   return rootLabel.low <= vLabel.lim && vLabel.lim <= rootLabel.lim;
 }
 
-},{"../graphlib":7,"../lodash":10,"../util":29,"./feasible-tree":25,"./util":28}],28:[function(require,module,exports){
+},{"../graphlib":7,"../lodash_wrap":10,"../util":29,"./feasible-tree":25,"./util":28}],28:[function(require,module,exports){
 "use strict";
 
-var _ = require("../lodash");
+var _ = require("../lodash_wrap");
 
 module.exports = {
   longestPath: longestPath,
@@ -2658,7 +2656,7 @@ function longestPath(g) {
     }
     visited[v] = true;
 
-    var rank = _.minBy(_.map(g.outEdges(v), function(e) {
+    var rank = _.min(_.map(g.outEdges(v), function(e) {
       return dfs(e.w) - g.edge(e).minlen;
     }));
 
@@ -2682,10 +2680,10 @@ function slack(g, e) {
   return g.node(e.w).rank - g.node(e.v).rank - g.edge(e).minlen;
 }
 
-},{"../lodash":10}],29:[function(require,module,exports){
+},{"../lodash_wrap":10}],29:[function(require,module,exports){
 "use strict";
 
-var _ = require("./lodash"),
+var _ = require("./lodash_wrap"),
     Graph = require("./graphlib").Graph;
 
 module.exports = {
@@ -2832,7 +2830,7 @@ function buildLayerMatrix(g) {
  * rank(v) >= 0 and at least one node w has rank(w) = 0.
  */
 function normalizeRanks(g) {
-  var min = _.minBy(_.map(g.nodes(), function(v) { return g.node(v).rank; }));
+  var min = _.min(_.map(g.nodes(), function(v) { return g.node(v).rank; }));
   _.forEach(g.nodes(), function(v) {
     var node = g.node(v);
     if (_.has(node, "rank")) {
@@ -2843,7 +2841,7 @@ function normalizeRanks(g) {
 
 function removeEmptyRanks(g) {
   // Ranks may not start at 0, so we need to offset them
-  var offset = _.minBy(_.map(g.nodes(), function(v) { return g.node(v).rank; }));
+  var offset = _.min(_.map(g.nodes(), function(v) { return g.node(v).rank; }));
 
   var layers = [];
   _.forEach(g.nodes(), function(v) {
@@ -2920,8 +2918,8 @@ function notime(name, fn) {
   return fn();
 }
 
-},{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.8.2";
+},{"./graphlib":7,"./lodash_wrap":10}],30:[function(require,module,exports){
+module.exports = "0.8.3-pre";
 
 },{}],31:[function(require,module,exports){
 /**
@@ -4121,8 +4119,23 @@ function read(json) {
 }
 
 },{"./graph":46,"./lodash":49}],49:[function(require,module,exports){
-arguments[4][10][0].apply(exports,arguments)
-},{"dup":10,"lodash":51}],50:[function(require,module,exports){
+/* global window */
+
+var lodash;
+
+if (typeof require === "function") {
+  try {
+    lodash = require("lodash");
+  } catch (e) {}
+}
+
+if (!lodash) {
+  lodash = window._;
+}
+
+module.exports = lodash;
+
+},{"lodash":51}],50:[function(require,module,exports){
 module.exports = '2.1.5';
 
 },{}],51:[function(require,module,exports){
@@ -4141,7 +4154,7 @@ module.exports = '2.1.5';
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '4.17.4';
+  var VERSION = '4.17.10';
 
   /** Used as the size to enable large array optimizations. */
   var LARGE_ARRAY_SIZE = 200;
@@ -4272,7 +4285,6 @@ module.exports = '2.1.5';
   /** Used to match property names within property paths. */
   var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
       reIsPlainProp = /^\w*$/,
-      reLeadingDot = /^\./,
       rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
 
   /**
@@ -4372,8 +4384,8 @@ module.exports = '2.1.5';
       reOptMod = rsModifier + '?',
       rsOptVar = '[' + rsVarRange + ']?',
       rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
-      rsOrdLower = '\\d*(?:(?:1st|2nd|3rd|(?![123])\\dth)\\b)',
-      rsOrdUpper = '\\d*(?:(?:1ST|2ND|3RD|(?![123])\\dTH)\\b)',
+      rsOrdLower = '\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])',
+      rsOrdUpper = '\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])',
       rsSeq = rsOptVar + reOptMod + rsOptJoin,
       rsEmoji = '(?:' + [rsDingbat, rsRegional, rsSurrPair].join('|') + ')' + rsSeq,
       rsSymbol = '(?:' + [rsNonAstral + rsCombo + '?', rsCombo, rsRegional, rsSurrPair, rsAstral].join('|') + ')';
@@ -4566,6 +4578,14 @@ module.exports = '2.1.5';
   /** Used to access faster Node.js helpers. */
   var nodeUtil = (function() {
     try {
+      // Use `util.types` for Node.js 10+.
+      var types = freeModule && freeModule.require && freeModule.require('util').types;
+
+      if (types) {
+        return types;
+      }
+
+      // Legacy `process.binding('util')` for Node.js < 10.
       return freeProcess && freeProcess.binding && freeProcess.binding('util');
     } catch (e) {}
   }());
@@ -4579,34 +4599,6 @@ module.exports = '2.1.5';
       nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
 
   /*--------------------------------------------------------------------------*/
-
-  /**
-   * Adds the key-value `pair` to `map`.
-   *
-   * @private
-   * @param {Object} map The map to modify.
-   * @param {Array} pair The key-value pair to add.
-   * @returns {Object} Returns `map`.
-   */
-  function addMapEntry(map, pair) {
-    // Don't return `map.set` because it's not chainable in IE 11.
-    map.set(pair[0], pair[1]);
-    return map;
-  }
-
-  /**
-   * Adds `value` to `set`.
-   *
-   * @private
-   * @param {Object} set The set to modify.
-   * @param {*} value The value to add.
-   * @returns {Object} Returns `set`.
-   */
-  function addSetEntry(set, value) {
-    // Don't return `set.add` because it's not chainable in IE 11.
-    set.add(value);
-    return set;
-  }
 
   /**
    * A faster alternative to `Function#apply`, this function invokes `func`
@@ -5372,6 +5364,20 @@ module.exports = '2.1.5';
       }
     }
     return result;
+  }
+
+  /**
+   * Gets the value at `key`, unless `key` is "__proto__".
+   *
+   * @private
+   * @param {Object} object The object to query.
+   * @param {string} key The key of the property to get.
+   * @returns {*} Returns the property value.
+   */
+  function safeGet(object, key) {
+    return key == '__proto__'
+      ? undefined
+      : object[key];
   }
 
   /**
@@ -6806,7 +6812,7 @@ module.exports = '2.1.5';
           if (!cloneableTags[tag]) {
             return object ? value : {};
           }
-          result = initCloneByTag(value, tag, baseClone, isDeep);
+          result = initCloneByTag(value, tag, isDeep);
         }
       }
       // Check for circular references and return its corresponding clone.
@@ -6816,6 +6822,22 @@ module.exports = '2.1.5';
         return stacked;
       }
       stack.set(value, result);
+
+      if (isSet(value)) {
+        value.forEach(function(subValue) {
+          result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
+        });
+
+        return result;
+      }
+
+      if (isMap(value)) {
+        value.forEach(function(subValue, key) {
+          result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
+        });
+
+        return result;
+      }
 
       var keysFunc = isFull
         ? (isFlat ? getAllKeysIn : getAllKeys)
@@ -7744,7 +7766,7 @@ module.exports = '2.1.5';
         }
         else {
           var newValue = customizer
-            ? customizer(object[key], srcValue, (key + ''), object, source, stack)
+            ? customizer(safeGet(object, key), srcValue, (key + ''), object, source, stack)
             : undefined;
 
           if (newValue === undefined) {
@@ -7771,8 +7793,8 @@ module.exports = '2.1.5';
      *  counterparts.
      */
     function baseMergeDeep(object, source, key, srcIndex, mergeFunc, customizer, stack) {
-      var objValue = object[key],
-          srcValue = source[key],
+      var objValue = safeGet(object, key),
+          srcValue = safeGet(source, key),
           stacked = stack.get(srcValue);
 
       if (stacked) {
@@ -8681,20 +8703,6 @@ module.exports = '2.1.5';
     }
 
     /**
-     * Creates a clone of `map`.
-     *
-     * @private
-     * @param {Object} map The map to clone.
-     * @param {Function} cloneFunc The function to clone values.
-     * @param {boolean} [isDeep] Specify a deep clone.
-     * @returns {Object} Returns the cloned map.
-     */
-    function cloneMap(map, isDeep, cloneFunc) {
-      var array = isDeep ? cloneFunc(mapToArray(map), CLONE_DEEP_FLAG) : mapToArray(map);
-      return arrayReduce(array, addMapEntry, new map.constructor);
-    }
-
-    /**
      * Creates a clone of `regexp`.
      *
      * @private
@@ -8705,20 +8713,6 @@ module.exports = '2.1.5';
       var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
       result.lastIndex = regexp.lastIndex;
       return result;
-    }
-
-    /**
-     * Creates a clone of `set`.
-     *
-     * @private
-     * @param {Object} set The set to clone.
-     * @param {Function} cloneFunc The function to clone values.
-     * @param {boolean} [isDeep] Specify a deep clone.
-     * @returns {Object} Returns the cloned set.
-     */
-    function cloneSet(set, isDeep, cloneFunc) {
-      var array = isDeep ? cloneFunc(setToArray(set), CLONE_DEEP_FLAG) : setToArray(set);
-      return arrayReduce(array, addSetEntry, new set.constructor);
     }
 
     /**
@@ -10315,7 +10309,7 @@ module.exports = '2.1.5';
      */
     function initCloneArray(array) {
       var length = array.length,
-          result = array.constructor(length);
+          result = new array.constructor(length);
 
       // Add properties assigned by `RegExp#exec`.
       if (length && typeof array[0] == 'string' && hasOwnProperty.call(array, 'index')) {
@@ -10342,16 +10336,15 @@ module.exports = '2.1.5';
      * Initializes an object clone based on its `toStringTag`.
      *
      * **Note:** This function only supports cloning values with tags of
-     * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
+     * `Boolean`, `Date`, `Error`, `Map`, `Number`, `RegExp`, `Set`, or `String`.
      *
      * @private
      * @param {Object} object The object to clone.
      * @param {string} tag The `toStringTag` of the object to clone.
-     * @param {Function} cloneFunc The function to clone values.
      * @param {boolean} [isDeep] Specify a deep clone.
      * @returns {Object} Returns the initialized clone.
      */
-    function initCloneByTag(object, tag, cloneFunc, isDeep) {
+    function initCloneByTag(object, tag, isDeep) {
       var Ctor = object.constructor;
       switch (tag) {
         case arrayBufferTag:
@@ -10370,7 +10363,7 @@ module.exports = '2.1.5';
           return cloneTypedArray(object, isDeep);
 
         case mapTag:
-          return cloneMap(object, isDeep, cloneFunc);
+          return new Ctor;
 
         case numberTag:
         case stringTag:
@@ -10380,7 +10373,7 @@ module.exports = '2.1.5';
           return cloneRegExp(object);
 
         case setTag:
-          return cloneSet(object, isDeep, cloneFunc);
+          return new Ctor;
 
         case symbolTag:
           return cloneSymbol(object);
@@ -10427,10 +10420,13 @@ module.exports = '2.1.5';
      * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
      */
     function isIndex(value, length) {
+      var type = typeof value;
       length = length == null ? MAX_SAFE_INTEGER : length;
+
       return !!length &&
-        (typeof value == 'number' || reIsUint.test(value)) &&
-        (value > -1 && value % 1 == 0 && value < length);
+        (type == 'number' ||
+          (type != 'symbol' && reIsUint.test(value))) &&
+            (value > -1 && value % 1 == 0 && value < length);
     }
 
     /**
@@ -10880,11 +10876,11 @@ module.exports = '2.1.5';
      */
     var stringToPath = memoizeCapped(function(string) {
       var result = [];
-      if (reLeadingDot.test(string)) {
+      if (string.charCodeAt(0) === 46 /* . */) {
         result.push('');
       }
-      string.replace(rePropName, function(match, number, quote, string) {
-        result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
+      string.replace(rePropName, function(match, number, quote, subString) {
+        result.push(quote ? subString.replace(reEscapeChar, '$1') : (number || match));
       });
       return result;
     });
@@ -14492,9 +14488,11 @@ module.exports = '2.1.5';
       function remainingWait(time) {
         var timeSinceLastCall = time - lastCallTime,
             timeSinceLastInvoke = time - lastInvokeTime,
-            result = wait - timeSinceLastCall;
+            timeWaiting = wait - timeSinceLastCall;
 
-        return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+        return maxing
+          ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke)
+          : timeWaiting;
       }
 
       function shouldInvoke(time) {
@@ -16926,9 +16924,35 @@ module.exports = '2.1.5';
      * _.defaults({ 'a': 1 }, { 'b': 2 }, { 'a': 3 });
      * // => { 'a': 1, 'b': 2 }
      */
-    var defaults = baseRest(function(args) {
-      args.push(undefined, customDefaultsAssignIn);
-      return apply(assignInWith, undefined, args);
+    var defaults = baseRest(function(object, sources) {
+      object = Object(object);
+
+      var index = -1;
+      var length = sources.length;
+      var guard = length > 2 ? sources[2] : undefined;
+
+      if (guard && isIterateeCall(sources[0], sources[1], guard)) {
+        length = 1;
+      }
+
+      while (++index < length) {
+        var source = sources[index];
+        var props = keysIn(source);
+        var propsIndex = -1;
+        var propsLength = props.length;
+
+        while (++propsIndex < propsLength) {
+          var key = props[propsIndex];
+          var value = object[key];
+
+          if (value === undefined ||
+              (eq(value, objectProto[key]) && !hasOwnProperty.call(object, key))) {
+            object[key] = source[key];
+          }
+        }
+      }
+
+      return object;
     });
 
     /**
@@ -17325,6 +17349,11 @@ module.exports = '2.1.5';
      * // => { '1': 'c', '2': 'b' }
      */
     var invert = createInverter(function(result, value, key) {
+      if (value != null &&
+          typeof value.toString != 'function') {
+        value = nativeObjectToString.call(value);
+      }
+
       result[value] = key;
     }, constant(identity));
 
@@ -17355,6 +17384,11 @@ module.exports = '2.1.5';
      * // => { 'group1': ['a', 'c'], 'group2': ['b'] }
      */
     var invertBy = createInverter(function(result, value, key) {
+      if (value != null &&
+          typeof value.toString != 'function') {
+        value = nativeObjectToString.call(value);
+      }
+
       if (hasOwnProperty.call(result, value)) {
         result[value].push(key);
       } else {
