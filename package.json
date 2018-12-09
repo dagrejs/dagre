@@ -12,7 +12,7 @@
     "layout"
   ],
   "dependencies": {
-    "graphlib": "^2.1.5",
+    "graphlib": "^2.1.6",
     "lodash": "^4.17.4"
   },
   "devDependencies": {
