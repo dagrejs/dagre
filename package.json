@@ -13,14 +13,14 @@
   ],
   "dependencies": {
     "graphlib": "^2.1.7",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",
     "browserify": "^16.2.3",
     "chai": "^4.1.2",
     "istanbul": "^0.4.5",
-    "jscs": "^3.0.7",
+    "eslint": "^5.13.0",
     "jshint": "^2.9.5",
     "jshint-stylish": "^2.2.1",
     "karma": "^3.0.0",
