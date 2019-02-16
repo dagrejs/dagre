@@ -1,7 +1,9 @@
-var _ = require("lodash"),
-    expect = require("./chai").expect,
-    Graph = require("../lib/graphlib").Graph,
-    util = require("../lib/util");
+/* eslint "no-console": off */
+
+var _ = require("lodash");
+var expect = require("./chai").expect;
+var Graph = require("../lib/graphlib").Graph;
+var util = require("../lib/util");
 
 describe("util", function() {
   describe("simplify", function() {
@@ -73,29 +75,29 @@ describe("util", function() {
 
   describe("successorWeights", function() {
     it("maps a node to its successors with associated weights", function() {
-       var g = new Graph({ multigraph: true });
-       g.setEdge("a", "b", { weight: 2 });
-       g.setEdge("b", "c", { weight: 1 });
-       g.setEdge("b", "c", { weight: 2 }, "multi");
-       g.setEdge("b", "d", { weight: 1 }, "multi");
-       expect(util.successorWeights(g).a).to.eql({ b: 2 });
-       expect(util.successorWeights(g).b).to.eql({ c: 3, d: 1 });
-       expect(util.successorWeights(g).c).to.eql({});
-       expect(util.successorWeights(g).d).to.eql({});
+      var g = new Graph({ multigraph: true });
+      g.setEdge("a", "b", { weight: 2 });
+      g.setEdge("b", "c", { weight: 1 });
+      g.setEdge("b", "c", { weight: 2 }, "multi");
+      g.setEdge("b", "d", { weight: 1 }, "multi");
+      expect(util.successorWeights(g).a).to.eql({ b: 2 });
+      expect(util.successorWeights(g).b).to.eql({ c: 3, d: 1 });
+      expect(util.successorWeights(g).c).to.eql({});
+      expect(util.successorWeights(g).d).to.eql({});
     });
   });
 
   describe("predecessorWeights", function() {
     it("maps a node to its predecessors with associated weights", function() {
-       var g = new Graph({ multigraph: true });
-       g.setEdge("a", "b", { weight: 2 });
-       g.setEdge("b", "c", { weight: 1 });
-       g.setEdge("b", "c", { weight: 2 }, "multi");
-       g.setEdge("b", "d", { weight: 1 }, "multi");
-       expect(util.predecessorWeights(g).a).to.eql({});
-       expect(util.predecessorWeights(g).b).to.eql({ a: 2 });
-       expect(util.predecessorWeights(g).c).to.eql({ b: 3 });
-       expect(util.predecessorWeights(g).d).to.eql({ b: 1 });
+      var g = new Graph({ multigraph: true });
+      g.setEdge("a", "b", { weight: 2 });
+      g.setEdge("b", "c", { weight: 1 });
+      g.setEdge("b", "c", { weight: 2 }, "multi");
+      g.setEdge("b", "d", { weight: 1 }, "multi");
+      expect(util.predecessorWeights(g).a).to.eql({});
+      expect(util.predecessorWeights(g).b).to.eql({ a: 2 });
+      expect(util.predecessorWeights(g).c).to.eql({ b: 3 });
+      expect(util.predecessorWeights(g).d).to.eql({ b: 1 });
     });
   });
 

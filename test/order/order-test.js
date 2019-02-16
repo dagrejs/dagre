@@ -1,9 +1,9 @@
-var _ = require("lodash"),
-    expect = require("../chai").expect,
-    Graph = require("../../lib/graphlib").Graph,
-    order = require("../../lib/order"),
-    crossCount = require("../../lib/order/cross-count"),
-    util = require("../../lib/util");
+var _ = require("lodash");
+var expect = require("../chai").expect;
+var Graph = require("../../lib/graphlib").Graph;
+var order = require("../../lib/order");
+var crossCount = require("../../lib/order/cross-count");
+var util = require("../../lib/util");
 
 describe("order", function() {
   var g;

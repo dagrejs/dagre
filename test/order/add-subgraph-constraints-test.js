@@ -1,7 +1,7 @@
-var _ = require("lodash"),
-    expect = require("../chai").expect,
-    Graph = require("../../lib/graphlib").Graph,
-    addSubgraphConstraints = require("../../lib/order/add-subgraph-constraints");
+var _ = require("lodash");
+var expect = require("../chai").expect;
+var Graph = require("../../lib/graphlib").Graph;
+var addSubgraphConstraints = require("../../lib/order/add-subgraph-constraints");
 
 describe("order/addSubgraphConstraints", function() {
   var g, cg;

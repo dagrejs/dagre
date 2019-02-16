@@ -1,7 +1,7 @@
-var _ = require("lodash"),
-    expect = require("../chai").expect,
-    Graph = require("../../lib/graphlib").Graph,
-    buildLayerGraph = require("../../lib/order/build-layer-graph");
+var _ = require("lodash");
+var expect = require("../chai").expect;
+var Graph = require("../../lib/graphlib").Graph;
+var buildLayerGraph = require("../../lib/order/build-layer-graph");
 
 describe("order/buildLayerGraph", function() {
   var g;
@@ -108,8 +108,8 @@ describe("order/buildLayerGraph", function() {
     });
     _.forEach(["a", "b"], function(v) { g.setParent(v, "sg"); });
 
-    var lg = buildLayerGraph(g, 0, "inEdges"),
-        root = lg.graph().root;
+    var lg = buildLayerGraph(g, 0, "inEdges");
+    var root = lg.graph().root;
     expect(_.sortBy(lg.children(root))).eqls(["c", "sg"]);
     expect(lg.parent("a")).equals("sg");
     expect(lg.parent("b")).equals("sg");

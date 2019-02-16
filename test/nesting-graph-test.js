@@ -1,15 +1,15 @@
-var expect = require("./chai").expect,
-    Graph = require("../lib/graphlib").Graph,
-    components = require("../lib/graphlib").alg.components,
-    nestingGraph = require("../lib/nesting-graph");
+var expect = require("./chai").expect;
+var Graph = require("../lib/graphlib").Graph;
+var components = require("../lib/graphlib").alg.components;
+var nestingGraph = require("../lib/nesting-graph");
 
 describe("rank/nestingGraph", function() {
   var g;
 
   beforeEach(function() {
     g = new Graph({ compound: true })
-          .setGraph({})
-          .setDefaultNodeLabel(function() { return {}; });
+      .setGraph({})
+      .setDefaultNodeLabel(function() { return {}; });
   });
 
   describe("run", function() {
@@ -27,8 +27,8 @@ describe("rank/nestingGraph", function() {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
 
-      var borderTop = g.node("sg1").borderTop,
-          borderBottom = g.node("sg1").borderBottom;
+      var borderTop = g.node("sg1").borderTop;
+      var borderBottom = g.node("sg1").borderBottom;
       expect(borderTop).to.exist;
       expect(borderBottom).to.exist;
       expect(g.parent(borderTop)).to.equal("sg1");
@@ -46,10 +46,10 @@ describe("rank/nestingGraph", function() {
       g.setParent("a", "sg2");
       nestingGraph.run(g);
 
-      var sg1Top = g.node("sg1").borderTop,
-          sg1Bottom = g.node("sg1").borderBottom,
-          sg2Top = g.node("sg2").borderTop,
-          sg2Bottom = g.node("sg2").borderBottom;
+      var sg1Top = g.node("sg1").borderTop;
+      var sg1Bottom = g.node("sg1").borderBottom;
+      var sg2Top = g.node("sg2").borderTop;
+      var sg2Bottom = g.node("sg2").borderBottom;
       expect(sg1Top).to.exist;
       expect(sg1Bottom).to.exist;
       expect(sg2Top).to.exist;
@@ -69,8 +69,8 @@ describe("rank/nestingGraph", function() {
       g.setEdge("x", "b", { weight: 200 });
       nestingGraph.run(g);
 
-      var top = g.node("sg").borderTop,
-          bot = g.node("sg").borderBottom;
+      var top = g.node("sg").borderTop;
+      var bot = g.node("sg").borderBottom;
       expect(g.edge(top, "x").weight).to.be.gt(300);
       expect(g.edge("x", bot).weight).to.be.gt(300);
     });
@@ -79,8 +79,8 @@ describe("rank/nestingGraph", function() {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
 
-      var root = g.graph().nestingRoot,
-          borderTop = g.node("sg1").borderTop;
+      var root = g.graph().nestingRoot;
+      var borderTop = g.node("sg1").borderTop;
       expect(root).to.exist;
       expect(borderTop).to.exist;
       expect(g.outEdges(root, borderTop)).to.have.length(1);
@@ -164,11 +164,11 @@ describe("rank/nestingGraph", function() {
       // 6: close sg2
       // 7: close sg1
 
-      var root = g.graph().nestingRoot,
-          sg1Top = g.node("sg1").borderTop,
-          sg1Bot = g.node("sg1").borderBottom,
-          sg2Top = g.node("sg2").borderTop,
-          sg2Bot = g.node("sg2").borderBottom;
+      var root = g.graph().nestingRoot;
+      var sg1Top = g.node("sg1").borderTop;
+      var sg1Bot = g.node("sg1").borderBottom;
+      var sg2Top = g.node("sg2").borderTop;
+      var sg2Bot = g.node("sg2").borderBottom;
 
       expect(g.edge(root, sg1Top).minlen).equals(3);
       expect(g.edge(sg1Top, sg2Top).minlen).equals(1);

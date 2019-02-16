@@ -3,8 +3,8 @@
 // These are smoke tests to make sure the bundles look like they are working
 // correctly.
 
-var expect = chai.expect,
-    graphlib = dagre.graphlib;
+var expect = chai.expect;
+var graphlib = dagre.graphlib;
 
 describe("bundle", function() {
   it("exports dagre", function() {

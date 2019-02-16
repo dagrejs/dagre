@@ -4,7 +4,7 @@ NPM = npm
 BROWSERIFY = ./node_modules/browserify/bin/cmd.js
 ISTANBUL = ./node_modules/istanbul/lib/cli.js
 JSHINT = ./node_modules/jshint/bin/jshint
-JSCS = ./node_modules/jscs/bin/jscs
+ESLINT = ./node_modules/eslint/bin/eslint.js
 KARMA = ./node_modules/karma/bin/karma
 MOCHA = ./node_modules/mocha/bin/_mocha
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
@@ -27,7 +27,7 @@ DIRS = $(BUILD_DIR)
 
 .PHONY: all bench clean browser-test unit-test test dist
 
-all: unit-test
+all: unit-test lint
 
 bench: test
 	@src/bench.js
@@ -42,8 +42,6 @@ test: unit-test browser-test
 
 unit-test: $(SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
 	@$(ISTANBUL) cover $(ISTANBUL_OPTS) $(MOCHA) --dir $(COVERAGE_DIR) -- $(MOCHA_OPTS) $(TEST_FILES) || $(MOCHA) $(MOCHA_OPTS) $(TEST_FILES)
-	@$(JSHINT) $(JSHINT_OPTS) $(filter-out node_modules, $?)
-	@$(JSCS) $(filter-out node_modules, $?)
 
 browser-test: $(BUILD_DIR)/$(MOD).js $(BUILD_DIR)/$(MOD).core.js
 	$(KARMA) start --single-run $(KARMA_OPTS)
@@ -51,6 +49,10 @@ browser-test: $(BUILD_DIR)/$(MOD).js $(BUILD_DIR)/$(MOD).core.js
 
 bower.json: package.json src/release/make-bower.json.js
 	@src/release/make-bower.json.js > $@
+
+lint:
+	@$(JSHINT) $(JSHINT_OPTS) $(filter-out node_modules, $?)
+	@$(ESLINT) $(SRC_FILES) $(TEST_FILES)
 
 $(BUILD_DIR)/$(MOD).js: index.js $(SRC_FILES) | unit-test
 	@$(BROWSERIFY) $< > $@ -s dagre

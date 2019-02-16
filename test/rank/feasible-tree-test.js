@@ -1,7 +1,7 @@
-var _ = require("lodash"),
-    expect = require("../chai").expect,
-    Graph = require("../../lib/graphlib").Graph,
-    feasibleTree = require("../../lib/rank/feasible-tree");
+var _ = require("lodash");
+var expect = require("../chai").expect;
+var Graph = require("../../lib/graphlib").Graph;
+var feasibleTree = require("../../lib/rank/feasible-tree");
 
 describe("feasibleTree", function() {
   it("creates a tree for a trivial input graph", function() {

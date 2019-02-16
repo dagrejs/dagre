@@ -1,7 +1,7 @@
-var _ = require("lodash"),
-    expect = require("./chai").expect,
-    normalize = require("../lib/normalize"),
-    Graph = require("../lib/graphlib").Graph;
+var _ = require("lodash");
+var expect = require("./chai").expect;
+var normalize = require("../lib/normalize");
+var Graph = require("../lib/graphlib").Graph;
 
 describe("normalize", function() {
   var g;
@@ -62,8 +62,8 @@ describe("normalize", function() {
 
       normalize.run(g);
 
-      var labelV = g.successors(g.successors("a")[0])[0],
-          labelNode = g.node(labelV);
+      var labelV = g.successors(g.successors("a")[0])[0];
+      var labelNode = g.node(labelV);
       expect(labelNode.width).to.equal(20);
       expect(labelNode.height).to.equal(10);
     });

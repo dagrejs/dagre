@@ -1,15 +1,15 @@
-var _ = require("lodash"),
-    expect = require("./chai").expect,
-    layout = require("..").layout,
-    Graph = require("../lib/graphlib").Graph;
+var _ = require("lodash");
+var expect = require("./chai").expect;
+var layout = require("..").layout;
+var Graph = require("../lib/graphlib").Graph;
 
 describe("layout", function() {
   var g;
 
   beforeEach(function() {
     g = new Graph({ multigraph: true, compound: true })
-          .setGraph({})
-          .setDefaultEdgeLabel(function() { return {}; });
+      .setGraph({})
+      .setDefaultEdgeLabel(function() { return {}; });
   });
 
   it("can layout a single node", function() {
@@ -180,8 +180,8 @@ describe("layout", function() {
         g.setNode("a", { width: 100, height: 100 });
         g.setEdge("a", "a", { width: 50, height: 50 });
         layout(g);
-        var nodeA = g.node("a"),
-            points = g.edge("a", "a").points;
+        var nodeA = g.node("a");
+        var points = g.edge("a", "a").points;
         expect(points).to.have.length(7);
         _.forEach(points, function(point) {
           if (rankdir !== "LR" && rankdir !== "RL") {

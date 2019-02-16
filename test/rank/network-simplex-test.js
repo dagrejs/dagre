@@ -1,15 +1,15 @@
-var _ = require("lodash"),
-    expect = require("../chai").expect,
-    Graph = require("../../lib/graphlib").Graph,
-    networkSimplex = require("../../lib/rank/network-simplex"),
-    longestPath = require("../../lib/rank/util").longestPath,
-    initLowLimValues = networkSimplex.initLowLimValues,
-    initCutValues = networkSimplex.initCutValues,
-    calcCutValue = networkSimplex.calcCutValue,
-    leaveEdge = networkSimplex.leaveEdge,
-    enterEdge = networkSimplex.enterEdge,
-    exchangeEdges = networkSimplex.exchangeEdges,
-    normalizeRanks = require("../../lib/util").normalizeRanks;
+var _ = require("lodash");
+var expect = require("../chai").expect;
+var Graph = require("../../lib/graphlib").Graph;
+var networkSimplex = require("../../lib/rank/network-simplex");
+var longestPath = require("../../lib/rank/util").longestPath;
+var initLowLimValues = networkSimplex.initLowLimValues;
+var initCutValues = networkSimplex.initCutValues;
+var calcCutValue = networkSimplex.calcCutValue;
+var leaveEdge = networkSimplex.leaveEdge;
+var enterEdge = networkSimplex.enterEdge;
+var exchangeEdges = networkSimplex.exchangeEdges;
+var normalizeRanks = require("../../lib/util").normalizeRanks;
 
 describe("network simplex", function() {
   var g, t, gansnerGraph, gansnerTree;
@@ -216,11 +216,11 @@ describe("network simplex", function() {
 
       initLowLimValues(g, "a");
 
-      var a = g.node("a"),
-          b = g.node("b"),
-          c = g.node("c"),
-          d = g.node("d"),
-          e = g.node("e");
+      var a = g.node("a");
+      var b = g.node("b");
+      var c = g.node("c");
+      var d = g.node("d");
+      var e = g.node("e");
 
       expect(_.sortBy(_.map(g.nodes(), function(v) { return g.node(v).lim; })))
         .to.eql(_.range(1, 6));

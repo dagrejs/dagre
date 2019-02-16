@@ -1,14 +1,14 @@
-var _ = require("lodash"),
-    expect = require("../chai").expect,
-    rank = require("../../lib/rank"),
-    Graph = require("../../lib/graphlib").Graph;
+var _ = require("lodash");
+var expect = require("../chai").expect;
+var rank = require("../../lib/rank");
+var Graph = require("../../lib/graphlib").Graph;
 
 describe("rank", function() {
   var RANKERS = [
-        "longest-path", "tight-tree",
-        "network-simplex", "unknown-should-still-work"
-      ],
-      g;
+    "longest-path", "tight-tree",
+    "network-simplex", "unknown-should-still-work"
+  ];
+  var g;
 
   beforeEach(function() {
     g = new Graph()
@@ -26,8 +26,8 @@ describe("rank", function() {
         g.graph().ranker = ranker;
         rank(g);
         _.forEach(g.edges(), function(e) {
-          var vRank = g.node(e.v).rank,
-              wRank = g.node(e.w).rank;
+          var vRank = g.node(e.v).rank;
+          var wRank = g.node(e.w).rank;
           expect(wRank - vRank).to.be.gte(g.edge(e).minlen);
         });
       });

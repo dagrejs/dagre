@@ -1,6 +1,6 @@
-var expect = require("./chai").expect,
-    addBorderSegments = require("../lib/add-border-segments"),
-    Graph = require("../lib/graphlib").Graph;
+var expect = require("./chai").expect;
+var addBorderSegments = require("../lib/add-border-segments");
+var Graph = require("../lib/graphlib").Graph;
 
 describe("addBorderSegments", function() {
   var g;
@@ -28,13 +28,15 @@ describe("addBorderSegments", function() {
     g.setNode("sg", { minRank: 1, maxRank: 1 });
     addBorderSegments(g);
 
-    var bl = g.node("sg").borderLeft[1],
-        br = g.node("sg").borderRight[1];
-    expect(g.node(bl)).eqls({ dummy: "border", borderType: "borderLeft",
-                              rank: 1, width: 0, height: 0 });
+    var bl = g.node("sg").borderLeft[1];
+    var br = g.node("sg").borderRight[1];
+    expect(g.node(bl)).eqls({ 
+      dummy: "border", borderType: "borderLeft",
+      rank: 1, width: 0, height: 0 });
     expect(g.parent(bl)).equals("sg");
-    expect(g.node(br)).eqls({ dummy: "border", borderType: "borderRight",
-                              rank: 1, width: 0, height: 0 });
+    expect(g.node(br)).eqls({ 
+      dummy: "border", borderType: "borderRight",
+      rank: 1, width: 0, height: 0 });
     expect(g.parent(br)).equals("sg");
   });
 
@@ -43,22 +45,26 @@ describe("addBorderSegments", function() {
     addBorderSegments(g);
 
     var sgNode = g.node("sg");
-    var bl2 = sgNode.borderLeft[1],
-        br2 = sgNode.borderRight[1];
-    expect(g.node(bl2)).eqls({ dummy: "border", borderType: "borderLeft",
-                               rank: 1, width: 0, height: 0 });
+    var bl2 = sgNode.borderLeft[1];
+    var br2 = sgNode.borderRight[1];
+    expect(g.node(bl2)).eqls({ 
+      dummy: "border", borderType: "borderLeft",
+      rank: 1, width: 0, height: 0 });
     expect(g.parent(bl2)).equals("sg");
-    expect(g.node(br2)).eqls({ dummy: "border", borderType: "borderRight",
-                               rank: 1, width: 0, height: 0 });
+    expect(g.node(br2)).eqls({ 
+      dummy: "border", borderType: "borderRight",
+      rank: 1, width: 0, height: 0 });
     expect(g.parent(br2)).equals("sg");
 
-    var bl1 = sgNode.borderLeft[2],
-        br1 = sgNode.borderRight[2];
-    expect(g.node(bl1)).eqls({ dummy: "border", borderType: "borderLeft",
-                               rank: 2, width: 0, height: 0 });
+    var bl1 = sgNode.borderLeft[2];
+    var br1 = sgNode.borderRight[2];
+    expect(g.node(bl1)).eqls({ 
+      dummy: "border", borderType: "borderLeft",
+      rank: 2, width: 0, height: 0 });
     expect(g.parent(bl1)).equals("sg");
-    expect(g.node(br1)).eqls({ dummy: "border", borderType: "borderRight",
-                               rank: 2, width: 0, height: 0 });
+    expect(g.node(br1)).eqls({
+      dummy: "border", borderType: "borderRight",
+      rank: 2, width: 0, height: 0 });
     expect(g.parent(br1)).equals("sg");
 
     expect(g.hasEdge(sgNode.borderLeft[1], sgNode.borderLeft[2])).to.be.true;
@@ -71,22 +77,26 @@ describe("addBorderSegments", function() {
     g.setParent("sg2", "sg1");
     addBorderSegments(g);
 
-    var bl1 = g.node("sg1").borderLeft[1],
-        br1 = g.node("sg1").borderRight[1];
-    expect(g.node(bl1)).eqls({ dummy: "border", borderType: "borderLeft",
-                              rank: 1, width: 0, height: 0 });
+    var bl1 = g.node("sg1").borderLeft[1];
+    var br1 = g.node("sg1").borderRight[1];
+    expect(g.node(bl1)).eqls({
+      dummy: "border", borderType: "borderLeft",
+      rank: 1, width: 0, height: 0 });
     expect(g.parent(bl1)).equals("sg1");
-    expect(g.node(br1)).eqls({ dummy: "border", borderType: "borderRight",
-                               rank: 1, width: 0, height: 0 });
+    expect(g.node(br1)).eqls({
+      dummy: "border", borderType: "borderRight",
+      rank: 1, width: 0, height: 0 });
     expect(g.parent(br1)).equals("sg1");
 
-    var bl2 = g.node("sg2").borderLeft[1],
-        br2 = g.node("sg2").borderRight[1];
-    expect(g.node(bl2)).eqls({ dummy: "border", borderType: "borderLeft",
-                               rank: 1, width: 0, height: 0 });
+    var bl2 = g.node("sg2").borderLeft[1];
+    var br2 = g.node("sg2").borderRight[1];
+    expect(g.node(bl2)).eqls({
+      dummy: "border", borderType: "borderLeft",
+      rank: 1, width: 0, height: 0 });
     expect(g.parent(bl2)).equals("sg2");
-    expect(g.node(br2)).eqls({ dummy: "border", borderType: "borderRight",
-                               rank: 1, width: 0, height: 0 });
+    expect(g.node(br2)).eqls({
+      dummy: "border", borderType: "borderRight",
+      rank: 1, width: 0, height: 0 });
     expect(g.parent(br2)).equals("sg2");
   });
 });

@@ -1,8 +1,8 @@
-var _ = require("lodash"),
-    expect = require("./chai").expect,
-    Graph = require("../lib/graphlib").Graph,
-    findCycles = require("../lib/graphlib").alg.findCycles,
-    greedyFAS = require("../lib/greedy-fas");
+var _ = require("lodash");
+var expect = require("./chai").expect;
+var Graph = require("../lib/graphlib").Graph;
+var findCycles = require("../lib/graphlib").alg.findCycles;
+var greedyFAS = require("../lib/greedy-fas");
 
 describe("greedyFAS", function() {
   var g;
@@ -90,8 +90,8 @@ describe("greedyFAS", function() {
 });
 
 function checkFAS(g, fas) {
-  var n = g.nodeCount(),
-      m = g.edgeCount();
+  var n = g.nodeCount();
+  var m = g.edgeCount();
   _.forEach(fas, function(edge) {
     g.removeEdge(edge.v, edge.w);
   });
