@@ -1,6 +1,6 @@
 {
   "name": "@futpib/dagre",
-  "version": "0.8.5-pre",
+  "version": "0.8.5-pre1",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
@@ -20,8 +20,8 @@
     "benchmark": "^2.1.4",
     "browserify": "^16.2.3",
     "chai": "^4.1.2",
-    "istanbul": "^0.4.5",
     "eslint": "^5.13.0",
+    "istanbul": "^0.4.5",
     "jshint": "^2.9.5",
     "jshint-stylish": "^2.2.1",
     "karma": "^3.0.0",
