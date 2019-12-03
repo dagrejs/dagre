@@ -1,6 +1,6 @@
 {
-  "name": "@futpib/dagre",
-  "version": "0.8.5-pre1",
+  "name": "dagre",
+  "version": "0.8.5",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
@@ -13,7 +13,7 @@
     "layout"
   ],
   "dependencies": {
-    "graphlib": "^2.1.7",
+    "graphlib": "^2.1.8",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
