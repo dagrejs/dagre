@@ -989,7 +989,7 @@ function dfs(g, root, nodeSep, weight, height, depths, v) {
 
   _.forEach(g.edges(), function (edge)  {
     if(edge.v === v || edge.w === v) {
-      g.setEdge(edge.v === v ? bottom : edge.v, edge.w === v ? bottom : edge.w, g.edge(edge));
+      g.setEdge(edge.v === v ? bottom : edge.v, edge.w === v ? top : edge.w, g.edge(edge));
     }
   });
 
