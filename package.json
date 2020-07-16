@@ -20,7 +20,7 @@
     "benchmark": "^2.1.4",
     "browserify": "^16.5.0",
     "chai": "^4.1.2",
-    "eslint": "^6.8.0",
+    "eslint": "7.4.0",
     "jshint": "^2.11.0",
     "jshint-stylish": "^2.2.1",
     "karma": "^4.4.1",
