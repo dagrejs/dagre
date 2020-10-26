@@ -13,8 +13,8 @@
     "layout"
   ],
   "dependencies": {
-    "graphlib": "2.1.8",
-    "lodash": "4.17.19"
+    "graphlib": "^2.1.8",
+    "lodash": "^4.17.19"
   },
   "devDependencies": {
     "benchmark": "2.1.4",
