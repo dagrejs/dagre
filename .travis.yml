@@ -4,4 +4,8 @@ node_js:
 script: KARMA_OPTS="--browsers Firefox,PhantomJS" make -e test
 before_script:
   - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
+services:
+  - xvfb
+addons:
+  firefox: latest
+script: KARMA_OPTS="--browsers Firefox" make -e test
