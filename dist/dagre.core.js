@@ -311,6 +311,7 @@ function debugOrdering(g) {
 }
 
 },{"./graphlib":7,"./lodash":10,"./util":29}],7:[function(require,module,exports){
+// eslint-disable-next-line no-redeclare
 /* global window */
 
 var graphlib;
@@ -549,7 +550,7 @@ function updateInputGraph(inputGraph, layoutGraph) {
 var graphNumAttrs = ["nodesep", "edgesep", "ranksep", "marginx", "marginy"];
 var graphDefaults = { ranksep: 50, edgesep: 20, nodesep: 50, rankdir: "tb" };
 var graphAttrs = ["acyclicer", "ranker", "rankdir", "align"];
-var nodeNumAttrs = ["width", "height"];
+var nodeNumAttrs = ["width", "height", "layer"]; // 需要传入layer作为参数参考
 var nodeDefaults = { width: 0, height: 0 };
 var edgeNumAttrs = ["minlen", "weight", "width", "height", "labeloffset"];
 var edgeDefaults = {
@@ -844,6 +845,7 @@ function canonicalize(attrs) {
 }
 
 },{"./acyclic":2,"./add-border-segments":3,"./coordinate-system":4,"./graphlib":7,"./lodash":10,"./nesting-graph":11,"./normalize":12,"./order":17,"./parent-dummy-chains":22,"./position":24,"./rank":26,"./util":29}],10:[function(require,module,exports){
+// eslint-disable-next-line no-redeclare
 /* global window */
 
 var lodash;
@@ -2650,8 +2652,9 @@ function isDescendant(tree, vLabel, rootLabel) {
 var _ = require("../lodash");
 
 module.exports = {
-  longestPath: longestPath,
-  slack: slack
+  // longestPath: longestPath,
+  longestPath: longestPathWithLayer,
+  slack: slack,
 };
 
 /*
@@ -2699,6 +2702,28 @@ function longestPath(g) {
   }
 
   _.forEach(g.sources(), dfs);
+}
+
+function longestPathWithLayer(g) {
+  function dfs(v, nextRank) {
+    var label = g.node(v);
+
+    var currRank = !isNaN(label.layer) ? label.layer * 2 : nextRank; // TODO: 因为rank是二倍的原因，这里乘二
+
+    // 没有指定，取最大值
+    if (label.rank === undefined || label.rank < currRank) {
+      label.rank = currRank;
+    }
+
+    // DFS遍历子节点
+    _.map(g.outEdges(v), function (e) {
+      dfs(e.w, currRank + g.edge(e).minlen);
+    });
+  }
+
+  g.sources().forEach(function (root) {
+    dfs(root, -1); // 默认的dummy root所在层的rank是-1
+  });
 }
 
 /*
@@ -2950,7 +2975,7 @@ function notime(name, fn) {
 }
 
 },{"./graphlib":7,"./lodash":10}],30:[function(require,module,exports){
-module.exports = "0.8.5";
+module.exports = "0.8.6-pre";
 
 },{}]},{},[1])(1)
 });

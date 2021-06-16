@@ -1832,6 +1832,7 @@ const testData = {
       id: "2",
       width: 20,
       height: 20,
+      layer: 1,
     },
     {
       id: "3",
@@ -1843,15 +1844,25 @@ const testData = {
       width: 20,
       height: 20,
     },
+    {
+      id: "5",
+      width: 20,
+      height: 20,
+      layer: 2,
+    },
   ],
   edges: [
     {
       source: "0",
-      target: "1",
+      target: "5",
     },
     {
       source: "0",
       target: "2",
+    },
+    {
+      source: "0",
+      target: "1",
     },
     {
       source: "1",
@@ -1865,6 +1876,10 @@ const testData = {
       source: "2",
       target: "4",
     },
+    // {
+    //   source: "5",
+    //   target: "4",
+    // },
   ],
 };
 
