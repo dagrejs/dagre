@@ -1816,14 +1816,65 @@ const data1 = {
   ],
 };
 
-const g = createGraph(data1);
+const testData = {
+  nodes: [
+    {
+      id: "0",
+      width: 20,
+      height: 20,
+    },
+    {
+      id: "1",
+      width: 20,
+      height: 20,
+    },
+    {
+      id: "2",
+      width: 20,
+      height: 20,
+    },
+    {
+      id: "3",
+      width: 20,
+      height: 20,
+    },
+    {
+      id: "4",
+      width: 20,
+      height: 20,
+    },
+  ],
+  edges: [
+    {
+      source: "0",
+      target: "1",
+    },
+    {
+      source: "0",
+      target: "2",
+    },
+    {
+      source: "1",
+      target: "3",
+    },
+    {
+      source: "3",
+      target: "4",
+    },
+    {
+      source: "2",
+      target: "4",
+    },
+  ],
+};
+
+const g = createGraph(testData);
 
 // Set an object for the graph label
 g.setGraph({
-  //   ranker: "longest-path",
-  //   ranker: "tight-tree",
-  //   ranker: "network-complex",
-  rankdir: "LR",
+  // ranker: "longest-path",
+  ranker: "tight-tree",
+  // ranker: "network-complex",
 });
 
 dagre.layout(g);
