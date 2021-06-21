@@ -1498,6 +1498,10 @@ const issueData = {
     },
   ],
 };
+issueData.nodes.forEach((n) => {
+  n.width = 20;
+  n.height = 20;
+});
 
 const data1 = {
   nodes: [
@@ -1883,13 +1887,13 @@ const testData = {
   ],
 };
 
-const g = createGraph(testData);
+const g = createGraph(issueData);
 
 // Set an object for the graph label
 g.setGraph({
   // ranker: "longest-path",
-  ranker: "tight-tree",
-  // ranker: "network-complex",
+  // ranker: "tight-tree",
+  ranker: "network-complex",
 });
 
 dagre.layout(g);
