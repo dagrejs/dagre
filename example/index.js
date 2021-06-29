@@ -1831,50 +1831,54 @@ const testData = {
       id: "1",
       width: 20,
       height: 20,
+      fixOrder: 0,
     },
     {
       id: "2",
       width: 20,
       height: 20,
       layer: 1,
+      fixOrder: 1,
     },
     {
       id: "3",
       width: 20,
       height: 20,
+      fixOrder: 0,
     },
     {
       id: "4",
       width: 20,
       height: 20,
+      fixOrder: 1,
     },
-    {
-      id: "5",
-      width: 20,
-      height: 20,
-      layer: 2,
-    },
+    // {
+    //   id: "5",
+    //   width: 20,
+    //   height: 20,
+    //   layer: 2,
+    // },
   ],
   edges: [
+    // {
+    //   source: "0",
+    //   target: "5",
+    // },
     {
       source: "0",
-      target: "5",
+      target: "1",
     },
     {
       source: "0",
       target: "2",
     },
     {
-      source: "0",
-      target: "1",
+      source: "1",
+      target: "4",
     },
     {
       source: "1",
       target: "3",
-    },
-    {
-      source: "3",
-      target: "4",
     },
     {
       source: "2",
@@ -1887,7 +1891,7 @@ const testData = {
   ],
 };
 
-const g = createGraph(issueData);
+const g = createGraph(testData);
 
 // Set an object for the graph label
 g.setGraph({
