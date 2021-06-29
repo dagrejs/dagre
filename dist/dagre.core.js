@@ -550,7 +550,7 @@ function updateInputGraph(inputGraph, layoutGraph) {
 var graphNumAttrs = ["nodesep", "edgesep", "ranksep", "marginx", "marginy"];
 var graphDefaults = { ranksep: 50, edgesep: 20, nodesep: 50, rankdir: "tb" };
 var graphAttrs = ["acyclicer", "ranker", "rankdir", "align"];
-var nodeNumAttrs = ["width", "height", "layer"]; // 需要传入layer作为参数参考
+var nodeNumAttrs = ["width", "height", "layer", "fixorder"]; // 需要传入layer, fixOrder作为参数参考
 var nodeDefaults = { width: 0, height: 0 };
 var edgeNumAttrs = ["minlen", "weight", "width", "height", "labeloffset"];
 var edgeDefaults = {
@@ -1462,6 +1462,19 @@ function initOrder(g) {
   }
 
   var orderedVs = _.sortBy(simpleNodes, function(v) { return g.node(v).rank; });
+
+  // 有fixOrder的，直接排序好放进去
+  var fixOrderNodes = _.sortBy(_.filter(orderedVs, function (n) {
+    return g.node(n).fixorder !== undefined;
+  }), function(n) {
+    return g.node(n).fixorder;
+  });
+
+  _.forEach(fixOrderNodes, function(n) {
+    layers[g.node(n).rank].push(n);
+    visited[n] = true;
+  });
+
   _.forEach(orderedVs, dfs);
 
   return layers;
