@@ -1614,6 +1614,8 @@ module.exports = sortSubgraph;
 
 function sortSubgraph(g, v, cg, biasRight) {
   var movable = g.children(v);
+  // fixorder的点不参与排序（这个方案不合适，只排了新增节点，和原来的分离）
+  // var movable = _.filter(g.children(v), function(v) { return g.node(v).fixorder === undefined; });
   var node = g.node(v);
   var bl = node ? node.borderLeft : undefined;
   var br = node ? node.borderRight: undefined;
@@ -1638,6 +1640,12 @@ function sortSubgraph(g, v, cg, biasRight) {
 
   var entries = resolveConflicts(barycenters, cg);
   expandSubgraphs(entries, subgraphs);
+
+  // 添加fixorder信息到entries里边
+  // TODO: 不考虑复合情况，只用第一个点的fixorder信息，后续考虑更完备的实现
+  _.forEach(entries, function (e) {
+    e.fixorder = g.node(e.vs[0]).fixorder;
+  });
 
   var result = sort(entries, biasRight);
 
@@ -1731,6 +1739,10 @@ function consumeUnsortable(vs, unsortable, index) {
 
 function compareWithBias(bias) {
   return function(entryV, entryW) {
+    // 排序的时候先判断fixorder，不行再判断重心
+    if (entryV.fixorder !== undefined && entryW.fixorder !== undefined) {
+      return entryV.fixorder - entryW.fixorder;
+    }
     if (entryV.barycenter < entryW.barycenter) {
       return -1;
     } else if (entryV.barycenter > entryW.barycenter) {

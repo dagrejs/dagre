@@ -1831,39 +1831,39 @@ const testData = {
       id: "1",
       width: 20,
       height: 20,
-      fixorder: 0,
+      // fixorder: 1,
     },
     {
       id: "2",
       width: 20,
       height: 20,
       layer: 1,
-      fixorder: 1,
+      // fixorder: 2,
     },
     {
       id: "3",
       width: 20,
       height: 20,
-      fixorder: 0,
+      // fixorder: 0,
     },
     {
       id: "4",
       width: 20,
       height: 20,
-      fixorder: 1,
+      // fixorder: 1,
     },
-    // {
-    //   id: "5",
-    //   width: 20,
-    //   height: 20,
-    //   layer: 2,
-    // },
+    {
+      id: "5",
+      width: 20,
+      height: 20,
+      // fixorder: 0,
+    },
   ],
   edges: [
-    // {
-    //   source: "0",
-    //   target: "5",
-    // },
+    {
+      source: "0",
+      target: "5",
+    },
     {
       source: "0",
       target: "1",
@@ -1884,10 +1884,10 @@ const testData = {
       source: "2",
       target: "4",
     },
-    // {
-    //   source: "5",
-    //   target: "4",
-    // },
+    {
+      source: "5",
+      target: "3",
+    },
   ],
 };
 
