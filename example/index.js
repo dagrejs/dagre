@@ -1831,14 +1831,14 @@ const testData = {
       id: "1",
       width: 20,
       height: 20,
-      // fixorder: 1,
+      fixorder: 2,
     },
     {
       id: "2",
       width: 20,
       height: 20,
-      layer: 1,
-      // fixorder: 2,
+      layer: 2,
+      fixorder: 0,
     },
     {
       id: "3",
@@ -1856,7 +1856,7 @@ const testData = {
       id: "5",
       width: 20,
       height: 20,
-      // fixorder: 0,
+      fixorder: 1,
     },
   ],
   edges: [
@@ -1896,11 +1896,13 @@ const g = createGraph(testData);
 // Set an object for the graph label
 g.setGraph({
   // ranker: "longest-path",
-  // ranker: "tight-tree",
-  ranker: "network-complex",
+  ranker: "tight-tree",
+  // ranker: "network-complex",
 });
 
-dagre.layout(g);
+dagre.layout(g, {
+  edgeLabelSpace: false,
+});
 
 g.nodes().forEach(function (v) {
   console.log("Node " + v + ": " + JSON.stringify(g.node(v)));

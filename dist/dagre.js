@@ -475,13 +475,16 @@ function layout(g, opts) {
   time("layout", function() {
     var layoutGraph = 
       time("  buildLayoutGraph", function() { return buildLayoutGraph(g); });
+    // 控制是否为边的label留位置（这会影响是否在边中间添加dummy node）
+    if (opts && opts.edgeLabelSpace) {
+      time("  makeSpaceForEdgeLabels", function() { makeSpaceForEdgeLabels(layoutGraph); });
+    }
     time("  runLayout",        function() { runLayout(layoutGraph, time); });
     time("  updateInputGraph", function() { updateInputGraph(g, layoutGraph); });
   });
 }
 
 function runLayout(g, time) {
-  time("    makeSpaceForEdgeLabels", function() { makeSpaceForEdgeLabels(g); });
   time("    removeSelfEdges",        function() { removeSelfEdges(g); });
   time("    acyclic",                function() { acyclic.run(g); });
   time("    nestingGraph.run",       function() { nestingGraph.run(g); });
@@ -602,6 +605,12 @@ function buildLayoutGraph(inputGraph) {
 function makeSpaceForEdgeLabels(g) {
   var graph = g.graph();
   graph.ranksep /= 2;
+  _.forEach(g.nodes(), function(n) {
+    var node = g.node(n);
+    if (!isNaN(node.layer)) {
+      node.layer *= 2; // TODO: 因为默认的rank变为两倍，设定的layer也*2
+    }
+  });
   _.forEach(g.edges(), function(e) {
     var edge = g.edge(e);
     edge.minlen *= 2;
@@ -2800,7 +2809,7 @@ function longestPathWithLayer(g) {
   function dfs(v, nextRank) {
     var label = g.node(v);
 
-    var currRank = !isNaN(label.layer) ? label.layer * 2 : nextRank; // TODO: 因为rank是二倍的原因，这里乘二
+    var currRank = !isNaN(label.layer) ? label.layer : nextRank;
 
     // 没有指定，取最大值
     if (label.rank === undefined || label.rank < currRank) {
