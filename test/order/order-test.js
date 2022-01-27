@@ -20,7 +20,7 @@ describe("order", function() {
     g.setPath(["a", "b", "c"]);
     g.setEdge("b", "d");
     g.setPath(["a", "e", "f"]);
-    order(g);
+    order(g, {});
     var layering = util.buildLayerMatrix(g);
     expect(crossCount(g, layering)).to.equal(0);
   });
@@ -30,7 +30,7 @@ describe("order", function() {
     _.forEach(["a", "d"], function(v) { g.setNode(v, { rank: 1 }); });
     _.forEach(["b", "f", "e"], function(v) { g.setNode(v, { rank: 2 }); });
     _.forEach(["c", "g"], function(v) { g.setNode(v, { rank: 3 }); });
-    order(g);
+    order(g, {});
     var layering = util.buildLayerMatrix(g);
     expect(crossCount(g, layering)).to.equal(0);
   });
@@ -40,7 +40,7 @@ describe("order", function() {
     _.forEach(["b", "e", "g"], function(v) { g.setNode(v, { rank: 2 }); });
     _.forEach(["c", "f", "h"], function(v) { g.setNode(v, { rank: 3 }); });
     g.setNode("d", { rank: 4 });
-    order(g);
+    order(g, {});
     var layering = util.buildLayerMatrix(g);
     expect(crossCount(g, layering)).to.be.lte(1);
   });
