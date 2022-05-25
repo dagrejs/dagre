@@ -18,9 +18,11 @@ jobs:
     - uses: browser-actions/setup-firefox@latest
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: package-lock.json
 
     - name: Install dependencies
       run: |
