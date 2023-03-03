@@ -75,8 +75,8 @@ describe("order/resolveConflicts", function() {
     cg.setEdge("b", "c");
     var results = resolveConflicts(input, cg);
     expect(results).to.have.length(1);
-    expect(_.indexOf(results[0].vs, "c")).to.be.gt(_.indexOf(results[0].vs, "a"));
-    expect(_.indexOf(results[0].vs, "c")).to.be.gt(_.indexOf(results[0].vs, "b"));
+    expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("a"));
+    expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("b"));
     expect(results[0].i).equals(0);
     expect(results[0].barycenter).equals((4 + 3 + 2) / 3);
     expect(results[0].weight).equals(3);
@@ -95,9 +95,9 @@ describe("order/resolveConflicts", function() {
     cg.setEdge("c", "d");
     var results = resolveConflicts(input, cg);
     expect(results).to.have.length(1);
-    expect(_.indexOf(results[0].vs, "c")).to.be.gt(_.indexOf(results[0].vs, "a"));
-    expect(_.indexOf(results[0].vs, "c")).to.be.gt(_.indexOf(results[0].vs, "b"));
-    expect(_.indexOf(results[0].vs, "d")).to.be.gt(_.indexOf(results[0].vs, "c"));
+    expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("a"));
+    expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("b"));
+    expect(results[0].vs.indexOf("d")).to.be.gt(results[0].vs.indexOf("c"));
     expect(results[0].i).equals(0);
     expect(results[0].barycenter).equals((4 + 3 + 2 + 1) / 4);
     expect(results[0].weight).equals(4);

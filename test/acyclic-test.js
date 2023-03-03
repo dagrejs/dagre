@@ -1,4 +1,3 @@
-var _ = require("lodash");
 var expect = require("./chai").expect;
 var acyclic = require("../lib/acyclic");
 var Graph = require("../lib/graphlib").Graph;
@@ -17,7 +16,7 @@ describe("acyclic", function() {
       .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; });
   });
 
-  _.forEach(ACYCLICERS, function(acyclicer) {
+  ACYCLICERS.forEach(acyclicer => {
     describe(acyclicer, function() {
       beforeEach(function() {
         g.setGraph({ acyclicer: acyclicer });
@@ -28,8 +27,8 @@ describe("acyclic", function() {
           g.setPath(["a", "b", "d"]);
           g.setPath(["a", "c", "d"]);
           acyclic.run(g);
-          var results = _.map(g.edges(), stripLabel);
-          expect(_.sortBy(results, ["v", "w"])).to.eql([
+          var results = g.edges().map(stripLabel);
+          expect(results.sort(sortEdges)).to.eql([
             { v: "a", w: "b" },
             { v: "a", w: "c" },
             { v: "b", w: "d" },
@@ -95,4 +94,17 @@ function stripLabel(edge) {
   var c = _.clone(edge);
   delete c.label;
   return c;
+}
+
+function sortEdges(a, b) {
+  if (a.name) {
+    return a.name.localeCompare(b.name);
+  }
+
+  const order = a.v.localeCompare(b.v);
+  if (order != 0) {
+    return order;
+  }
+
+  return a.w.localeCompare(b.w);
 }
