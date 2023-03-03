@@ -1,15 +1,15 @@
 var expect = require("../chai").expect;
 var sortSubgraph = require("../../lib/order/sort-subgraph");
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 
 describe("order/sortSubgraph", function() {
   var g, cg;
 
   beforeEach(function() {
     g = new Graph({ compound: true })
-      .setDefaultNodeLabel(function() { return {}; })
-      .setDefaultEdgeLabel(function() { return { weight: 1 }; });
-    [0, 1, 2, 3, 4].forEach(function(v) { g.setNode(v, { order: v }); });
+      .setDefaultNodeLabel(() => ({}))
+      .setDefaultEdgeLabel(() => ({ weight: 1 }));
+    [0, 1, 2, 3, 4].forEach(v => g.setNode(v, { order: v }));
     cg = new Graph();
   });
 

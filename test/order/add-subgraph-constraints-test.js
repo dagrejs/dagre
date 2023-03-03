@@ -12,7 +12,7 @@ describe("order/addSubgraphConstraints", function() {
 
   it("does not change CG for a flat set of nodes", function() {
     var vs = ["a", "b", "c", "d"];
-    vs.forEachfunction(v) { g.setNode(v); });
+    vs.forEach(v => g.setNode(v));
     addSubgraphConstraints(g, cg, vs);
     expect(cg.nodeCount()).equals(0);
     expect(cg.edgeCount()).equals(0);
@@ -20,9 +20,7 @@ describe("order/addSubgraphConstraints", function() {
 
   it("doesn't create a constraint for contiguous subgraph nodes", function() {
     var vs = ["a", "b", "c"];
-    vs.forEach(function(v) {
-      g.setParent(v, "sg");
-    });
+    vs.forEach(v => g.setParent(v, "sg"));
     addSubgraphConstraints(g, cg, vs);
     expect(cg.nodeCount()).equals(0);
     expect(cg.edgeCount()).equals(0);
@@ -38,9 +36,7 @@ describe("order/addSubgraphConstraints", function() {
 
   it("works for multiple levels", function() {
     var vs = ["a", "b", "c", "d", "e", "f", "g", "h"];
-    vs.forEach(function(v) {
-      g.setNode(v);
-    });
+    vs.forEach(v => g.setNode(v));
     g.setParent("b", "sg2");
     g.setParent("sg2", "sg1");
     g.setParent("c", "sg1");
@@ -50,7 +46,7 @@ describe("order/addSubgraphConstraints", function() {
     g.setParent("g", "sg5");
     g.setParent("sg5", "sg4");
     addSubgraphConstraints(g, cg, vs);
-    expect(cg.edges().sort((a, b) => a["v"].localeCompare(b.["v"]))).eqls([
+    expect(cg.edges().sort((a, b) => a.v.localeCompare(b.v))).eqls([
       { v: "sg1", w: "sg4" },
       { v: "sg2", w: "sg3" }
     ]);

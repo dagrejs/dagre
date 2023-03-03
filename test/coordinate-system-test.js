@@ -1,4 +1,4 @@
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var coordinateSystem = require("../lib/coordinate-system");
 var expect = require("./chai").expect;
 

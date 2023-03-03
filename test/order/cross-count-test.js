@@ -1,5 +1,5 @@
 var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var crossCount = require("../../lib/order/cross-count");
 
 describe("crossCount", function() {
@@ -7,7 +7,7 @@ describe("crossCount", function() {
 
   beforeEach(function() {
     g = new Graph()
-      .setDefaultEdgeLabel(function() { return { weight: 1 }; });
+      .setDefaultEdgeLabel(() => ({ weight: 1 }));
   });
 
   it("returns 0 for an empty layering", function() {

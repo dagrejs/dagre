@@ -1,5 +1,5 @@
 var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var initOrder = require("../../lib/order/init-order");
 
 describe("order/initOrder", function() {
@@ -7,7 +7,7 @@ describe("order/initOrder", function() {
 
   beforeEach(function() {
     g = new Graph({ compound: true })
-      .setDefaultEdgeLabel(function() { return { weight: 1 }; });
+      .setDefaultEdgeLabel(() => ({ weight: 1 }));
   });
 
   it("assigns non-overlapping orders for each rank in a tree", function() {
@@ -20,8 +20,8 @@ describe("order/initOrder", function() {
 
     var layering = initOrder(g);
     expect(layering[0]).to.eql(["a"]);
-    expect(layering[1]sort()).to.eql(["b", "e"]);
-    expect(layering[2]sort()).to.eql(["c", "d"]);
+    expect(layering[1].sort()).to.eql(["b", "e"]);
+    expect(layering[2].sort()).to.eql(["c", "d"]);
   });
 
   it("assigns non-overlapping orders for each rank in a DAG", function() {

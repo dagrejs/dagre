@@ -1,14 +1,14 @@
 var expect = require("../chai").expect;
 var barycenter = require("../../lib/order/barycenter");
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 
 describe("order/barycenter", function() {
   var g;
 
   beforeEach(function() {
     g = new Graph()
-      .setDefaultNodeLabel(function() { return {}; })
-      .setDefaultEdgeLabel(function() { return { weight: 1 }; });
+      .setDefaultNodeLabel(() => ({}))
+      .setDefaultEdgeLabel(() => ({ weight: 1 }));
   });
 
   it("assigns an undefined barycenter for a node with no predecessors", function() {
