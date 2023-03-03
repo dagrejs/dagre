@@ -1,8 +1,7 @@
 /* eslint "no-console": off */
 
-var _ = require("lodash");
 var expect = require("./chai").expect;
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var util = require("../lib/util");
 
 describe("util", function() {
@@ -173,7 +172,7 @@ describe("util", function() {
 
     it("logs timing information", function() {
       var capture = [];
-      console.log = function() { capture.push(_.toArray(arguments)[0]); };
+      console.log = function() { capture.push(Array.from(arguments)[0]); };
       util.time("foo", function() {});
       expect(capture.length).to.equal(1);
       expect(capture[0]).to.match(/^foo time: .*ms/);
@@ -181,7 +180,7 @@ describe("util", function() {
 
     it("returns the value from the evaluated function", function() {
       console.log = function() {};
-      expect(util.time("foo", _.constant("bar"))).to.equal("bar");
+      expect(util.time("foo", () => "bar")).to.equal("bar");
     });
   });
 

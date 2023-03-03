@@ -1,7 +1,6 @@
-var _ = require("lodash");
 var expect = require("./chai").expect;
 var normalize = require("../lib/normalize");
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 
 describe("normalize", function() {
   var g;
@@ -18,7 +17,7 @@ describe("normalize", function() {
 
       normalize.run(g);
 
-      expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: "a", w: "b" }]);
+      expect(g.edges().map(incidentNodes)).to.eql([{ v: "a", w: "b" }]);
       expect(g.node("a").rank).to.equal(0);
       expect(g.node("b").rank).to.equal(1);
     });
@@ -89,7 +88,7 @@ describe("normalize", function() {
       normalize.run(g);
       normalize.undo(g);
 
-      expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: "a", w: "b" }]);
+      expect(g.edges().map(incidentNodes)).to.eql([{ v: "a", w: "b" }]);
       expect(g.node("a").rank).to.equal(0);
       expect(g.node("b").rank).to.equal(2);
     });
@@ -161,7 +160,7 @@ describe("normalize", function() {
 
       normalize.undo(g);
 
-      expect(_.pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
+      expect(pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
         x: 50, y: 60, width: 20, height: 10
       });
     });
@@ -181,7 +180,7 @@ describe("normalize", function() {
 
       normalize.undo(g);
 
-      expect(_.pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
+      expect(pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
         x: 50, y: 60, width: 20, height: 10
       });
     });
@@ -194,7 +193,7 @@ describe("normalize", function() {
 
       normalize.run(g);
 
-      var outEdges = _.sortBy(g.outEdges("a"), "name");
+      var outEdges = g.outEdges("a").sort((a, b) => a.name.localeCompare(b.name));
       expect(outEdges).to.have.length(2);
 
       var barDummy = g.node(outEdges[0].w);
@@ -216,4 +215,14 @@ describe("normalize", function() {
 
 function incidentNodes(edge) {
   return { v: edge.v, w: edge.w };
+}
+
+function pick(obj, keys) {
+  const picked = {};
+
+  for (const key of keys) {
+    picked[key] = obj[key];
+  }
+
+  return picked;
 }

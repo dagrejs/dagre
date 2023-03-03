@@ -1,6 +1,5 @@
-var _ = require("lodash");
 var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var addSubgraphConstraints = require("../../lib/order/add-subgraph-constraints");
 
 describe("order/addSubgraphConstraints", function() {
@@ -51,7 +50,7 @@ describe("order/addSubgraphConstraints", function() {
     g.setParent("g", "sg5");
     g.setParent("sg5", "sg4");
     addSubgraphConstraints(g, cg, vs);
-    expect(_.sortBy(cg.edges(), "v")).eqls([
+    expect(cg.edges().sort((a, b) => a["v"].localeCompare(b.["v"]))).eqls([
       { v: "sg1", w: "sg4" },
       { v: "sg2", w: "sg3" }
     ]);

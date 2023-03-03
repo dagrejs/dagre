@@ -1,6 +1,5 @@
-var _ = require("lodash");
 var expect = require("./chai").expect;
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var findCycles = require("../lib/graphlib").alg.findCycles;
 var greedyFAS = require("../lib/greedy-fas");
 
@@ -82,7 +81,7 @@ describe("greedyFAS", function() {
     g.setEdge("a", "b", 5, "foo");
     g.setEdge("b", "a", 2, "bar");
     g.setEdge("b", "a", 2, "baz");
-    expect(_.sortBy(greedyFAS(g, weightFn(g)), "name")).to.eql([
+    expect(greedyFAS(g, weightFn(g).sort((a, b) => a.name.localeCompare(b.name)))).to.eql([
       { v: "b", w: "a", name: "bar" },
       { v: "b", w: "a", name: "baz" }
     ]);
@@ -92,7 +91,7 @@ describe("greedyFAS", function() {
 function checkFAS(g, fas) {
   var n = g.nodeCount();
   var m = g.edgeCount();
-  _.forEach(fas, function(edge) {
+  fas.forEach(function(edge) {
     g.removeEdge(edge.v, edge.w);
   });
   expect(findCycles(g)).to.eql([]);

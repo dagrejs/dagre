@@ -1,7 +1,7 @@
 var expect = require("./chai").expect;
 var acyclic = require("../lib/acyclic");
-var Graph = require("../lib/graphlib").Graph;
-var findCycles = require("../lib/graphlib").alg.findCycles;
+var Graph = require("@dagrejs/graphlib").Graph;
+var findCycles = require("@dagrejs/graphlib").alg.findCycles;
 
 describe("acyclic", function() {
   var ACYCLICERS = [
