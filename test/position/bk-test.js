@@ -645,6 +645,7 @@ describe("position/bk", function() {
 
     it("aligns inner segments", function() {
       g.graph().nodesep = 10;
+      g.graph().edgesep = 10;
       g.setNode("a", { rank: 0, order: 0, width:  50, dummy: true });
       g.setNode("b", { rank: 0, order: 1, width:  60 });
       g.setNode("c", { rank: 1, order: 0, width:  70 });

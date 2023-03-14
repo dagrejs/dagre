@@ -81,7 +81,7 @@ describe("greedyFAS", function() {
     g.setEdge("a", "b", 5, "foo");
     g.setEdge("b", "a", 2, "bar");
     g.setEdge("b", "a", 2, "baz");
-    expect(greedyFAS(g, weightFn(g).sort((a, b) => a.name.localeCompare(b.name)))).to.eql([
+    expect(greedyFAS(g, weightFn(g)).sort((a, b) => a.name.localeCompare(b.name))).to.eql([
       { v: "b", w: "a", name: "bar" },
       { v: "b", w: "a", name: "baz" }
     ]);

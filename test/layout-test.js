@@ -266,7 +266,9 @@ describe("layout", function() {
           g.setEdge("a", "b", {
             width: 1000, height: 2000, labelpos: "l", labeloffset: 0
           });
+          console.log("START");
           layout(g);
+          console.log("END");
           if (rankdir === "TB" || rankdir === "BT") {
             expect(g.edge("a", "b").x).equals(1000 / 2);
           } else {

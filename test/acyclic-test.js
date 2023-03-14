@@ -91,7 +91,7 @@ describe("acyclic", function() {
 });
 
 function stripLabel(edge) {
-  var c = _.clone(edge);
+  var c = Object.assign({}, edge);
   delete c.label;
   return c;
 }

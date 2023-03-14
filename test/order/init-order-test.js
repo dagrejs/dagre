@@ -11,7 +11,7 @@ describe("order/initOrder", function() {
   });
 
   it("assigns non-overlapping orders for each rank in a tree", function() {
-    Object.Entries({ a: 0, b: 1, c: 2, d: 2, e: 1 }).sort(function(rank, v) {
+    Object.entries({ a: 0, b: 1, c: 2, d: 2, e: 1 }).sort(function(rank, v) {
       g.setNode(v, { rank: rank });
     });
     g.setPath(["a", "b", "c"]);
@@ -25,7 +25,7 @@ describe("order/initOrder", function() {
   });
 
   it("assigns non-overlapping orders for each rank in a DAG", function() {
-    Object.Entries({ a: 0, b: 1, c: 1, d: 2 }).sort(function(rank, v) {
+    Object.entries({ a: 0, b: 1, c: 1, d: 2 }).sort(function(rank, v) {
       g.setNode(v, { rank: rank });
     });
     g.setPath(["a", "b", "d"]);
