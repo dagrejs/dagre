@@ -1,5 +1,5 @@
 {
-  "name": "dagre",
+  "name": "@dagrejs/dagre",
   "version": "0.8.6-pre",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
@@ -8,32 +8,37 @@
   ],
   "license": "MIT",
   "main": "index.js",
+  "scripts": {
+    "lint": "make lint",
+    "test": "make test"
+  },
   "keywords": [
     "graph",
     "layout"
   ],
   "dependencies": {
-    "graphlib": "^2.1.8",
+    "@dagrejs/graphlib": "2.1.10",
     "lodash": "^4.17.19"
   },
   "devDependencies": {
     "benchmark": "2.1.4",
     "browserify": "17.0.0",
     "chai": "4.3.6",
-    "eslint": "8.15.0",
-    "jshint": "2.13.4",
+    "eslint": "8.35.0",
+    "jshint": "2.13.5",
     "jshint-stylish": "2.2.1",
-    "karma": "6.3.19",
+    "karma": "6.4.1",
     "karma-chrome-launcher": "3.1.1",
     "karma-firefox-launcher": "2.1.2",
     "karma-mocha": "2.0.1",
     "karma-requirejs": "1.1.0",
     "karma-safari-launcher": "1.0.0",
-    "mocha": "10.0.0",
+    "mocha": "10.1.0",
+    "nyc": "^15.1.0",
     "requirejs": "2.3.6",
     "semver": "7.3.7",
     "sprintf": "0.1.5",
-    "uglify-js": "3.15.4"
+    "uglify-js": "3.17.4"
   },
   "repository": {
     "type": "git",

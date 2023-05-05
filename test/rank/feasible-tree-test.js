@@ -1,6 +1,6 @@
 var _ = require("lodash");
 var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var feasibleTree = require("../../lib/rank/feasible-tree");
 
 describe("feasibleTree", function() {

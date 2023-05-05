@@ -1,6 +1,7 @@
 MOD = dagre
 
 NPM = npm
+NYC = nyc
 BROWSERIFY = ./node_modules/browserify/bin/cmd.js
 JSHINT = ./node_modules/jshint/bin/jshint
 ESLINT = ./node_modules/eslint/bin/eslint.js
@@ -12,7 +13,7 @@ JSHINT_OPTS = --reporter node_modules/jshint-stylish/index.js
 MOCHA_OPTS = -R dot
 
 BUILD_DIR = build
-COVERAGE_DIR = $(BUILD_DIR)/cov
+COVERAGE_DIR = ./.nyc_output
 DIST_DIR = dist
 
 SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js')

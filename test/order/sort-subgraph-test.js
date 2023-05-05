@@ -1,7 +1,7 @@
 var _ = require("lodash");
 var expect = require("../chai").expect;
 var sortSubgraph = require("../../lib/order/sort-subgraph");
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 
 describe("order/sortSubgraph", function() {
   var g, cg;

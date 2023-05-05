@@ -12,7 +12,7 @@ var alignCoordinates = bk.alignCoordinates;
 var balance = bk.balance;
 var findSmallestWidthAlignment = bk.findSmallestWidthAlignment;
 var positionX = bk.positionX;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 
 describe("position/bk", function() {
   var g;
