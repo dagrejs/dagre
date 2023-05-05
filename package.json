@@ -17,8 +17,7 @@
     "layout"
   ],
   "dependencies": {
-    "@dagrejs/graphlib": "2.1.10",
-    "lodash": "^4.17.19"
+    "@dagrejs/graphlib": "2.1.10"
   },
   "devDependencies": {
     "benchmark": "2.1.4",
