@@ -3,8 +3,8 @@
   "env": {
     "browser": true,
     "es6": true,
-    "node": true,
-    "mocha": true
+    "mocha": true,
+    "node": true
   },
   "parserOptions": {
     "ecmaVersion": "latest"
@@ -12,6 +12,7 @@
   "rules": {
     "indent": [ "error", 2 ],
     "linebreak-style": [ "error", "unix" ],
+    "no-prototype-builtins": 0,
     "semi": [ "error", "always" ]
   }
 }

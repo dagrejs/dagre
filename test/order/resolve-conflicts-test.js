@@ -149,5 +149,5 @@ describe("order/resolveConflicts", function() {
 });
 
 function sortFunc(a, b) {
-  return a.vs[0].localeCompare(b.vs[0]);;
+  return a.vs[0].localeCompare(b.vs[0]);
 }
