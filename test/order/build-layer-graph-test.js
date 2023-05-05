@@ -1,4 +1,3 @@
-var _ = require("lodash");
 var expect = require("../chai").expect;
 var Graph = require("@dagrejs/graphlib").Graph;
 var buildLayerGraph = require("../../lib/order/build-layer-graph");
@@ -106,11 +105,11 @@ describe("order/buildLayerGraph", function() {
       borderLeft: ["bl"],
       borderRight: ["br"]
     });
-    _.forEach(["a", "b"], function(v) { g.setParent(v, "sg"); });
+    ["a", "b"].forEach(function(v) { g.setParent(v, "sg"); });
 
     var lg = buildLayerGraph(g, 0, "inEdges");
     var root = lg.graph().root;
-    expect(_.sortBy(lg.children(root))).eqls(["c", "sg"]);
+    expect(lg.children(root).sort()).eqls(["c", "sg"]);
     expect(lg.parent("a")).equals("sg");
     expect(lg.parent("b")).equals("sg");
   });
