@@ -1,4 +1,3 @@
-var _ = require("lodash");
 var expect = require("../chai").expect;
 var rank = require("../../lib/rank");
 var Graph = require("@dagrejs/graphlib").Graph;
@@ -20,12 +19,12 @@ describe("rank", function() {
       .setPath(["a", "f", "g"]);
   });
 
-  _.forEach(RANKERS, function(ranker) {
+  RANKERS.forEach(function(ranker) {
     describe(ranker, function() {
       it("respects the minlen attribute", function() {
         g.graph().ranker = ranker;
         rank(g);
-        _.forEach(g.edges(), function(e) {
+        g.edges().forEach(function(e) {
           var vRank = g.node(e.v).rank;
           var wRank = g.node(e.w).rank;
           expect(wRank - vRank).to.be.gte(g.edge(e).minlen);
