@@ -1,4 +1,3 @@
-var _ = require("lodash");
 var expect = require("./chai").expect;
 var layout = require("..").layout;
 var Graph = require("@dagrejs/graphlib").Graph;
@@ -59,16 +58,16 @@ describe("layout", function() {
       a: { x: 75 / 2, y: 100 / 2 },
       b: { x: 75 / 2, y: 100 + 150 + 70 + 150 + 200 / 2 }
     });
-    expect(_.pick(g.edge("a", "b"), ["x", "y"]))
-      .eqls({ x: 75 / 2, y: 100  + 150 + 70 / 2 });
+    expect(g.edge("a", "b").x).eqls(75 / 2);
+    expect(g.edge("a", "b").y).eqls(100  + 150 + 70 / 2 );
   });
 
   describe("can layout an edge with a long label, with rankdir =", function() {
-    _.forEach(["TB", "BT", "LR", "RL"], function(rankdir) {
+    ["TB", "BT", "LR", "RL"].forEach(rankdir => {
       it(rankdir, function() {
         g.graph().nodesep = g.graph().edgesep = 10;
         g.graph().rankdir = rankdir;
-        _.forEach(["a", "b", "c", "d"], function(v) {
+        ["a", "b", "c", "d"].forEach(v => {
           g.setNode(v, { width: 10, height: 10 });
         });
         g.setEdge("a", "c", { width: 2000, height: 10, labelpos: "c" });
@@ -90,11 +89,11 @@ describe("layout", function() {
   });
 
   describe("can apply an offset, with rankdir =", function() {
-    _.forEach(["TB", "BT", "LR", "RL"], function(rankdir) {
+    ["TB", "BT", "LR", "RL"].forEach(rankdir => {
       it(rankdir, function() {
         g.graph().nodesep = g.graph().edgesep = 10;
         g.graph().rankdir = rankdir;
-        _.forEach(["a", "b", "c", "d"], function(v) {
+        ["a", "b", "c", "d"].forEach(v => {
           g.setNode(v, { width: 10, height: 10 });
         });
         g.setEdge("a", "b", { width: 10, height: 10, labelpos: "l", labeloffset: 1000 });
@@ -173,7 +172,7 @@ describe("layout", function() {
   });
 
   describe("can layout a self loop", function() {
-    _.forEach(["TB", "BT", "LR", "RL"], function(rankdir) {
+    ["TB", "BT", "LR", "RL"].forEach(rankdir => {
       it ("in rankdir = " + rankdir, function() {
         g.graph().edgesep = 75;
         g.graph().rankdir = rankdir;
@@ -183,7 +182,7 @@ describe("layout", function() {
         var nodeA = g.node("a");
         var points = g.edge("a", "a").points;
         expect(points).to.have.length(7);
-        _.forEach(points, function(point) {
+        points.forEach(point => {
           if (rankdir !== "LR" && rankdir !== "RL") {
             expect(point.x).gt(nodeA.x);
             expect(Math.abs(point.y - nodeA.y)).lte(nodeA.height / 2);
@@ -204,7 +203,7 @@ describe("layout", function() {
   });
 
   it("minimizes the height of subgraphs", function() {
-    _.forEach(["a", "b", "c", "d", "x", "y"], function(v) {
+    ["a", "b", "c", "d", "x", "y"].forEach(v => {
       g.setNode(v, { width: 50, height: 50 });
     });
     g.setPath(["a", "b", "c", "d"]);
@@ -233,7 +232,7 @@ describe("layout", function() {
       expect(g.node("sg").y, "y " + rankdir).gt(50 / 2);
     }
 
-    _.forEach(["tb", "bt", "lr", "rl"], function(rankdir) {
+    ["tb", "bt", "lr", "rl"].forEach(rankdir => {
       g.graph().rankdir = rankdir;
       layout(g);
       check(rankdir);
@@ -248,7 +247,7 @@ describe("layout", function() {
   });
 
   describe("ensures all coordinates are in the bounding box for the graph", function() {
-    _.forEach(["TB", "BT", "LR", "RL"], function(rankdir) {
+    ["TB", "BT", "LR", "RL"].forEach(rankdir => {
       describe(rankdir, function() {
         beforeEach(function() {
           g.graph().rankdir = rankdir;
@@ -292,7 +291,9 @@ describe("layout", function() {
 
 function extractCoordinates(g) {
   var nodes = g.nodes();
-  return _.zipObject(nodes, _.map(nodes, function(v) {
-    return _.pick(g.node(v), ["x", "y"]);
-  }));
+  return nodes.reduce((acc, v) => {
+    const node = g.node(v);
+    acc[v] = { x: node.x, y: node.y };
+    return acc;
+  }, {});
 }

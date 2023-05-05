@@ -1,6 +1,5 @@
 /* eslint "no-console": off */
 
-var _ = require("lodash");
 var expect = require("./chai").expect;
 var Graph = require("@dagrejs/graphlib").Graph;
 var util = require("../lib/util");
@@ -173,7 +172,7 @@ describe("util", function() {
 
     it("logs timing information", function() {
       var capture = [];
-      console.log = function() { capture.push(_.toArray(arguments)[0]); };
+      console.log = function() { capture.push(Array.from(arguments)[0]); };
       util.time("foo", function() {});
       expect(capture.length).to.equal(1);
       expect(capture[0]).to.match(/^foo time: .*ms/);
@@ -181,7 +180,7 @@ describe("util", function() {
 
     it("returns the value from the evaluated function", function() {
       console.log = function() {};
-      expect(util.time("foo", _.constant("bar"))).to.equal("bar");
+      expect(util.time("foo", () => "bar")).to.equal("bar");
     });
   });
 
@@ -242,6 +241,44 @@ describe("util", function() {
       util.removeEmptyRanks(g);
       expect(g.node("a").rank).equals(0);
       expect(g.node("b").rank).equals(2);
+    });
+  });
+
+  describe("range", () => {
+    it("Builds an array to the limit", () => {
+      const range = util.range(4);
+      expect(range.length).equals(4);
+      expect(range.reduce((acc, v) => acc + v)).equals(6);
+    });
+
+    it("Builds an array with a start", () => {
+      const range = util.range(2, 4);
+      expect(range.length).equals(2);
+      expect(range.reduce((acc, v) => acc + v)).equals(5);
+    });
+  });
+
+  describe("mapValues", () => {
+    it("Creates an object with the same keys", () => {
+      const users = {
+        'fred':    { 'user': 'fred',    'age': 40 },
+        'pebbles': { 'user': 'pebbles', 'age': 1 }
+      };
+
+      const ages = util.mapValues(users, user => user.age);
+      expect(ages.fred).equals(40);
+      expect(ages.pebbles).equals(1);
+    });
+
+    it("Can take a property name", () => {
+      const users = {
+        'fred':    { 'user': 'fred',    'age': 40 },
+        'pebbles': { 'user': 'pebbles', 'age': 1 }
+      };
+
+      const ages = util.mapValues(users, 'age');
+      expect(ages.fred).equals(40);
+      expect(ages.pebbles).equals(1);
     });
   });
 });
