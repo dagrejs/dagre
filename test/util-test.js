@@ -256,6 +256,12 @@ describe("util", function() {
       expect(range.length).equals(2);
       expect(range.reduce((acc, v) => acc + v)).equals(5);
     });
+
+    it("Builds an array with a negative step", () => {
+      const range = util.range(5, -1, -1);
+      expect(range[0]).equals(5);
+      expect(range[5]).equals(0);
+    });
   });
 
   describe("mapValues", () => {
