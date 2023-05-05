@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/graphlib/dist/graphlib.core.js',
+      'node_modules/@dagre/graphlib/dist/graphlib.core.js',
       'build/dagre.core.js',
 
       'node_modules/chai/chai.js',
