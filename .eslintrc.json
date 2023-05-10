@@ -1,13 +1,18 @@
 {
+  "extends": "eslint:recommended",
   "env": {
     "browser": true,
-    "node": true,
-    "mocha": true
+    "es6": true,
+    "mocha": true,
+    "node": true
   },
-  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
   "rules": {
     "indent": [ "error", 2 ],
     "linebreak-style": [ "error", "unix" ],
+    "no-prototype-builtins": 0,
     "semi": [ "error", "always" ]
   }
 }

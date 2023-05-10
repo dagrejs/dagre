@@ -1,6 +1,5 @@
-var _ = require("lodash");
 var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var resolveConflicts = require("../../lib/order/resolve-conflicts");
 
 describe("order/resolveConflicts", function() {
@@ -15,7 +14,7 @@ describe("order/resolveConflicts", function() {
       { v: "a", barycenter: 2, weight: 3 },
       { v: "b", barycenter: 1, weight: 2 }
     ];
-    expect(_.sortBy(resolveConflicts(input, cg), "vs")).eqls([
+    expect(resolveConflicts(input, cg).sort(sortFunc)).eqls([
       { vs: ["a"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
     ]);
@@ -27,7 +26,7 @@ describe("order/resolveConflicts", function() {
       { v: "b", barycenter: 1, weight: 2 }
     ];
     cg.setEdge("b", "a");
-    expect(_.sortBy(resolveConflicts(input, cg), "vs")).eqls([
+    expect(resolveConflicts(input, cg).sort(sortFunc)).eqls([
       { vs: ["a"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
     ]);
@@ -39,7 +38,7 @@ describe("order/resolveConflicts", function() {
       { v: "b", barycenter: 1, weight: 2 }
     ];
     cg.setEdge("a", "b");
-    expect(_.sortBy(resolveConflicts(input, cg), "vs")).eqls([
+    expect(resolveConflicts(input, cg)).eqls([
       { vs: ["a", "b"],
         i: 0,
         barycenter: (3 * 2 + 2 * 1) / (3 + 2),
@@ -56,7 +55,7 @@ describe("order/resolveConflicts", function() {
       { v: "d", barycenter: 1, weight: 1 }
     ];
     cg.setPath(["a", "b", "c", "d"]);
-    expect(_.sortBy(resolveConflicts(input, cg), "vs")).eqls([
+    expect(resolveConflicts(input, cg)).eqls([
       { vs: ["a", "b", "c", "d"],
         i: 0,
         barycenter: (4 + 3 + 2 + 1) / 4,
@@ -75,8 +74,8 @@ describe("order/resolveConflicts", function() {
     cg.setEdge("b", "c");
     var results = resolveConflicts(input, cg);
     expect(results).to.have.length(1);
-    expect(_.indexOf(results[0].vs, "c")).to.be.gt(_.indexOf(results[0].vs, "a"));
-    expect(_.indexOf(results[0].vs, "c")).to.be.gt(_.indexOf(results[0].vs, "b"));
+    expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("a"));
+    expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("b"));
     expect(results[0].i).equals(0);
     expect(results[0].barycenter).equals((4 + 3 + 2) / 3);
     expect(results[0].weight).equals(3);
@@ -95,9 +94,9 @@ describe("order/resolveConflicts", function() {
     cg.setEdge("c", "d");
     var results = resolveConflicts(input, cg);
     expect(results).to.have.length(1);
-    expect(_.indexOf(results[0].vs, "c")).to.be.gt(_.indexOf(results[0].vs, "a"));
-    expect(_.indexOf(results[0].vs, "c")).to.be.gt(_.indexOf(results[0].vs, "b"));
-    expect(_.indexOf(results[0].vs, "d")).to.be.gt(_.indexOf(results[0].vs, "c"));
+    expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("a"));
+    expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("b"));
+    expect(results[0].vs.indexOf("d")).to.be.gt(results[0].vs.indexOf("c"));
     expect(results[0].i).equals(0);
     expect(results[0].barycenter).equals((4 + 3 + 2 + 1) / 4);
     expect(results[0].weight).equals(4);
@@ -108,7 +107,7 @@ describe("order/resolveConflicts", function() {
       { v: "a" },
       { v: "b", barycenter: 1, weight: 2 }
     ];
-    expect(_.sortBy(resolveConflicts(input, cg), "vs")).eqls([
+    expect(resolveConflicts(input, cg).sort(sortFunc)).eqls([
       { vs: ["a"], i: 0 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
     ]);
@@ -120,7 +119,7 @@ describe("order/resolveConflicts", function() {
       { v: "b", barycenter: 1, weight: 2 }
     ];
     cg.setEdge("a", "b");
-    expect(_.sortBy(resolveConflicts(input, cg), "vs")).eqls([
+    expect(resolveConflicts(input, cg)).eqls([
       { vs: ["a", "b"], i: 0, barycenter: 1, weight: 2 }
     ]);
   });
@@ -131,7 +130,7 @@ describe("order/resolveConflicts", function() {
       { v: "b", barycenter: 1, weight: 2 }
     ];
     cg.setEdge("b", "a");
-    expect(_.sortBy(resolveConflicts(input, cg), "vs")).eqls([
+    expect(resolveConflicts(input, cg)).eqls([
       { vs: ["b", "a"], i: 0, barycenter: 1, weight: 2 }
     ]);
   });
@@ -142,9 +141,13 @@ describe("order/resolveConflicts", function() {
       { v: "b", barycenter: 1, weight: 2 }
     ];
     cg.setEdge("c", "d");
-    expect(_.sortBy(resolveConflicts(input, cg), "vs")).eqls([
+    expect(resolveConflicts(input, cg).sort(sortFunc)).eqls([
       { vs: ["a"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
     ]);
   });
 });
+
+function sortFunc(a, b) {
+  return a.vs[0].localeCompare(b.vs[0]);
+}

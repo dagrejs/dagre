@@ -1,4 +1,3 @@
-var _ = require("lodash");
 var expect = require("../chai").expect;
 var buildLayerMatrix = require("../../lib/util").buildLayerMatrix;
 var bk = require("../../lib/position/bk");
@@ -12,7 +11,7 @@ var alignCoordinates = bk.alignCoordinates;
 var balance = bk.balance;
 var findSmallestWidthAlignment = bk.findSmallestWidthAlignment;
 var positionX = bk.positionX;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 
 describe("position/bk", function() {
   var g;
@@ -55,7 +54,7 @@ describe("position/bk", function() {
       expect(hasConflict(conflicts, "b", "c")).to.be.false;
     });
 
-    _.forEach(["a", "b", "c", "d"], function(v) {
+    ["a", "b", "c", "d"].forEach(function(v) {
       it("does not mark type-0 conflicts (" + v + " is dummy)", function() {
         g.node(v).dummy = true;
 
@@ -65,9 +64,9 @@ describe("position/bk", function() {
       });
     });
 
-    _.forEach(["a", "b", "c", "d"], function(v) {
+    ["a", "b", "c", "d"].forEach(function(v) {
       it("does mark type-1 conflicts (" + v + " is non-dummy)", function() {
-        _.forEach(["a", "b", "c", "d"], function(w) {
+        ["a", "b", "c", "d"].forEach(function(w) {
           if (v !== w) {
             g.node(w).dummy = true;
           }
@@ -85,7 +84,7 @@ describe("position/bk", function() {
     });
 
     it("does not mark type-2 conflicts (all dummies)", function() {
-      _.forEach(["a", "b", "c", "d"], function(v) {
+      ["a", "b", "c", "d"].forEach(function(v) {
         g.node(v).dummy = true;
       });
 
@@ -114,11 +113,11 @@ describe("position/bk", function() {
     });
 
     it("marks type-2 conflicts favoring border segments #1", function() {
-      _.forEach(["a", "d"], function(v) {
+      ["a", "d"].forEach(function(v) {
         g.node(v).dummy = true;
       });
 
-      _.forEach(["b", "c"], function(v) {
+      ["b", "c"].forEach(function(v) {
         g.node(v).dummy = "border";
       });
 
@@ -129,11 +128,11 @@ describe("position/bk", function() {
     });
 
     it("marks type-2 conflicts favoring border segments #2", function() {
-      _.forEach(["b", "c"], function(v) {
+      ["b", "c"].forEach(function(v) {
         g.node(v).dummy = true;
       });
 
-      _.forEach(["a", "d"], function(v) {
+      ["a", "d"].forEach(function(v) {
         g.node(v).dummy = "border";
       });
 
@@ -646,6 +645,7 @@ describe("position/bk", function() {
 
     it("aligns inner segments", function() {
       g.graph().nodesep = 10;
+      g.graph().edgesep = 10;
       g.setNode("a", { rank: 0, order: 0, width:  50, dummy: true });
       g.setNode("b", { rank: 0, order: 1, width:  60 });
       g.setNode("c", { rank: 1, order: 0, width:  70 });

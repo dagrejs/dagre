@@ -1,6 +1,5 @@
-var _ = require("lodash");
 var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var networkSimplex = require("../../lib/rank/network-simplex");
 var longestPath = require("../../lib/rank/util").longestPath;
 var initLowLimValues = networkSimplex.initLowLimValues;
@@ -222,8 +221,8 @@ describe("network simplex", function() {
       var d = g.node("d");
       var e = g.node("e");
 
-      expect(_.sortBy(_.map(g.nodes(), function(v) { return g.node(v).lim; })))
-        .to.eql(_.range(1, 6));
+      expect(g.nodes().map(v => g.node(v).lim).sort())
+        .to.eql([1, 2, 3, 4, 5]);
 
       expect(a).to.eql({ low: 1, lim: 5 });
 
@@ -262,8 +261,8 @@ describe("network simplex", function() {
       expect(t.edge("g", "f").cutvalue).to.equal(0);
 
       // ensure lim numbers look right
-      var lims = _.sortBy(_.map(t.nodes(), function(v) { return t.node(v).lim; }));
-      expect(lims).to.eql(_.range(1, 9));
+      var lims = t.nodes().map(v => t.node(v).lim).sort();
+      expect(lims).to.eql([1, 2, 3, 4, 5, 6, 7, 8]);
     });
 
     it("updates ranks", function() {

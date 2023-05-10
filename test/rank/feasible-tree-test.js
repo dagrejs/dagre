@@ -1,6 +1,5 @@
-var _ = require("lodash");
 var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var feasibleTree = require("../../lib/rank/feasible-tree");
 
 describe("feasibleTree", function() {
@@ -28,8 +27,8 @@ describe("feasibleTree", function() {
     expect(g.node("b").rank).to.eql(g.node("a").rank + 1);
     expect(g.node("c").rank).to.eql(g.node("b").rank + 1);
     expect(g.node("d").rank).to.eql(g.node("a").rank + 1);
-    expect(_.sortBy(tree.neighbors("a"))).to.eql(["b", "d"]);
-    expect(_.sortBy(tree.neighbors("b"))).to.eql(["a", "c"]);
+    expect(tree.neighbors("a").sort()).to.eql(["b", "d"]);
+    expect(tree.neighbors("b").sort()).to.eql(["a", "c"]);
     expect(tree.neighbors("c")).to.eql(["b"]);
     expect(tree.neighbors("d")).to.eql(["a"]);
   });
@@ -45,8 +44,8 @@ describe("feasibleTree", function() {
     var tree = feasibleTree(g);
     expect(g.node("a").rank).to.eql(g.node("b").rank + 1);
     expect(g.node("c").rank).to.eql(g.node("b").rank + 1);
-    expect(_.sortBy(tree.neighbors("a"))).to.eql(["b"]);
-    expect(_.sortBy(tree.neighbors("b"))).to.eql(["a", "c"]);
-    expect(_.sortBy(tree.neighbors("c"))).to.eql(["b"]);
+    expect(tree.neighbors("a").sort()).to.eql(["b"]);
+    expect(tree.neighbors("b").sort()).to.eql(["a", "c"]);
+    expect(tree.neighbors("c").sort()).to.eql(["b"]);
   });
 });
