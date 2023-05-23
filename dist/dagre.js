@@ -2950,7 +2950,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.0.0";
+module.exports = "1.0.1";
 
 },{}],29:[function(require,module,exports){
 /**
@@ -4118,6 +4118,19 @@ class Graph {
   }
 
   /**
+   * Gets the label for the specified edge and converts it to an object.
+   * Complexity: O(1)
+   */
+  edgeAsObj() {
+    const edge = this.edge(...arguments);
+    if (typeof edge !== "object") {
+      return {label: edge};
+    }
+
+    return edge;
+  }
+
+  /**
    * Detects whether the graph contains specified edge or not. No subgraphs are considered.
    * Complexity: O(1).
    */
@@ -4331,7 +4344,7 @@ function read(json) {
 }
 
 },{"./graph":44}],47:[function(require,module,exports){
-module.exports = '2.1.12';
+module.exports = '2.1.13';
 
 },{}]},{},[1])(1)
 });
