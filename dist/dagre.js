@@ -2950,7 +2950,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.0.1";
+module.exports = "1.0.2";
 
 },{}],29:[function(require,module,exports){
 /**
