@@ -18,6 +18,7 @@
     "dist/",
     "lib/"
   ],
+  "types": "index.d.ts",
   "keywords": [
     "graph",
     "layout"
