@@ -1,10 +1,3 @@
-
-# Important!
-
-**This project does not have a maintainer or active project members. There won’t be any support or attention to pull requests. Please do not contact previous maintainers unless you are qualified and have the resources to make a serious commitment to fully take over ownership of the project.**
-
-
-
 # dagre - Graph layout for JavaScript
 
 [![Build Status](https://github.com/dagrejs/dagre/workflows/Build%20Status/badge.svg?branch=master)](https://github.com/dagrejs/dagre/actions?query=workflow%3A%22Build+Status%22)
