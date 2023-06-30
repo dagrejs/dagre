@@ -68,6 +68,13 @@ declare module '@dagrejs/dagre' {
   }
 
   export interface Label {
+    label?: string;
+    width?: number;
+    height?: number;
+    minRank?: number;
+    maxRank?: number;
+    borderLeft?: string[];
+    borderRight?: string[];
     [key: string]: any;
   }
   export type WeightFn = (edge: Edge) => number;
