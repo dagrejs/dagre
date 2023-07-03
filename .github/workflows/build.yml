@@ -1,0 +1,38 @@
+name: Build Status
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: browser-actions/setup-firefox@latest
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: package-lock.json
+
+    - name: Install dependencies
+      run: |
+        npm install
+        sudo apt-get install graphviz xvfb
+
+    - name: Lint
+      run: |
+        make lint
+
+    - name: Test
+      run: |
+        KARMA_OPTS="--browsers Firefox" xvfb-run --auto-servernum make -e test

@@ -1,6 +1,6 @@
 {
   "name": "dagre",
-  "version": "0.8.4",
+  "version": "1.0.2",
   "main": [
     "dist/dagre.core.js"
   ],
@@ -20,7 +20,6 @@
     "test/**"
   ],
   "dependencies": {
-    "graphlib": "^2.1.7",
-    "lodash": "^4.17.4"
+    "@dagrejs/graphlib": "2.1.13"
   }
 }
