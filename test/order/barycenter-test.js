@@ -2,16 +2,16 @@ var expect = require("../chai").expect;
 var barycenter = require("../../lib/order/barycenter");
 var Graph = require("@dagrejs/graphlib").Graph;
 
-describe("order/barycenter", function() {
+describe("order/barycenter", () => {
   var g;
 
-  beforeEach(function() {
+  beforeEach(() => {
     g = new Graph()
-      .setDefaultNodeLabel(function() { return {}; })
-      .setDefaultEdgeLabel(function() { return { weight: 1 }; });
+      .setDefaultNodeLabel(() => ({}))
+      .setDefaultEdgeLabel(() => ({ weight: 1 }));
   });
 
-  it("assigns an undefined barycenter for a node with no predecessors", function() {
+  it("assigns an undefined barycenter for a node with no predecessors", () => {
     g.setNode("x", {});
 
     var results = barycenter(g, ["x"]);
@@ -19,7 +19,7 @@ describe("order/barycenter", function() {
     expect(results[0]).to.eql({ v: "x" });
   });
 
-  it("assigns the position of the sole predecessors", function() {
+  it("assigns the position of the sole predecessors", () => {
     g.setNode("a", { order: 2 });
     g.setEdge("a", "x");
 
@@ -28,7 +28,7 @@ describe("order/barycenter", function() {
     expect(results[0]).eqls({ v: "x", barycenter: 2, weight: 1 });
   });
 
-  it("assigns the average of multiple predecessors", function() {
+  it("assigns the average of multiple predecessors", () => {
     g.setNode("a", { order: 2 });
     g.setNode("b", { order: 4 });
     g.setEdge("a", "x");
@@ -39,7 +39,7 @@ describe("order/barycenter", function() {
     expect(results[0]).eqls({ v: "x", barycenter: 3, weight: 2 });
   });
 
-  it("takes into account the weight of edges", function() {
+  it("takes into account the weight of edges", () => {
     g.setNode("a", { order: 2 });
     g.setNode("b", { order: 4 });
     g.setEdge("a", "x", { weight: 3 });
@@ -50,7 +50,7 @@ describe("order/barycenter", function() {
     expect(results[0]).eqls({ v: "x", barycenter: 2.5, weight: 4 });
   });
 
-  it("calculates barycenters for all nodes in the movable layer", function() {
+  it("calculates barycenters for all nodes in the movable layer", () => {
     g.setNode("a", { order: 1 });
     g.setNode("b", { order: 2 });
     g.setNode("c", { order: 4 });

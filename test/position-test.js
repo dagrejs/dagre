@@ -2,10 +2,10 @@ var expect = require("./chai").expect;
 var position = require("../lib/position");
 var Graph = require("@dagrejs/graphlib").Graph;
 
-describe("position", function() {
+describe("position", () => {
   var g;
 
-  beforeEach(function() {
+  beforeEach(() => {
     g = new Graph({ compound: true })
       .setGraph({
         ranksep: 50,
@@ -14,7 +14,7 @@ describe("position", function() {
       });
   });
 
-  it("respects ranksep", function() {
+  it("respects ranksep", () => {
     g.graph().ranksep = 1000;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     g.setNode("b", { width: 50, height:  80, rank: 1, order: 0 });
@@ -23,7 +23,7 @@ describe("position", function() {
     expect(g.node("b").y).to.equal(100 + 1000 + 80 / 2);
   });
 
-  it("use the largest height in each rank with ranksep", function() {
+  it("use the largest height in each rank with ranksep", () => {
     g.graph().ranksep = 1000;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     g.setNode("b", { width: 50, height:  80, rank: 0, order: 1 });
@@ -35,7 +35,7 @@ describe("position", function() {
     expect(g.node("c").y).to.equal(100 + 1000 + 90 / 2);
   });
 
-  it("respects nodesep", function() {
+  it("respects nodesep", () => {
     g.graph().nodesep = 1000;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     g.setNode("b", { width: 70, height:  80, rank: 0, order: 1 });
@@ -43,7 +43,7 @@ describe("position", function() {
     expect(g.node("b").x).to.equal(g.node("a").x + 50 / 2 + 1000 + 70 / 2);
   });
 
-  it("should not try to position the subgraph node itself", function() {
+  it("should not try to position the subgraph node itself", () => {
     g.setNode("a", { width: 50, height: 50, rank: 0, order: 0 });
     g.setNode("sg1", {});
     g.setParent("a", "sg1");

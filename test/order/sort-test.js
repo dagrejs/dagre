@@ -1,8 +1,8 @@
 var expect = require("../chai").expect;
 var sort = require("../../lib/order/sort");
 
-describe("sort", function() {
-  it("sorts nodes by barycenter", function() {
+describe("sort", () => {
+  it("sorts nodes by barycenter", () => {
     var input = [
       { vs: ["a"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
@@ -13,7 +13,7 @@ describe("sort", function() {
       weight: 3 + 2 });
   });
 
-  it("can sort super-nodes", function() {
+  it("can sort super-nodes", () => {
     var input = [
       { vs: ["a", "c", "d"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
@@ -24,7 +24,7 @@ describe("sort", function() {
       weight: 3 + 2 });
   });
 
-  it("biases to the left by default", function() {
+  it("biases to the left by default", () => {
     var input = [
       { vs: ["a"], i: 0, barycenter: 1, weight: 1 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 1 }
@@ -35,7 +35,7 @@ describe("sort", function() {
       weight: 2 });
   });
 
-  it("biases to the right if biasRight = true", function() {
+  it("biases to the right if biasRight = true", () => {
     var input = [
       { vs: ["a"], i: 0, barycenter: 1, weight: 1 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 1 }
@@ -46,7 +46,7 @@ describe("sort", function() {
       weight: 2 });
   });
 
-  it("can sort nodes without a barycenter", function() {
+  it("can sort nodes without a barycenter", () => {
     var input = [
       { vs: ["a"], i: 0, barycenter: 2, weight: 1 },
       { vs: ["b"], i: 1, barycenter: 6, weight: 1 },
@@ -60,7 +60,7 @@ describe("sort", function() {
     });
   });
 
-  it("can handle no barycenters for any nodes", function() {
+  it("can handle no barycenters for any nodes", () => {
     var input = [
       { vs: ["a"], i: 0 },
       { vs: ["b"], i: 3 },
@@ -70,7 +70,7 @@ describe("sort", function() {
     expect(sort(input)).eqls({ vs: ["a", "d", "c", "b"] });
   });
 
-  it("can handle a barycenter of 0", function() {
+  it("can handle a barycenter of 0", () => {
     var input = [
       { vs: ["a"], i: 0, barycenter: 0, weight: 1 },
       { vs: ["b"], i: 3 },

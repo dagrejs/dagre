@@ -2,8 +2,8 @@ var expect = require("../chai").expect;
 var Graph = require("@dagrejs/graphlib").Graph;
 var feasibleTree = require("../../lib/rank/feasible-tree");
 
-describe("feasibleTree", function() {
-  it("creates a tree for a trivial input graph", function() {
+describe("feasibleTree", () => {
+  it("creates a tree for a trivial input graph", () => {
     var g = new Graph()
       .setNode("a", { rank: 0 })
       .setNode("b", { rank: 1 })
@@ -14,7 +14,7 @@ describe("feasibleTree", function() {
     expect(tree.neighbors("a")).to.eql(["b"]);
   });
 
-  it("correctly shortens slack by pulling a node up", function() {
+  it("correctly shortens slack by pulling a node up", () => {
     var g = new Graph()
       .setNode("a", { rank: 0 })
       .setNode("b", { rank: 1 })
@@ -33,7 +33,7 @@ describe("feasibleTree", function() {
     expect(tree.neighbors("d")).to.eql(["a"]);
   });
 
-  it("correctly shortens slack by pulling a node down", function() {
+  it("correctly shortens slack by pulling a node down", () => {
     var g = new Graph()
       .setNode("a", { rank: 2 })
       .setNode("b", { rank: 0 })

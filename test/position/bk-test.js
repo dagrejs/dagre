@@ -13,19 +13,17 @@ var findSmallestWidthAlignment = bk.findSmallestWidthAlignment;
 var positionX = bk.positionX;
 var Graph = require("@dagrejs/graphlib").Graph;
 
-describe("position/bk", function() {
+describe("position/bk", () => {
   var g;
 
-  beforeEach(function() {
-    g = new Graph().setGraph({});
-  });
+  beforeEach(() => g = new Graph().setGraph({}));
 
-  describe("findType1Conflicts", function() {
+  describe("findType1Conflicts", () => {
     var layering;
 
-    beforeEach(function() {
+    beforeEach(() => {
       g
-        .setDefaultEdgeLabel(function() { return {}; })
+        .setDefaultEdgeLabel(() => ({}))
         .setNode("a", { rank: 0, order: 0 })
         .setNode("b", { rank: 0, order: 1 })
         .setNode("c", { rank: 1, order: 0 })
@@ -37,7 +35,7 @@ describe("position/bk", function() {
       layering = buildLayerMatrix(g);
     });
 
-    it("does not mark edges that have no conflict", function() {
+    it("does not mark edges that have no conflict", () => {
       g.removeEdge("a", "d");
       g.removeEdge("b", "c");
       g.setEdge("a", "c");
@@ -48,14 +46,14 @@ describe("position/bk", function() {
       expect(hasConflict(conflicts, "b", "d")).to.be.false;
     });
 
-    it("does not mark type-0 conflicts (no dummies)", function() {
+    it("does not mark type-0 conflicts (no dummies)", () => {
       var conflicts = findType1Conflicts(g, layering);
       expect(hasConflict(conflicts, "a", "d")).to.be.false;
       expect(hasConflict(conflicts, "b", "c")).to.be.false;
     });
 
-    ["a", "b", "c", "d"].forEach(function(v) {
-      it("does not mark type-0 conflicts (" + v + " is dummy)", function() {
+    ["a", "b", "c", "d"].forEach(v => {
+      it("does not mark type-0 conflicts (" + v + " is dummy)", () => {
         g.node(v).dummy = true;
 
         var conflicts = findType1Conflicts(g, layering);
@@ -64,9 +62,9 @@ describe("position/bk", function() {
       });
     });
 
-    ["a", "b", "c", "d"].forEach(function(v) {
-      it("does mark type-1 conflicts (" + v + " is non-dummy)", function() {
-        ["a", "b", "c", "d"].forEach(function(w) {
+    ["a", "b", "c", "d"].forEach(v => {
+      it("does mark type-1 conflicts (" + v + " is non-dummy)", () => {
+        ["a", "b", "c", "d"].forEach(w => {
           if (v !== w) {
             g.node(w).dummy = true;
           }
@@ -83,10 +81,8 @@ describe("position/bk", function() {
       });
     });
 
-    it("does not mark type-2 conflicts (all dummies)", function() {
-      ["a", "b", "c", "d"].forEach(function(v) {
-        g.node(v).dummy = true;
-      });
+    it("does not mark type-2 conflicts (all dummies)", () => {
+      ["a", "b", "c", "d"].forEach(v => g.node(v).dummy = true);
 
       var conflicts = findType1Conflicts(g, layering);
       expect(hasConflict(conflicts, "a", "d")).to.be.false;
@@ -95,12 +91,12 @@ describe("position/bk", function() {
     });
   });
 
-  describe("findType2Conflicts", function() {
+  describe("findType2Conflicts", () => {
     var layering;
 
-    beforeEach(function() {
+    beforeEach(() => {
       g
-        .setDefaultEdgeLabel(function() { return {}; })
+        .setDefaultEdgeLabel(() => ({}))
         .setNode("a", { rank: 0, order: 0 })
         .setNode("b", { rank: 0, order: 1 })
         .setNode("c", { rank: 1, order: 0 })
@@ -112,14 +108,10 @@ describe("position/bk", function() {
       layering = buildLayerMatrix(g);
     });
 
-    it("marks type-2 conflicts favoring border segments #1", function() {
-      ["a", "d"].forEach(function(v) {
-        g.node(v).dummy = true;
-      });
+    it("marks type-2 conflicts favoring border segments #1", () => {
+      ["a", "d"].forEach(v => g.node(v).dummy = true);
 
-      ["b", "c"].forEach(function(v) {
-        g.node(v).dummy = "border";
-      });
+      ["b", "c"].forEach(v => g.node(v).dummy = "border");
 
       var conflicts = findType2Conflicts(g, layering);
       expect(hasConflict(conflicts, "a", "d")).to.be.true;
@@ -127,14 +119,10 @@ describe("position/bk", function() {
       findType1Conflicts(g, layering);
     });
 
-    it("marks type-2 conflicts favoring border segments #2", function() {
-      ["b", "c"].forEach(function(v) {
-        g.node(v).dummy = true;
-      });
+    it("marks type-2 conflicts favoring border segments #2", () => {
+      ["b", "c"].forEach(v => g.node(v).dummy = true);
 
-      ["a", "d"].forEach(function(v) {
-        g.node(v).dummy = "border";
-      });
+      ["a", "d"].forEach(v => g.node(v).dummy = "border");
 
       var conflicts = findType2Conflicts(g, layering);
       expect(hasConflict(conflicts, "a", "d")).to.be.false;
@@ -144,15 +132,15 @@ describe("position/bk", function() {
 
   });
 
-  describe("hasConflict", function() {
-    it("can test for a type-1 conflict regardless of edge orientation", function() {
+  describe("hasConflict", () => {
+    it("can test for a type-1 conflict regardless of edge orientation", () => {
       var conflicts = {};
       addConflict(conflicts, "b", "a");
       expect(hasConflict(conflicts, "a", "b")).to.be.true;
       expect(hasConflict(conflicts, "b", "a")).to.be.true;
     });
 
-    it("works for multiple conflicts with the same node", function() {
+    it("works for multiple conflicts with the same node", () => {
       var conflicts = {};
       addConflict(conflicts, "a", "b");
       addConflict(conflicts, "a", "c");
@@ -161,8 +149,8 @@ describe("position/bk", function() {
     });
   });
 
-  describe("verticalAlignment", function() {
-    it("Aligns with itself if the node has no adjacencies", function() {
+  describe("verticalAlignment", () => {
+    it("Aligns with itself if the node has no adjacencies", () => {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 1, order: 0 });
 
@@ -176,7 +164,7 @@ describe("position/bk", function() {
       });
     });
 
-    it("Aligns with its sole adjacency", function() {
+    it("Aligns with its sole adjacency", () => {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 1, order: 0 });
       g.setEdge("a", "b");
@@ -191,7 +179,7 @@ describe("position/bk", function() {
       });
     });
 
-    it("aligns with its left median when possible", function() {
+    it("aligns with its left median when possible", () => {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 0, order: 1 });
       g.setNode("c", { rank: 1, order: 0 });
@@ -208,7 +196,7 @@ describe("position/bk", function() {
       });
     });
 
-    it("aligns correctly even regardless of node name / insertion order", function() {
+    it("aligns correctly even regardless of node name / insertion order", () => {
       // This test ensures that we're actually properly sorting nodes by
       // position when searching for candidates. Many of these tests previously
       // passed because the node insertion order matched the order of the nodes
@@ -230,7 +218,7 @@ describe("position/bk", function() {
     });
 
 
-    it("aligns with its right median when left is unavailable", function() {
+    it("aligns with its right median when left is unavailable", () => {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 0, order: 1 });
       g.setNode("c", { rank: 1, order: 0 });
@@ -249,7 +237,7 @@ describe("position/bk", function() {
       });
     });
 
-    it("aligns with neither median if both are unavailable", function() {
+    it("aligns with neither median if both are unavailable", () => {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 0, order: 1 });
       g.setNode("c", { rank: 1, order: 0 });
@@ -270,7 +258,7 @@ describe("position/bk", function() {
       });
     });
 
-    it("aligns with the single median for an odd number of adjacencies", function() {
+    it("aligns with the single median for an odd number of adjacencies", () => {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 0, order: 1 });
       g.setNode("c", { rank: 0, order: 2 });
@@ -289,7 +277,7 @@ describe("position/bk", function() {
       });
     });
 
-    it("aligns blocks across multiple layers", function() {
+    it("aligns blocks across multiple layers", () => {
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 1, order: 0 });
       g.setNode("c", { rank: 1, order: 1 });
@@ -308,8 +296,8 @@ describe("position/bk", function() {
     });
   });
 
-  describe("horizonalCompaction", function() {
-    it("places the center of a single node graph at origin (0,0)", function() {
+  describe("horizonalCompaction", () => {
+    it("places the center of a single node graph at origin (0,0)", () => {
       var root =  { a: "a" };
       var align = { a: "a" };
       g.setNode("a", { rank: 0, order: 0 });
@@ -318,7 +306,7 @@ describe("position/bk", function() {
       expect(xs.a).to.equal(0);
     });
 
-    it("separates adjacent nodes by specified node separation", function() {
+    it("separates adjacent nodes by specified node separation", () => {
       var root =  { a: "a", b: "b" };
       var align = { a: "a", b: "b" };
       g.graph().nodesep = 100;
@@ -330,7 +318,7 @@ describe("position/bk", function() {
       expect(xs.b).to.equal(100 / 2 + 100 + 200 / 2);
     });
 
-    it("separates adjacent edges by specified node separation", function() {
+    it("separates adjacent edges by specified node separation", () => {
       var root =  { a: "a", b: "b" };
       var align = { a: "a", b: "b" };
       g.graph().edgesep = 20;
@@ -342,7 +330,7 @@ describe("position/bk", function() {
       expect(xs.b).to.equal(100 / 2 + 20 + 200 / 2);
     });
 
-    it("aligns the centers of nodes in the same block", function() {
+    it("aligns the centers of nodes in the same block", () => {
       var root =  { a: "a", b: "a" };
       var align = { a: "b", b: "a" };
       g.setNode("a", { rank: 0, order: 0, width: 100 });
@@ -353,7 +341,7 @@ describe("position/bk", function() {
       expect(xs.b).to.equal(0);
     });
 
-    it("separates blocks with the appropriate separation", function() {
+    it("separates blocks with the appropriate separation", () => {
       var root =  { a: "a", b: "a", c: "c" };
       var align = { a: "b", b: "a", c: "c" };
       g.graph().nodesep = 75;
@@ -367,7 +355,7 @@ describe("position/bk", function() {
       expect(xs.c).to.equal(0);
     });
 
-    it("separates classes with the appropriate separation", function() {
+    it("separates classes with the appropriate separation", () => {
       var root =  { a: "a", b: "b", c: "c", d: "b" };
       var align = { a: "a", b: "d", c: "c", d: "b" };
       g.graph().nodesep = 75;
@@ -383,7 +371,7 @@ describe("position/bk", function() {
       expect(xs.d).to.equal(100 / 2 + 75 + 200 / 2);
     });
 
-    it("shifts classes by max sep from the adjacent block #1", function() {
+    it("shifts classes by max sep from the adjacent block #1", () => {
       var root =  { a: "a", b: "b", c: "a", d: "b" };
       var align = { a: "c", b: "d", c: "a", d: "b" };
       g.graph().nodesep = 75;
@@ -399,7 +387,7 @@ describe("position/bk", function() {
       expect(xs.d).to.equal(50 / 2 + 75 + 150 / 2);
     });
 
-    it("shifts classes by max sep from the adjacent block #2", function() {
+    it("shifts classes by max sep from the adjacent block #2", () => {
       var root =  { a: "a", b: "b", c: "a", d: "b" };
       var align = { a: "c", b: "d", c: "a", d: "b" };
       g.graph().nodesep = 75;
@@ -415,7 +403,7 @@ describe("position/bk", function() {
       expect(xs.d).to.equal(60 / 2 + 75 + 150 / 2);
     });
 
-    it("cascades class shift", function() {
+    it("cascades class shift", () => {
       var root =  { a: "a", b: "b", c: "c", d: "d", e: "b", f: "f", g: "d" };
       var align = { a: "a", b: "e", c: "c", d: "g", e: "b", f: "f", g: "d" };
       g.graph().nodesep = 75;
@@ -438,7 +426,7 @@ describe("position/bk", function() {
       expect(xs.g).to.equal(xs.f + 50 / 2 + 75 + 50 / 2);
     });
 
-    it("handles labelpos = l", function() {
+    it("handles labelpos = l", () => {
       var root =  { a: "a", b: "b", c: "c" };
       var align = { a: "a", b: "b", c: "c" };
       g.graph().edgesep = 50;
@@ -455,7 +443,7 @@ describe("position/bk", function() {
       expect(xs.c).to.equal(xs.b + 0 + 50 + 300 / 2);
     });
 
-    it("handles labelpos = c", function() {
+    it("handles labelpos = c", () => {
       var root =  { a: "a", b: "b", c: "c" };
       var align = { a: "a", b: "b", c: "c" };
       g.graph().edgesep = 50;
@@ -472,7 +460,7 @@ describe("position/bk", function() {
       expect(xs.c).to.equal(xs.b + 200 / 2 + 50 + 300 / 2);
     });
 
-    it("handles labelpos = r", function() {
+    it("handles labelpos = r", () => {
       var root =  { a: "a", b: "b", c: "c" };
       var align = { a: "a", b: "b", c: "c" };
       g.graph().edgesep = 50;
@@ -490,8 +478,8 @@ describe("position/bk", function() {
     });
   });
 
-  describe("alignCoordinates", function() {
-    it("aligns a single node", function() {
+  describe("alignCoordinates", () => {
+    it("aligns a single node", () => {
       var xss = {
         ul: { a:  50 },
         ur: { a: 100 },
@@ -507,7 +495,7 @@ describe("position/bk", function() {
       expect(xss.dr).to.eql({ a: 50 });
     });
 
-    it("aligns multiple nodes", function() {
+    it("aligns multiple nodes", () => {
       var xss = {
         ul: { a:  50, b: 1000 },
         ur: { a: 100, b:  900 },
@@ -524,8 +512,8 @@ describe("position/bk", function() {
     });
   });
 
-  describe("findSmallestWidthAlignment", function() {
-    it("finds the alignment with the smallest width", function() {
+  describe("findSmallestWidthAlignment", () => {
+    it("finds the alignment with the smallest width", () => {
       g.setNode("a", { width: 50 });
       g.setNode("b", { width: 50 });
 
@@ -539,7 +527,7 @@ describe("position/bk", function() {
       expect(findSmallestWidthAlignment(g, xss)).to.eql(xss.dr);
     });
 
-    it("takes node width into account", function() {
+    it("takes node width into account", () => {
       g.setNode("a", { width:  50 });
       g.setNode("b", { width:  50 });
       g.setNode("c", { width: 200 });
@@ -555,8 +543,8 @@ describe("position/bk", function() {
     });
   });
 
-  describe("balance", function() {
-    it("aligns a single node to the shared median value", function() {
+  describe("balance", () => {
+    it("aligns a single node to the shared median value", () => {
       var xss = {
         ul: { a:   0 },
         ur: { a: 100 },
@@ -567,7 +555,7 @@ describe("position/bk", function() {
       expect(balance(xss)).to.eql({ a: 100 });
     });
 
-    it("aligns a single node to the average of different median values", function() {
+    it("aligns a single node to the average of different median values", () => {
       var xss = {
         ul: { a:   0 },
         ur: { a:  75 },
@@ -578,7 +566,7 @@ describe("position/bk", function() {
       expect(balance(xss)).to.eql({ a: 100 });
     });
 
-    it("balances multiple nodes", function() {
+    it("balances multiple nodes", () => {
       var xss = {
         ul: { a:   0, b: 50 },
         ur: { a:  75, b:  0 },
@@ -590,20 +578,20 @@ describe("position/bk", function() {
     });
   });
 
-  describe("positionX", function() {
-    it("positions a single node at origin", function() {
+  describe("positionX", () => {
+    it("positions a single node at origin", () => {
       g.setNode("a", { rank: 0, order: 0, width: 100 });
       expect(positionX(g)).to.eql({ a: 0 });
     });
 
-    it("positions a single node block at origin", function() {
+    it("positions a single node block at origin", () => {
       g.setNode("a", { rank: 0, order: 0, width: 100 });
       g.setNode("b", { rank: 1, order: 0, width: 100 });
       g.setEdge("a", "b");
       expect(positionX(g)).to.eql({ a: 0, b: 0 });
     });
 
-    it("positions a single node block at origin even when their sizes differ", function() {
+    it("positions a single node block at origin even when their sizes differ", () => {
       g.setNode("a", { rank: 0, order: 0, width:  40 });
       g.setNode("b", { rank: 1, order: 0, width: 500 });
       g.setNode("c", { rank: 2, order: 0, width:  20 });
@@ -611,7 +599,7 @@ describe("position/bk", function() {
       expect(positionX(g)).to.eql({ a: 0, b: 0, c: 0 });
     });
 
-    it("centers a node if it is a predecessor of two same sized nodes", function() {
+    it("centers a node if it is a predecessor of two same sized nodes", () => {
       g.graph().nodesep = 10;
       g.setNode("a", { rank: 0, order: 0, width:  20 });
       g.setNode("b", { rank: 1, order: 0, width:  50 });
@@ -624,7 +612,7 @@ describe("position/bk", function() {
       expect(pos).to.eql({ a: a, b: a - (25 + 5), c: a + (25 + 5) });
     });
 
-    it("shifts blocks on both sides of aligned block", function() {
+    it("shifts blocks on both sides of aligned block", () => {
       g.graph().nodesep = 10;
       g.setNode("a", { rank: 0, order: 0, width:  50 });
       g.setNode("b", { rank: 0, order: 1, width:  60 });
@@ -643,7 +631,7 @@ describe("position/bk", function() {
       });
     });
 
-    it("aligns inner segments", function() {
+    it("aligns inner segments", () => {
       g.graph().nodesep = 10;
       g.graph().edgesep = 10;
       g.setNode("a", { rank: 0, order: 0, width:  50, dummy: true });
