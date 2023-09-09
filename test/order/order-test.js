@@ -1,11 +1,11 @@
-var expect = require("../chai").expect;
-var Graph = require("@dagrejs/graphlib").Graph;
-var order = require("../../lib/order");
-var crossCount = require("../../lib/order/cross-count");
-var util = require("../../lib/util");
+let expect = require("../chai").expect;
+let Graph = require("@dagrejs/graphlib").Graph;
+let order = require("../../lib/order");
+let crossCount = require("../../lib/order/cross-count");
+let util = require("../../lib/util");
 
 describe("order", () => {
-  var g;
+  let g;
 
   beforeEach(() => {
     g = new Graph()
@@ -20,7 +20,7 @@ describe("order", () => {
     g.setEdge("b", "d");
     g.setPath(["a", "e", "f"]);
     order(g);
-    var layering = util.buildLayerMatrix(g);
+    let layering = util.buildLayerMatrix(g);
     expect(crossCount(g, layering)).to.equal(0);
   });
 
@@ -30,7 +30,7 @@ describe("order", () => {
     ["b", "f", "e"].forEach(v => g.setNode(v, { rank: 2 }));
     ["c", "g"].forEach(v => g.setNode(v, { rank: 3 }));
     order(g);
-    var layering = util.buildLayerMatrix(g);
+    let layering = util.buildLayerMatrix(g);
     expect(crossCount(g, layering)).to.equal(0);
   });
 
@@ -40,7 +40,7 @@ describe("order", () => {
     ["c", "f", "h"].forEach(v => g.setNode(v, { rank: 3 }));
     g.setNode("d", { rank: 4 });
     order(g);
-    var layering = util.buildLayerMatrix(g);
+    let layering = util.buildLayerMatrix(g);
     expect(crossCount(g, layering)).to.be.lte(1);
   });
 });
