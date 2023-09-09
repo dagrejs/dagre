@@ -1,13 +1,13 @@
-var expect = require("../chai").expect;
-var rank = require("../../lib/rank");
-var Graph = require("@dagrejs/graphlib").Graph;
+let expect = require("../chai").expect;
+let rank = require("../../lib/rank");
+let Graph = require("@dagrejs/graphlib").Graph;
 
 describe("rank", () => {
-  var RANKERS = [
+  let RANKERS = [
     "longest-path", "tight-tree",
     "network-simplex", "unknown-should-still-work"
   ];
-  var g;
+  let g;
 
   beforeEach(() => {
     g = new Graph()
@@ -25,14 +25,14 @@ describe("rank", () => {
         g.graph().ranker = ranker;
         rank(g);
         g.edges().forEach(e => {
-          var vRank = g.node(e.v).rank;
-          var wRank = g.node(e.w).rank;
+          let vRank = g.node(e.v).rank;
+          let wRank = g.node(e.w).rank;
           expect(wRank - vRank).to.be.gte(g.edge(e).minlen);
         });
       });
 
       it("can rank a single node graph", () => {
-        var g = new Graph().setGraph({}).setNode("a", {});
+        let g = new Graph().setGraph({}).setNode("a", {});
         rank(g, ranker);
         expect(g.node("a").rank).to.equal(0);
       });
