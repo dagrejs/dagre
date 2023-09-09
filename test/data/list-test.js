@@ -1,8 +1,8 @@
-var expect = require("../chai").expect;
-var List = require("../../lib/data/list");
+let expect = require("../chai").expect;
+let List = require("../../lib/data/list");
 
 describe("data.List", () => {
-  var list;
+  let list;
 
   beforeEach(() => {
     list = new List();
@@ -14,14 +14,14 @@ describe("data.List", () => {
     });
 
     it("unlinks and returns the first entry", () => {
-      var obj = {};
+      let obj = {};
       list.enqueue(obj);
       expect(list.dequeue()).to.equal(obj);
     });
 
     it("unlinks and returns multiple entries in FIFO order", () => {
-      var obj1 = {};
-      var obj2 = {};
+      let obj1 = {};
+      let obj2 = {};
       list.enqueue(obj1);
       list.enqueue(obj2);
 
@@ -30,8 +30,8 @@ describe("data.List", () => {
     });
 
     it("unlinks and relinks an entry if it is re-enqueued", () => {
-      var obj1 = {};
-      var obj2 = {};
+      let obj1 = {};
+      let obj2 = {};
       list.enqueue(obj1);
       list.enqueue(obj2);
       list.enqueue(obj1);
@@ -41,8 +41,8 @@ describe("data.List", () => {
     });
 
     it("unlinks and relinks an entry if it is enqueued on another list", () => {
-      var obj = {};
-      var list2 = new List();
+      let obj = {};
+      let list2 = new List();
       list.enqueue(obj);
       list2.enqueue(obj);
 
