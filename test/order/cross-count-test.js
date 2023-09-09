@@ -1,9 +1,9 @@
-var expect = require("../chai").expect;
-var Graph = require("@dagrejs/graphlib").Graph;
-var crossCount = require("../../lib/order/cross-count");
+let expect = require("../chai").expect;
+let Graph = require("@dagrejs/graphlib").Graph;
+let crossCount = require("../../lib/order/cross-count");
 
 describe("crossCount", () => {
-  var g;
+  let g;
 
   beforeEach(() => {
     g = new Graph()
