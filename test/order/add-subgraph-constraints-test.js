@@ -1,9 +1,9 @@
-var expect = require("../chai").expect;
-var Graph = require("@dagrejs/graphlib").Graph;
-var addSubgraphConstraints = require("../../lib/order/add-subgraph-constraints");
+let expect = require("../chai").expect;
+let Graph = require("@dagrejs/graphlib").Graph;
+let addSubgraphConstraints = require("../../lib/order/add-subgraph-constraints");
 
 describe("order/addSubgraphConstraints", () => {
-  var g, cg;
+  let g, cg;
 
   beforeEach(() => {
     g = new Graph({ compound: true });
@@ -11,7 +11,7 @@ describe("order/addSubgraphConstraints", () => {
   });
 
   it("does not change CG for a flat set of nodes", () => {
-    var vs = ["a", "b", "c", "d"];
+    let vs = ["a", "b", "c", "d"];
     vs.forEach(v => g.setNode(v));
     addSubgraphConstraints(g, cg, vs);
     expect(cg.nodeCount()).equals(0);
@@ -19,7 +19,7 @@ describe("order/addSubgraphConstraints", () => {
   });
 
   it("doesn't create a constraint for contiguous subgraph nodes", () => {
-    var vs = ["a", "b", "c"];
+    let vs = ["a", "b", "c"];
     vs.forEach(v => g.setParent(v, "sg"));
     addSubgraphConstraints(g, cg, vs);
     expect(cg.nodeCount()).equals(0);
@@ -27,7 +27,7 @@ describe("order/addSubgraphConstraints", () => {
   });
 
   it("adds a constraint when the parents for adjacent nodes are different", () => {
-    var vs = ["a", "b"];
+    let vs = ["a", "b"];
     g.setParent("a", "sg1");
     g.setParent("b", "sg2");
     addSubgraphConstraints(g, cg, vs);
@@ -35,7 +35,7 @@ describe("order/addSubgraphConstraints", () => {
   });
 
   it("works for multiple levels", () => {
-    var vs = ["a", "b", "c", "d", "e", "f", "g", "h"];
+    let vs = ["a", "b", "c", "d", "e", "f", "g", "h"];
     vs.forEach(v => g.setNode(v));
     g.setParent("b", "sg2");
     g.setParent("sg2", "sg1");
