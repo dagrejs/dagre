@@ -36,8 +36,8 @@ module.exports = {
 },{"./lib/debug":6,"./lib/layout":8,"./lib/util":27,"./lib/version":28,"@dagrejs/graphlib":29}],2:[function(require,module,exports){
 "use strict";
 
-var greedyFAS = require("./greedy-fas");
-var uniqueId = require("./util").uniqueId;
+let greedyFAS = require("./greedy-fas");
+let uniqueId = require("./util").uniqueId;
 
 module.exports = {
   run: run,
@@ -45,11 +45,11 @@ module.exports = {
 };
 
 function run(g) {
-  var fas = (g.graph().acyclicer === "greedy"
+  let fas = (g.graph().acyclicer === "greedy"
     ? greedyFAS(g, weightFn(g))
     : dfsFAS(g));
   fas.forEach(function(e) {
-    var label = g.edge(e);
+    let label = g.edge(e);
     g.removeEdge(e);
     label.forwardName = e.name;
     label.reversed = true;
@@ -64,9 +64,9 @@ function run(g) {
 }
 
 function dfsFAS(g) {
-  var fas = [];
-  var stack = {};
-  var visited = {};
+  let fas = [];
+  let stack = {};
+  let visited = {};
 
   function dfs(v) {
     if (visited.hasOwnProperty(v)) {
@@ -90,11 +90,11 @@ function dfsFAS(g) {
 
 function undo(g) {
   g.edges().forEach(function(e) {
-    var label = g.edge(e);
+    let label = g.edge(e);
     if (label.reversed) {
       g.removeEdge(e);
 
-      var forwardName = label.forwardName;
+      let forwardName = label.forwardName;
       delete label.reversed;
       delete label.forwardName;
       g.setEdge(e.w, e.v, label, forwardName);
@@ -103,14 +103,14 @@ function undo(g) {
 }
 
 },{"./greedy-fas":7,"./util":27}],3:[function(require,module,exports){
-var util = require("./util");
+let util = require("./util");
 
 module.exports = addBorderSegments;
 
 function addBorderSegments(g) {
   function dfs(v) {
-    var children = g.children(v);
-    var node = g.node(v);
+    let children = g.children(v);
+    let node = g.node(v);
     if (children.length) {
       children.forEach(dfs);
     }
@@ -118,7 +118,7 @@ function addBorderSegments(g) {
     if (node.hasOwnProperty("minRank")) {
       node.borderLeft = [];
       node.borderRight = [];
-      for (var rank = node.minRank, maxRank = node.maxRank + 1;
+      for (let rank = node.minRank, maxRank = node.maxRank + 1;
         rank < maxRank;
         ++rank) {
         addBorderNode(g, "borderLeft", "_bl", v, node, rank);
@@ -131,9 +131,9 @@ function addBorderSegments(g) {
 }
 
 function addBorderNode(g, prop, prefix, sg, sgNode, rank) {
-  var label = { width: 0, height: 0, rank: rank, borderType: prop };
-  var prev = sgNode[prop][rank - 1];
-  var curr = util.addDummyNode(g, "border", label, prefix);
+  let label = { width: 0, height: 0, rank: rank, borderType: prop };
+  let prev = sgNode[prop][rank - 1];
+  let curr = util.addDummyNode(g, "border", label, prefix);
   sgNode[prop][rank] = curr;
   g.setParent(curr, sg);
   if (prev) {
@@ -150,14 +150,14 @@ module.exports = {
 };
 
 function adjust(g) {
-  var rankDir = g.graph().rankdir.toLowerCase();
+  let rankDir = g.graph().rankdir.toLowerCase();
   if (rankDir === "lr" || rankDir === "rl") {
     swapWidthHeight(g);
   }
 }
 
 function undo(g) {
-  var rankDir = g.graph().rankdir.toLowerCase();
+  let rankDir = g.graph().rankdir.toLowerCase();
   if (rankDir === "bt" || rankDir === "rl") {
     reverseY(g);
   }
@@ -174,7 +174,7 @@ function swapWidthHeight(g) {
 }
 
 function swapWidthHeightOne(attrs) {
-  var w = attrs.width;
+  let w = attrs.width;
   attrs.width = attrs.height;
   attrs.height = w;
 }
@@ -183,7 +183,7 @@ function reverseY(g) {
   g.nodes().forEach(v => reverseYOne(g.node(v)));
 
   g.edges().forEach(function(e) {
-    var edge = g.edge(e);
+    let edge = g.edge(e);
     edge.points.forEach(reverseYOne);
     if (edge.hasOwnProperty("y")) {
       reverseYOne(edge);
