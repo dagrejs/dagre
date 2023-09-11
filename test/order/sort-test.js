@@ -1,9 +1,9 @@
-var expect = require("../chai").expect;
-var sort = require("../../lib/order/sort");
+let expect = require("../chai").expect;
+let sort = require("../../lib/order/sort");
 
 describe("sort", () => {
   it("sorts nodes by barycenter", () => {
-    var input = [
+    let input = [
       { vs: ["a"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
     ];
@@ -14,7 +14,7 @@ describe("sort", () => {
   });
 
   it("can sort super-nodes", () => {
-    var input = [
+    let input = [
       { vs: ["a", "c", "d"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
     ];
@@ -25,7 +25,7 @@ describe("sort", () => {
   });
 
   it("biases to the left by default", () => {
-    var input = [
+    let input = [
       { vs: ["a"], i: 0, barycenter: 1, weight: 1 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 1 }
     ];
@@ -36,7 +36,7 @@ describe("sort", () => {
   });
 
   it("biases to the right if biasRight = true", () => {
-    var input = [
+    let input = [
       { vs: ["a"], i: 0, barycenter: 1, weight: 1 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 1 }
     ];
@@ -47,7 +47,7 @@ describe("sort", () => {
   });
 
   it("can sort nodes without a barycenter", () => {
-    var input = [
+    let input = [
       { vs: ["a"], i: 0, barycenter: 2, weight: 1 },
       { vs: ["b"], i: 1, barycenter: 6, weight: 1 },
       { vs: ["c"], i: 2 },
@@ -61,7 +61,7 @@ describe("sort", () => {
   });
 
   it("can handle no barycenters for any nodes", () => {
-    var input = [
+    let input = [
       { vs: ["a"], i: 0 },
       { vs: ["b"], i: 3 },
       { vs: ["c"], i: 2 },
@@ -71,7 +71,7 @@ describe("sort", () => {
   });
 
   it("can handle a barycenter of 0", () => {
-    var input = [
+    let input = [
       { vs: ["a"], i: 0, barycenter: 0, weight: 1 },
       { vs: ["b"], i: 3 },
       { vs: ["c"], i: 2 },
