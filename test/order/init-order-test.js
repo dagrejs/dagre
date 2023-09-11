@@ -1,9 +1,9 @@
-var expect = require("../chai").expect;
-var Graph = require("@dagrejs/graphlib").Graph;
-var initOrder = require("../../lib/order/init-order");
+let expect = require("../chai").expect;
+let Graph = require("@dagrejs/graphlib").Graph;
+let initOrder = require("../../lib/order/init-order");
 
 describe("order/initOrder", () => {
-  var g;
+  let g;
 
   beforeEach(() => {
     g = new Graph({ compound: true })
@@ -18,7 +18,7 @@ describe("order/initOrder", () => {
     g.setEdge("b", "d");
     g.setEdge("a", "e");
 
-    var layering = initOrder(g);
+    let layering = initOrder(g);
     expect(layering[0]).to.eql(["a"]);
     expect(layering[1].sort()).to.eql(["b", "e"]);
     expect(layering[2].sort()).to.eql(["c", "d"]);
@@ -31,7 +31,7 @@ describe("order/initOrder", () => {
     g.setPath(["a", "b", "d"]);
     g.setPath(["a", "c", "d"]);
 
-    var layering = initOrder(g);
+    let layering = initOrder(g);
     expect(layering[0]).to.eql(["a"]);
     expect(layering[1].sort()).to.eql(["b", "c"]);
     expect(layering[2].sort()).to.eql(["d"]);
@@ -42,7 +42,7 @@ describe("order/initOrder", () => {
     g.setNode("sg1", {});
     g.setParent("a", "sg1");
 
-    var layering = initOrder(g);
+    let layering = initOrder(g);
     expect(layering).to.eql([["a"]]);
   });
 });
