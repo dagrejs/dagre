@@ -1,12 +1,12 @@
-var expect = require("../chai").expect;
-var Graph = require("@dagrejs/graphlib").Graph;
-var normalizeRanks = require("../../lib/util").normalizeRanks;
-var rankUtil = require("../../lib/rank/util");
-var longestPath = rankUtil.longestPath;
+let expect = require("../chai").expect;
+let Graph = require("@dagrejs/graphlib").Graph;
+let normalizeRanks = require("../../lib/util").normalizeRanks;
+let rankUtil = require("../../lib/rank/util");
+let longestPath = rankUtil.longestPath;
 
 describe("rank/util", () => {
   describe("longestPath", () => {
-    var g;
+    let g;
 
     beforeEach(() => {
       g = new Graph()
