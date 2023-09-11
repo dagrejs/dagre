@@ -1,9 +1,9 @@
-var expect = require("../chai").expect;
-var Graph = require("@dagrejs/graphlib").Graph;
-var buildLayerGraph = require("../../lib/order/build-layer-graph");
+let expect = require("../chai").expect;
+let Graph = require("@dagrejs/graphlib").Graph;
+let buildLayerGraph = require("../../lib/order/build-layer-graph");
 
 describe("order/buildLayerGraph", () => {
-  var g;
+  let g;
 
   beforeEach(() => g = new Graph({ compound: true, multigraph: true }));
 
@@ -13,7 +13,7 @@ describe("order/buildLayerGraph", () => {
     g.setNode("c", { rank: 2 });
     g.setNode("d", { rank: 3 });
 
-    var lg;
+    let lg;
     lg = buildLayerGraph(g, 1, "inEdges");
     expect(lg.hasNode(lg.graph().root));
     expect(lg.children()).eqls([lg.graph().root]);
@@ -39,7 +39,7 @@ describe("order/buildLayerGraph", () => {
     g.setNode("b", { foo: 2, rank: 2 });
     g.setEdge("a", "b", { weight: 1 });
 
-    var lg = buildLayerGraph(g, 2, "inEdges");
+    let lg = buildLayerGraph(g, 2, "inEdges");
 
     expect(lg.node("a").foo).equals(1);
     g.node("a").foo = "updated";
