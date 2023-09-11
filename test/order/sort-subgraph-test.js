@@ -1,9 +1,9 @@
-var expect = require("../chai").expect;
-var sortSubgraph = require("../../lib/order/sort-subgraph");
-var Graph = require("@dagrejs/graphlib").Graph;
+let expect = require("../chai").expect;
+let sortSubgraph = require("../../lib/order/sort-subgraph");
+let Graph = require("@dagrejs/graphlib").Graph;
 
 describe("order/sortSubgraph", () => {
-  var g, cg;
+  let g, cg;
 
   beforeEach(() => {
     g = new Graph({ compound: true })
@@ -54,7 +54,7 @@ describe("order/sortSubgraph", () => {
     g.setEdge(4, "y");
     ["x", "y"].forEach(v => g.setParent(v, "movable"));
 
-    var results = sortSubgraph(g, "movable", cg);
+    let results = sortSubgraph(g, "movable", cg);
     expect(results.barycenter).to.equal(2.25);
     expect(results.weight).to.equal(4);
   });
