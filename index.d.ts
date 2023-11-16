@@ -105,7 +105,7 @@ declare module '@dagrejs/dagre' {
     weight?: number | undefined;
     width?: number | undefined;
     height?: number | undefined;
-    lablepos?: 'l' | 'c' | 'r' | undefined;
+    labelpos?: 'l' | 'c' | 'r' | undefined;
     labeloffest?: number | undefined;
   }
 
