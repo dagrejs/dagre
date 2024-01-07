@@ -132,6 +132,7 @@ declare module '@dagrejs/dagre' {
     padding?: number | undefined;
     paddingX?: number | undefined;
     paddingY?: number | undefined;
+    rank?: number | undefined;
     rx?: number | undefined;
     ry?: number | undefined;
     shape?: string | undefined;
