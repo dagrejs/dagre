@@ -14,6 +14,19 @@ describe("position", () => {
       });
   });
 
+  it("nodes overlapping", () => {
+    g.graph().ranksep = 50;
+    g.setNode("a", { width: 50, height: 320, rank: 0, order: 0 });
+    g.setNode("b", { width: 50, height: 120, rank: 1, order: 0 });
+    g.setEdge("a", "b");
+    position(g);
+    expect(g.node("a").y).to.equal(320 / 2); // 160
+    expect(g.node("b").y).to.equal(320 + 50 + 120 / 2); // 430
+    // node A (y: 160, height: 320) -> bottom 480
+    // node B (y: 430, height: 120) -> top 430
+    // nodes overlap
+  });
+
   it("respects ranksep", () => {
     g.graph().ranksep = 1000;
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
