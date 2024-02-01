@@ -54,7 +54,7 @@ index.js: convert
 
 lint:
 	@$(JSHINT) $(JSHINT_OPTS) $(filter-out node_modules, $?)
-	@$(ESLINT) $(SRC_FILES) $(TEST_FILES)
+	@$(ESLINT) $(MJS_FILES) $(TEST_FILES)
 
 $(BUILD_DIR)/$(MOD).js: $(CJS_FILES) | unit-test
 	@$(BROWSERIFY) $< > $@ -s dagre
