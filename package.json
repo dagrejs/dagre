@@ -27,6 +27,11 @@
     "@dagrejs/graphlib": "2.1.13"
   },
   "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.23.9",
+    "@babel/plugin-transform-export-namespace-from": "^7.23.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.23.3",
+    "babel-plugin-add-module-exports": "^1.0.4",
     "benchmark": "2.1.4",
     "browserify": "17.0.0",
     "chai": "4.3.6",
