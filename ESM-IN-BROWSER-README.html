@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+  <head>
+    <script type="importmap">
+      {
+        "imports": {
+          "@dagrejs/graphlib": "../graphlib/mjs-lib/index.js"
+        }
+      }
+    </script>
+    <script src="./mjs-lib/index.js" type="module">i
+      import * as dagre from "./mjs-lib/index.js";
+      // dagre something
+    </script>
+  </head>
+  <body>
+    <pre>
+    This HTML file is an example of how you might use the ESM source directly
+    in the browser. It can also be used to do a sanity check on the mjs-lib
+    directory, as it will throw errors if it (the browser) cannot resolve
+    the modules. You might want to change "../graphlib/mjs-lib/index.js"
+    to a path pointing to your copy that you'll serve, or a copy somewhere
+    on a CDN if one is available.
+
+    If you use a bundler or nodejs, this doesn't matter because, unlike
+    a browser, they understand what "@dagrejs/graphlib" means and you
+    don't need to resolve it manually. -- @ayjayt on github, 2024-02-01
+    </pre>
+  </body>
+</html>
+
