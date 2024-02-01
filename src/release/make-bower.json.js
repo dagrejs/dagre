@@ -21,6 +21,8 @@ var template = {
     "index.js",
     "karma*",
     "lib/**",
+    "mjs-lib/**",
+    "old-lib/**",
     "package.json",
     "src/**",
     "test/**"
