@@ -59,7 +59,7 @@ echo Published to npm
 
 # Update patch level version + commit
 ./src/release/bump-version.js
-make mjs-lib/version.js # why is version updated in lib, a src directory, and then build not run?
+make mjs-lib/version.js
 git commit package.json mjs-lib/version.js -m "Bump version and set as pre-release"
 git push origin
 echo Updated patch version
