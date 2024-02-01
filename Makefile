@@ -50,7 +50,7 @@ lint:
 	@$(JSHINT) $(JSHINT_OPTS) $(filter-out node_modules, $?)
 	@$(ESLINT) $(SRC_FILES) $(TEST_FILES)
 
-$(BUILD_DIR)/$(MOD).js: index.js $(SRC_FILES) | unit-test
+$(BUILD_DIR)/$(MOD).js: $(SRC_FILES) | unit-test
 	@$(BROWSERIFY) $< > $@ -s dagre
 
 $(BUILD_DIR)/$(MOD).min.js: $(BUILD_DIR)/$(MOD).js
