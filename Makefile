@@ -1,7 +1,7 @@
 MOD = dagre
 
 NPM = npm
-NYC = nyc
+NYC = npx nyc
 BROWSERIFY = ./node_modules/browserify/bin/cmd.js
 JSHINT = ./node_modules/jshint/bin/jshint
 ESLINT = ./node_modules/eslint/bin/eslint.js
