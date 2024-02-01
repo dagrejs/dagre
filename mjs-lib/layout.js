@@ -3,15 +3,15 @@
 import * as acyclic from "./acyclic.js";
 import * as normalize from "./normalize.js";
 import { default as rank } from "./rank/index.js";
-import { normalizeRanks as normalizeRanks } from "./util.js";
 import { default as parentDummyChains } from "./parent-dummy-chains.js";
-import { removeEmptyRanks as removeEmptyRanks } from "./util.js";
 import * as nestingGraph from "./nesting-graph.js";
 import { default as addBorderSegments } from "./add-border-segments.js";
 import * as coordinateSystem from "./coordinate-system.js";
 import { default as order } from "./order/index.js";
 import { default as position } from "./position/index.js";
 import  * as util from "./util.js";
+const removeEmptyRanks = util.removeEmptyRanks;
+const normalizeRanks = util.normalizeRanks;
 import { Graph as Graph } from "@dagrejs/graphlib";
 
 
