@@ -1,16 +1,14 @@
-var expect = require("../chai").expect;
-var Graph = require("@dagrejs/graphlib").Graph;
-var resolveConflicts = require("../../lib/order/resolve-conflicts");
+let expect = require("../chai").expect;
+let Graph = require("@dagrejs/graphlib").Graph;
+let resolveConflicts = require("../../lib/order/resolve-conflicts");
 
-describe("order/resolveConflicts", function() {
-  var cg;
+describe("order/resolveConflicts", () => {
+  let cg;
 
-  beforeEach(function() {
-    cg = new Graph();
-  });
+  beforeEach(() => cg = new Graph());
 
-  it("returns back nodes unchanged when no constraints exist", function() {
-    var input = [
+  it("returns back nodes unchanged when no constraints exist", () => {
+    let input = [
       { v: "a", barycenter: 2, weight: 3 },
       { v: "b", barycenter: 1, weight: 2 }
     ];
@@ -20,8 +18,8 @@ describe("order/resolveConflicts", function() {
     ]);
   });
 
-  it("returns back nodes unchanged when no conflicts exist", function() {
-    var input = [
+  it("returns back nodes unchanged when no conflicts exist", () => {
+    let input = [
       { v: "a", barycenter: 2, weight: 3 },
       { v: "b", barycenter: 1, weight: 2 }
     ];
@@ -32,8 +30,8 @@ describe("order/resolveConflicts", function() {
     ]);
   });
 
-  it("coalesces nodes when there is a conflict", function() {
-    var input = [
+  it("coalesces nodes when there is a conflict", () => {
+    let input = [
       { v: "a", barycenter: 2, weight: 3 },
       { v: "b", barycenter: 1, weight: 2 }
     ];
@@ -47,8 +45,8 @@ describe("order/resolveConflicts", function() {
     ]);
   });
 
-  it("coalesces nodes when there is a conflict #2", function() {
-    var input = [
+  it("coalesces nodes when there is a conflict #2", () => {
+    let input = [
       { v: "a", barycenter: 4, weight: 1 },
       { v: "b", barycenter: 3, weight: 1 },
       { v: "c", barycenter: 2, weight: 1 },
@@ -64,15 +62,15 @@ describe("order/resolveConflicts", function() {
     ]);
   });
 
-  it("works with multiple constraints for the same target #1", function() {
-    var input = [
+  it("works with multiple constraints for the same target #1", () => {
+    let input = [
       { v: "a", barycenter: 4, weight: 1 },
       { v: "b", barycenter: 3, weight: 1 },
       { v: "c", barycenter: 2, weight: 1 },
     ];
     cg.setEdge("a", "c");
     cg.setEdge("b", "c");
-    var results = resolveConflicts(input, cg);
+    let results = resolveConflicts(input, cg);
     expect(results).to.have.length(1);
     expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("a"));
     expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("b"));
@@ -81,8 +79,8 @@ describe("order/resolveConflicts", function() {
     expect(results[0].weight).equals(3);
   });
 
-  it("works with multiple constraints for the same target #2", function() {
-    var input = [
+  it("works with multiple constraints for the same target #2", () => {
+    let input = [
       { v: "a", barycenter: 4, weight: 1 },
       { v: "b", barycenter: 3, weight: 1 },
       { v: "c", barycenter: 2, weight: 1 },
@@ -92,7 +90,7 @@ describe("order/resolveConflicts", function() {
     cg.setEdge("a", "d");
     cg.setEdge("b", "c");
     cg.setEdge("c", "d");
-    var results = resolveConflicts(input, cg);
+    let results = resolveConflicts(input, cg);
     expect(results).to.have.length(1);
     expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("a"));
     expect(results[0].vs.indexOf("c")).to.be.gt(results[0].vs.indexOf("b"));
@@ -102,8 +100,8 @@ describe("order/resolveConflicts", function() {
     expect(results[0].weight).equals(4);
   });
 
-  it("does nothing to a node lacking both a barycenter and a constraint", function() {
-    var input = [
+  it("does nothing to a node lacking both a barycenter and a constraint", () => {
+    let input = [
       { v: "a" },
       { v: "b", barycenter: 1, weight: 2 }
     ];
@@ -113,8 +111,8 @@ describe("order/resolveConflicts", function() {
     ]);
   });
 
-  it("treats a node w/o a barycenter as always violating constraints #1", function() {
-    var input = [
+  it("treats a node w/o a barycenter as always violating constraints #1", () => {
+    let input = [
       { v: "a" },
       { v: "b", barycenter: 1, weight: 2 }
     ];
@@ -124,8 +122,8 @@ describe("order/resolveConflicts", function() {
     ]);
   });
 
-  it("treats a node w/o a barycenter as always violating constraints #2", function() {
-    var input = [
+  it("treats a node w/o a barycenter as always violating constraints #2", () => {
+    let input = [
       { v: "a" },
       { v: "b", barycenter: 1, weight: 2 }
     ];
@@ -135,8 +133,8 @@ describe("order/resolveConflicts", function() {
     ]);
   });
 
-  it("ignores edges not related to entries", function() {
-    var input = [
+  it("ignores edges not related to entries", () => {
+    let input = [
       { v: "a", barycenter: 2, weight: 3 },
       { v: "b", barycenter: 1, weight: 2 }
     ];

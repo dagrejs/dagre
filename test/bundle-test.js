@@ -6,8 +6,8 @@
 var expect = chai.expect;
 var graphlib = dagre.graphlib;
 
-describe("bundle", function() {
-  it("exports dagre", function() {
+describe("bundle", () => {
+  it("exports dagre", () => {
     expect(dagre).to.be.an("object");
     expect(dagre.graphlib).to.be.an("object");
     expect(dagre.layout).to.be.a("function");
@@ -15,7 +15,7 @@ describe("bundle", function() {
     expect(dagre.version).to.be.a("string");
   });
 
-  it("can do trivial layout", function() {
+  it("can do trivial layout", () => {
     var g = new graphlib.Graph().setGraph({});
     g.setNode("a", { label: "a", width: 50, height: 100 });
     g.setNode("b", { label: "b", width: 50, height: 100 });

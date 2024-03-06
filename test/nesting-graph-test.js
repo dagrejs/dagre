@@ -3,17 +3,17 @@ var Graph = require("@dagrejs/graphlib").Graph;
 var components = require("@dagrejs/graphlib").alg.components;
 var nestingGraph = require("../lib/nesting-graph");
 
-describe("rank/nestingGraph", function() {
+describe("rank/nestingGraph", () => {
   var g;
 
-  beforeEach(function() {
+  beforeEach(() => {
     g = new Graph({ compound: true })
       .setGraph({})
-      .setDefaultNodeLabel(function() { return {}; });
+      .setDefaultNodeLabel(() => ({}));
   });
 
-  describe("run", function() {
-    it("connects a disconnected graph", function() {
+  describe("run", () => {
+    it("connects a disconnected graph", () => {
       g.setNode("a");
       g.setNode("b");
       expect(components(g)).to.have.length(2);
@@ -23,7 +23,7 @@ describe("rank/nestingGraph", function() {
       expect(g.hasNode("b"));
     });
 
-    it("adds border nodes to the top and bottom of a subgraph", function() {
+    it("adds border nodes to the top and bottom of a subgraph", () => {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
 
@@ -41,7 +41,7 @@ describe("rank/nestingGraph", function() {
       expect(g.node(borderBottom)).eqls({ width: 0, height: 0, dummy: "border" });
     });
 
-    it("adds edges between borders of nested subgraphs", function() {
+    it("adds edges between borders of nested subgraphs", () => {
       g.setParent("sg2", "sg1");
       g.setParent("a", "sg2");
       nestingGraph.run(g);
@@ -60,7 +60,7 @@ describe("rank/nestingGraph", function() {
       expect(g.edge(g.outEdges(sg2Bottom, sg1Bottom)[0]).minlen).equals(1);
     });
 
-    it("adds sufficient weight to border to node edges", function() {
+    it("adds sufficient weight to border to node edges", () => {
       // We want to keep subgraphs tight, so we should ensure that the weight for
       // the edge between the top (and bottom) border nodes and nodes in the
       // subgraph have weights exceeding anything in the graph.
@@ -75,7 +75,7 @@ describe("rank/nestingGraph", function() {
       expect(g.edge("x", bot).weight).to.be.gt(300);
     });
 
-    it("adds an edge from the root to the tops of top-level subgraphs", function() {
+    it("adds an edge from the root to the tops of top-level subgraphs", () => {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
 
@@ -87,7 +87,7 @@ describe("rank/nestingGraph", function() {
       expect(g.hasEdge(g.outEdges(root, borderTop)[0])).to.be.true;
     });
 
-    it("adds an edge from root to each node with the correct minlen #1", function() {
+    it("adds an edge from root to each node with the correct minlen #1", () => {
       g.setNode("a");
       nestingGraph.run(g);
 
@@ -97,7 +97,7 @@ describe("rank/nestingGraph", function() {
       expect(g.edge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 1 });
     });
 
-    it("adds an edge from root to each node with the correct minlen #2", function() {
+    it("adds an edge from root to each node with the correct minlen #2", () => {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
 
@@ -107,7 +107,7 @@ describe("rank/nestingGraph", function() {
       expect(g.edge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 3 });
     });
 
-    it("adds an edge from root to each node with the correct minlen #3", function() {
+    it("adds an edge from root to each node with the correct minlen #3", () => {
       g.setParent("sg2", "sg1");
       g.setParent("a", "sg2");
       nestingGraph.run(g);
@@ -118,7 +118,7 @@ describe("rank/nestingGraph", function() {
       expect(g.edge(g.outEdges(root, "a")[0])).eqls({ weight: 0, minlen: 5 });
     });
 
-    it("does not add an edge from the root to itself", function() {
+    it("does not add an edge from the root to itself", () => {
       g.setNode("a");
       nestingGraph.run(g);
 
@@ -126,20 +126,20 @@ describe("rank/nestingGraph", function() {
       expect(g.outEdges(root, root)).eqls([]);
     });
 
-    it("expands inter-node edges to separate SG border and nodes #1", function() {
+    it("expands inter-node edges to separate SG border and nodes #1", () => {
       g.setEdge("a", "b", { minlen: 1 });
       nestingGraph.run(g);
       expect(g.edge("a", "b").minlen).equals(1);
     });
 
-    it("expands inter-node edges to separate SG border and nodes #2", function() {
+    it("expands inter-node edges to separate SG border and nodes #2", () => {
       g.setParent("a", "sg1");
       g.setEdge("a", "b", { minlen: 1 });
       nestingGraph.run(g);
       expect(g.edge("a", "b").minlen).equals(3);
     });
 
-    it("expands inter-node edges to separate SG border and nodes #3", function() {
+    it("expands inter-node edges to separate SG border and nodes #3", () => {
       g.setParent("sg2", "sg1");
       g.setParent("a", "sg2");
       g.setEdge("a", "b", { minlen: 1 });
@@ -147,7 +147,7 @@ describe("rank/nestingGraph", function() {
       expect(g.edge("a", "b").minlen).equals(5);
     });
 
-    it("sets minlen correctly for nested SG boder to children", function() {
+    it("sets minlen correctly for nested SG boder to children", () => {
       g.setParent("a", "sg1");
       g.setParent("sg2", "sg1");
       g.setParent("b", "sg2");
@@ -180,8 +180,8 @@ describe("rank/nestingGraph", function() {
     });
   });
 
-  describe("cleanup", function() {
-    it("removes nesting graph edges", function() {
+  describe("cleanup", () => {
+    it("removes nesting graph edges", () => {
       g.setParent("a", "sg1");
       g.setEdge("a", "b", { minlen: 1 });
       nestingGraph.run(g);
@@ -189,7 +189,7 @@ describe("rank/nestingGraph", function() {
       expect(g.successors("a")).eqls(["b"]);
     });
 
-    it("removes the root node", function() {
+    it("removes the root node", () => {
       g.setParent("a", "sg1");
       nestingGraph.run(g);
       nestingGraph.cleanup(g);

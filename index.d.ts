@@ -13,7 +13,7 @@ declare module '@dagrejs/dagre' {
 
       graph(): GraphLabel;
       isDirected(): boolean;
-      isMultiGraph(): boolean;
+      isMultigraph(): boolean;
       setGraph(label: GraphLabel): Graph<T>;
 
       edge(edgeObj: Edge): GraphEdge;
@@ -105,7 +105,7 @@ declare module '@dagrejs/dagre' {
     weight?: number | undefined;
     width?: number | undefined;
     height?: number | undefined;
-    lablepos?: 'l' | 'c' | 'r' | undefined;
+    labelpos?: 'l' | 'c' | 'r' | undefined;
     labeloffest?: number | undefined;
   }
 
@@ -139,6 +139,7 @@ declare module '@dagrejs/dagre' {
     padding?: number | undefined;
     paddingX?: number | undefined;
     paddingY?: number | undefined;
+    rank?: number | undefined;
     rx?: number | undefined;
     ry?: number | undefined;
     shape?: string | undefined;

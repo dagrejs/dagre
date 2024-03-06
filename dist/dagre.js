@@ -36,8 +36,8 @@ module.exports = {
 },{"./lib/debug":6,"./lib/layout":8,"./lib/util":27,"./lib/version":28,"@dagrejs/graphlib":29}],2:[function(require,module,exports){
 "use strict";
 
-var greedyFAS = require("./greedy-fas");
-var uniqueId = require("./util").uniqueId;
+let greedyFAS = require("./greedy-fas");
+let uniqueId = require("./util").uniqueId;
 
 module.exports = {
   run: run,
@@ -45,11 +45,11 @@ module.exports = {
 };
 
 function run(g) {
-  var fas = (g.graph().acyclicer === "greedy"
+  let fas = (g.graph().acyclicer === "greedy"
     ? greedyFAS(g, weightFn(g))
     : dfsFAS(g));
-  fas.forEach(function(e) {
-    var label = g.edge(e);
+  fas.forEach(e => {
+    let label = g.edge(e);
     g.removeEdge(e);
     label.forwardName = e.name;
     label.reversed = true;
@@ -57,16 +57,16 @@ function run(g) {
   });
 
   function weightFn(g) {
-    return function(e) {
+    return e => {
       return g.edge(e).weight;
     };
   }
 }
 
 function dfsFAS(g) {
-  var fas = [];
-  var stack = {};
-  var visited = {};
+  let fas = [];
+  let stack = {};
+  let visited = {};
 
   function dfs(v) {
     if (visited.hasOwnProperty(v)) {
@@ -74,7 +74,7 @@ function dfsFAS(g) {
     }
     visited[v] = true;
     stack[v] = true;
-    g.outEdges(v).forEach(function(e) {
+    g.outEdges(v).forEach(e => {
       if (stack.hasOwnProperty(e.w)) {
         fas.push(e);
       } else {
@@ -89,12 +89,12 @@ function dfsFAS(g) {
 }
 
 function undo(g) {
-  g.edges().forEach(function(e) {
-    var label = g.edge(e);
+  g.edges().forEach(e => {
+    let label = g.edge(e);
     if (label.reversed) {
       g.removeEdge(e);
 
-      var forwardName = label.forwardName;
+      let forwardName = label.forwardName;
       delete label.reversed;
       delete label.forwardName;
       g.setEdge(e.w, e.v, label, forwardName);
@@ -103,14 +103,14 @@ function undo(g) {
 }
 
 },{"./greedy-fas":7,"./util":27}],3:[function(require,module,exports){
-var util = require("./util");
+let util = require("./util");
 
 module.exports = addBorderSegments;
 
 function addBorderSegments(g) {
   function dfs(v) {
-    var children = g.children(v);
-    var node = g.node(v);
+    let children = g.children(v);
+    let node = g.node(v);
     if (children.length) {
       children.forEach(dfs);
     }
@@ -118,7 +118,7 @@ function addBorderSegments(g) {
     if (node.hasOwnProperty("minRank")) {
       node.borderLeft = [];
       node.borderRight = [];
-      for (var rank = node.minRank, maxRank = node.maxRank + 1;
+      for (let rank = node.minRank, maxRank = node.maxRank + 1;
         rank < maxRank;
         ++rank) {
         addBorderNode(g, "borderLeft", "_bl", v, node, rank);
@@ -131,9 +131,9 @@ function addBorderSegments(g) {
 }
 
 function addBorderNode(g, prop, prefix, sg, sgNode, rank) {
-  var label = { width: 0, height: 0, rank: rank, borderType: prop };
-  var prev = sgNode[prop][rank - 1];
-  var curr = util.addDummyNode(g, "border", label, prefix);
+  let label = { width: 0, height: 0, rank: rank, borderType: prop };
+  let prev = sgNode[prop][rank - 1];
+  let curr = util.addDummyNode(g, "border", label, prefix);
   sgNode[prop][rank] = curr;
   g.setParent(curr, sg);
   if (prev) {
@@ -150,14 +150,14 @@ module.exports = {
 };
 
 function adjust(g) {
-  var rankDir = g.graph().rankdir.toLowerCase();
+  let rankDir = g.graph().rankdir.toLowerCase();
   if (rankDir === "lr" || rankDir === "rl") {
     swapWidthHeight(g);
   }
 }
 
 function undo(g) {
-  var rankDir = g.graph().rankdir.toLowerCase();
+  let rankDir = g.graph().rankdir.toLowerCase();
   if (rankDir === "bt" || rankDir === "rl") {
     reverseY(g);
   }
@@ -174,7 +174,7 @@ function swapWidthHeight(g) {
 }
 
 function swapWidthHeightOne(attrs) {
-  var w = attrs.width;
+  let w = attrs.width;
   attrs.width = attrs.height;
   attrs.height = w;
 }
@@ -182,8 +182,8 @@ function swapWidthHeightOne(attrs) {
 function reverseY(g) {
   g.nodes().forEach(v => reverseYOne(g.node(v)));
 
-  g.edges().forEach(function(e) {
-    var edge = g.edge(e);
+  g.edges().forEach(e => {
+    let edge = g.edge(e);
     edge.points.forEach(reverseYOne);
     if (edge.hasOwnProperty("y")) {
       reverseYOne(edge);
@@ -198,8 +198,8 @@ function reverseYOne(attrs) {
 function swapXY(g) {
   g.nodes().forEach(v => swapXYOne(g.node(v)));
 
-  g.edges().forEach(function(e) {
-    var edge = g.edge(e);
+  g.edges().forEach(e => {
+    let edge = g.edge(e);
     edge.points.forEach(swapXYOne);
     if (edge.hasOwnProperty("x")) {
       swapXYOne(edge);
@@ -208,7 +208,7 @@ function swapXY(g) {
 }
 
 function swapXYOne(attrs) {
-  var x = attrs.x;
+  let x = attrs.x;
   attrs.x = attrs.y;
   attrs.y = x;
 }
@@ -219,44 +219,44 @@ function swapXYOne(attrs) {
  * "Introduction to Algorithms".
  */
 
-module.exports = List;
+class List {
+  constructor() {
+    let sentinel = {};
+    sentinel._next = sentinel._prev = sentinel;
+    this._sentinel = sentinel;
+  }
 
-function List() {
-  var sentinel = {};
-  sentinel._next = sentinel._prev = sentinel;
-  this._sentinel = sentinel;
+  dequeue() {
+    let sentinel = this._sentinel;
+    let entry = sentinel._prev;
+    if (entry !== sentinel) {
+      unlink(entry);
+      return entry;
+    }
+  }
+
+  enqueue(entry) {
+    let sentinel = this._sentinel;
+    if (entry._prev && entry._next) {
+      unlink(entry);
+    }
+    entry._next = sentinel._next;
+    sentinel._next._prev = entry;
+    sentinel._next = entry;
+    entry._prev = sentinel;
+  }
+
+  toString() {
+    let strs = [];
+    let sentinel = this._sentinel;
+    let curr = sentinel._prev;
+    while (curr !== sentinel) {
+      strs.push(JSON.stringify(curr, filterOutLinks));
+      curr = curr._prev;
+    }
+    return "[" + strs.join(", ") + "]";
+  }
 }
-
-List.prototype.dequeue = function() {
-  var sentinel = this._sentinel;
-  var entry = sentinel._prev;
-  if (entry !== sentinel) {
-    unlink(entry);
-    return entry;
-  }
-};
-
-List.prototype.enqueue = function(entry) {
-  var sentinel = this._sentinel;
-  if (entry._prev && entry._next) {
-    unlink(entry);
-  }
-  entry._next = sentinel._next;
-  sentinel._next._prev = entry;
-  sentinel._next = entry;
-  entry._prev = sentinel;
-};
-
-List.prototype.toString = function() {
-  var strs = [];
-  var sentinel = this._sentinel;
-  var curr = sentinel._prev;
-  while (curr !== sentinel) {
-    strs.push(JSON.stringify(curr, filterOutLinks));
-    curr = curr._prev;
-  }
-  return "[" + strs.join(", ") + "]";
-};
 
 function unlink(entry) {
   entry._prev._next = entry._next;
@@ -271,9 +271,11 @@ function filterOutLinks(k, v) {
   }
 }
 
+module.exports = List;
+
 },{}],6:[function(require,module,exports){
-var util = require("./util");
-var Graph = require("@dagrejs/graphlib").Graph;
+let util = require("./util");
+let Graph = require("@dagrejs/graphlib").Graph;
 
 module.exports = {
   debugOrdering: debugOrdering
@@ -281,23 +283,21 @@ module.exports = {
 
 /* istanbul ignore next */
 function debugOrdering(g) {
-  var layerMatrix = util.buildLayerMatrix(g);
+  let layerMatrix = util.buildLayerMatrix(g);
 
-  var h = new Graph({ compound: true, multigraph: true }).setGraph({});
+  let h = new Graph({ compound: true, multigraph: true }).setGraph({});
 
-  g.nodes().forEach(function(v) {
+  g.nodes().forEach(v => {
     h.setNode(v, { label: v });
     h.setParent(v, "layer" + g.node(v).rank);
   });
 
-  g.edges().forEach(function(e) {
-    h.setEdge(e.v, e.w, {}, e.name);
-  });
+  g.edges().forEach(e => h.setEdge(e.v, e.w, {}, e.name));
 
-  layerMatrix.forEach(function(layer, i) {
-    var layerV = "layer" + i;
+  layerMatrix.forEach((layer, i) => {
+    let layerV = "layer" + i;
     h.setNode(layerV, { rank: "same" });
-    layer.reduce(function(u, v) {
+    layer.reduce((u, v) => {
       h.setEdge(u, v, { style: "invis" });
       return v;
     });
@@ -307,8 +307,8 @@ function debugOrdering(g) {
 }
 
 },{"./util":27,"@dagrejs/graphlib":29}],7:[function(require,module,exports){
-var Graph = require("@dagrejs/graphlib").Graph;
-var List = require("./data/list");
+let Graph = require("@dagrejs/graphlib").Graph;
+let List = require("./data/list");
 
 /*
  * A greedy heuristic for finding a feedback arc set for a graph. A feedback
@@ -319,30 +319,30 @@ var List = require("./data/list");
  */
 module.exports = greedyFAS;
 
-var DEFAULT_WEIGHT_FN = () => 1;
+let DEFAULT_WEIGHT_FN = () => 1;
 
 function greedyFAS(g, weightFn) {
   if (g.nodeCount() <= 1) {
     return [];
   }
-  var state = buildState(g, weightFn || DEFAULT_WEIGHT_FN);
-  var results = doGreedyFAS(state.graph, state.buckets, state.zeroIdx);
+  let state = buildState(g, weightFn || DEFAULT_WEIGHT_FN);
+  let results = doGreedyFAS(state.graph, state.buckets, state.zeroIdx);
 
   // Expand multi-edges
   return results.flatMap(e => g.outEdges(e.v, e.w));
 }
 
 function doGreedyFAS(g, buckets, zeroIdx) {
-  var results = [];
-  var sources = buckets[buckets.length - 1];
-  var sinks = buckets[0];
+  let results = [];
+  let sources = buckets[buckets.length - 1];
+  let sinks = buckets[0];
 
-  var entry;
+  let entry;
   while (g.nodeCount()) {
     while ((entry = sinks.dequeue()))   { removeNode(g, buckets, zeroIdx, entry); }
     while ((entry = sources.dequeue())) { removeNode(g, buckets, zeroIdx, entry); }
     if (g.nodeCount()) {
-      for (var i = buckets.length - 2; i > 0; --i) {
+      for (let i = buckets.length - 2; i > 0; --i) {
         entry = buckets[i].dequeue();
         if (entry) {
           results = results.concat(removeNode(g, buckets, zeroIdx, entry, true));
@@ -356,11 +356,11 @@ function doGreedyFAS(g, buckets, zeroIdx) {
 }
 
 function removeNode(g, buckets, zeroIdx, entry, collectPredecessors) {
-  var results = collectPredecessors ? [] : undefined;
+  let results = collectPredecessors ? [] : undefined;
 
-  g.inEdges(entry.v).forEach(function(edge) {
-    var weight = g.edge(edge);
-    var uEntry = g.node(edge.v);
+  g.inEdges(entry.v).forEach(edge => {
+    let weight = g.edge(edge);
+    let uEntry = g.node(edge.v);
 
     if (collectPredecessors) {
       results.push({ v: edge.v, w: edge.w });
@@ -370,10 +370,10 @@ function removeNode(g, buckets, zeroIdx, entry, collectPredecessors) {
     assignBucket(buckets, zeroIdx, uEntry);
   });
 
-  g.outEdges(entry.v).forEach(function(edge) {
-    var weight = g.edge(edge);
-    var w = edge.w;
-    var wEntry = g.node(w);
+  g.outEdges(entry.v).forEach(edge => {
+    let weight = g.edge(edge);
+    let w = edge.w;
+    let wEntry = g.node(w);
     wEntry["in"] -= weight;
     assignBucket(buckets, zeroIdx, wEntry);
   });
@@ -384,29 +384,29 @@ function removeNode(g, buckets, zeroIdx, entry, collectPredecessors) {
 }
 
 function buildState(g, weightFn) {
-  var fasGraph = new Graph();
-  var maxIn = 0;
-  var maxOut = 0;
+  let fasGraph = new Graph();
+  let maxIn = 0;
+  let maxOut = 0;
 
-  g.nodes().forEach(function(v) {
+  g.nodes().forEach(v => {
     fasGraph.setNode(v, { v: v, "in": 0, out: 0 });
   });
 
   // Aggregate weights on nodes, but also sum the weights across multi-edges
   // into a single edge for the fasGraph.
-  g.edges().forEach(function(e) {
-    var prevWeight = fasGraph.edge(e.v, e.w) || 0;
-    var weight = weightFn(e);
-    var edgeWeight = prevWeight + weight;
+  g.edges().forEach(e => {
+    let prevWeight = fasGraph.edge(e.v, e.w) || 0;
+    let weight = weightFn(e);
+    let edgeWeight = prevWeight + weight;
     fasGraph.setEdge(e.v, e.w, edgeWeight);
     maxOut = Math.max(maxOut, fasGraph.node(e.v).out += weight);
     maxIn  = Math.max(maxIn,  fasGraph.node(e.w)["in"]  += weight);
   });
 
-  var buckets = range(maxOut + maxIn + 3).map(() => new List());
-  var zeroIdx = maxIn + 1;
+  let buckets = range(maxOut + maxIn + 3).map(() => new List());
+  let zeroIdx = maxIn + 1;
 
-  fasGraph.nodes().forEach(function(v) {
+  fasGraph.nodes().forEach(v => {
     assignBucket(buckets, zeroIdx, fasGraph.node(v));
   });
 
@@ -435,60 +435,60 @@ function range(limit) {
 },{"./data/list":5,"@dagrejs/graphlib":29}],8:[function(require,module,exports){
 "use strict";
 
-var acyclic = require("./acyclic");
-var normalize = require("./normalize");
-var rank = require("./rank");
-var normalizeRanks = require("./util").normalizeRanks;
-var parentDummyChains = require("./parent-dummy-chains");
-var removeEmptyRanks = require("./util").removeEmptyRanks;
-var nestingGraph = require("./nesting-graph");
-var addBorderSegments = require("./add-border-segments");
-var coordinateSystem = require("./coordinate-system");
-var order = require("./order");
-var position = require("./position");
-var util = require("./util");
-var Graph = require("@dagrejs/graphlib").Graph;
+let acyclic = require("./acyclic");
+let normalize = require("./normalize");
+let rank = require("./rank");
+let normalizeRanks = require("./util").normalizeRanks;
+let parentDummyChains = require("./parent-dummy-chains");
+let removeEmptyRanks = require("./util").removeEmptyRanks;
+let nestingGraph = require("./nesting-graph");
+let addBorderSegments = require("./add-border-segments");
+let coordinateSystem = require("./coordinate-system");
+let order = require("./order");
+let position = require("./position");
+let util = require("./util");
+let Graph = require("@dagrejs/graphlib").Graph;
 
 module.exports = layout;
 
 function layout(g, opts) {
-  var time = opts && opts.debugTiming ? util.time : util.notime;
-  time("layout", function() {
-    var layoutGraph =
-      time("  buildLayoutGraph", function() { return buildLayoutGraph(g); });
-    time("  runLayout",        function() { runLayout(layoutGraph, time); });
-    time("  updateInputGraph", function() { updateInputGraph(g, layoutGraph); });
+  let time = opts && opts.debugTiming ? util.time : util.notime;
+  time("layout", () => {
+    let layoutGraph =
+      time("  buildLayoutGraph", () => buildLayoutGraph(g));
+    time("  runLayout",        () => runLayout(layoutGraph, time));
+    time("  updateInputGraph", () => updateInputGraph(g, layoutGraph));
   });
 }
 
 function runLayout(g, time) {
-  time("    makeSpaceForEdgeLabels", function() { makeSpaceForEdgeLabels(g); });
-  time("    removeSelfEdges",        function() { removeSelfEdges(g); });
-  time("    acyclic",                function() { acyclic.run(g); });
-  time("    nestingGraph.run",       function() { nestingGraph.run(g); });
-  time("    rank",                   function() { rank(util.asNonCompoundGraph(g)); });
-  time("    injectEdgeLabelProxies", function() { injectEdgeLabelProxies(g); });
-  time("    removeEmptyRanks",       function() { removeEmptyRanks(g); });
-  time("    nestingGraph.cleanup",   function() { nestingGraph.cleanup(g); });
-  time("    normalizeRanks",         function() { normalizeRanks(g); });
-  time("    assignRankMinMax",       function() { assignRankMinMax(g); });
-  time("    removeEdgeLabelProxies", function() { removeEdgeLabelProxies(g); });
-  time("    normalize.run",          function() { normalize.run(g); });
-  time("    parentDummyChains",      function() { parentDummyChains(g); });
-  time("    addBorderSegments",      function() { addBorderSegments(g); });
-  time("    order",                  function() { order(g); });
-  time("    insertSelfEdges",        function() { insertSelfEdges(g); });
-  time("    adjustCoordinateSystem", function() { coordinateSystem.adjust(g); });
-  time("    position",               function() { position(g); });
-  time("    positionSelfEdges",      function() { positionSelfEdges(g); });
-  time("    removeBorderNodes",      function() { removeBorderNodes(g); });
-  time("    normalize.undo",         function() { normalize.undo(g); });
-  time("    fixupEdgeLabelCoords",   function() { fixupEdgeLabelCoords(g); });
-  time("    undoCoordinateSystem",   function() { coordinateSystem.undo(g); });
-  time("    translateGraph",         function() { translateGraph(g); });
-  time("    assignNodeIntersects",   function() { assignNodeIntersects(g); });
-  time("    reversePoints",          function() { reversePointsForReversedEdges(g); });
-  time("    acyclic.undo",           function() { acyclic.undo(g); });
+  time("    makeSpaceForEdgeLabels", () => makeSpaceForEdgeLabels(g));
+  time("    removeSelfEdges",        () => removeSelfEdges(g));
+  time("    acyclic",                () => acyclic.run(g));
+  time("    nestingGraph.run",       () => nestingGraph.run(g));
+  time("    rank",                   () => rank(util.asNonCompoundGraph(g)));
+  time("    injectEdgeLabelProxies", () => injectEdgeLabelProxies(g));
+  time("    removeEmptyRanks",       () => removeEmptyRanks(g));
+  time("    nestingGraph.cleanup",   () => nestingGraph.cleanup(g));
+  time("    normalizeRanks",         () => normalizeRanks(g));
+  time("    assignRankMinMax",       () => assignRankMinMax(g));
+  time("    removeEdgeLabelProxies", () => removeEdgeLabelProxies(g));
+  time("    normalize.run",          () => normalize.run(g));
+  time("    parentDummyChains",      () => parentDummyChains(g));
+  time("    addBorderSegments",      () => addBorderSegments(g));
+  time("    order",                  () => order(g));
+  time("    insertSelfEdges",        () => insertSelfEdges(g));
+  time("    adjustCoordinateSystem", () => coordinateSystem.adjust(g));
+  time("    position",               () => position(g));
+  time("    positionSelfEdges",      () => positionSelfEdges(g));
+  time("    removeBorderNodes",      () => removeBorderNodes(g));
+  time("    normalize.undo",         () => normalize.undo(g));
+  time("    fixupEdgeLabelCoords",   () => fixupEdgeLabelCoords(g));
+  time("    undoCoordinateSystem",   () => coordinateSystem.undo(g));
+  time("    translateGraph",         () => translateGraph(g));
+  time("    assignNodeIntersects",   () => assignNodeIntersects(g));
+  time("    reversePoints",          () => reversePointsForReversedEdges(g));
+  time("    acyclic.undo",           () => acyclic.undo(g));
 }
 
 /*
@@ -499,8 +499,8 @@ function runLayout(g, time) {
  */
 function updateInputGraph(inputGraph, layoutGraph) {
   inputGraph.nodes().forEach(v => {
-    var inputLabel = inputGraph.node(v);
-    var layoutLabel = layoutGraph.node(v);
+    let inputLabel = inputGraph.node(v);
+    let layoutLabel = layoutGraph.node(v);
 
     if (inputLabel) {
       inputLabel.x = layoutLabel.x;
@@ -515,8 +515,8 @@ function updateInputGraph(inputGraph, layoutGraph) {
   });
 
   inputGraph.edges().forEach(e => {
-    var inputLabel = inputGraph.edge(e);
-    var layoutLabel = layoutGraph.edge(e);
+    let inputLabel = inputGraph.edge(e);
+    let layoutLabel = layoutGraph.edge(e);
 
     inputLabel.points = layoutLabel.points;
     if (layoutLabel.hasOwnProperty("x")) {
@@ -529,17 +529,17 @@ function updateInputGraph(inputGraph, layoutGraph) {
   inputGraph.graph().height = layoutGraph.graph().height;
 }
 
-var graphNumAttrs = ["nodesep", "edgesep", "ranksep", "marginx", "marginy"];
-var graphDefaults = { ranksep: 50, edgesep: 20, nodesep: 50, rankdir: "tb" };
-var graphAttrs = ["acyclicer", "ranker", "rankdir", "align"];
-var nodeNumAttrs = ["width", "height"];
-var nodeDefaults = { width: 0, height: 0 };
-var edgeNumAttrs = ["minlen", "weight", "width", "height", "labeloffset"];
-var edgeDefaults = {
+let graphNumAttrs = ["nodesep", "edgesep", "ranksep", "marginx", "marginy"];
+let graphDefaults = { ranksep: 50, edgesep: 20, nodesep: 50, rankdir: "tb" };
+let graphAttrs = ["acyclicer", "ranker", "rankdir", "align"];
+let nodeNumAttrs = ["width", "height"];
+let nodeDefaults = { width: 0, height: 0 };
+let edgeNumAttrs = ["minlen", "weight", "width", "height", "labeloffset"];
+let edgeDefaults = {
   minlen: 1, weight: 1, width: 0, height: 0,
   labeloffset: 10, labelpos: "r"
 };
-var edgeAttrs = ["labelpos"];
+let edgeAttrs = ["labelpos"];
 
 /*
  * Constructs a new graph from the input graph, which can be used for layout.
@@ -548,8 +548,8 @@ var edgeAttrs = ["labelpos"];
  * attributes can influence layout.
  */
 function buildLayoutGraph(inputGraph) {
-  var g = new Graph({ multigraph: true, compound: true });
-  var graph = canonicalize(inputGraph.graph());
+  let g = new Graph({ multigraph: true, compound: true });
+  let graph = canonicalize(inputGraph.graph());
 
   g.setGraph(Object.assign({},
     graphDefaults,
@@ -557,7 +557,7 @@ function buildLayoutGraph(inputGraph) {
     util.pick(graph, graphAttrs)));
 
   inputGraph.nodes().forEach(v => {
-    var node = canonicalize(inputGraph.node(v));
+    let node = canonicalize(inputGraph.node(v));
     const newNode = selectNumberAttrs(node, nodeNumAttrs);
     Object.keys(nodeDefaults).forEach(k => {
       if (newNode[k] === undefined) {
@@ -570,7 +570,7 @@ function buildLayoutGraph(inputGraph) {
   });
 
   inputGraph.edges().forEach(e => {
-    var edge = canonicalize(inputGraph.edge(e));
+    let edge = canonicalize(inputGraph.edge(e));
     g.setEdge(e, Object.assign({},
       edgeDefaults,
       selectNumberAttrs(edge, edgeNumAttrs),
@@ -589,10 +589,10 @@ function buildLayoutGraph(inputGraph) {
  * away from the edge itself a bit.
  */
 function makeSpaceForEdgeLabels(g) {
-  var graph = g.graph();
+  let graph = g.graph();
   graph.ranksep /= 2;
   g.edges().forEach(e => {
-    var edge = g.edge(e);
+    let edge = g.edge(e);
     edge.minlen *= 2;
     if (edge.labelpos.toLowerCase() !== "c") {
       if (graph.rankdir === "TB" || graph.rankdir === "BT") {
@@ -612,20 +612,20 @@ function makeSpaceForEdgeLabels(g) {
  */
 function injectEdgeLabelProxies(g) {
   g.edges().forEach(e => {
-    var edge = g.edge(e);
+    let edge = g.edge(e);
     if (edge.width && edge.height) {
-      var v = g.node(e.v);
-      var w = g.node(e.w);
-      var label = { rank: (w.rank - v.rank) / 2 + v.rank, e: e };
+      let v = g.node(e.v);
+      let w = g.node(e.w);
+      let label = { rank: (w.rank - v.rank) / 2 + v.rank, e: e };
       util.addDummyNode(g, "edge-proxy", label, "_ep");
     }
   });
 }
 
 function assignRankMinMax(g) {
-  var maxRank = 0;
+  let maxRank = 0;
   g.nodes().forEach(v => {
-    var node = g.node(v);
+    let node = g.node(v);
     if (node.borderTop) {
       node.minRank = g.node(node.borderTop).rank;
       node.maxRank = g.node(node.borderBottom).rank;
@@ -637,7 +637,7 @@ function assignRankMinMax(g) {
 
 function removeEdgeLabelProxies(g) {
   g.nodes().forEach(v => {
-    var node = g.node(v);
+    let node = g.node(v);
     if (node.dummy === "edge-proxy") {
       g.edge(node.e).labelRank = node.rank;
       g.removeNode(v);
@@ -646,19 +646,19 @@ function removeEdgeLabelProxies(g) {
 }
 
 function translateGraph(g) {
-  var minX = Number.POSITIVE_INFINITY;
-  var maxX = 0;
-  var minY = Number.POSITIVE_INFINITY;
-  var maxY = 0;
-  var graphLabel = g.graph();
-  var marginX = graphLabel.marginx || 0;
-  var marginY = graphLabel.marginy || 0;
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = 0;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxY = 0;
+  let graphLabel = g.graph();
+  let marginX = graphLabel.marginx || 0;
+  let marginY = graphLabel.marginy || 0;
 
   function getExtremes(attrs) {
-    var x = attrs.x;
-    var y = attrs.y;
-    var w = attrs.width;
-    var h = attrs.height;
+    let x = attrs.x;
+    let y = attrs.y;
+    let w = attrs.width;
+    let h = attrs.height;
     minX = Math.min(minX, x - w / 2);
     maxX = Math.max(maxX, x + w / 2);
     minY = Math.min(minY, y - h / 2);
@@ -667,7 +667,7 @@ function translateGraph(g) {
 
   g.nodes().forEach(v => getExtremes(g.node(v)));
   g.edges().forEach(e => {
-    var edge = g.edge(e);
+    let edge = g.edge(e);
     if (edge.hasOwnProperty("x")) {
       getExtremes(edge);
     }
@@ -677,13 +677,13 @@ function translateGraph(g) {
   minY -= marginY;
 
   g.nodes().forEach(v => {
-    var node = g.node(v);
+    let node = g.node(v);
     node.x -= minX;
     node.y -= minY;
   });
 
   g.edges().forEach(e => {
-    var edge = g.edge(e);
+    let edge = g.edge(e);
     edge.points.forEach(p => {
       p.x -= minX;
       p.y -= minY;
@@ -698,10 +698,10 @@ function translateGraph(g) {
 
 function assignNodeIntersects(g) {
   g.edges().forEach(e => {
-    var edge = g.edge(e);
-    var nodeV = g.node(e.v);
-    var nodeW = g.node(e.w);
-    var p1, p2;
+    let edge = g.edge(e);
+    let nodeV = g.node(e.v);
+    let nodeW = g.node(e.w);
+    let p1, p2;
     if (!edge.points) {
       edge.points = [];
       p1 = nodeW;
@@ -717,7 +717,7 @@ function assignNodeIntersects(g) {
 
 function fixupEdgeLabelCoords(g) {
   g.edges().forEach(e => {
-    var edge = g.edge(e);
+    let edge = g.edge(e);
     if (edge.hasOwnProperty("x")) {
       if (edge.labelpos === "l" || edge.labelpos === "r") {
         edge.width -= edge.labeloffset;
@@ -732,7 +732,7 @@ function fixupEdgeLabelCoords(g) {
 
 function reversePointsForReversedEdges(g) {
   g.edges().forEach(e => {
-    var edge = g.edge(e);
+    let edge = g.edge(e);
     if (edge.reversed) {
       edge.points.reverse();
     }
@@ -742,11 +742,11 @@ function reversePointsForReversedEdges(g) {
 function removeBorderNodes(g) {
   g.nodes().forEach(v => {
     if (g.children(v).length) {
-      var node = g.node(v);
-      var t = g.node(node.borderTop);
-      var b = g.node(node.borderBottom);
-      var l = g.node(node.borderLeft[node.borderLeft.length - 1]);
-      var r = g.node(node.borderRight[node.borderRight.length - 1]);
+      let node = g.node(v);
+      let t = g.node(node.borderTop);
+      let b = g.node(node.borderBottom);
+      let l = g.node(node.borderLeft[node.borderLeft.length - 1]);
+      let r = g.node(node.borderRight[node.borderRight.length - 1]);
 
       node.width = Math.abs(r.x - l.x);
       node.height = Math.abs(b.y - t.y);
@@ -840,17 +840,17 @@ function canonicalize(attrs) {
 }
 
 },{"./acyclic":2,"./add-border-segments":3,"./coordinate-system":4,"./nesting-graph":9,"./normalize":10,"./order":15,"./parent-dummy-chains":20,"./position":22,"./rank":24,"./util":27,"@dagrejs/graphlib":29}],9:[function(require,module,exports){
-var util = require("./util");
+let util = require("./util");
 
 module.exports = {
-  run: run,
-  cleanup: cleanup
+  run,
+  cleanup,
 };
 
 /*
  * A nesting graph creates dummy nodes for the tops and bottoms of subgraphs,
  * adds appropriate edges to ensure that all cluster nodes are placed between
- * these boundries, and ensures that the graph is connected.
+ * these boundaries, and ensures that the graph is connected.
  *
  * In addition we ensure, through the use of the minlen property, that nodes
  * and subgraph border nodes to not end up on the same rank.
@@ -871,10 +871,10 @@ module.exports = {
  * Graphs."
  */
 function run(g) {
-  var root = util.addDummyNode(g, "root", {}, "_root");
-  var depths = treeDepths(g);
-  var height = Math.max(...Object.values(depths)) - 1; // Note: depths is an Object not an array
-  var nodeSep = 2 * height + 1;
+  let root = util.addDummyNode(g, "root", {}, "_root");
+  let depths = treeDepths(g);
+  let height = Math.max(...Object.values(depths)) - 1; // Note: depths is an Object not an array
+  let nodeSep = 2 * height + 1;
 
   g.graph().nestingRoot = root;
 
@@ -882,12 +882,10 @@ function run(g) {
   g.edges().forEach(e => g.edge(e).minlen *= nodeSep);
 
   // Calculate a weight that is sufficient to keep subgraphs vertically compact
-  var weight = sumWeights(g) + 1;
+  let weight = sumWeights(g) + 1;
 
   // Create border nodes and link them up
-  g.children().forEach(function(child) {
-    dfs(g, root, nodeSep, weight, height, depths, child);
-  });
+  g.children().forEach(child => dfs(g, root, nodeSep, weight, height, depths, child));
 
   // Save the multiplier for node layers for later removal of empty border
   // layers.
@@ -895,7 +893,7 @@ function run(g) {
 }
 
 function dfs(g, root, nodeSep, weight, height, depths, v) {
-  var children = g.children(v);
+  let children = g.children(v);
   if (!children.length) {
     if (v !== root) {
       g.setEdge(root, v, { weight: 0, minlen: nodeSep });
@@ -903,23 +901,23 @@ function dfs(g, root, nodeSep, weight, height, depths, v) {
     return;
   }
 
-  var top = util.addBorderNode(g, "_bt");
-  var bottom = util.addBorderNode(g, "_bb");
-  var label = g.node(v);
+  let top = util.addBorderNode(g, "_bt");
+  let bottom = util.addBorderNode(g, "_bb");
+  let label = g.node(v);
 
   g.setParent(top, v);
   label.borderTop = top;
   g.setParent(bottom, v);
   label.borderBottom = bottom;
 
-  children.forEach(function(child) {
+  children.forEach(child => {
     dfs(g, root, nodeSep, weight, height, depths, child);
 
-    var childNode = g.node(child);
-    var childTop = childNode.borderTop ? childNode.borderTop : child;
-    var childBottom = childNode.borderBottom ? childNode.borderBottom : child;
-    var thisWeight = childNode.borderTop ? weight : 2 * weight;
-    var minlen = childTop !== childBottom ? 1 : height - depths[v] + 1;
+    let childNode = g.node(child);
+    let childTop = childNode.borderTop ? childNode.borderTop : child;
+    let childBottom = childNode.borderBottom ? childNode.borderBottom : child;
+    let thisWeight = childNode.borderTop ? weight : 2 * weight;
+    let minlen = childTop !== childBottom ? 1 : height - depths[v] + 1;
 
     g.setEdge(top, childTop, {
       weight: thisWeight,
@@ -971,7 +969,7 @@ function cleanup(g) {
 },{"./util":27}],10:[function(require,module,exports){
 "use strict";
 
-var util = require("./util");
+let util = require("./util");
 
 module.exports = {
   run: run,
@@ -1000,19 +998,19 @@ function run(g) {
 }
 
 function normalizeEdge(g, e) {
-  var v = e.v;
-  var vRank = g.node(v).rank;
-  var w = e.w;
-  var wRank = g.node(w).rank;
-  var name = e.name;
-  var edgeLabel = g.edge(e);
-  var labelRank = edgeLabel.labelRank;
+  let v = e.v;
+  let vRank = g.node(v).rank;
+  let w = e.w;
+  let wRank = g.node(w).rank;
+  let name = e.name;
+  let edgeLabel = g.edge(e);
+  let labelRank = edgeLabel.labelRank;
 
   if (wRank === vRank + 1) return;
 
   g.removeEdge(e);
 
-  var dummy, attrs, i;
+  let dummy, attrs, i;
   for (i = 0, ++vRank; vRank < wRank; ++i, ++vRank) {
     edgeLabel.points = [];
     attrs = {
@@ -1038,10 +1036,10 @@ function normalizeEdge(g, e) {
 }
 
 function undo(g) {
-  g.graph().dummyChains.forEach(function(v) {
-    var node = g.node(v);
-    var origLabel = node.edgeLabel;
-    var w;
+  g.graph().dummyChains.forEach(v => {
+    let node = g.node(v);
+    let origLabel = node.edgeLabel;
+    let w;
     g.setEdge(node.edgeObj, origLabel);
     while (node.dummy) {
       w = g.successors(v)[0];
@@ -1063,11 +1061,11 @@ function undo(g) {
 module.exports = addSubgraphConstraints;
 
 function addSubgraphConstraints(g, cg, vs) {
-  var prev = {},
+  let prev = {},
     rootPrev;
 
-  vs.forEach(function(v) {
-    var child = g.parent(v),
+  vs.forEach(v => {
+    let child = g.parent(v),
       parent,
       prevChild;
     while (child) {
@@ -1117,12 +1115,12 @@ module.exports = barycenter;
 
 function barycenter(g, movable = []) {
   return movable.map(v => {
-    var inV = g.inEdges(v);
+    let inV = g.inEdges(v);
     if (!inV.length) {
       return { v: v };
     } else {
-      var result = inV.reduce((acc, e) => {
-        var edge = g.edge(e),
+      let result = inV.reduce((acc, e) => {
+        let edge = g.edge(e),
           nodeU = g.node(e.v);
         return {
           sum: acc.sum + (edge.weight * nodeU.order),
@@ -1141,8 +1139,8 @@ function barycenter(g, movable = []) {
 
 
 },{}],13:[function(require,module,exports){
-var Graph = require("@dagrejs/graphlib").Graph;
-var util = require("../util");
+let Graph = require("@dagrejs/graphlib").Graph;
+let util = require("../util");
 
 module.exports = buildLayerGraph;
 
@@ -1177,12 +1175,12 @@ module.exports = buildLayerGraph;
  *       graph is not a multi-graph.
  */
 function buildLayerGraph(g, rank, relationship) {
-  var root = createRootNode(g),
+  let root = createRootNode(g),
     result = new Graph({ compound: true }).setGraph({ root: root })
-      .setDefaultNodeLabel(function(v) { return g.node(v); });
+      .setDefaultNodeLabel(v => g.node(v));
 
-  g.nodes().forEach(function(v) {
-    var node = g.node(v),
+  g.nodes().forEach(v => {
+    let node = g.node(v),
       parent = g.parent(v);
 
     if (node.rank === rank || node.minRank <= rank && rank <= node.maxRank) {
@@ -1190,8 +1188,8 @@ function buildLayerGraph(g, rank, relationship) {
       result.setParent(v, parent || root);
 
       // This assumes we have only short edges!
-      g[relationship](v).forEach(function(e) {
-        var u = e.v === v ? e.w : e.v,
+      g[relationship](v).forEach(e => {
+        let u = e.v === v ? e.w : e.v,
           edge = result.edge(u, v),
           weight = edge !== undefined ? edge.weight : 0;
         result.setEdge(u, v, { weight: g.edge(e).weight + weight });
@@ -1218,7 +1216,7 @@ function createRootNode(g) {
 },{"../util":27,"@dagrejs/graphlib":29}],14:[function(require,module,exports){
 "use strict";
 
-var zipObject = require("../util").zipObject;
+let zipObject = require("../util").zipObject;
 
 module.exports = crossCount;
 
@@ -1239,8 +1237,8 @@ module.exports = crossCount;
  * This algorithm is derived from Barth, et al., "Bilayer Cross Counting."
  */
 function crossCount(g, layering) {
-  var cc = 0;
-  for (var i = 1; i < layering.length; ++i) {
+  let cc = 0;
+  for (let i = 1; i < layering.length; ++i) {
     cc += twoLayerCrossCount(g, layering[i-1], layering[i]);
   }
   return cc;
@@ -1250,26 +1248,26 @@ function twoLayerCrossCount(g, northLayer, southLayer) {
   // Sort all of the edges between the north and south layers by their position
   // in the north layer and then the south. Map these edges to the position of
   // their head in the south layer.
-  var southPos = zipObject(southLayer, southLayer.map((v, i) => i));
-  var southEntries = northLayer.flatMap(v => {
+  let southPos = zipObject(southLayer, southLayer.map((v, i) => i));
+  let southEntries = northLayer.flatMap(v => {
     return g.outEdges(v).map(e => {
       return { pos: southPos[e.w], weight: g.edge(e).weight };
     }).sort((a, b) => a.pos - b.pos);
   });
 
   // Build the accumulator tree
-  var firstIndex = 1;
+  let firstIndex = 1;
   while (firstIndex < southLayer.length) firstIndex <<= 1;
-  var treeSize = 2 * firstIndex - 1;
+  let treeSize = 2 * firstIndex - 1;
   firstIndex -= 1;
-  var tree = new Array(treeSize).fill(0);
+  let tree = new Array(treeSize).fill(0);
 
   // Calculate the weighted crossings
-  var cc = 0;
+  let cc = 0;
   southEntries.forEach(entry => {
-    var index = entry.pos + firstIndex;
+    let index = entry.pos + firstIndex;
     tree[index] += entry.weight;
-    var weightSum = 0;
+    let weightSum = 0;
     while (index > 0) {
       if (index % 2) {
         weightSum += tree[index + 1];
@@ -1286,13 +1284,13 @@ function twoLayerCrossCount(g, northLayer, southLayer) {
 },{"../util":27}],15:[function(require,module,exports){
 "use strict";
 
-var initOrder = require("./init-order");
-var crossCount = require("./cross-count");
-var sortSubgraph = require("./sort-subgraph");
-var buildLayerGraph = require("./build-layer-graph");
-var addSubgraphConstraints = require("./add-subgraph-constraints");
-var Graph = require("@dagrejs/graphlib").Graph;
-var util = require("../util");
+let initOrder = require("./init-order");
+let crossCount = require("./cross-count");
+let sortSubgraph = require("./sort-subgraph");
+let buildLayerGraph = require("./build-layer-graph");
+let addSubgraphConstraints = require("./add-subgraph-constraints");
+let Graph = require("@dagrejs/graphlib").Graph;
+let util = require("../util");
 
 module.exports = order;
 
@@ -1312,21 +1310,21 @@ module.exports = order;
  *       algorithm.
  */
 function order(g) {
-  var maxRank = util.maxRank(g),
+  let maxRank = util.maxRank(g),
     downLayerGraphs = buildLayerGraphs(g, util.range(1, maxRank + 1), "inEdges"),
     upLayerGraphs = buildLayerGraphs(g, util.range(maxRank - 1, -1, -1), "outEdges");
 
-  var layering = initOrder(g);
+  let layering = initOrder(g);
   assignOrder(g, layering);
 
-  var bestCC = Number.POSITIVE_INFINITY,
+  let bestCC = Number.POSITIVE_INFINITY,
     best;
 
-  for (var i = 0, lastBest = 0; lastBest < 4; ++i, ++lastBest) {
+  for (let i = 0, lastBest = 0; lastBest < 4; ++i, ++lastBest) {
     sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2);
 
     layering = util.buildLayerMatrix(g);
-    var cc = crossCount(g, layering);
+    let cc = crossCount(g, layering);
     if (cc < bestCC) {
       lastBest = 0;
       best = Object.assign({}, layering);
@@ -1344,10 +1342,10 @@ function buildLayerGraphs(g, ranks, relationship) {
 }
 
 function sweepLayerGraphs(layerGraphs, biasRight) {
-  var cg = new Graph();
+  let cg = new Graph();
   layerGraphs.forEach(function(lg) {
-    var root = lg.graph().root;
-    var sorted = sortSubgraph(lg, root, cg, biasRight);
+    let root = lg.graph().root;
+    let sorted = sortSubgraph(lg, root, cg, biasRight);
     sorted.vs.forEach((v, i) => lg.node(v).order = i);
     addSubgraphConstraints(lg, cg, sorted.vs);
   });
@@ -1360,7 +1358,7 @@ function assignOrder(g, layering) {
 },{"../util":27,"./add-subgraph-constraints":11,"./build-layer-graph":13,"./cross-count":14,"./init-order":16,"./sort-subgraph":18,"@dagrejs/graphlib":29}],16:[function(require,module,exports){
 "use strict";
 
-var util = require("../util");
+let util = require("../util");
 
 module.exports = initOrder;
 
@@ -1376,20 +1374,20 @@ module.exports = initOrder;
  * the order of its nodes.
  */
 function initOrder(g) {
-  var visited = {};
-  var simpleNodes = g.nodes().filter(v => !g.children(v).length);
-  var maxRank = Math.max(...simpleNodes.map(v => g.node(v).rank));
-  var layers = util.range(maxRank + 1).map(() => []);
+  let visited = {};
+  let simpleNodes = g.nodes().filter(v => !g.children(v).length);
+  let maxRank = Math.max(...simpleNodes.map(v => g.node(v).rank));
+  let layers = util.range(maxRank + 1).map(() => []);
 
   function dfs(v) {
     if (visited[v]) return;
     visited[v] = true;
-    var node = g.node(v);
+    let node = g.node(v);
     layers[node.rank].push(v);
     g.successors(v).forEach(dfs);
   }
 
-  var orderedVs = simpleNodes.sort((a, b) => g.node(a).rank - g.node(b).rank);
+  let orderedVs = simpleNodes.sort((a, b) => g.node(a).rank - g.node(b).rank);
   orderedVs.forEach(dfs);
 
   return layers;
@@ -1398,7 +1396,7 @@ function initOrder(g) {
 },{"../util":27}],17:[function(require,module,exports){
 "use strict";
 
-var util = require("../util");
+let util = require("../util");
 
 module.exports = resolveConflicts;
 
@@ -1428,9 +1426,9 @@ module.exports = resolveConflicts;
  *    elements in `vs`.
  */
 function resolveConflicts(entries, cg) {
-  var mappedEntries = {};
+  let mappedEntries = {};
   entries.forEach((entry, i) => {
-    var tmp = mappedEntries[entry.v] = {
+    let tmp = mappedEntries[entry.v] = {
       indegree: 0,
       "in": [],
       out: [],
@@ -1444,24 +1442,24 @@ function resolveConflicts(entries, cg) {
   });
 
   cg.edges().forEach(e => {
-    var entryV = mappedEntries[e.v];
-    var entryW = mappedEntries[e.w];
+    let entryV = mappedEntries[e.v];
+    let entryW = mappedEntries[e.w];
     if (entryV !== undefined && entryW !== undefined) {
       entryW.indegree++;
       entryV.out.push(mappedEntries[e.w]);
     }
   });
 
-  var sourceSet = Object.values(mappedEntries).filter(entry => !entry.indegree);
+  let sourceSet = Object.values(mappedEntries).filter(entry => !entry.indegree);
 
   return doResolveConflicts(sourceSet);
 }
 
 function doResolveConflicts(sourceSet) {
-  var entries = [];
+  let entries = [];
 
   function handleIn(vEntry) {
-    return function(uEntry) {
+    return uEntry => {
       if (uEntry.merged) {
         return;
       }
@@ -1474,7 +1472,7 @@ function doResolveConflicts(sourceSet) {
   }
 
   function handleOut(vEntry) {
-    return function(wEntry) {
+    return wEntry => {
       wEntry["in"].push(vEntry);
       if (--wEntry.indegree === 0) {
         sourceSet.push(wEntry);
@@ -1483,7 +1481,7 @@ function doResolveConflicts(sourceSet) {
   }
 
   while (sourceSet.length) {
-    var entry = sourceSet.pop();
+    let entry = sourceSet.pop();
     entries.push(entry);
     entry["in"].reverse().forEach(handleIn(entry));
     entry.out.forEach(handleOut(entry));
@@ -1495,8 +1493,8 @@ function doResolveConflicts(sourceSet) {
 }
 
 function mergeEntries(target, source) {
-  var sum = 0;
-  var weight = 0;
+  let sum = 0;
+  let weight = 0;
 
   if (target.weight) {
     sum += target.barycenter * target.weight;
@@ -1516,27 +1514,27 @@ function mergeEntries(target, source) {
 }
 
 },{"../util":27}],18:[function(require,module,exports){
-var barycenter = require("./barycenter");
-var resolveConflicts = require("./resolve-conflicts");
-var sort = require("./sort");
+let barycenter = require("./barycenter");
+let resolveConflicts = require("./resolve-conflicts");
+let sort = require("./sort");
 
 module.exports = sortSubgraph;
 
 function sortSubgraph(g, v, cg, biasRight) {
-  var movable = g.children(v);
-  var node = g.node(v);
-  var bl = node ? node.borderLeft : undefined;
-  var br = node ? node.borderRight: undefined;
-  var subgraphs = {};
+  let movable = g.children(v);
+  let node = g.node(v);
+  let bl = node ? node.borderLeft : undefined;
+  let br = node ? node.borderRight: undefined;
+  let subgraphs = {};
 
   if (bl) {
     movable = movable.filter(w => w !== bl && w !== br);
   }
 
-  var barycenters = barycenter(g, movable);
-  barycenters.forEach(function(entry) {
+  let barycenters = barycenter(g, movable);
+  barycenters.forEach(entry => {
     if (g.children(entry.v).length) {
-      var subgraphResult = sortSubgraph(g, entry.v, cg, biasRight);
+      let subgraphResult = sortSubgraph(g, entry.v, cg, biasRight);
       subgraphs[entry.v] = subgraphResult;
       if (subgraphResult.hasOwnProperty("barycenter")) {
         mergeBarycenters(entry, subgraphResult);
@@ -1544,15 +1542,15 @@ function sortSubgraph(g, v, cg, biasRight) {
     }
   });
 
-  var entries = resolveConflicts(barycenters, cg);
+  let entries = resolveConflicts(barycenters, cg);
   expandSubgraphs(entries, subgraphs);
 
-  var result = sort(entries, biasRight);
+  let result = sort(entries, biasRight);
 
   if (bl) {
     result.vs = [bl, result.vs, br].flat(true);
     if (g.predecessors(bl).length) {
-      var blPred = g.node(g.predecessors(bl)[0]),
+      let blPred = g.node(g.predecessors(bl)[0]),
         brPred = g.node(g.predecessors(br)[0]);
       if (!result.hasOwnProperty("barycenter")) {
         result.barycenter = 0;
@@ -1568,8 +1566,8 @@ function sortSubgraph(g, v, cg, biasRight) {
 }
 
 function expandSubgraphs(entries, subgraphs) {
-  entries.forEach(function(entry) {
-    entry.vs = entry.vs.flatMap(function(v) {
+  entries.forEach(entry => {
+    entry.vs = entry.vs.flatMap(v => {
       if (subgraphs[v]) {
         return subgraphs[v].vs;
       }
@@ -1591,15 +1589,15 @@ function mergeBarycenters(target, other) {
 }
 
 },{"./barycenter":12,"./resolve-conflicts":17,"./sort":19}],19:[function(require,module,exports){
-var util = require("../util");
+let util = require("../util");
 
 module.exports = sort;
 
 function sort(entries, biasRight) {
-  var parts = util.partition(entries, function(entry) {
+  let parts = util.partition(entries, entry => {
     return entry.hasOwnProperty("barycenter");
   });
-  var sortable = parts.lhs,
+  let sortable = parts.lhs,
     unsortable = parts.rhs.sort((a, b) => b.i - a.i),
     vs = [],
     sum = 0,
@@ -1610,7 +1608,7 @@ function sort(entries, biasRight) {
 
   vsIndex = consumeUnsortable(vs, unsortable, vsIndex);
 
-  sortable.forEach(function (entry) {
+  sortable.forEach(entry => {
     vsIndex += entry.vs.length;
     vs.push(entry.vs);
     sum += entry.barycenter * entry.weight;
@@ -1618,7 +1616,7 @@ function sort(entries, biasRight) {
     vsIndex = consumeUnsortable(vs, unsortable, vsIndex);
   });
 
-  var result = { vs: vs.flat(true) };
+  let result = { vs: vs.flat(true) };
   if (weight) {
     result.barycenter = sum / weight;
     result.weight = weight;
@@ -1627,7 +1625,7 @@ function sort(entries, biasRight) {
 }
 
 function consumeUnsortable(vs, unsortable, index) {
-  var last;
+  let last;
   while (unsortable.length && (last = unsortable[unsortable.length - 1]).i <= index) {
     unsortable.pop();
     vs.push(last.vs);
@@ -1637,7 +1635,7 @@ function consumeUnsortable(vs, unsortable, index) {
 }
 
 function compareWithBias(bias) {
-  return function(entryV, entryW) {
+  return (entryV, entryW) => {
     if (entryV.barycenter < entryW.barycenter) {
       return -1;
     } else if (entryV.barycenter > entryW.barycenter) {
@@ -1652,17 +1650,17 @@ function compareWithBias(bias) {
 module.exports = parentDummyChains;
 
 function parentDummyChains(g) {
-  var postorderNums = postorder(g);
+  let postorderNums = postorder(g);
 
-  g.graph().dummyChains.forEach(function(v) {
-    var node = g.node(v);
-    var edgeObj = node.edgeObj;
-    var pathData = findPath(g, postorderNums, edgeObj.v, edgeObj.w);
-    var path = pathData.path;
-    var lca = pathData.lca;
-    var pathIdx = 0;
-    var pathV = path[pathIdx];
-    var ascending = true;
+  g.graph().dummyChains.forEach(v => {
+    let node = g.node(v);
+    let edgeObj = node.edgeObj;
+    let pathData = findPath(g, postorderNums, edgeObj.v, edgeObj.w);
+    let path = pathData.path;
+    let lca = pathData.lca;
+    let pathIdx = 0;
+    let pathV = path[pathIdx];
+    let ascending = true;
 
     while (v !== edgeObj.w) {
       node = g.node(v);
@@ -1695,12 +1693,12 @@ function parentDummyChains(g) {
 // Find a path from v to w through the lowest common ancestor (LCA). Return the
 // full path and the LCA.
 function findPath(g, postorderNums, v, w) {
-  var vPath = [];
-  var wPath = [];
-  var low = Math.min(postorderNums[v].low, postorderNums[w].low);
-  var lim = Math.max(postorderNums[v].lim, postorderNums[w].lim);
-  var parent;
-  var lca;
+  let vPath = [];
+  let wPath = [];
+  let low = Math.min(postorderNums[v].low, postorderNums[w].low);
+  let lim = Math.max(postorderNums[v].lim, postorderNums[w].lim);
+  let parent;
+  let lca;
 
   // Traverse up from v to find the LCA
   parent = v;
@@ -1721,11 +1719,11 @@ function findPath(g, postorderNums, v, w) {
 }
 
 function postorder(g) {
-  var result = {};
-  var lim = 0;
+  let result = {};
+  let lim = 0;
 
   function dfs(v) {
-    var low = lim;
+    let low = lim;
     g.children(v).forEach(dfs);
     result[v] = { low: low, lim: lim++ };
   }
@@ -1737,8 +1735,8 @@ function postorder(g) {
 },{}],21:[function(require,module,exports){
 "use strict";
 
-var Graph = require("@dagrejs/graphlib").Graph;
-var util = require("../util");
+let Graph = require("@dagrejs/graphlib").Graph;
+let util = require("../util");
 
 /*
  * This module provides coordinate assignment based on Brandes and Köpf, "Fast
@@ -1776,10 +1774,10 @@ module.exports = {
  * single node in the layers being scanned.
  */
 function findType1Conflicts(g, layering) {
-  var conflicts = {};
+  let conflicts = {};
 
   function visitLayer(prevLayer, layer) {
-    var
+    let
       // last visited node in the previous layer that is incident on an inner
       // segment.
       k0 = 0,
@@ -1789,14 +1787,14 @@ function findType1Conflicts(g, layering) {
       prevLayerLength = prevLayer.length,
       lastNode = layer[layer.length - 1];
 
-    layer.forEach(function(v, i) {
-      var w = findOtherInnerSegmentNode(g, v),
+    layer.forEach((v, i) => {
+      let w = findOtherInnerSegmentNode(g, v),
         k1 = w ? g.node(w).order : prevLayerLength;
 
       if (w || v === lastNode) {
-        layer.slice(scanPos, i+1).forEach(function(scanNode) {
-          g.predecessors(scanNode).forEach(function(u) {
-            var uLabel = g.node(u),
+        layer.slice(scanPos, i+1).forEach(scanNode => {
+          g.predecessors(scanNode).forEach(u => {
+            let uLabel = g.node(u),
               uPos = uLabel.order;
             if ((uPos < k0 || k1 < uPos) &&
                 !(uLabel.dummy && g.node(scanNode).dummy)) {
@@ -1817,15 +1815,15 @@ function findType1Conflicts(g, layering) {
 }
 
 function findType2Conflicts(g, layering) {
-  var conflicts = {};
+  let conflicts = {};
 
   function scan(south, southPos, southEnd, prevNorthBorder, nextNorthBorder) {
-    var v;
-    util.range(southPos, southEnd).forEach(function(i) {
+    let v;
+    util.range(southPos, southEnd).forEach(i => {
       v = south[i];
       if (g.node(v).dummy) {
-        g.predecessors(v).forEach(function(u) {
-          var uNode = g.node(u);
+        g.predecessors(v).forEach(u => {
+          let uNode = g.node(u);
           if (uNode.dummy &&
               (uNode.order < prevNorthBorder || uNode.order > nextNorthBorder)) {
             addConflict(conflicts, u, v);
@@ -1837,13 +1835,13 @@ function findType2Conflicts(g, layering) {
 
 
   function visitLayer(north, south) {
-    var prevNorthPos = -1,
+    let prevNorthPos = -1,
       nextNorthPos,
       southPos = 0;
 
-    south.forEach(function(v, southLookahead) {
+    south.forEach((v, southLookahead) => {
       if (g.node(v).dummy === "border") {
-        var predecessors = g.predecessors(v);
+        let predecessors = g.predecessors(v);
         if (predecessors.length) {
           nextNorthPos = g.node(predecessors[0]).order;
           scan(south, southPos, southLookahead, prevNorthPos, nextNorthPos);
@@ -1869,12 +1867,12 @@ function findOtherInnerSegmentNode(g, v) {
 
 function addConflict(conflicts, v, w) {
   if (v > w) {
-    var tmp = v;
+    let tmp = v;
     v = w;
     w = tmp;
   }
 
-  var conflictsV = conflicts[v];
+  let conflictsV = conflicts[v];
   if (!conflictsV) {
     conflicts[v] = conflictsV = {};
   }
@@ -1883,7 +1881,7 @@ function addConflict(conflicts, v, w) {
 
 function hasConflict(conflicts, v, w) {
   if (v > w) {
-    var tmp = v;
+    let tmp = v;
     v = w;
     w = tmp;
   }
@@ -1899,30 +1897,30 @@ function hasConflict(conflicts, v, w) {
  * blocks would be split in that scenario.
  */
 function verticalAlignment(g, layering, conflicts, neighborFn) {
-  var root = {},
+  let root = {},
     align = {},
     pos = {};
 
   // We cache the position here based on the layering because the graph and
   // layering may be out of sync. The layering matrix is manipulated to
   // generate different extreme alignments.
-  layering.forEach(function(layer) {
-    layer.forEach(function(v, order) {
+  layering.forEach(layer => {
+    layer.forEach((v, order) => {
       root[v] = v;
       align[v] = v;
       pos[v] = order;
     });
   });
 
-  layering.forEach(function(layer) {
-    var prevIdx = -1;
-    layer.forEach(function(v) {
-      var ws = neighborFn(v);
+  layering.forEach(layer => {
+    let prevIdx = -1;
+    layer.forEach(v => {
+      let ws = neighborFn(v);
       if (ws.length) {
         ws = ws.sort((a, b) => pos[a] - pos[b]);
-        var mp = (ws.length - 1) / 2;
-        for (var i = Math.floor(mp), il = Math.ceil(mp); i <= il; ++i) {
-          var w = ws[i];
+        let mp = (ws.length - 1) / 2;
+        for (let i = Math.floor(mp), il = Math.ceil(mp); i <= il; ++i) {
+          let w = ws[i];
           if (align[v] === v &&
               prevIdx < pos[w] &&
               !hasConflict(conflicts, v, w)) {
@@ -1944,14 +1942,14 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
   // sweeps. The first sweep places blocks with the smallest possible
   // coordinates. The second sweep removes unused space by moving blocks to the
   // greatest coordinates without violating separation.
-  var xs = {},
+  let xs = {},
     blockG = buildBlockGraph(g, layering, root, reverseSep),
     borderType = reverseSep ? "borderLeft" : "borderRight";
 
   function iterate(setXsFunc, nextNodesFunc) {
-    var stack = blockG.nodes();
-    var elem = stack.pop();
-    var visited = {};
+    let stack = blockG.nodes();
+    let elem = stack.pop();
+    let visited = {};
     while (elem) {
       if (visited[elem]) {
         setXsFunc(elem);
@@ -1967,18 +1965,18 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
 
   // First pass, assign smallest coordinates
   function pass1(elem) {
-    xs[elem] = blockG.inEdges(elem).reduce(function(acc, e) {
+    xs[elem] = blockG.inEdges(elem).reduce((acc, e) => {
       return Math.max(acc, xs[e.v] + blockG.edge(e));
     }, 0);
   }
 
   // Second pass, assign greatest coordinates
   function pass2(elem) {
-    var min = blockG.outEdges(elem).reduce(function(acc, e) {
+    let min = blockG.outEdges(elem).reduce((acc, e) => {
       return Math.min(acc, xs[e.w] - blockG.edge(e));
     }, Number.POSITIVE_INFINITY);
 
-    var node = g.node(elem);
+    let node = g.node(elem);
     if (min !== Number.POSITIVE_INFINITY && node.borderType !== borderType) {
       xs[elem] = Math.max(xs[elem], min);
     }
@@ -1995,14 +1993,14 @@ function horizontalCompaction(g, layering, root, align, reverseSep) {
 
 
 function buildBlockGraph(g, layering, root, reverseSep) {
-  var blockGraph = new Graph(),
+  let blockGraph = new Graph(),
     graphLabel = g.graph(),
     sepFn = sep(graphLabel.nodesep, graphLabel.edgesep, reverseSep);
 
-  layering.forEach(function(layer) {
-    var u;
-    layer.forEach(function(v) {
-      var vRoot = root[v];
+  layering.forEach(layer => {
+    let u;
+    layer.forEach(v => {
+      let vRoot = root[v];
       blockGraph.setNode(vRoot);
       if (u) {
         var uRoot = root[u],
@@ -2021,11 +2019,11 @@ function buildBlockGraph(g, layering, root, reverseSep) {
  */
 function findSmallestWidthAlignment(g, xss) {
   return Object.values(xss).reduce((currentMinAndXs, xs) => {
-    var max = Number.NEGATIVE_INFINITY;
-    var min = Number.POSITIVE_INFINITY;
+    let max = Number.NEGATIVE_INFINITY;
+    let min = Number.POSITIVE_INFINITY;
 
     Object.entries(xs).forEach(([v, x]) => {
-      var halfWidth = width(g, v) / 2;
+      let halfWidth = width(g, v) / 2;
 
       max = Math.max(x + halfWidth, max);
       min = Math.min(x - halfWidth, min);
@@ -2047,18 +2045,18 @@ function findSmallestWidthAlignment(g, xss) {
  * coordinate of the smallest width alignment.
  */
 function alignCoordinates(xss, alignTo) {
-  var alignToVals = Object.values(alignTo),
+  let alignToVals = Object.values(alignTo),
     alignToMin = Math.min(...alignToVals),
     alignToMax = Math.max(...alignToVals);
 
-  ["u", "d"].forEach(function(vert) {
-    ["l", "r"].forEach(function(horiz) {
-      var alignment = vert + horiz,
+  ["u", "d"].forEach(vert => {
+    ["l", "r"].forEach(horiz => {
+      let alignment = vert + horiz,
         xs = xss[alignment];
 
       if (xs === alignTo) return;
 
-      var xsVals = Object.values(xs);
+      let xsVals = Object.values(xs);
       let delta = alignToMin - Math.min(...xsVals);
       if (horiz !== "l") {
         delta = alignToMax - Math.max(...xsVals);
@@ -2072,36 +2070,36 @@ function alignCoordinates(xss, alignTo) {
 }
 
 function balance(xss, align) {
-  return util.mapValues(xss.ul, function(num, v) {
+  return util.mapValues(xss.ul, (num, v) => {
     if (align) {
       return xss[align.toLowerCase()][v];
     } else {
-      var xs = Object.values(xss).map(xs => xs[v]).sort((a, b) => a - b);
+      let xs = Object.values(xss).map(xs => xs[v]).sort((a, b) => a - b);
       return (xs[1] + xs[2]) / 2;
     }
   });
 }
 
 function positionX(g) {
-  var layering = util.buildLayerMatrix(g);
-  var conflicts = Object.assign(
+  let layering = util.buildLayerMatrix(g);
+  let conflicts = Object.assign(
     findType1Conflicts(g, layering),
     findType2Conflicts(g, layering));
 
-  var xss = {};
-  var adjustedLayering;
-  ["u", "d"].forEach(function(vert) {
+  let xss = {};
+  let adjustedLayering;
+  ["u", "d"].forEach(vert => {
     adjustedLayering = vert === "u" ? layering : Object.values(layering).reverse();
-    ["l", "r"].forEach(function(horiz) {
+    ["l", "r"].forEach(horiz => {
       if (horiz === "r") {
         adjustedLayering = adjustedLayering.map(inner => {
           return Object.values(inner).reverse();
         });
       }
 
-      var neighborFn = (vert === "u" ? g.predecessors : g.successors).bind(g);
-      var align = verticalAlignment(g, adjustedLayering, conflicts, neighborFn);
-      var xs = horizontalCompaction(g, adjustedLayering,
+      let neighborFn = (vert === "u" ? g.predecessors : g.successors).bind(g);
+      let align = verticalAlignment(g, adjustedLayering, conflicts, neighborFn);
+      let xs = horizontalCompaction(g, adjustedLayering,
         align.root, align.align, horiz === "r");
       if (horiz === "r") {
         xs = util.mapValues(xs, x => -x);
@@ -2111,17 +2109,17 @@ function positionX(g) {
   });
 
 
-  var smallestWidth = findSmallestWidthAlignment(g, xss);
+  let smallestWidth = findSmallestWidthAlignment(g, xss);
   alignCoordinates(xss, smallestWidth);
   return balance(xss, g.graph().align);
 }
 
 function sep(nodeSep, edgeSep, reverseSep) {
-  return function(g, v, w) {
-    var vLabel = g.node(v);
-    var wLabel = g.node(w);
-    var sum = 0;
-    var delta;
+  return (g, v, w) => {
+    let vLabel = g.node(v);
+    let wLabel = g.node(w);
+    let sum = 0;
+    let delta;
 
     sum += vLabel.width / 2;
     if (vLabel.hasOwnProperty("labelpos")) {
@@ -2161,8 +2159,8 @@ function width(g, v) {
 },{"../util":27,"@dagrejs/graphlib":29}],22:[function(require,module,exports){
 "use strict";
 
-var util = require("../util");
-var positionX = require("./bk").positionX;
+let util = require("../util");
+let positionX = require("./bk").positionX;
 
 module.exports = position;
 
@@ -2174,10 +2172,10 @@ function position(g) {
 }
 
 function positionY(g) {
-  var layering = util.buildLayerMatrix(g);
-  var rankSep = g.graph().ranksep;
-  var prevY = 0;
-  layering.forEach(function(layer) {
+  let layering = util.buildLayerMatrix(g);
+  let rankSep = g.graph().ranksep;
+  let prevY = 0;
+  layering.forEach(layer => {
     const maxHeight = layer.reduce((acc, v) => {
       const height = g.node(v).height;
       if (acc > height) {
@@ -2249,7 +2247,7 @@ function feasibleTree(g) {
  */
 function tightTree(t, g) {
   function dfs(v) {
-    g.nodeEdges(v).forEach(function(e) {
+    g.nodeEdges(v).forEach(e => {
       var edgeV = e.v,
         w = (v === edgeV) ? e.w : edgeV;
       if (!t.hasNode(w) && !slack(g, e)) {
@@ -2442,7 +2440,7 @@ function calcCutValue(t, g, child) {
 
   cutValue = graphEdge.weight;
 
-  g.nodeEdges(child).forEach(function(e) {
+  g.nodeEdges(child).forEach(e => {
     var isOutEdge = e.v === child,
       other = isOutEdge ? e.w : e.v;
 
@@ -2473,7 +2471,7 @@ function dfsAssignLowLim(tree, visited, nextLim, v, parent) {
   var label = tree.node(v);
 
   visited[v] = true;
-  tree.neighbors(v).forEach(function(w) {
+  tree.neighbors(v).forEach(w => {
     if (!visited.hasOwnProperty(w)) {
       nextLim = dfsAssignLowLim(tree, visited, nextLim, w, v);
     }
@@ -2519,7 +2517,7 @@ function enterEdge(t, g, edge) {
     flip = true;
   }
 
-  var candidates = g.edges().filter(function(edge) {
+  var candidates = g.edges().filter(edge => {
     return flip === isDescendant(t, t.node(edge.v), tailLabel) &&
            flip !== isDescendant(t, t.node(edge.w), tailLabel);
   });
@@ -2547,7 +2545,7 @@ function updateRanks(t, g) {
   var root = t.nodes().find(v => !g.node(v).parent);
   var vs = preorder(t, root);
   vs = vs.slice(1);
-  vs.forEach(function(v) {
+  vs.forEach(v => {
     var parent = t.node(v).parent,
       edge = g.edge(v, parent),
       flipped = false;
@@ -2646,7 +2644,7 @@ function slack(g, e) {
 
 "use strict";
 
-var Graph = require("@dagrejs/graphlib").Graph;
+let Graph = require("@dagrejs/graphlib").Graph;
 
 module.exports = {
   addBorderNode,
@@ -2674,7 +2672,7 @@ module.exports = {
  * Adds a dummy node to the graph and return v.
  */
 function addDummyNode(g, type, attrs, name) {
-  var v;
+  let v;
   do {
     v = uniqueId(name);
   } while (g.hasNode(v));
@@ -2689,11 +2687,11 @@ function addDummyNode(g, type, attrs, name) {
  * associated with multi-edges.
  */
 function simplify(g) {
-  var simplified = new Graph().setGraph(g.graph());
+  let simplified = new Graph().setGraph(g.graph());
   g.nodes().forEach(v => simplified.setNode(v, g.node(v)));
   g.edges().forEach(e => {
-    var simpleLabel = simplified.edge(e.v, e.w) || { weight: 0, minlen: 1 };
-    var label = g.edge(e);
+    let simpleLabel = simplified.edge(e.v, e.w) || { weight: 0, minlen: 1 };
+    let label = g.edge(e);
     simplified.setEdge(e.v, e.w, {
       weight: simpleLabel.weight + label.weight,
       minlen: Math.max(simpleLabel.minlen, label.minlen)
@@ -2703,7 +2701,7 @@ function simplify(g) {
 }
 
 function asNonCompoundGraph(g) {
-  var simplified = new Graph({ multigraph: g.isMultigraph() }).setGraph(g.graph());
+  let simplified = new Graph({ multigraph: g.isMultigraph() }).setGraph(g.graph());
   g.nodes().forEach(v => {
     if (!g.children(v).length) {
       simplified.setNode(v, g.node(v));
@@ -2716,8 +2714,8 @@ function asNonCompoundGraph(g) {
 }
 
 function successorWeights(g) {
-  var weightMap = g.nodes().map(v => {
-    var sucs = {};
+  let weightMap = g.nodes().map(v => {
+    let sucs = {};
     g.outEdges(v).forEach(e => {
       sucs[e.w] = (sucs[e.w] || 0) + g.edge(e).weight;
     });
@@ -2727,8 +2725,8 @@ function successorWeights(g) {
 }
 
 function predecessorWeights(g) {
-  var weightMap = g.nodes().map(v => {
-    var preds = {};
+  let weightMap = g.nodes().map(v => {
+    let preds = {};
     g.inEdges(v).forEach(e => {
       preds[e.v] = (preds[e.v] || 0) + g.edge(e).weight;
     });
@@ -2742,21 +2740,21 @@ function predecessorWeights(g) {
  * ({x, y, width, height}) if it were pointing at the rectangle's center.
  */
 function intersectRect(rect, point) {
-  var x = rect.x;
-  var y = rect.y;
+  let x = rect.x;
+  let y = rect.y;
 
   // Rectangle intersection algorithm from:
   // http://math.stackexchange.com/questions/108113/find-edge-between-two-boxes
-  var dx = point.x - x;
-  var dy = point.y - y;
-  var w = rect.width / 2;
-  var h = rect.height / 2;
+  let dx = point.x - x;
+  let dy = point.y - y;
+  let w = rect.width / 2;
+  let h = rect.height / 2;
 
   if (!dx && !dy) {
     throw new Error("Not possible to find intersection inside of the rectangle");
   }
 
-  var sx, sy;
+  let sx, sy;
   if (Math.abs(dy) * w > Math.abs(dx) * h) {
     // Intersection is top or bottom of rect.
     if (dy < 0) {
@@ -2781,10 +2779,10 @@ function intersectRect(rect, point) {
  * function will produce a matrix with the ids of each node.
  */
 function buildLayerMatrix(g) {
-  var layering = range(maxRank(g) + 1).map(() => []);
+  let layering = range(maxRank(g) + 1).map(() => []);
   g.nodes().forEach(v => {
-    var node = g.node(v);
-    var rank = node.rank;
+    let node = g.node(v);
+    let rank = node.rank;
     if (rank !== undefined) {
       layering[rank][node.order] = v;
     }
@@ -2797,8 +2795,8 @@ function buildLayerMatrix(g) {
  * rank(v) >= 0 and at least one node w has rank(w) = 0.
  */
 function normalizeRanks(g) {
-  var min = Math.min(...g.nodes().map(v => {
-    var rank = g.node(v).rank;
+  let min = Math.min(...g.nodes().map(v => {
+    let rank = g.node(v).rank;
     if (rank === undefined) {
       return Number.MAX_VALUE;
     }
@@ -2806,7 +2804,7 @@ function normalizeRanks(g) {
     return rank;
   }));
   g.nodes().forEach(v => {
-    var node = g.node(v);
+    let node = g.node(v);
     if (node.hasOwnProperty("rank")) {
       node.rank -= min;
     }
@@ -2815,19 +2813,19 @@ function normalizeRanks(g) {
 
 function removeEmptyRanks(g) {
   // Ranks may not start at 0, so we need to offset them
-  var offset = Math.min(...g.nodes().map(v => g.node(v).rank));
+  let offset = Math.min(...g.nodes().map(v => g.node(v).rank));
 
-  var layers = [];
+  let layers = [];
   g.nodes().forEach(v => {
-    var rank = g.node(v).rank - offset;
+    let rank = g.node(v).rank - offset;
     if (!layers[rank]) {
       layers[rank] = [];
     }
     layers[rank].push(v);
   });
 
-  var delta = 0;
-  var nodeRankFactor = g.graph().nodeRankFactor;
+  let delta = 0;
+  let nodeRankFactor = g.graph().nodeRankFactor;
   Array.from(layers).forEach((vs, i) => {
     if (vs === undefined && i % nodeRankFactor !== 0) {
       --delta;
@@ -2838,7 +2836,7 @@ function removeEmptyRanks(g) {
 }
 
 function addBorderNode(g, prefix, rank, order) {
-  var node = {
+  let node = {
     width: 0,
     height: 0
   };
@@ -2851,7 +2849,7 @@ function addBorderNode(g, prefix, rank, order) {
 
 function maxRank(g) {
   return Math.max(...g.nodes().map(v => {
-    var rank = g.node(v).rank;
+    let rank = g.node(v).rank;
     if (rank === undefined) {
       return Number.MIN_VALUE;
     }
@@ -2866,7 +2864,7 @@ function maxRank(g) {
  * into `rhs.
  */
 function partition(collection, fn) {
-  var result = { lhs: [], rhs: [] };
+  let result = { lhs: [], rhs: [] };
   collection.forEach(value => {
     if (fn(value)) {
       result.lhs.push(value);
@@ -2882,7 +2880,7 @@ function partition(collection, fn) {
  * time it takes to execute the function.
  */
 function time(name, fn) {
-  var start = Date.now();
+  let start = Date.now();
   try {
     return fn();
   } finally {
@@ -2950,7 +2948,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.0.2";
+module.exports = "1.0.4";
 
 },{}],29:[function(require,module,exports){
 /**
