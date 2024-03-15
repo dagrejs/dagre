@@ -1,3 +1,0 @@
-{
-  "plugins": ["@babel/plugin-transform-export-namespace-from", "@babel/plugin-transform-modules-commonjs", "add-module-exports"]
-}

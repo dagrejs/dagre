@@ -1,6 +1,6 @@
 {
   "name": "@dagrejs/dagre",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
@@ -12,17 +12,11 @@
     "lint": "make lint",
     "test": "make test"
   },
-  "module": "./mjs-lib/index.js",
-  "exports": {
-    "import": "./mjs-lib/index.js",
-    "require": "./index.js"
-  },
   "files": [
     "index.js",
     "index.d.ts",
     "dist/",
-    "lib/",
-    "mjs-lib/"
+    "lib/"
   ],
   "types": "index.d.ts",
   "keywords": [
@@ -33,11 +27,6 @@
     "@dagrejs/graphlib": "2.2.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.23.9",
-    "@babel/core": "^7.23.9",
-    "@babel/plugin-transform-export-namespace-from": "^7.23.4",
-    "@babel/plugin-transform-modules-commonjs": "^7.23.3",
-    "babel-plugin-add-module-exports": "^1.0.4",
     "benchmark": "2.1.4",
     "browserify": "17.0.0",
     "chai": "4.3.6",
