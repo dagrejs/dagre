@@ -1309,13 +1309,22 @@ module.exports = order;
  *    1. Graph nodes will have an "order" attribute based on the results of the
  *       algorithm.
  */
-function order(g) {
+function order(g, opts) {
+  if (opts && typeof opts.customOrder === 'function') {
+    opts.customOrder(g, order);
+    return;
+  }
+
   let maxRank = util.maxRank(g),
     downLayerGraphs = buildLayerGraphs(g, util.range(1, maxRank + 1), "inEdges"),
     upLayerGraphs = buildLayerGraphs(g, util.range(maxRank - 1, -1, -1), "outEdges");
 
   let layering = initOrder(g);
   assignOrder(g, layering);
+
+  if (opts && opts.disableOptimalOrderHeuristic) {
+    return;
+  }
 
   let bestCC = Number.POSITIVE_INFINITY,
     best;
@@ -1810,7 +1819,8 @@ function findType1Conflicts(g, layering) {
     return layer;
   }
 
-  layering.reduce(visitLayer);
+  layering.length && layering.reduce(visitLayer);
+
   return conflicts;
 }
 
@@ -1855,7 +1865,8 @@ function findType2Conflicts(g, layering) {
     return south;
   }
 
-  layering.reduce(visitLayer);
+  layering.length && layering.reduce(visitLayer);
+
   return conflicts;
 }
 
@@ -2948,7 +2959,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.0.4";
+module.exports = "1.1.1";
 
 },{}],29:[function(require,module,exports){
 /**
@@ -4342,7 +4353,7 @@ function read(json) {
 }
 
 },{"./graph":44}],47:[function(require,module,exports){
-module.exports = '2.1.13';
+module.exports = '2.2.1';
 
 },{}]},{},[1])(1)
 });
