@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: browser-actions/setup-firefox@latest
+    - uses: browser-actions/setup-chrome@latest
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -35,4 +35,4 @@ jobs:
 
     - name: Test
       run: |
-        KARMA_OPTS="--browsers Firefox" xvfb-run --auto-servernum make -e test
+        KARMA_OPTS="--browsers Chrome" xvfb-run --auto-servernum make -e test
