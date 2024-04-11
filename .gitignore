@@ -2,3 +2,5 @@ build/
 node_modules/
 tmp/
 /.nyc_output
+package-lock.json
+yarn.lock
