@@ -2959,7 +2959,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.1.1";
+module.exports = "1.1.2";
 
 },{}],29:[function(require,module,exports){
 /**
@@ -3422,28 +3422,28 @@ topsort.CycleException = CycleException;
  * have its priority decreased in O(log n) time.
  */
 class PriorityQueue {
-  #arr = [];
-  #keyIndices = {};
+  _arr = [];
+  _keyIndices = {};
 
   /**
    * Returns the number of elements in the queue. Takes `O(1)` time.
    */
   size() {
-    return this.#arr.length;
+    return this._arr.length;
   }
 
   /**
    * Returns the keys that are in the queue. Takes `O(n)` time.
    */
   keys() {
-    return this.#arr.map(function(x) { return x.key; });
+    return this._arr.map(function(x) { return x.key; });
   }
 
   /**
    * Returns `true` if **key** is in the queue and `false` if not.
    */
   has(key) {
-    return this.#keyIndices.hasOwnProperty(key);
+    return this._keyIndices.hasOwnProperty(key);
   }
 
   /**
@@ -3453,9 +3453,9 @@ class PriorityQueue {
    * @param {Object} key
    */
   priority(key) {
-    var index = this.#keyIndices[key];
+    var index = this._keyIndices[key];
     if (index !== undefined) {
-      return this.#arr[index].priority;
+      return this._arr[index].priority;
     }
   }
 
@@ -3467,7 +3467,7 @@ class PriorityQueue {
     if (this.size() === 0) {
       throw new Error("Queue underflow");
     }
-    return this.#arr[0].key;
+    return this._arr[0].key;
   }
 
   /**
@@ -3479,14 +3479,14 @@ class PriorityQueue {
    * @param {Number} priority the initial priority for the key
    */
   add(key, priority) {
-    var keyIndices = this.#keyIndices;
+    var keyIndices = this._keyIndices;
     key = String(key);
     if (!keyIndices.hasOwnProperty(key)) {
-      var arr = this.#arr;
+      var arr = this._arr;
       var index = arr.length;
       keyIndices[key] = index;
       arr.push({key: key, priority: priority});
-      this.#decrease(index);
+      this._decrease(index);
       return true;
     }
     return false;
@@ -3496,10 +3496,10 @@ class PriorityQueue {
    * Removes and returns the smallest key in the queue. Takes `O(log n)` time.
    */
   removeMin() {
-    this.#swap(0, this.#arr.length - 1);
-    var min = this.#arr.pop();
-    delete this.#keyIndices[min.key];
-    this.#heapify(0);
+    this._swap(0, this._arr.length - 1);
+    var min = this._arr.pop();
+    delete this._keyIndices[min.key];
+    this._heapify(0);
     return min.key;
   }
 
@@ -3511,17 +3511,17 @@ class PriorityQueue {
    * @param {Number} priority the new priority for the key
    */
   decrease(key, priority) {
-    var index = this.#keyIndices[key];
-    if (priority > this.#arr[index].priority) {
+    var index = this._keyIndices[key];
+    if (priority > this._arr[index].priority) {
       throw new Error("New priority is greater than current priority. " +
-          "Key: " + key + " Old: " + this.#arr[index].priority + " New: " + priority);
+          "Key: " + key + " Old: " + this._arr[index].priority + " New: " + priority);
     }
-    this.#arr[index].priority = priority;
-    this.#decrease(index);
+    this._arr[index].priority = priority;
+    this._decrease(index);
   }
 
-  #heapify(i) {
-    var arr = this.#arr;
+  _heapify(i) {
+    var arr = this._arr;
     var l = 2 * i;
     var r = l + 1;
     var largest = i;
@@ -3531,14 +3531,14 @@ class PriorityQueue {
         largest = arr[r].priority < arr[largest].priority ? r : largest;
       }
       if (largest !== i) {
-        this.#swap(i, largest);
-        this.#heapify(largest);
+        this._swap(i, largest);
+        this._heapify(largest);
       }
     }
   }
 
-  #decrease(index) {
-    var arr = this.#arr;
+  _decrease(index) {
+    var arr = this._arr;
     var priority = arr[index].priority;
     var parent;
     while (index !== 0) {
@@ -3546,14 +3546,14 @@ class PriorityQueue {
       if (arr[parent].priority < priority) {
         break;
       }
-      this.#swap(index, parent);
+      this._swap(index, parent);
       index = parent;
     }
   }
 
-  #swap(i, j) {
-    var arr = this.#arr;
-    var keyIndices = this.#keyIndices;
+  _swap(i, j) {
+    var arr = this._arr;
+    var keyIndices = this._keyIndices;
     var origArrI = arr[i];
     var origArrJ = arr[j];
     arr[i] = origArrJ;
@@ -3583,64 +3583,64 @@ var EDGE_KEY_DELIM = "\x01";
 //    we're going to get to a performant hashtable in JavaScript.
 
 class Graph {
-  #isDirected = true;
-  #isMultigraph = false;
-  #isCompound = false;
+  _isDirected = true;
+  _isMultigraph = false;
+  _isCompound = false;
 
   // Label for the graph itself
-  #label;
+  _label;
 
   // Defaults to be set when creating a new node
-  #defaultNodeLabelFn = () => undefined;
+  _defaultNodeLabelFn = () => undefined;
 
   // Defaults to be set when creating a new edge
-  #defaultEdgeLabelFn = () => undefined;
+  _defaultEdgeLabelFn = () => undefined;
 
   // v -> label
-  #nodes = {};
+  _nodes = {};
 
   // v -> edgeObj
-  #in = {};
+  _in = {};
 
   // u -> v -> Number
-  #preds = {};
+  _preds = {};
 
   // v -> edgeObj
-  #out = {};
+  _out = {};
 
   // v -> w -> Number
-  #sucs = {};
+  _sucs = {};
 
   // e -> edgeObj
-  #edgeObjs = {};
+  _edgeObjs = {};
 
   // e -> label
-  #edgeLabels = {};
+  _edgeLabels = {};
 
   /* Number of nodes in the graph. Should only be changed by the implementation. */
-  #nodeCount = 0;
+  _nodeCount = 0;
 
   /* Number of edges in the graph. Should only be changed by the implementation. */
-  #edgeCount = 0;
+  _edgeCount = 0;
 
-  #parent;
+  _parent;
 
-  #children;
+  _children;
 
   constructor(opts) {
     if (opts) {
-      this.#isDirected = opts.hasOwnProperty("directed") ? opts.directed : true;
-      this.#isMultigraph = opts.hasOwnProperty("multigraph") ? opts.multigraph : false;
-      this.#isCompound = opts.hasOwnProperty("compound") ? opts.compound : false;
+      this._isDirected = opts.hasOwnProperty("directed") ? opts.directed : true;
+      this._isMultigraph = opts.hasOwnProperty("multigraph") ? opts.multigraph : false;
+      this._isCompound = opts.hasOwnProperty("compound") ? opts.compound : false;
     }
 
-    if (this.#isCompound) {
+    if (this._isCompound) {
       // v -> parent
-      this.#parent = {};
+      this._parent = {};
 
       // v -> children
-      this.#children = {};
-      this.#children[GRAPH_NODE] = {};
+      this._children = {};
+      this._children[GRAPH_NODE] = {};
     }
   }
 
@@ -3650,28 +3650,28 @@ class Graph {
    * Whether graph was created with 'directed' flag set to true or not.
    */
   isDirected() {
-    return this.#isDirected;
+    return this._isDirected;
   }
 
   /**
    * Whether graph was created with 'multigraph' flag set to true or not.
    */
   isMultigraph() {
-    return this.#isMultigraph;
+    return this._isMultigraph;
   }
 
   /**
    * Whether graph was created with 'compound' flag set to true or not.
    */
   isCompound() {
-    return this.#isCompound;
+    return this._isCompound;
   }
 
   /**
    * Sets the label of the graph.
    */
   setGraph(label) {
-    this.#label = label;
+    this._label = label;
     return this;
   }
 
@@ -3679,7 +3679,7 @@ class Graph {
    * Gets the graph label.
    */
   graph() {
-    return this.#label;
+    return this._label;
   }
 
 
@@ -3693,9 +3693,9 @@ class Graph {
    * Complexity: O(1).
    */
   setDefaultNodeLabel(newDefault) {
-    this.#defaultNodeLabelFn = newDefault;
+    this._defaultNodeLabelFn = newDefault;
     if (typeof newDefault !== 'function') {
-      this.#defaultNodeLabelFn = () => newDefault;
+      this._defaultNodeLabelFn = () => newDefault;
     }
 
     return this;
@@ -3706,7 +3706,7 @@ class Graph {
    * Complexity: O(1).
    */
   nodeCount() {
-    return this.#nodeCount;
+    return this._nodeCount;
   }
 
   /**
@@ -3715,7 +3715,7 @@ class Graph {
    * Complexity: O(1).
    */
   nodes() {
-    return Object.keys(this.#nodes);
+    return Object.keys(this._nodes);
   }
 
   /**
@@ -3724,7 +3724,7 @@ class Graph {
    */
   sources() {
     var self = this;
-    return this.nodes().filter(v => Object.keys(self.#in[v]).length === 0);
+    return this.nodes().filter(v => Object.keys(self._in[v]).length === 0);
   }
 
   /**
@@ -3733,7 +3733,7 @@ class Graph {
    */
   sinks() {
     var self = this;
-    return this.nodes().filter(v => Object.keys(self.#out[v]).length === 0);
+    return this.nodes().filter(v => Object.keys(self._out[v]).length === 0);
   }
 
   /**
@@ -3760,24 +3760,24 @@ class Graph {
    * Complexity: O(1).
    */
   setNode(v, value) {
-    if (this.#nodes.hasOwnProperty(v)) {
+    if (this._nodes.hasOwnProperty(v)) {
       if (arguments.length > 1) {
-        this.#nodes[v] = value;
+        this._nodes[v] = value;
       }
       return this;
     }
 
-    this.#nodes[v] = arguments.length > 1 ? value : this.#defaultNodeLabelFn(v);
-    if (this.#isCompound) {
-      this.#parent[v] = GRAPH_NODE;
-      this.#children[v] = {};
-      this.#children[GRAPH_NODE][v] = true;
+    this._nodes[v] = arguments.length > 1 ? value : this._defaultNodeLabelFn(v);
+    if (this._isCompound) {
+      this._parent[v] = GRAPH_NODE;
+      this._children[v] = {};
+      this._children[GRAPH_NODE][v] = true;
     }
-    this.#in[v] = {};
-    this.#preds[v] = {};
-    this.#out[v] = {};
-    this.#sucs[v] = {};
-    ++this.#nodeCount;
+    this._in[v] = {};
+    this._preds[v] = {};
+    this._out[v] = {};
+    this._sucs[v] = {};
+    ++this._nodeCount;
     return this;
   }
 
@@ -3786,14 +3786,14 @@ class Graph {
    * Complexity: O(|V|).
    */
   node(v) {
-    return this.#nodes[v];
+    return this._nodes[v];
   }
 
   /**
    * Detects whether graph has a node with specified name or not.
    */
   hasNode(v) {
-    return this.#nodes.hasOwnProperty(v);
+    return this._nodes.hasOwnProperty(v);
   }
 
   /**
@@ -3804,24 +3804,24 @@ class Graph {
    */
   removeNode(v) {
     var self = this;
-    if (this.#nodes.hasOwnProperty(v)) {
-      var removeEdge = e => self.removeEdge(self.#edgeObjs[e]);
-      delete this.#nodes[v];
-      if (this.#isCompound) {
-        this.#removeFromParentsChildList(v);
-        delete this.#parent[v];
+    if (this._nodes.hasOwnProperty(v)) {
+      var removeEdge = e => self.removeEdge(self._edgeObjs[e]);
+      delete this._nodes[v];
+      if (this._isCompound) {
+        this._removeFromParentsChildList(v);
+        delete this._parent[v];
         this.children(v).forEach(function(child) {
           self.setParent(child);
         });
-        delete this.#children[v];
+        delete this._children[v];
       }
-      Object.keys(this.#in[v]).forEach(removeEdge);
-      delete this.#in[v];
-      delete this.#preds[v];
-      Object.keys(this.#out[v]).forEach(removeEdge);
-      delete this.#out[v];
-      delete this.#sucs[v];
-      --this.#nodeCount;
+      Object.keys(this._in[v]).forEach(removeEdge);
+      delete this._in[v];
+      delete this._preds[v];
+      Object.keys(this._out[v]).forEach(removeEdge);
+      delete this._out[v];
+      delete this._sucs[v];
+      --this._nodeCount;
     }
     return this;
   }
@@ -3833,7 +3833,7 @@ class Graph {
    * Average-case complexity: O(1).
    */
   setParent(v, parent) {
-    if (!this.#isCompound) {
+    if (!this._isCompound) {
       throw new Error("Cannot set parent in a non-compound graph");
     }
 
@@ -3853,14 +3853,14 @@ class Graph {
     }
 
     this.setNode(v);
-    this.#removeFromParentsChildList(v);
-    this.#parent[v] = parent;
-    this.#children[parent][v] = true;
+    this._removeFromParentsChildList(v);
+    this._parent[v] = parent;
+    this._children[parent][v] = true;
     return this;
   }
 
-  #removeFromParentsChildList(v) {
-    delete this.#children[this.#parent[v]][v];
+  _removeFromParentsChildList(v) {
+    delete this._children[this._parent[v]][v];
   }
 
   /**
@@ -3868,8 +3868,8 @@ class Graph {
    * Complexity: O(1).
    */
   parent(v) {
-    if (this.#isCompound) {
-      var parent = this.#parent[v];
+    if (this._isCompound) {
+      var parent = this._parent[v];
       if (parent !== GRAPH_NODE) {
         return parent;
       }
@@ -3881,8 +3881,8 @@ class Graph {
    * Complexity: O(1).
    */
   children(v = GRAPH_NODE) {
-    if (this.#isCompound) {
-      var children = this.#children[v];
+    if (this._isCompound) {
+      var children = this._children[v];
       if (children) {
         return Object.keys(children);
       }
@@ -3899,7 +3899,7 @@ class Graph {
    * Complexity: O(|V|).
    */
   predecessors(v) {
-    var predsV = this.#preds[v];
+    var predsV = this._preds[v];
     if (predsV) {
       return Object.keys(predsV);
     }
@@ -3911,7 +3911,7 @@ class Graph {
    * Complexity: O(|V|).
    */
   successors(v) {
-    var sucsV = this.#sucs[v];
+    var sucsV = this._sucs[v];
     if (sucsV) {
       return Object.keys(sucsV);
     }
@@ -3952,21 +3952,21 @@ class Graph {
    */
   filterNodes(filter) {
     var copy = new this.constructor({
-      directed: this.#isDirected,
-      multigraph: this.#isMultigraph,
-      compound: this.#isCompound
+      directed: this._isDirected,
+      multigraph: this._isMultigraph,
+      compound: this._isCompound
     });
 
     copy.setGraph(this.graph());
 
     var self = this;
-    Object.entries(this.#nodes).forEach(function([v, value]) {
+    Object.entries(this._nodes).forEach(function([v, value]) {
       if (filter(v)) {
         copy.setNode(v, value);
       }
     });
 
-    Object.values(this.#edgeObjs).forEach(function(e) {
+    Object.values(this._edgeObjs).forEach(function(e) {
       if (copy.hasNode(e.v) && copy.hasNode(e.w)) {
         copy.setEdge(e, self.edge(e));
       }
@@ -3985,7 +3985,7 @@ class Graph {
       }
     }
 
-    if (this.#isCompound) {
+    if (this._isCompound) {
       copy.nodes().forEach(v => copy.setParent(v, findParent(v)));
     }
 
@@ -4002,9 +4002,9 @@ class Graph {
    * Complexity: O(1).
    */
   setDefaultEdgeLabel(newDefault) {
-    this.#defaultEdgeLabelFn = newDefault;
+    this._defaultEdgeLabelFn = newDefault;
     if (typeof newDefault !== 'function') {
-      this.#defaultEdgeLabelFn = () => newDefault;
+      this._defaultEdgeLabelFn = () => newDefault;
     }
 
     return this;
@@ -4015,7 +4015,7 @@ class Graph {
    * Complexity: O(1).
    */
   edgeCount() {
-    return this.#edgeCount;
+    return this._edgeCount;
   }
 
   /**
@@ -4023,7 +4023,7 @@ class Graph {
    * Complexity: O(|E|).
    */
   edges() {
-    return Object.values(this.#edgeObjs);
+    return Object.values(this._edgeObjs);
   }
 
   /**
@@ -4081,15 +4081,15 @@ class Graph {
       name = "" + name;
     }
 
-    var e = edgeArgsToId(this.#isDirected, v, w, name);
-    if (this.#edgeLabels.hasOwnProperty(e)) {
+    var e = edgeArgsToId(this._isDirected, v, w, name);
+    if (this._edgeLabels.hasOwnProperty(e)) {
       if (valueSpecified) {
-        this.#edgeLabels[e] = value;
+        this._edgeLabels[e] = value;
       }
       return this;
     }
 
-    if (name !== undefined && !this.#isMultigraph) {
+    if (name !== undefined && !this._isMultigraph) {
       throw new Error("Cannot set a named edge when isMultigraph = false");
     }
 
@@ -4098,20 +4098,20 @@ class Graph {
     this.setNode(v);
     this.setNode(w);
 
-    this.#edgeLabels[e] = valueSpecified ? value : this.#defaultEdgeLabelFn(v, w, name);
+    this._edgeLabels[e] = valueSpecified ? value : this._defaultEdgeLabelFn(v, w, name);
 
-    var edgeObj = edgeArgsToObj(this.#isDirected, v, w, name);
+    var edgeObj = edgeArgsToObj(this._isDirected, v, w, name);
     // Ensure we add undirected edges in a consistent way.
     v = edgeObj.v;
     w = edgeObj.w;
 
     Object.freeze(edgeObj);
-    this.#edgeObjs[e] = edgeObj;
-    incrementOrInitEntry(this.#preds[w], v);
-    incrementOrInitEntry(this.#sucs[v], w);
-    this.#in[w][e] = edgeObj;
-    this.#out[v][e] = edgeObj;
-    this.#edgeCount++;
+    this._edgeObjs[e] = edgeObj;
+    incrementOrInitEntry(this._preds[w], v);
+    incrementOrInitEntry(this._sucs[v], w);
+    this._in[w][e] = edgeObj;
+    this._out[v][e] = edgeObj;
+    this._edgeCount++;
     return this;
   }
 
@@ -4121,9 +4121,9 @@ class Graph {
    */
   edge(v, w, name) {
     var e = (arguments.length === 1
-      ? edgeObjToId(this.#isDirected, arguments[0])
-      : edgeArgsToId(this.#isDirected, v, w, name));
-    return this.#edgeLabels[e];
+      ? edgeObjToId(this._isDirected, arguments[0])
+      : edgeArgsToId(this._isDirected, v, w, name));
+    return this._edgeLabels[e];
   }
 
   /**
@@ -4145,9 +4145,9 @@ class Graph {
    */
   hasEdge(v, w, name) {
     var e = (arguments.length === 1
-      ? edgeObjToId(this.#isDirected, arguments[0])
-      : edgeArgsToId(this.#isDirected, v, w, name));
-    return this.#edgeLabels.hasOwnProperty(e);
+      ? edgeObjToId(this._isDirected, arguments[0])
+      : edgeArgsToId(this._isDirected, v, w, name));
+    return this._edgeLabels.hasOwnProperty(e);
   }
 
   /**
@@ -4156,19 +4156,19 @@ class Graph {
    */
   removeEdge(v, w, name) {
     var e = (arguments.length === 1
-      ? edgeObjToId(this.#isDirected, arguments[0])
-      : edgeArgsToId(this.#isDirected, v, w, name));
-    var edge = this.#edgeObjs[e];
+      ? edgeObjToId(this._isDirected, arguments[0])
+      : edgeArgsToId(this._isDirected, v, w, name));
+    var edge = this._edgeObjs[e];
     if (edge) {
       v = edge.v;
       w = edge.w;
-      delete this.#edgeLabels[e];
-      delete this.#edgeObjs[e];
-      decrementOrRemoveEntry(this.#preds[w], v);
-      decrementOrRemoveEntry(this.#sucs[v], w);
-      delete this.#in[w][e];
-      delete this.#out[v][e];
-      this.#edgeCount--;
+      delete this._edgeLabels[e];
+      delete this._edgeObjs[e];
+      decrementOrRemoveEntry(this._preds[w], v);
+      decrementOrRemoveEntry(this._sucs[v], w);
+      delete this._in[w][e];
+      delete this._out[v][e];
+      this._edgeCount--;
     }
     return this;
   }
@@ -4179,7 +4179,7 @@ class Graph {
    * Complexity: O(|E|).
    */
   inEdges(v, u) {
-    var inV = this.#in[v];
+    var inV = this._in[v];
     if (inV) {
       var edges = Object.values(inV);
       if (!u) {
@@ -4195,7 +4195,7 @@ class Graph {
    * Complexity: O(|E|).
    */
   outEdges(v, w) {
-    var outV = this.#out[v];
+    var outV = this._out[v];
     if (outV) {
       var edges = Object.values(outV);
       if (!w) {
@@ -4353,7 +4353,7 @@ function read(json) {
 }
 
 },{"./graph":44}],47:[function(require,module,exports){
-module.exports = '2.2.1';
+module.exports = '2.2.2';
 
 },{}]},{},[1])(1)
 });
