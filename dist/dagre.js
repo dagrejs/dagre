@@ -456,12 +456,12 @@ function layout(g, opts) {
   time("layout", () => {
     let layoutGraph =
       time("  buildLayoutGraph", () => buildLayoutGraph(g));
-    time("  runLayout",        () => runLayout(layoutGraph, time));
+    time("  runLayout",        () => runLayout(layoutGraph, time, opts));
     time("  updateInputGraph", () => updateInputGraph(g, layoutGraph));
   });
 }
 
-function runLayout(g, time) {
+function runLayout(g, time, opts) {
   time("    makeSpaceForEdgeLabels", () => makeSpaceForEdgeLabels(g));
   time("    removeSelfEdges",        () => removeSelfEdges(g));
   time("    acyclic",                () => acyclic.run(g));
@@ -476,7 +476,7 @@ function runLayout(g, time) {
   time("    normalize.run",          () => normalize.run(g));
   time("    parentDummyChains",      () => parentDummyChains(g));
   time("    addBorderSegments",      () => addBorderSegments(g));
-  time("    order",                  () => order(g));
+  time("    order",                  () => order(g, opts));
   time("    insertSelfEdges",        () => insertSelfEdges(g));
   time("    adjustCoordinateSystem", () => coordinateSystem.adjust(g));
   time("    position",               () => position(g));
@@ -2959,7 +2959,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.1.2";
+module.exports = "1.1.3";
 
 },{}],29:[function(require,module,exports){
 /**
