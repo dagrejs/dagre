@@ -24,7 +24,7 @@
     "layout"
   ],
   "dependencies": {
-    "@dagrejs/graphlib": "2.2.2"
+    "@dagrejs/graphlib": "2.2.3"
   },
   "devDependencies": {
     "benchmark": "2.1.4",
