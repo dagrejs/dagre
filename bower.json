@@ -20,6 +20,6 @@
     "test/**"
   ],
   "dependencies": {
-    "@dagrejs/graphlib": "2.2.3"
+    "@dagrejs/graphlib": "2.2.4"
   }
 }

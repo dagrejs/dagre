@@ -3041,7 +3041,7 @@ function components(g) {
   var cmpt;
 
   function dfs(v) {
-    if (visited.hasOwnProperty(v)) return;
+    if (Object.hasOwn(visited, v)) return;
     visited[v] = true;
     cmpt.push(v);
     g.successors(v).forEach(dfs);
@@ -3098,7 +3098,7 @@ function postOrderDfs(v, navigation, visited, acc) {
     if (curr[1]) {
       acc.push(curr[0]);
     } else {
-      if (!visited.hasOwnProperty(curr[0])) {
+      if (!Object.hasOwn(visited, curr[0])) {
         visited[curr[0]] = true;
         stack.push([curr[0], true]);
         forEachRight(navigation(curr[0]), w => stack.push([w, false]));
@@ -3111,7 +3111,7 @@ function preOrderDfs(v, navigation, visited, acc) {
   var stack = [v];
   while (stack.length > 0) {
     var curr = stack.pop();
-    if (!visited.hasOwnProperty(curr)) {
+    if (!Object.hasOwn(visited, curr)) {
       visited[curr] = true;
       acc.push(curr);
       forEachRight(navigation(curr), w => stack.push(w));
@@ -3345,7 +3345,7 @@ function prim(g, weightFunc) {
   var init = false;
   while (pq.size() > 0) {
     v = pq.removeMin();
-    if (parents.hasOwnProperty(v)) {
+    if (Object.hasOwn(parents, v)) {
       result.setEdge(v, parents[v]);
     } else if (init) {
       throw new Error("Input graph is not connected: " + g);
@@ -3377,7 +3377,7 @@ function tarjan(g) {
     stack.push(v);
 
     g.successors(v).forEach(function(w) {
-      if (!visited.hasOwnProperty(w)) {
+      if (!Object.hasOwn(visited, w)) {
         dfs(w);
         entry.lowlink = Math.min(entry.lowlink, visited[w].lowlink);
       } else if (visited[w].onStack) {
@@ -3398,7 +3398,7 @@ function tarjan(g) {
   }
 
   g.nodes().forEach(function(v) {
-    if (!visited.hasOwnProperty(v)) {
+    if (!Object.hasOwn(visited, v)) {
       dfs(v);
     }
   });
@@ -3413,11 +3413,11 @@ function topsort(g) {
   var results = [];
 
   function visit(node) {
-    if (stack.hasOwnProperty(node)) {
+    if (Object.hasOwn(stack, node)) {
       throw new CycleException();
     }
 
-    if (!visited.hasOwnProperty(node)) {
+    if (!Object.hasOwn(visited, node)) {
       stack[node] = true;
       visited[node] = true;
       g.predecessors(node).forEach(visit);
@@ -3474,7 +3474,7 @@ class PriorityQueue {
    * Returns `true` if **key** is in the queue and `false` if not.
    */
   has(key) {
-    return this._keyIndices.hasOwnProperty(key);
+    return Object.hasOwn(this._keyIndices, key);
   }
 
   /**
@@ -3512,7 +3512,7 @@ class PriorityQueue {
   add(key, priority) {
     var keyIndices = this._keyIndices;
     key = String(key);
-    if (!keyIndices.hasOwnProperty(key)) {
+    if (!Object.hasOwn(keyIndices, key)) {
       var arr = this._arr;
       var index = arr.length;
       keyIndices[key] = index;
@@ -3660,9 +3660,9 @@ class Graph {
 
   constructor(opts) {
     if (opts) {
-      this._isDirected = opts.hasOwnProperty("directed") ? opts.directed : true;
-      this._isMultigraph = opts.hasOwnProperty("multigraph") ? opts.multigraph : false;
-      this._isCompound = opts.hasOwnProperty("compound") ? opts.compound : false;
+      this._isDirected = Object.hasOwn(opts, "directed") ? opts.directed : true;
+      this._isMultigraph = Object.hasOwn(opts, "multigraph") ? opts.multigraph : false;
+      this._isCompound = Object.hasOwn(opts, "compound") ? opts.compound : false;
     }
 
     if (this._isCompound) {
@@ -3791,7 +3791,7 @@ class Graph {
    * Complexity: O(1).
    */
   setNode(v, value) {
-    if (this._nodes.hasOwnProperty(v)) {
+    if (Object.hasOwn(this._nodes, v)) {
       if (arguments.length > 1) {
         this._nodes[v] = value;
       }
@@ -3824,7 +3824,7 @@ class Graph {
    * Detects whether graph has a node with specified name or not.
    */
   hasNode(v) {
-    return this._nodes.hasOwnProperty(v);
+    return Object.hasOwn(this._nodes, v);
   }
 
   /**
@@ -3835,7 +3835,7 @@ class Graph {
    */
   removeNode(v) {
     var self = this;
-    if (this._nodes.hasOwnProperty(v)) {
+    if (Object.hasOwn(this._nodes, v)) {
       var removeEdge = e => self.removeEdge(self._edgeObjs[e]);
       delete this._nodes[v];
       if (this._isCompound) {
@@ -4113,7 +4113,7 @@ class Graph {
     }
 
     var e = edgeArgsToId(this._isDirected, v, w, name);
-    if (this._edgeLabels.hasOwnProperty(e)) {
+    if (Object.hasOwn(this._edgeLabels, e)) {
       if (valueSpecified) {
         this._edgeLabels[e] = value;
       }
@@ -4178,7 +4178,7 @@ class Graph {
     var e = (arguments.length === 1
       ? edgeObjToId(this._isDirected, arguments[0])
       : edgeArgsToId(this._isDirected, v, w, name));
-    return this._edgeLabels.hasOwnProperty(e);
+    return Object.hasOwn(this._edgeLabels, e);
   }
 
   /**
@@ -4384,7 +4384,7 @@ function read(json) {
 }
 
 },{"./graph":44}],47:[function(require,module,exports){
-module.exports = '2.2.3';
+module.exports = '2.2.4';
 
 },{}]},{},[1])(1)
 });
