@@ -69,13 +69,13 @@ function dfsFAS(g) {
   let visited = {};
 
   function dfs(v) {
-    if (visited.hasOwnProperty(v)) {
+    if (Object.hasOwn(visited, v)) {
       return;
     }
     visited[v] = true;
     stack[v] = true;
     g.outEdges(v).forEach(e => {
-      if (stack.hasOwnProperty(e.w)) {
+      if (Object.hasOwn(stack, e.w)) {
         fas.push(e);
       } else {
         dfs(e.w);
@@ -115,7 +115,7 @@ function addBorderSegments(g) {
       children.forEach(dfs);
     }
 
-    if (node.hasOwnProperty("minRank")) {
+    if (Object.hasOwn(node, "minRank")) {
       node.borderLeft = [];
       node.borderRight = [];
       for (let rank = node.minRank, maxRank = node.maxRank + 1;
@@ -185,7 +185,7 @@ function reverseY(g) {
   g.edges().forEach(e => {
     let edge = g.edge(e);
     edge.points.forEach(reverseYOne);
-    if (edge.hasOwnProperty("y")) {
+    if (Object.hasOwn(edge, "y")) {
       reverseYOne(edge);
     }
   });
@@ -201,7 +201,7 @@ function swapXY(g) {
   g.edges().forEach(e => {
     let edge = g.edge(e);
     edge.points.forEach(swapXYOne);
-    if (edge.hasOwnProperty("x")) {
+    if (Object.hasOwn(edge, "x")) {
       swapXYOne(edge);
     }
   });
@@ -519,7 +519,7 @@ function updateInputGraph(inputGraph, layoutGraph) {
     let layoutLabel = layoutGraph.edge(e);
 
     inputLabel.points = layoutLabel.points;
-    if (layoutLabel.hasOwnProperty("x")) {
+    if (Object.hasOwn(layoutLabel, "x")) {
       inputLabel.x = layoutLabel.x;
       inputLabel.y = layoutLabel.y;
     }
@@ -668,7 +668,7 @@ function translateGraph(g) {
   g.nodes().forEach(v => getExtremes(g.node(v)));
   g.edges().forEach(e => {
     let edge = g.edge(e);
-    if (edge.hasOwnProperty("x")) {
+    if (Object.hasOwn(edge, "x")) {
       getExtremes(edge);
     }
   });
@@ -688,8 +688,8 @@ function translateGraph(g) {
       p.x -= minX;
       p.y -= minY;
     });
-    if (edge.hasOwnProperty("x")) { edge.x -= minX; }
-    if (edge.hasOwnProperty("y")) { edge.y -= minY; }
+    if (Object.hasOwn(edge, "x")) { edge.x -= minX; }
+    if (Object.hasOwn(edge, "y")) { edge.y -= minY; }
   });
 
   graphLabel.width = maxX - minX + marginX;
@@ -718,7 +718,7 @@ function assignNodeIntersects(g) {
 function fixupEdgeLabelCoords(g) {
   g.edges().forEach(e => {
     let edge = g.edge(e);
-    if (edge.hasOwnProperty("x")) {
+    if (Object.hasOwn(edge, "x")) {
       if (edge.labelpos === "l" || edge.labelpos === "r") {
         edge.width -= edge.labeloffset;
       }
@@ -873,7 +873,8 @@ module.exports = {
 function run(g) {
   let root = util.addDummyNode(g, "root", {}, "_root");
   let depths = treeDepths(g);
-  let height = Math.max(...Object.values(depths)) - 1; // Note: depths is an Object not an array
+  let depthsArr = Object.values(depths);
+  let height = util.applyWithChunking(Math.max, depthsArr) - 1; // Note: depths is an Object not an array
   let nodeSep = 2 * height + 1;
 
   g.graph().nestingRoot = root;
@@ -1195,7 +1196,7 @@ function buildLayerGraph(g, rank, relationship) {
         result.setEdge(u, v, { weight: g.edge(e).weight + weight });
       });
 
-      if (node.hasOwnProperty("minRank")) {
+      if (Object.hasOwn(node, "minRank")) {
         result.setNode(v, {
           borderLeft: node.borderLeft[rank],
           borderRight: node.borderRight[rank]
@@ -1385,7 +1386,8 @@ module.exports = initOrder;
 function initOrder(g) {
   let visited = {};
   let simpleNodes = g.nodes().filter(v => !g.children(v).length);
-  let maxRank = Math.max(...simpleNodes.map(v => g.node(v).rank));
+  let simpleNodesRanks = simpleNodes.map(v => g.node(v).rank);
+  let maxRank = util.applyWithChunking(Math.max, simpleNodesRanks);
   let layers = util.range(maxRank + 1).map(() => []);
 
   function dfs(v) {
@@ -1545,7 +1547,7 @@ function sortSubgraph(g, v, cg, biasRight) {
     if (g.children(entry.v).length) {
       let subgraphResult = sortSubgraph(g, entry.v, cg, biasRight);
       subgraphs[entry.v] = subgraphResult;
-      if (subgraphResult.hasOwnProperty("barycenter")) {
+      if (Object.hasOwn(subgraphResult, "barycenter")) {
         mergeBarycenters(entry, subgraphResult);
       }
     }
@@ -1561,7 +1563,7 @@ function sortSubgraph(g, v, cg, biasRight) {
     if (g.predecessors(bl).length) {
       let blPred = g.node(g.predecessors(bl)[0]),
         brPred = g.node(g.predecessors(br)[0]);
-      if (!result.hasOwnProperty("barycenter")) {
+      if (!Object.hasOwn(result, "barycenter")) {
         result.barycenter = 0;
         result.weight = 0;
       }
@@ -1604,7 +1606,7 @@ module.exports = sort;
 
 function sort(entries, biasRight) {
   let parts = util.partition(entries, entry => {
-    return entry.hasOwnProperty("barycenter");
+    return Object.hasOwn(entry, "barycenter");
   });
   let sortable = parts.lhs,
     unsortable = parts.rhs.sort((a, b) => b.i - a.i),
@@ -1896,7 +1898,7 @@ function hasConflict(conflicts, v, w) {
     v = w;
     w = tmp;
   }
-  return !!conflicts[v] && conflicts[v].hasOwnProperty(w);
+  return !!conflicts[v] && Object.hasOwn(conflicts[v], w);
 }
 
 /*
@@ -2057,8 +2059,8 @@ function findSmallestWidthAlignment(g, xss) {
  */
 function alignCoordinates(xss, alignTo) {
   let alignToVals = Object.values(alignTo),
-    alignToMin = Math.min(...alignToVals),
-    alignToMax = Math.max(...alignToVals);
+    alignToMin = util.applyWithChunking(Math.min, alignToVals),
+    alignToMax = util.applyWithChunking(Math.max, alignToVals);
 
   ["u", "d"].forEach(vert => {
     ["l", "r"].forEach(horiz => {
@@ -2068,9 +2070,9 @@ function alignCoordinates(xss, alignTo) {
       if (xs === alignTo) return;
 
       let xsVals = Object.values(xs);
-      let delta = alignToMin - Math.min(...xsVals);
+      let delta = alignToMin - util.applyWithChunking(Math.min, xsVals);
       if (horiz !== "l") {
-        delta = alignToMax - Math.max(...xsVals);
+        delta = alignToMax - util.applyWithChunking(Math.max,xsVals);
       }
 
       if (delta) {
@@ -2133,7 +2135,7 @@ function sep(nodeSep, edgeSep, reverseSep) {
     let delta;
 
     sum += vLabel.width / 2;
-    if (vLabel.hasOwnProperty("labelpos")) {
+    if (Object.hasOwn(vLabel, "labelpos")) {
       switch (vLabel.labelpos.toLowerCase()) {
       case "l": delta = -vLabel.width / 2; break;
       case "r": delta = vLabel.width / 2; break;
@@ -2148,7 +2150,7 @@ function sep(nodeSep, edgeSep, reverseSep) {
     sum += (wLabel.dummy ? edgeSep : nodeSep) / 2;
 
     sum += wLabel.width / 2;
-    if (wLabel.hasOwnProperty("labelpos")) {
+    if (Object.hasOwn(wLabel, "labelpos")) {
       switch (wLabel.labelpos.toLowerCase()) {
       case "l": delta = wLabel.width / 2; break;
       case "r": delta = -wLabel.width / 2; break;
@@ -2483,7 +2485,7 @@ function dfsAssignLowLim(tree, visited, nextLim, v, parent) {
 
   visited[v] = true;
   tree.neighbors(v).forEach(w => {
-    if (!visited.hasOwnProperty(w)) {
+    if (!Object.hasOwn(visited, w)) {
       nextLim = dfsAssignLowLim(tree, visited, nextLim, w, v);
     }
   });
@@ -2588,6 +2590,8 @@ function isDescendant(tree, vLabel, rootLabel) {
 },{"../util":27,"./feasible-tree":23,"./util":26,"@dagrejs/graphlib":29}],26:[function(require,module,exports){
 "use strict";
 
+const { applyWithChunking } = require("../util");
+
 module.exports = {
   longestPath: longestPath,
   slack: slack
@@ -2619,18 +2623,20 @@ function longestPath(g) {
 
   function dfs(v) {
     var label = g.node(v);
-    if (visited.hasOwnProperty(v)) {
+    if (Object.hasOwn(visited, v)) {
       return label.rank;
     }
     visited[v] = true;
 
-    var rank = Math.min(...g.outEdges(v).map(e => {
+    let outEdgesMinLens = g.outEdges(v).map(e => {
       if (e == null) {
         return Number.POSITIVE_INFINITY;
       }
 
       return dfs(e.w) - g.edge(e).minlen;
-    }));
+    });
+
+    var rank = applyWithChunking(Math.min, outEdgesMinLens);
 
     if (rank === Number.POSITIVE_INFINITY) {
       rank = 0;
@@ -2650,7 +2656,7 @@ function slack(g, e) {
   return g.node(e.w).rank - g.node(e.v).rank - g.edge(e).minlen;
 }
 
-},{}],27:[function(require,module,exports){
+},{"../util":27}],27:[function(require,module,exports){
 /* eslint "no-console": off */
 
 "use strict";
@@ -2660,6 +2666,7 @@ let Graph = require("@dagrejs/graphlib").Graph;
 module.exports = {
   addBorderNode,
   addDummyNode,
+  applyWithChunking,
   asNonCompoundGraph,
   buildLayerMatrix,
   intersectRect,
@@ -2806,17 +2813,18 @@ function buildLayerMatrix(g) {
  * rank(v) >= 0 and at least one node w has rank(w) = 0.
  */
 function normalizeRanks(g) {
-  let min = Math.min(...g.nodes().map(v => {
+  let nodeRanks = g.nodes().map(v => {
     let rank = g.node(v).rank;
     if (rank === undefined) {
       return Number.MAX_VALUE;
     }
 
     return rank;
-  }));
+  });
+  let min = applyWithChunking(Math.min, nodeRanks);
   g.nodes().forEach(v => {
     let node = g.node(v);
-    if (node.hasOwnProperty("rank")) {
+    if (Object.hasOwn(node, "rank")) {
       node.rank -= min;
     }
   });
@@ -2824,7 +2832,8 @@ function normalizeRanks(g) {
 
 function removeEmptyRanks(g) {
   // Ranks may not start at 0, so we need to offset them
-  let offset = Math.min(...g.nodes().map(v => g.node(v).rank));
+  let nodeRanks = g.nodes().map(v => g.node(v).rank);
+  let offset = applyWithChunking(Math.min, nodeRanks);
 
   let layers = [];
   g.nodes().forEach(v => {
@@ -2858,15 +2867,37 @@ function addBorderNode(g, prefix, rank, order) {
   return addDummyNode(g, "border", node, prefix);
 }
 
+function splitToChunks(array, chunkSize = CHUNKING_THRESHOLD) {
+  const chunks = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    const chunk = array.slice(i, i + chunkSize);
+    chunks.push(chunk);
+  }
+  return chunks;
+}
+
+const CHUNKING_THRESHOLD = 65535;
+
+function applyWithChunking(fn, argsArray) {
+  if(argsArray.length > CHUNKING_THRESHOLD) {
+    const chunks = splitToChunks(argsArray);
+    return fn.apply(null, chunks.map(chunk => fn.apply(null, chunk)));
+  } else {
+    return fn.apply(null, argsArray);
+  }
+}
+
 function maxRank(g) {
-  return Math.max(...g.nodes().map(v => {
+  const nodes = g.nodes();
+  const nodeRanks = nodes.map(v => {
     let rank = g.node(v).rank;
     if (rank === undefined) {
       return Number.MIN_VALUE;
     }
-
     return rank;
-  }));
+  });
+
+  return applyWithChunking(Math.max, nodeRanks);
 }
 
 /*
@@ -2959,7 +2990,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.1.3";
+module.exports = "1.1.4";
 
 },{}],29:[function(require,module,exports){
 /**
@@ -4353,7 +4384,7 @@ function read(json) {
 }
 
 },{"./graph":44}],47:[function(require,module,exports){
-module.exports = '2.2.2';
+module.exports = '2.2.3';
 
 },{}]},{},[1])(1)
 });
