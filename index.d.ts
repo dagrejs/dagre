@@ -29,7 +29,7 @@ declare module '@dagrejs/dagre' {
       setEdge(params: Edge, value?: string | { [key: string]: any }): Graph<T>;
       setEdge(sourceId: string, targetId: string, value?: string | Label, name?: string): Graph<T>;
 
-      children(parentName: string): string | undefined;
+      children(parentName: string): string[];
       hasNode(name: string): boolean;
       neighbors(name: string): Array<Node<T>> | undefined;
       node(id: string | Label): Node<T>;
