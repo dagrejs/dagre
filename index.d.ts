@@ -31,12 +31,12 @@ declare module '@dagrejs/dagre' {
 
       children(parentName: string): string[];
       hasNode(name: string): boolean;
-      neighbors(name: string): Array<Node<T>> | undefined;
+      neighbors(name: string): string[] | undefined;
       node(id: string | Label): Node<T>;
       nodeCount(): number;
       nodes(): string[];
       parent(childName: string): string | undefined;
-      predecessors(name: string): Array<Node<T>> | undefined;
+      predecessors(name: string): string[] | undefined;
       removeNode(name: string): Graph<T>;
       filterNodes(callback: (nodeId: string) => boolean): Graph<T>;
       setDefaultNodeLabel(callback: string | ((nodeId: string) => string | Label)): Graph<T>;
@@ -44,7 +44,7 @@ declare module '@dagrejs/dagre' {
       setParent(childName: string, parentName: string): void;
       sinks(): Array<Node<T>>;
       sources(): Array<Node<T>>;
-      successors(name: string): Array<Node<T>> | undefined;
+      successors(name: string): string[] | undefined;
     }
 
     namespace json {
