@@ -27,6 +27,11 @@ g.setEdge("bpitt",     "kbacon");
 g.setEdge("hford",     "lwilson");
 g.setEdge("lwilson",   "kbacon");
 
+// Add a debugger statement to pause execution before layout calculation
+console.log("About to run dagre layout algorithm");
+debugger; // This will pause execution when DevTools is open
+//TODO on Laptop I had to remove dagre from the ignore list to debug it
+
 // Calculate layout (this assigns positions to nodes)
 dagre.layout(g);
 
