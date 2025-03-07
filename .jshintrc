@@ -1,5 +1,6 @@
 {
-  "esversion": 6,
+  "esversion": 11,
+  "browser": true,
 
   "camelcase": true,
   "eqeqeq": true,
@@ -8,7 +9,6 @@
   "immed": true,
   "newcap": true,
   "noarg": true,
-  "quotmark": "double",
   "trailing": true,
   "undef": true,
   "unused": true,
