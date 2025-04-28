@@ -20,10 +20,10 @@ const prevNodeRankMap = {
   "Start": 0,
   "Zahlungseingang": 12,
   "End": 14,
-  "zugehöriger Wareneingang": 6,
+  "zugehoeriger Wareneingang": 6,
   "Anlage der Bestellung": 2,
   "Reisekostenerfassung": 10,
-  "Durchführung der Reise": 8,
+  "Durchfuehrung der Reise": 8,
   "Reisekostenfreigabe 2": 6,
   "Reisekostenantrag": 2,
   "Reisekostenfreigabe": 4,
@@ -73,7 +73,6 @@ variant.edges.forEach((edge, i) => {
   });
 });
 
-// Add a debugger statement to pause execution before layout calculation
 console.log("About to run dagre layout algorithm");
 debugger; // This will pause execution when DevTools is open
 //TODO on Laptop I had to remove dagre from the ignore list to debug it
