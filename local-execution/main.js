@@ -73,8 +73,6 @@ variant.edges.forEach((edge, i) => {
   });
 });
 
-console.log("About to run dagre layout algorithm");
-debugger; // This will pause execution when DevTools is open
 //TODO on Laptop I had to remove dagre from the ignore list to debug it
 
 // Calculate layout (this assigns positions to nodes)
