@@ -164,3 +164,4 @@ export const variant1to7 = {
     { source: "zugehoeriger Wareneingang", target: "Auftragserstellung", weight: 1 }
   ],
 };
+
