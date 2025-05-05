@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "clear cache": "vite --force",
     "build": "vite build",
     "preview": "vite preview"
   },
