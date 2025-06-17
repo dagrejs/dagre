@@ -1,29 +1,26 @@
-var _ = require("lodash");
 var expect = require("./chai").expect;
 var normalize = require("../lib/normalize");
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 
-describe("normalize", function() {
+describe("normalize", () => {
   var g;
 
-  beforeEach(function() {
-    g = new Graph({ multigraph: true, compound: true }).setGraph({});
-  });
+  beforeEach(() => g = new Graph({ multigraph: true, compound: true }).setGraph({}));
 
-  describe("run", function() {
-    it("does not change a short edge", function() {
+  describe("run", () => {
+    it("does not change a short edge", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 1 });
       g.setEdge("a", "b", {});
 
       normalize.run(g);
 
-      expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: "a", w: "b" }]);
+      expect(g.edges().map(incidentNodes)).to.eql([{ v: "a", w: "b" }]);
       expect(g.node("a").rank).to.equal(0);
       expect(g.node("b").rank).to.equal(1);
     });
 
-    it("splits a two layer edge into two segments", function() {
+    it("splits a two layer edge into two segments", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", {});
@@ -42,7 +39,7 @@ describe("normalize", function() {
       expect(g.graph().dummyChains[0]).to.equal(successor);
     });
 
-    it("assigns width = 0, height = 0 to dummy nodes by default", function() {
+    it("assigns width = 0, height = 0 to dummy nodes by default", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", { width: 10, height: 10 });
@@ -55,7 +52,7 @@ describe("normalize", function() {
       expect(g.node(successor).height).to.equal(0);
     });
 
-    it("assigns width and height from the edge for the node on labelRank", function() {
+    it("assigns width and height from the edge for the node on labelRank", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 4 });
       g.setEdge("a", "b", { width: 20, height: 10, labelRank: 2 });
@@ -68,7 +65,7 @@ describe("normalize", function() {
       expect(labelNode.height).to.equal(10);
     });
 
-    it("preserves the weight for the edge", function() {
+    it("preserves the weight for the edge", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", { weight: 2 });
@@ -80,8 +77,8 @@ describe("normalize", function() {
     });
   });
 
-  describe("undo", function() {
-    it("reverses the run operation", function() {
+  describe("undo", () => {
+    it("reverses the run operation", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", {});
@@ -89,12 +86,12 @@ describe("normalize", function() {
       normalize.run(g);
       normalize.undo(g);
 
-      expect(_.map(g.edges(), incidentNodes)).to.eql([{ v: "a", w: "b" }]);
+      expect(g.edges().map(incidentNodes)).to.eql([{ v: "a", w: "b" }]);
       expect(g.node("a").rank).to.equal(0);
       expect(g.node("b").rank).to.equal(2);
     });
 
-    it("restores previous edge labels", function() {
+    it("restores previous edge labels", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", { foo: "bar" });
@@ -105,7 +102,7 @@ describe("normalize", function() {
       expect(g.edge("a", "b").foo).equals("bar");
     });
 
-    it("collects assigned coordinates into the 'points' attribute", function() {
+    it("collects assigned coordinates into the 'points' attribute", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", {});
@@ -121,7 +118,7 @@ describe("normalize", function() {
       expect(g.edge("a", "b").points).eqls([{ x: 5, y: 10 }]);
     });
 
-    it("merges assigned coordinates into the 'points' attribute", function() {
+    it("merges assigned coordinates into the 'points' attribute", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 4 });
       g.setEdge("a", "b", {});
@@ -146,7 +143,7 @@ describe("normalize", function() {
         .eqls([{ x: 5, y: 10 }, { x: 20, y: 25 }, { x: 100, y: 200 }]);
     });
 
-    it("sets coords and dims for the label, if the edge has one", function() {
+    it("sets coords and dims for the label, if the edge has one", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", { width: 10, height: 20, labelRank: 1 });
@@ -161,12 +158,12 @@ describe("normalize", function() {
 
       normalize.undo(g);
 
-      expect(_.pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
+      expect(pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
         x: 50, y: 60, width: 20, height: 10
       });
     });
 
-    it("sets coords and dims for the label, if the long edge has one", function() {
+    it("sets coords and dims for the label, if the long edge has one", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 4 });
       g.setEdge("a", "b", { width: 10, height: 20, labelRank: 2 });
@@ -181,12 +178,12 @@ describe("normalize", function() {
 
       normalize.undo(g);
 
-      expect(_.pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
+      expect(pick(g.edge("a", "b"), ["x", "y", "width", "height"])).eqls({
         x: 50, y: 60, width: 20, height: 10
       });
     });
 
-    it("restores multi-edges", function() {
+    it("restores multi-edges", () => {
       g.setNode("a", { rank: 0 });
       g.setNode("b", { rank: 2 });
       g.setEdge("a", "b", {}, "bar");
@@ -194,7 +191,7 @@ describe("normalize", function() {
 
       normalize.run(g);
 
-      var outEdges = _.sortBy(g.outEdges("a"), "name");
+      var outEdges = g.outEdges("a").sort((a, b) => a.name.localeCompare(b.name));
       expect(outEdges).to.have.length(2);
 
       var barDummy = g.node(outEdges[0].w);
@@ -216,4 +213,14 @@ describe("normalize", function() {
 
 function incidentNodes(edge) {
   return { v: edge.v, w: edge.w };
+}
+
+function pick(obj, keys) {
+  const picked = {};
+
+  for (const key of keys) {
+    picked[key] = obj[key];
+  }
+
+  return picked;
 }

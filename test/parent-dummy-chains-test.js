@@ -1,15 +1,15 @@
 var expect = require("./chai").expect;
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var parentDummyChains = require("../lib/parent-dummy-chains");
 
-describe("parentDummyChains", function() {
+describe("parentDummyChains", () => {
   var g;
 
-  beforeEach(function() {
+  beforeEach(() => {
     g = new Graph({ compound: true }).setGraph({});
   });
 
-  it("does not set a parent if both the tail and head have no parent", function() {
+  it("does not set a parent if both the tail and head have no parent", () => {
     g.setNode("a");
     g.setNode("b");
     g.setNode("d1", { edgeObj: { v: "a", w: "b" } });
@@ -20,7 +20,7 @@ describe("parentDummyChains", function() {
     expect(g.parent("d1")).to.be.undefined;
   });
 
-  it("uses the tail's parent for the first node if it is not the root", function() {
+  it("uses the tail's parent for the first node if it is not the root", () => {
     g.setParent("a", "sg1");
     g.setNode("sg1", { minRank: 0, maxRank: 2 });
     g.setNode("d1", { edgeObj: { v: "a", w: "b" }, rank: 2 });
@@ -31,7 +31,7 @@ describe("parentDummyChains", function() {
     expect(g.parent("d1")).equals("sg1");
   });
 
-  it("uses the heads's parent for the first node if tail's is root", function() {
+  it("uses the heads's parent for the first node if tail's is root", () => {
     g.setParent("b", "sg1");
     g.setNode("sg1", { minRank: 1, maxRank: 3 });
     g.setNode("d1", { edgeObj: { v: "a", w: "b" }, rank: 1 });
@@ -42,7 +42,7 @@ describe("parentDummyChains", function() {
     expect(g.parent("d1")).equals("sg1");
   });
 
-  it("handles a long chain starting in a subgraph", function() {
+  it("handles a long chain starting in a subgraph", () => {
     g.setParent("a", "sg1");
     g.setNode("sg1", { minRank: 0, maxRank: 2 });
     g.setNode("d1", { edgeObj: { v: "a", w: "b" }, rank: 2 });
@@ -57,7 +57,7 @@ describe("parentDummyChains", function() {
     expect(g.parent("d3")).to.be.undefined;
   });
 
-  it("handles a long chain ending in a subgraph", function() {
+  it("handles a long chain ending in a subgraph", () => {
     g.setParent("b", "sg1");
     g.setNode("sg1", { minRank: 3, maxRank: 5 });
     g.setNode("d1", { edgeObj: { v: "a", w: "b" }, rank: 1 });
@@ -72,7 +72,7 @@ describe("parentDummyChains", function() {
     expect(g.parent("d3")).equals("sg1");
   });
 
-  it("handles nested subgraphs", function() {
+  it("handles nested subgraphs", () => {
     g.setParent("a", "sg2");
     g.setParent("sg2", "sg1");
     g.setNode("sg1", { minRank: 0, maxRank: 4 });
@@ -96,7 +96,7 @@ describe("parentDummyChains", function() {
     expect(g.parent("d5")).equals("sg4");
   });
 
-  it("handles overlapping rank ranges", function() {
+  it("handles overlapping rank ranges", () => {
     g.setParent("a", "sg1");
     g.setNode("sg1", { minRank: 0, maxRank: 3 });
     g.setParent("b", "sg2");
@@ -113,7 +113,7 @@ describe("parentDummyChains", function() {
     expect(g.parent("d3")).equals("sg2");
   });
 
-  it("handles an LCA that is not the root of the graph #1", function() {
+  it("handles an LCA that is not the root of the graph #1", () => {
     g.setParent("a", "sg1");
     g.setParent("sg2", "sg1");
     g.setNode("sg1", { minRank: 0, maxRank: 6 });
@@ -129,7 +129,7 @@ describe("parentDummyChains", function() {
     expect(g.parent("d2")).equals("sg2");
   });
 
-  it("handles an LCA that is not the root of the graph #2", function() {
+  it("handles an LCA that is not the root of the graph #2", () => {
     g.setParent("a", "sg2");
     g.setParent("sg2", "sg1");
     g.setNode("sg1", { minRank: 0, maxRank: 6 });

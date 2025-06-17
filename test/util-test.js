@@ -1,26 +1,23 @@
 /* eslint "no-console": off */
 
-var _ = require("lodash");
 var expect = require("./chai").expect;
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 var util = require("../lib/util");
 
-describe("util", function() {
-  describe("simplify", function() {
+describe("util", () => {
+  describe("simplify", () => {
     var g;
 
-    beforeEach(function() {
-      g = new Graph({ multigraph: true });
-    });
+    beforeEach(() => g = new Graph({ multigraph: true }));
 
-    it("copies without change a graph with no multi-edges", function() {
+    it("copies without change a graph with no multi-edges", () => {
       g.setEdge("a", "b", { weight: 1, minlen: 1 });
       var g2 = util.simplify(g);
       expect(g2.edge("a", "b")).eql({ weight: 1, minlen: 1 });
       expect(g2.edgeCount()).equals(1);
     });
 
-    it("collapses multi-edges", function() {
+    it("collapses multi-edges", () => {
       g.setEdge("a", "b", { weight: 1, minlen: 1 });
       g.setEdge("a", "b", { weight: 2, minlen: 2 }, "multi");
       var g2 = util.simplify(g);
@@ -29,21 +26,19 @@ describe("util", function() {
       expect(g2.edgeCount()).equals(1);
     });
 
-    it("copies the graph object", function() {
+    it("copies the graph object", () => {
       g.setGraph({ foo: "bar" });
       var g2 = util.simplify(g);
       expect(g2.graph()).eqls({ foo: "bar" });
     });
   });
 
-  describe("asNonCompoundGraph", function() {
+  describe("asNonCompoundGraph", () => {
     var g;
 
-    beforeEach(function() {
-      g = new Graph({ compound: true, multigraph: true });
-    });
+    beforeEach(() => g = new Graph({ compound: true, multigraph: true }));
 
-    it("copies all nodes", function() {
+    it("copies all nodes", () => {
       g.setNode("a", { foo: "bar" });
       g.setNode("b");
       var g2 = util.asNonCompoundGraph(g);
@@ -51,7 +46,7 @@ describe("util", function() {
       expect(g2.hasNode("b")).to.be.true;
     });
 
-    it("copies all edges", function() {
+    it("copies all edges", () => {
       g.setEdge("a", "b", { foo: "bar" });
       g.setEdge("a", "b", { foo: "baz" }, "multi");
       var g2 = util.asNonCompoundGraph(g);
@@ -59,22 +54,22 @@ describe("util", function() {
       expect(g2.edge("a", "b", "multi")).eqls({ foo: "baz" });
     });
 
-    it("does not copy compound nodes", function() {
+    it("does not copy compound nodes", () => {
       g.setParent("a", "sg1");
       var g2 = util.asNonCompoundGraph(g);
       expect(g2.parent(g)).to.be.undefined;
       expect(g2.isCompound()).to.be.false;
     });
 
-    it ("copies the graph object", function() {
+    it ("copies the graph object", () => {
       g.setGraph({ foo: "bar" });
       var g2 = util.asNonCompoundGraph(g);
       expect(g2.graph()).eqls({ foo: "bar" });
     });
   });
 
-  describe("successorWeights", function() {
-    it("maps a node to its successors with associated weights", function() {
+  describe("successorWeights", () => {
+    it("maps a node to its successors with associated weights", () => {
       var g = new Graph({ multigraph: true });
       g.setEdge("a", "b", { weight: 2 });
       g.setEdge("b", "c", { weight: 1 });
@@ -87,8 +82,8 @@ describe("util", function() {
     });
   });
 
-  describe("predecessorWeights", function() {
-    it("maps a node to its predecessors with associated weights", function() {
+  describe("predecessorWeights", () => {
+    it("maps a node to its predecessors with associated weights", () => {
       var g = new Graph({ multigraph: true });
       g.setEdge("a", "b", { weight: 2 });
       g.setEdge("b", "c", { weight: 1 });
@@ -101,7 +96,7 @@ describe("util", function() {
     });
   });
 
-  describe("intersectRect", function() {
+  describe("intersectRect", () => {
     function expectIntersects(rect, point) {
       var cross = util.intersectRect(rect, point);
       if (cross.x !== point.x) {
@@ -117,7 +112,7 @@ describe("util", function() {
       }
     }
 
-    it("creates a slope that will intersect the rectangle's center", function() {
+    it("creates a slope that will intersect the rectangle's center", () => {
       var rect = { x: 0, y: 0, width: 1, height: 1 };
       expectIntersects(rect, { x:  2, y:  6 });
       expectIntersects(rect, { x:  2, y: -6 });
@@ -127,7 +122,7 @@ describe("util", function() {
       expectIntersects(rect, { x:  0, y:  5 });
     });
 
-    it("touches the border of the rectangle", function() {
+    it("touches the border of the rectangle", () => {
       var rect = { x: 0, y: 0, width: 1, height: 1 };
       expectTouchesBorder(rect, { x:  2, y:  6 });
       expectTouchesBorder(rect, { x:  2, y: -6 });
@@ -137,14 +132,14 @@ describe("util", function() {
       expectTouchesBorder(rect, { x:  0, y:  5 });
     });
 
-    it("throws an error if the point is at the center of the rectangle", function() {
+    it("throws an error if the point is at the center of the rectangle", () => {
       var rect = { x: 0, y: 0, width: 1, height: 1 };
-      expect(function() { util.intersectRect(rect, { x: 0, y: 0 }); }).to.throw();
+      expect(() => util.intersectRect(rect, { x: 0, y: 0 })).to.throw();
     });
   });
 
-  describe("buildLayerMatrix", function() {
-    it("creates a matrix based on rank and order of nodes in the graph", function() {
+  describe("buildLayerMatrix", () => {
+    it("creates a matrix based on rank and order of nodes in the graph", () => {
       var g = new Graph();
       g.setNode("a", { rank: 0, order: 0 });
       g.setNode("b", { rank: 0, order: 1 });
@@ -160,33 +155,29 @@ describe("util", function() {
     });
   });
 
-  describe("time", function() {
+  describe("time", () => {
     var consoleLog;
 
-    beforeEach(function() {
-      consoleLog = console.log;
-    });
+    beforeEach(() => consoleLog = console.log);
 
-    afterEach(function() {
-      console.log = consoleLog;
-    });
+    afterEach(() => console.log = consoleLog);
 
-    it("logs timing information", function() {
+    it("logs timing information", () => {
       var capture = [];
-      console.log = function() { capture.push(_.toArray(arguments)[0]); };
+      console.log = function() { capture.push(Array.from(arguments)[0]); };
       util.time("foo", function() {});
       expect(capture.length).to.equal(1);
       expect(capture[0]).to.match(/^foo time: .*ms/);
     });
 
-    it("returns the value from the evaluated function", function() {
+    it("returns the value from the evaluated function", () => {
       console.log = function() {};
-      expect(util.time("foo", _.constant("bar"))).to.equal("bar");
+      expect(util.time("foo", () => "bar")).to.equal("bar");
     });
   });
 
-  describe("normalizeRanks", function() {
-    it("adjust ranks such that all are >= 0, and at least one is 0", function() {
+  describe("normalizeRanks", () => {
+    it("adjust ranks such that all are >= 0, and at least one is 0", () => {
       var g = new Graph()
         .setNode("a", { rank: 3 })
         .setNode("b", { rank: 2 })
@@ -199,7 +190,7 @@ describe("util", function() {
       expect(g.node("c").rank).to.equal(2);
     });
 
-    it("works for negative ranks", function() {
+    it("works for negative ranks", () => {
       var g = new Graph()
         .setNode("a", { rank: -3 })
         .setNode("b", { rank: -2 });
@@ -210,7 +201,7 @@ describe("util", function() {
       expect(g.node("b").rank).to.equal(1);
     });
 
-    it("does not assign a rank to subgraphs", function() {
+    it("does not assign a rank to subgraphs", () => {
       var g = new Graph({ compound: true })
         .setNode("a", { rank: 0 })
         .setNode("sg", {})
@@ -223,8 +214,8 @@ describe("util", function() {
     });
   });
 
-  describe("removeEmptyRanks", function() {
-    it("Removes border ranks without any nodes", function() {
+  describe("removeEmptyRanks", () => {
+    it("Removes border ranks without any nodes", () => {
       var g = new Graph()
         .setGraph({ nodeRankFactor: 4 })
         .setNode("a", { rank: 0 })
@@ -234,7 +225,7 @@ describe("util", function() {
       expect(g.node("b").rank).equals(1);
     });
 
-    it("Does not remove non-border ranks", function() {
+    it("Does not remove non-border ranks", () => {
       var g = new Graph()
         .setGraph({ nodeRankFactor: 4 })
         .setNode("a", { rank: 0 })
@@ -242,6 +233,50 @@ describe("util", function() {
       util.removeEmptyRanks(g);
       expect(g.node("a").rank).equals(0);
       expect(g.node("b").rank).equals(2);
+    });
+  });
+
+  describe("range", () => {
+    it("Builds an array to the limit", () => {
+      const range = util.range(4);
+      expect(range.length).equals(4);
+      expect(range.reduce((acc, v) => acc + v)).equals(6);
+    });
+
+    it("Builds an array with a start", () => {
+      const range = util.range(2, 4);
+      expect(range.length).equals(2);
+      expect(range.reduce((acc, v) => acc + v)).equals(5);
+    });
+
+    it("Builds an array with a negative step", () => {
+      const range = util.range(5, -1, -1);
+      expect(range[0]).equals(5);
+      expect(range[5]).equals(0);
+    });
+  });
+
+  describe("mapValues", () => {
+    it("Creates an object with the same keys", () => {
+      const users = {
+        'fred':    { 'user': 'fred',    'age': 40 },
+        'pebbles': { 'user': 'pebbles', 'age': 1 }
+      };
+
+      const ages = util.mapValues(users, user => user.age);
+      expect(ages.fred).equals(40);
+      expect(ages.pebbles).equals(1);
+    });
+
+    it("Can take a property name", () => {
+      const users = {
+        'fred':    { 'user': 'fred',    'age': 40 },
+        'pebbles': { 'user': 'pebbles', 'age': 1 }
+      };
+
+      const ages = util.mapValues(users, 'age');
+      expect(ages.fred).equals(40);
+      expect(ages.pebbles).equals(1);
     });
   });
 });

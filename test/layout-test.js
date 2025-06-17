@@ -1,18 +1,17 @@
-var _ = require("lodash");
 var expect = require("./chai").expect;
 var layout = require("..").layout;
-var Graph = require("../lib/graphlib").Graph;
+var Graph = require("@dagrejs/graphlib").Graph;
 
-describe("layout", function() {
+describe("layout", () => {
   var g;
 
-  beforeEach(function() {
+  beforeEach(() => {
     g = new Graph({ multigraph: true, compound: true })
       .setGraph({})
-      .setDefaultEdgeLabel(function() { return {}; });
+      .setDefaultEdgeLabel(() => ({}));
   });
 
-  it("can layout a single node", function() {
+  it("can layout a single node", () => {
     g.setNode("a", { width: 50, height: 100 });
     layout(g);
     expect(extractCoordinates(g)).to.eql({
@@ -22,7 +21,7 @@ describe("layout", function() {
     expect(g.node("a").y).to.equal(100 / 2);
   });
 
-  it("can layout two nodes on the same rank", function() {
+  it("can layout two nodes on the same rank", () => {
     g.graph().nodesep = 200;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
@@ -33,7 +32,7 @@ describe("layout", function() {
     });
   });
 
-  it("can layout two nodes connected by an edge", function() {
+  it("can layout two nodes connected by an edge", () => {
     g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
@@ -49,7 +48,7 @@ describe("layout", function() {
     expect(g.edge("a", "b")).to.not.have.property("y");
   });
 
-  it("can layout an edge with a label", function() {
+  it("can layout an edge with a label", () => {
     g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
@@ -59,16 +58,16 @@ describe("layout", function() {
       a: { x: 75 / 2, y: 100 / 2 },
       b: { x: 75 / 2, y: 100 + 150 + 70 + 150 + 200 / 2 }
     });
-    expect(_.pick(g.edge("a", "b"), ["x", "y"]))
-      .eqls({ x: 75 / 2, y: 100  + 150 + 70 / 2 });
+    expect(g.edge("a", "b").x).eqls(75 / 2);
+    expect(g.edge("a", "b").y).eqls(100  + 150 + 70 / 2 );
   });
 
-  describe("can layout an edge with a long label, with rankdir =", function() {
-    _.forEach(["TB", "BT", "LR", "RL"], function(rankdir) {
-      it(rankdir, function() {
+  describe("can layout an edge with a long label, with rankdir =", () => {
+    ["TB", "BT", "LR", "RL"].forEach(rankdir => {
+      it(rankdir, () => {
         g.graph().nodesep = g.graph().edgesep = 10;
         g.graph().rankdir = rankdir;
-        _.forEach(["a", "b", "c", "d"], function(v) {
+        ["a", "b", "c", "d"].forEach(v => {
           g.setNode(v, { width: 10, height: 10 });
         });
         g.setEdge("a", "c", { width: 2000, height: 10, labelpos: "c" });
@@ -89,12 +88,12 @@ describe("layout", function() {
     });
   });
 
-  describe("can apply an offset, with rankdir =", function() {
-    _.forEach(["TB", "BT", "LR", "RL"], function(rankdir) {
-      it(rankdir, function() {
+  describe("can apply an offset, with rankdir =", () => {
+    ["TB", "BT", "LR", "RL"].forEach(rankdir => {
+      it(rankdir, () => {
         g.graph().nodesep = g.graph().edgesep = 10;
         g.graph().rankdir = rankdir;
-        _.forEach(["a", "b", "c", "d"], function(v) {
+        ["a", "b", "c", "d"].forEach(v => {
           g.setNode(v, { width: 10, height: 10 });
         });
         g.setEdge("a", "b", { width: 10, height: 10, labelpos: "l", labeloffset: 1000 });
@@ -112,7 +111,7 @@ describe("layout", function() {
     });
   });
 
-  it("can layout a long edge with a label", function() {
+  it("can layout a long edge with a label", () => {
     g.graph().ranksep = 300;
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
@@ -124,7 +123,7 @@ describe("layout", function() {
       .to.be.lt(g.node("b").y);
   });
 
-  it("can layout out a short cycle", function() {
+  it("can layout out a short cycle", () => {
     g.graph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });
     g.setNode("b", { width: 100, height: 100 });
@@ -140,7 +139,7 @@ describe("layout", function() {
     expect(g.edge("b", "a").points[0].y).gt(g.edge("b", "a").points[1].y);
   });
 
-  it("adds rectangle intersects for edges", function() {
+  it("adds rectangle intersects for edges", () => {
     g.graph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });
     g.setNode("b", { width: 100, height: 100 });
@@ -155,7 +154,7 @@ describe("layout", function() {
     ]);
   });
 
-  it("adds rectangle intersects for edges spanning multiple ranks", function() {
+  it("adds rectangle intersects for edges spanning multiple ranks", () => {
     g.graph().ranksep = 200;
     g.setNode("a", { width: 100, height: 100 });
     g.setNode("b", { width: 100, height: 100 });
@@ -172,9 +171,9 @@ describe("layout", function() {
     ]);
   });
 
-  describe("can layout a self loop", function() {
-    _.forEach(["TB", "BT", "LR", "RL"], function(rankdir) {
-      it ("in rankdir = " + rankdir, function() {
+  describe("can layout a self loop", () => {
+    ["TB", "BT", "LR", "RL"].forEach(rankdir => {
+      it ("in rankdir = " + rankdir, () => {
         g.graph().edgesep = 75;
         g.graph().rankdir = rankdir;
         g.setNode("a", { width: 100, height: 100 });
@@ -183,7 +182,7 @@ describe("layout", function() {
         var nodeA = g.node("a");
         var points = g.edge("a", "a").points;
         expect(points).to.have.length(7);
-        _.forEach(points, function(point) {
+        points.forEach(point => {
           if (rankdir !== "LR" && rankdir !== "RL") {
             expect(point.x).gt(nodeA.x);
             expect(Math.abs(point.y - nodeA.y)).lte(nodeA.height / 2);
@@ -196,15 +195,15 @@ describe("layout", function() {
     });
   });
 
-  it("can layout a graph with subgraphs", function() {
+  it("can layout a graph with subgraphs", () => {
     // To be expanded, this primarily ensures nothing blows up for the moment.
     g.setNode("a", { width: 50, height: 50 });
     g.setParent("a", "sg1");
     layout(g);
   });
 
-  it("minimizes the height of subgraphs", function() {
-    _.forEach(["a", "b", "c", "d", "x", "y"], function(v) {
+  it("minimizes the height of subgraphs", () => {
+    ["a", "b", "c", "d", "x", "y"].forEach(v => {
       g.setNode(v, { width: 50, height: 50 });
     });
     g.setPath(["a", "b", "c", "d"]);
@@ -221,7 +220,7 @@ describe("layout", function() {
     expect(g.node("x").y).to.equal(g.node("y").y);
   });
 
-  it("can layout subgraphs with different rankdirs", function() {
+  it("can layout subgraphs with different rankdirs", () => {
     g.setNode("a", { width: 50, height: 50 });
     g.setNode("sg", {});
     g.setParent("a", "sg");
@@ -233,35 +232,35 @@ describe("layout", function() {
       expect(g.node("sg").y, "y " + rankdir).gt(50 / 2);
     }
 
-    _.forEach(["tb", "bt", "lr", "rl"], function(rankdir) {
+    ["tb", "bt", "lr", "rl"].forEach(rankdir => {
       g.graph().rankdir = rankdir;
       layout(g);
       check(rankdir);
     });
   });
 
-  it("adds dimensions to the graph", function() {
+  it("adds dimensions to the graph", () => {
     g.setNode("a", { width: 100, height: 50 });
     layout(g);
     expect(g.graph().width).equals(100);
     expect(g.graph().height).equals(50);
   });
 
-  describe("ensures all coordinates are in the bounding box for the graph", function() {
-    _.forEach(["TB", "BT", "LR", "RL"], function(rankdir) {
-      describe(rankdir, function() {
-        beforeEach(function() {
+  describe("ensures all coordinates are in the bounding box for the graph", () => {
+    ["TB", "BT", "LR", "RL"].forEach(rankdir => {
+      describe(rankdir, () => {
+        beforeEach(() => {
           g.graph().rankdir = rankdir;
         });
 
-        it("node", function() {
+        it("node", () => {
           g.setNode("a", { width: 100, height: 200 });
           layout(g);
           expect(g.node("a").x).equals(100 / 2);
           expect(g.node("a").y).equals(200 / 2);
         });
 
-        it("edge, labelpos = l", function() {
+        it("edge, labelpos = l", () => {
           g.setNode("a", { width: 100, height: 100 });
           g.setNode("b", { width: 100, height: 100 });
           g.setEdge("a", "b", {
@@ -278,7 +277,7 @@ describe("layout", function() {
     });
   });
 
-  it("treats attributes with case-insensitivity", function() {
+  it("treats attributes with case-insensitivity", () => {
     g.graph().nodeSep = 200; // note the capital S
     g.setNode("a", { width: 50, height: 100 });
     g.setNode("b", { width: 75, height: 200 });
@@ -292,7 +291,9 @@ describe("layout", function() {
 
 function extractCoordinates(g) {
   var nodes = g.nodes();
-  return _.zipObject(nodes, _.map(nodes, function(v) {
-    return _.pick(g.node(v), ["x", "y"]);
-  }));
+  return nodes.reduce((acc, v) => {
+    const node = g.node(v);
+    acc[v] = { x: node.x, y: node.y };
+    return acc;
+  }, {});
 }

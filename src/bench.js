@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-var Benchmark = require("benchmark"),
+let Benchmark = require("benchmark"),
     sprintf = require("sprintf").sprintf;
 
-var Graph = require("graphlib").Graph,
+let Graph = require("graphlib").Graph,
     rank = require("../lib/rank"),
     layout = require("..").layout;
 
 function runBenchmark(name, fn) {
-  var options = {};
+  let options = {};
   options.onComplete = function(bench) {
-    var target = bench.target,
+    let target = bench.target,
         hz = target.hz,
         stats = target.stats,
         rme = stats.rme,
@@ -34,7 +34,7 @@ function runBenchmark(name, fn) {
   new Benchmark(name, fn, options).run();
 }
 
-var g = new Graph()
+let g = new Graph()
   .setGraph({})
   .setDefaultNodeLabel(function() { return { width: 1, height: 1}; })
   .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; })

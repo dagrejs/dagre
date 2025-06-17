@@ -1,29 +1,26 @@
-var _ = require("lodash");
-var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
-var buildLayerGraph = require("../../lib/order/build-layer-graph");
+let expect = require("../chai").expect;
+let Graph = require("@dagrejs/graphlib").Graph;
+let buildLayerGraph = require("../../lib/order/build-layer-graph");
 
-describe("order/buildLayerGraph", function() {
-  var g;
+describe("order/buildLayerGraph", () => {
+  let g;
 
-  beforeEach(function() {
-    g = new Graph({ compound: true, multigraph: true });
-  });
+  beforeEach(() => g = new Graph({ compound: true, multigraph: true }));
 
-  it("places movable nodes with no parents under the root node", function() {
+  it("places movable nodes with no parents under the root node", () => {
     g.setNode("a", { rank: 1 });
     g.setNode("b", { rank: 1 });
     g.setNode("c", { rank: 2 });
     g.setNode("d", { rank: 3 });
 
-    var lg;
+    let lg;
     lg = buildLayerGraph(g, 1, "inEdges");
     expect(lg.hasNode(lg.graph().root));
     expect(lg.children()).eqls([lg.graph().root]);
     expect(lg.children(lg.graph().root)).eqls(["a", "b"]);
   });
 
-  it("copies flat nodes from the layer to the graph", function() {
+  it("copies flat nodes from the layer to the graph", () => {
     g.setNode("a", { rank: 1 });
     g.setNode("b", { rank: 1 });
     g.setNode("c", { rank: 2 });
@@ -35,14 +32,14 @@ describe("order/buildLayerGraph", function() {
     expect(buildLayerGraph(g, 3, "inEdges").nodes()).to.include("d");
   });
 
-  it("uses the original node label for copied nodes", function() {
+  it("uses the original node label for copied nodes", () => {
     // This allows us to make updates to the original graph and have them
     // be available automatically in the layer graph.
     g.setNode("a", { foo: 1, rank: 1 });
     g.setNode("b", { foo: 2, rank: 2 });
     g.setEdge("a", "b", { weight: 1 });
 
-    var lg = buildLayerGraph(g, 2, "inEdges");
+    let lg = buildLayerGraph(g, 2, "inEdges");
 
     expect(lg.node("a").foo).equals(1);
     g.node("a").foo = "updated";
@@ -53,7 +50,7 @@ describe("order/buildLayerGraph", function() {
     expect(lg.node("b").foo).equals("updated");
   });
 
-  it("copies edges incident on rank nodes to the graph (inEdges)", function() {
+  it("copies edges incident on rank nodes to the graph (inEdges)", () => {
     g.setNode("a", { rank: 1 });
     g.setNode("b", { rank: 1 });
     g.setNode("c", { rank: 2 });
@@ -70,7 +67,7 @@ describe("order/buildLayerGraph", function() {
     expect(buildLayerGraph(g, 3, "inEdges").edge("c", "d")).eqls({ weight: 4 });
   });
 
-  it("copies edges incident on rank nodes to the graph (outEdges)", function() {
+  it("copies edges incident on rank nodes to the graph (outEdges)", () => {
     g.setNode("a", { rank: 1 });
     g.setNode("b", { rank: 1 });
     g.setNode("c", { rank: 2 });
@@ -87,7 +84,7 @@ describe("order/buildLayerGraph", function() {
     expect(buildLayerGraph(g, 3, "outEdges").edgeCount()).to.equal(0);
   });
 
-  it("collapses multi-edges", function() {
+  it("collapses multi-edges", () => {
     g.setNode("a", { rank: 1 });
     g.setNode("b", { rank: 2 });
     g.setEdge("a", "b", { weight: 2 });
@@ -96,7 +93,7 @@ describe("order/buildLayerGraph", function() {
     expect(buildLayerGraph(g, 2, "inEdges").edge("a", "b")).eqls({ weight: 5 });
   });
 
-  it("preserves hierarchy for the movable layer", function() {
+  it("preserves hierarchy for the movable layer", () => {
     g.setNode("a", { rank: 0 });
     g.setNode("b", { rank: 0 });
     g.setNode("c", { rank: 0 });
@@ -106,11 +103,11 @@ describe("order/buildLayerGraph", function() {
       borderLeft: ["bl"],
       borderRight: ["br"]
     });
-    _.forEach(["a", "b"], function(v) { g.setParent(v, "sg"); });
+    ["a", "b"].forEach(v => g.setParent(v, "sg"));
 
     var lg = buildLayerGraph(g, 0, "inEdges");
     var root = lg.graph().root;
-    expect(_.sortBy(lg.children(root))).eqls(["c", "sg"]);
+    expect(lg.children(root).sort()).eqls(["c", "sg"]);
     expect(lg.parent("a")).equals("sg");
     expect(lg.parent("b")).equals("sg");
   });
