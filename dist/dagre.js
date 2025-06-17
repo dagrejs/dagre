@@ -532,7 +532,7 @@ function updateInputGraph(inputGraph, layoutGraph) {
 let graphNumAttrs = ["nodesep", "edgesep", "ranksep", "marginx", "marginy"];
 let graphDefaults = { ranksep: 50, edgesep: 20, nodesep: 50, rankdir: "tb" };
 let graphAttrs = ["acyclicer", "ranker", "rankdir", "align"];
-let nodeNumAttrs = ["width", "height"];
+let nodeNumAttrs = ["width", "height", "rank"];
 let nodeDefaults = { width: 0, height: 0 };
 let edgeNumAttrs = ["minlen", "weight", "width", "height", "labeloffset"];
 let edgeDefaults = {
@@ -2330,10 +2330,16 @@ module.exports = rank;
  *       fix them up later.
  */
 function rank(g) {
+  var ranker = g.graph().ranker;
+  if (ranker instanceof Function) {
+    return ranker(g);
+  }
+
   switch(g.graph().ranker) {
   case "network-simplex": networkSimplexRanker(g); break;
   case "tight-tree": tightTreeRanker(g); break;
   case "longest-path": longestPathRanker(g); break;
+  case "none": break;
   default: networkSimplexRanker(g);
   }
 }
@@ -2690,10 +2696,10 @@ module.exports = {
  * Adds a dummy node to the graph and return v.
  */
 function addDummyNode(g, type, attrs, name) {
-  let v;
-  do {
+  var v = name;
+  while (g.hasNode(v)) {
     v = uniqueId(name);
-  } while (g.hasNode(v));
+  }
 
   attrs.dummy = type;
   g.setNode(v, attrs);
@@ -2937,7 +2943,7 @@ function notime(name, fn) {
 let idCounter = 0;
 function uniqueId(prefix) {
   var id = ++idCounter;
-  return toString(prefix) + id;
+  return prefix + ("" + id);
 }
 
 function range(start, limit, step = 1) {
@@ -2990,7 +2996,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.1.4";
+module.exports = "1.1.5";
 
 },{}],29:[function(require,module,exports){
 /**
