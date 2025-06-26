@@ -57,7 +57,7 @@ declare module '@dagrejs/dagre' {
       function dijkstra(graph: Graph, source: string, weightFn?: WeightFn, edgeFn?: EdgeFn): any;
       function dijkstraAll(graph: Graph, weightFn?: WeightFn, edgeFn?: EdgeFn): any;
       function findCycles(graph: Graph): string[][];
-      function floydWarchall(graph: Graph, weightFn?: WeightFn, edgeFn?: EdgeFn): any;
+      function floydWarshall(graph: Graph, weightFn?: WeightFn, edgeFn?: EdgeFn): any;
       function isAcyclic(graph: Graph): boolean;
       function postorder(graph: Graph, nodeNames: string | string[]): string[];
       function preorder(graph: Graph, nodeNames: string | string[]): string[];
