@@ -6,9 +6,8 @@
 
 Dagre is a JavaScript library that makes it easy to lay out directed graphs on the client-side.
 
-For more details, including examples and configuration options, please see our [wiki](https://github.com/dagrejs/dagre/wiki).
-
-There are 2 versions on NPM, but only [the one in the DagreJs org](https://www.npmjs.com/package/@dagrejs/dagre) is receiving updates right now.
+This is a fork of the original library @dagrejs/dagre.
+The fork is maintained by Chalk AI and includes some updates and improvements around complex formatting of grouped layouts.
 
 ## License
 
