@@ -6,10 +6,14 @@
 //                 Graham Lea <https://github.com/GrahamLea>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-declare module '@dagrejs/dagre' {
+declare module "@chalk-ai/dagre" {
   export namespace graphlib {
     class Graph<T = {}> {
-      constructor(opt?: { directed?: boolean | undefined; multigraph?: boolean | undefined; compound?: boolean | undefined });
+      constructor(opt?: {
+        directed?: boolean | undefined;
+        multigraph?: boolean | undefined;
+        compound?: boolean | undefined;
+      });
 
       graph(): GraphLabel;
       isDirected(): boolean;
@@ -24,10 +28,23 @@ declare module '@dagrejs/dagre' {
       hasEdge(outNodeName: string, inNodeName: string, name?: string): boolean;
       inEdges(inNodeName: string, outNodeName?: string): Edge[] | undefined;
       outEdges(outNodeName: string, inNodeName?: string): Edge[] | undefined;
-      removeEdge(outNodeName: string, inNodeName: string, name?: string): Graph<T>;
-      setDefaultEdgeLabel(callback: string | ((v: string, w: string, name?: string) => string | Label)): Graph<T>;
+      removeEdge(
+        outNodeName: string,
+        inNodeName: string,
+        name?: string,
+      ): Graph<T>;
+      setDefaultEdgeLabel(
+        callback:
+          | string
+          | ((v: string, w: string, name?: string) => string | Label),
+      ): Graph<T>;
       setEdge(params: Edge, value?: string | { [key: string]: any }): Graph<T>;
-      setEdge(sourceId: string, targetId: string, value?: string | Label, name?: string): Graph<T>;
+      setEdge(
+        sourceId: string,
+        targetId: string,
+        value?: string | Label,
+        name?: string,
+      ): Graph<T>;
 
       children(parentName: string): string[];
       hasNode(name: string): boolean;
@@ -39,7 +56,9 @@ declare module '@dagrejs/dagre' {
       predecessors(name: string): string[] | undefined;
       removeNode(name: string): Graph<T>;
       filterNodes(callback: (nodeId: string) => boolean): Graph<T>;
-      setDefaultNodeLabel(callback: string | ((nodeId: string) => string | Label)): Graph<T>;
+      setDefaultNodeLabel(
+        callback: string | ((nodeId: string) => string | Label),
+      ): Graph<T>;
       setNode(name: string, label: string | Label): Graph<T>;
       setParent(childName: string, parentName: string): void;
       sinks(): Array<Node<T>>;
@@ -54,10 +73,23 @@ declare module '@dagrejs/dagre' {
 
     namespace alg {
       function components(graph: Graph): string[][];
-      function dijkstra(graph: Graph, source: string, weightFn?: WeightFn, edgeFn?: EdgeFn): any;
-      function dijkstraAll(graph: Graph, weightFn?: WeightFn, edgeFn?: EdgeFn): any;
+      function dijkstra(
+        graph: Graph,
+        source: string,
+        weightFn?: WeightFn,
+        edgeFn?: EdgeFn,
+      ): any;
+      function dijkstraAll(
+        graph: Graph,
+        weightFn?: WeightFn,
+        edgeFn?: EdgeFn,
+      ): any;
       function findCycles(graph: Graph): string[][];
-      function floydWarshall(graph: Graph, weightFn?: WeightFn, edgeFn?: EdgeFn): any;
+      function floydWarshall(
+        graph: Graph,
+        weightFn?: WeightFn,
+        edgeFn?: EdgeFn,
+      ): any;
       function isAcyclic(graph: Graph): boolean;
       function postorder(graph: Graph, nodeNames: string | string[]): string[];
       function preorder(graph: Graph, nodeNames: string | string[]): string[];
@@ -105,12 +137,15 @@ declare module '@dagrejs/dagre' {
     weight?: number | undefined;
     width?: number | undefined;
     height?: number | undefined;
-    labelpos?: 'l' | 'c' | 'r' | undefined;
+    labelpos?: "l" | "c" | "r" | undefined;
     labeloffest?: number | undefined;
   }
 
   export interface LayoutConfig {
-    customOrder?: (graph: graphlib.Graph, order: (graph: graphlib.Graph, opts: configUnion) => void) => void;
+    customOrder?: (
+      graph: graphlib.Graph,
+      order: (graph: graphlib.Graph, opts: configUnion) => void,
+    ) => void;
     disableOptimalOrderHeuristic?: boolean;
   }
 
