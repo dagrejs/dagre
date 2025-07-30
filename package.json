@@ -1,10 +1,11 @@
 {
   "name": "@dagrejs/dagre",
-  "version": "1.1.7",
-  "description": "Graph layout for JavaScript",
+  "version": "1.1.6",
+  "description": "Graph layout for JavaScript (Chalk AI Fork)",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
-    "Matthew Dahl (https://github.com/sandersky)"
+    "Matthew Dahl (https://github.com/sandersky)",
+    "Nathan Fenner"
   ],
   "license": "MIT",
   "main": "index.js",
@@ -38,15 +39,15 @@
     "karma-mocha": "2.0.1",
     "karma-requirejs": "1.1.0",
     "karma-safari-launcher": "1.0.0",
-    "mocha": "10.1.0",
+    "mocha": "^10.8.2",
     "nyc": "^15.1.0",
-    "requirejs": "2.3.6",
-    "semver": "7.3.7",
+    "requirejs": "^2.3.7",
+    "semver": "^7.7.2",
     "sprintf": "0.1.5",
     "uglify-js": "3.17.4"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dagrejs/dagre.git"
+    "url": "https://github.com/chalk-ai/dagre.git"
   }
 }
