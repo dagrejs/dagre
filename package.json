@@ -44,6 +44,7 @@
     "requirejs": "^2.3.7",
     "semver": "^7.7.2",
     "sprintf": "0.1.5",
+    "typescript": "^5.9.2",
     "uglify-js": "3.17.4"
   },
   "repository": {

@@ -1,7 +1,9 @@
 "use strict";
 
-var Graph = require("@dagrejs/graphlib").Graph;
-var slack = require("./util").slack;
+import { Edge, Graph } from "@dagrejs/graphlib";
+
+// @ts-ignore
+import { slack } from "./util.js";
 
 module.exports = feasibleTree;
 
@@ -30,18 +32,22 @@ module.exports = feasibleTree;
  * Returns a tree (undirected graph) that is constructed using only "tight"
  * edges.
  */
-function feasibleTree(g) {
-  var t = new Graph({ directed: false });
+function feasibleTree(g: Graph): Graph {
+  const t = new Graph({ directed: false });
 
   // Choose arbitrary node from which to start our tree
-  var start = g.nodes()[0];
-  var size = g.nodeCount();
+  const start = g.nodes()[0];
+  const size = g.nodeCount();
   t.setNode(start, {});
 
-  var edge, delta;
   while (tightTree(t, g) < size) {
-    edge = findMinSlackEdge(t, g);
-    delta = t.hasNode(edge.v) ? slack(g, edge) : -slack(g, edge);
+    const edge = findMinSlackEdge(t, g);
+    if (edge === null) {
+      throw new Error(
+        "failed to find min-slack edge to form rank-tight spanning tree"
+      );
+    }
+    const delta = t.hasNode(edge.v) ? slack(g, edge) : -slack(g, edge);
     shiftRanks(t, g, delta);
   }
 
@@ -52,11 +58,11 @@ function feasibleTree(g) {
  * Finds a maximal tree of tight edges and returns the number of nodes in the
  * tree.
  */
-function tightTree(t, g) {
-  function dfs(v) {
-    g.nodeEdges(v).forEach(e => {
-      var edgeV = e.v,
-        w = (v === edgeV) ? e.w : edgeV;
+function tightTree(t: Graph, g: Graph) {
+  function dfs(v: string) {
+    g.nodeEdges(v)!.forEach((e) => {
+      const edgeV = e.v;
+      const w = v === edgeV ? e.w : edgeV;
       if (!t.hasNode(w) && !slack(g, e)) {
         t.setNode(w, {});
         t.setEdge(v, w, {});
@@ -73,23 +79,26 @@ function tightTree(t, g) {
  * Finds the edge with the smallest slack that is incident on tree and returns
  * it.
  */
-function findMinSlackEdge(t, g) {
+function findMinSlackEdge(t: Graph, g: Graph): Edge | null {
   const edges = g.edges();
 
-  return edges.reduce((acc, edge) => {
-    let edgeSlack = Number.POSITIVE_INFINITY;
-    if (t.hasNode(edge.v) !== t.hasNode(edge.w)) {
-      edgeSlack = slack(g, edge);
-    }
+  return edges.reduce(
+    (acc: [number, null | Edge], edge: Edge): [number, null | Edge] => {
+      let edgeSlack = Number.POSITIVE_INFINITY;
+      if (t.hasNode(edge.v) !== t.hasNode(edge.w)) {
+        edgeSlack = slack(g, edge);
+      }
 
-    if (edgeSlack < acc[0]) {
-      return [edgeSlack, edge];
-    }
+      if (edgeSlack < acc[0]) {
+        return [edgeSlack, edge];
+      }
 
-    return acc;
-  }, [Number.POSITIVE_INFINITY, null])[1];
+      return acc;
+    },
+    [Number.POSITIVE_INFINITY, null]
+  )[1];
 }
 
-function shiftRanks(t, g, delta) {
-  t.nodes().forEach(v => g.node(v).rank += delta);
+function shiftRanks(t: Graph, g: Graph, delta: number) {
+  t.nodes().forEach((v) => (g.node(v).rank += delta));
 }

@@ -16,7 +16,17 @@ BUILD_DIR = build
 COVERAGE_DIR = ./.nyc_output
 DIST_DIR = dist
 
-SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js')
+# Find any `.ts` files in the source.
+TS_FILES := $(shell find lib -type f -name '*.ts')
+# Convert the `TS_FILES` to the name of their output files `.js`.
+TS_JS_OUTPUTS := $(TS_FILES:.ts=.js)
+
+# Generate any `.js` files derived from `.ts` files.
+$(TS_JS_OUTPUTS): $(TS_FILES)
+	@npx tsc || true
+
+SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js') $(TS_JS_OUTPUTS)
+
 TEST_FILES = $(shell find test -type f -name '*.js' | grep -v 'bundle-test.js')
 BUILD_FILES = $(addprefix $(BUILD_DIR)/, $(MOD).js $(MOD).min.js)
 
