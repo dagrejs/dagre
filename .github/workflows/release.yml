@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        registry-url: 'https://registry.npmjs.org'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run release script
+      run: node scripts/release.js
+      env:
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+    
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        body: |
+          Release ${{ github.ref_name }}
+          
+          Built distribution files are available in the dist/ directory.
+        draft: false
+        prerelease: ${{ contains(github.ref_name, '-') }}
+    
+    - name: Publish to NPM
+      run: npm publish --access=public
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    
+    - name: Bump version for next development cycle
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        ./src/release/bump-version.js
+        make lib/version.js
+        git add package.json lib/version.js
+        git commit -m "Bump version and set as pre-release [skip ci]"
+        git push origin master
