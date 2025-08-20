@@ -25,7 +25,11 @@ TS_JS_OUTPUTS := $(TS_FILES:.ts=.js)
 $(TS_JS_OUTPUTS): $(TS_FILES)
 	@npx tsc || true
 
-SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js') $(TS_JS_OUTPUTS)
+# The original JS source files (excluding those generated from `.ts` files).
+JS_FILES = $(filter-out $(TS_JS_OUTPUTS), index.js lib/version.js $(shell find lib -type f -name '*.js'))
+
+# The source `.js` files AND any `.js` files generated from `.ts` files.
+BUILT_SRC_FILES = $(ORIGINAL_SRC_FILES) $(TS_JS_OUTPUTS)
 
 TEST_FILES = $(shell find test -type f -name '*.js' | grep -v 'bundle-test.js')
 BUILD_FILES = $(addprefix $(BUILD_DIR)/, $(MOD).js $(MOD).min.js)
@@ -47,7 +51,7 @@ $(DIRS):
 
 test: unit-test browser-test
 
-unit-test: $(SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
+unit-test: $(BUILT_SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
 	@$(NYC) $(MOCHA) --dir $(COVERAGE_DIR) -- $(MOCHA_OPTS) $(TEST_FILES) || $(MOCHA) $(MOCHA_OPTS) $(TEST_FILES)
 
 browser-test: $(BUILD_DIR)/$(MOD).js
@@ -58,9 +62,9 @@ bower.json: package.json src/release/make-bower.json.js
 
 lint:
 	@$(JSHINT) $(JSHINT_OPTS) $(filter-out node_modules, $?)
-	@$(ESLINT) $(SRC_FILES) $(TEST_FILES)
+	@$(ESLINT) $(JS_FILES) $(TS_FILES) $(TEST_FILES)
 
-$(BUILD_DIR)/$(MOD).js: index.js $(SRC_FILES) | unit-test
+$(BUILD_DIR)/$(MOD).js: index.js $(BUILT_SRC_FILES) | unit-test
 	@$(BROWSERIFY) $< > $@ -s dagre
 
 $(BUILD_DIR)/$(MOD).min.js: $(BUILD_DIR)/$(MOD).js

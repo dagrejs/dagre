@@ -31,7 +31,7 @@
     "benchmark": "2.1.4",
     "browserify": "17.0.0",
     "chai": "4.3.6",
-    "eslint": "8.35.0",
+    "eslint": "9.33.0",
     "jshint": "2.13.5",
     "jshint-stylish": "2.2.1",
     "karma": "6.4.1",
@@ -45,6 +45,7 @@
     "semver": "^7.7.2",
     "sprintf": "0.1.5",
     "typescript": "^5.9.2",
+    "typescript-eslint": "8.40.0",
     "uglify-js": "3.17.4"
   },
   "repository": {
