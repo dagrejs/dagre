@@ -1,6 +1,6 @@
 {
   "name": "@chalk-ai/dagre",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Graph layout for JavaScript (Chalk AI Fork)",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
@@ -51,5 +51,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/chalk-ai/dagre.git"
-  }
+  },
+  "packageManager": "yarn@4.3.0+sha512.1606bef7c84bc7d83b8576063de2fd08f7d69f9939015bed800f9585a002390268ecc777e9feeba7e26e9556aef6beaad4806968db2182ab5dd3e955ab3b9a0b"
 }

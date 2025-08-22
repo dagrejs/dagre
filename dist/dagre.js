@@ -1338,6 +1338,7 @@ function order(g, opts) {
 
   for (let i = 0, lastBest = 0; lastBest < 4; ++i, ++lastBest) {
     sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2);
+    densifyOrders(g);
 
     layering = util.buildLayerMatrix(g);
     let cc = crossCount(g, layering);
@@ -1349,6 +1350,32 @@ function order(g, opts) {
   }
 
   assignOrder(g, best);
+  densifyOrders(g);
+}
+
+/**
+ * Given a graph, densifies the orders in each rank.
+ * That is, reassigns `order` on nodes so that there is a node with order 0, 1, 2, 3, ...
+ * with no gaps for each rank, up to the number of items in that rank.
+ */
+function densifyOrders(g) {
+  const nodesWithRank = new Map();
+  for (const n of g.nodes()) {
+    const node = g.node(n);
+    if (node.rank !== undefined && node.order !== undefined) {
+      if (!nodesWithRank.has(node.rank)) {
+        nodesWithRank.set(node.rank, []);
+      }
+      nodesWithRank.get(node.rank).push(node);
+    }
+  }
+  for (const nodesSharingRank of nodesWithRank.values()) {
+    nodesSharingRank.sort((n1, n2) => n1.order - n2.order);
+    for (let order = 0; order< nodesSharingRank.length; order++) {
+      nodesSharingRank[order].order = order;
+    }
+  }
+
 }
 
 function buildLayerGraphs(g, ranks, relationship) {
@@ -2241,12 +2268,11 @@ function positionY(g) {
 
 },{"../util":27,"./bk":21}],23:[function(require,module,exports){
 "use strict";
-
-var Graph = require("@dagrejs/graphlib").Graph;
-var slack = require("./util").slack;
-
+Object.defineProperty(exports, "__esModule", { value: true });
+var graphlib_1 = require("@dagrejs/graphlib");
+// @ts-ignore
+var util_js_1 = require("./util.js");
 module.exports = feasibleTree;
-
 /*
  * Constructs a spanning tree with tight edges and adjusted the input node's
  * ranks to achieve this. A tight edge is one that is has a length that matches
@@ -2273,70 +2299,62 @@ module.exports = feasibleTree;
  * edges.
  */
 function feasibleTree(g) {
-  var t = new Graph({ directed: false });
-
-  // Choose arbitrary node from which to start our tree
-  var start = g.nodes()[0];
-  var size = g.nodeCount();
-  t.setNode(start, {});
-
-  var edge, delta;
-  while (tightTree(t, g) < size) {
-    edge = findMinSlackEdge(t, g);
-    delta = t.hasNode(edge.v) ? slack(g, edge) : -slack(g, edge);
-    shiftRanks(t, g, delta);
-  }
-
-  return t;
+    var t = new graphlib_1.Graph({ directed: false });
+    // Choose arbitrary node from which to start our tree
+    var start = g.nodes()[0];
+    var size = g.nodeCount();
+    t.setNode(start, {});
+    while (tightTree(t, g) < size) {
+        var edge = findMinSlackEdge(t, g);
+        if (edge === null) {
+            throw new Error("failed to find min-slack edge to form rank-tight spanning tree");
+        }
+        var delta = t.hasNode(edge.v) ? (0, util_js_1.slack)(g, edge) : -(0, util_js_1.slack)(g, edge);
+        shiftRanks(t, g, delta);
+    }
+    return t;
 }
-
 /*
  * Finds a maximal tree of tight edges and returns the number of nodes in the
  * tree.
  */
 function tightTree(t, g) {
-  function dfs(v) {
-    g.nodeEdges(v).forEach(e => {
-      var edgeV = e.v,
-        w = (v === edgeV) ? e.w : edgeV;
-      if (!t.hasNode(w) && !slack(g, e)) {
-        t.setNode(w, {});
-        t.setEdge(v, w, {});
-        dfs(w);
-      }
-    });
-  }
-
-  t.nodes().forEach(dfs);
-  return t.nodeCount();
+    function dfs(v) {
+        g.nodeEdges(v).forEach(function (e) {
+            var edgeV = e.v;
+            var w = v === edgeV ? e.w : edgeV;
+            if (!t.hasNode(w) && !(0, util_js_1.slack)(g, e)) {
+                t.setNode(w, {});
+                t.setEdge(v, w, {});
+                dfs(w);
+            }
+        });
+    }
+    t.nodes().forEach(dfs);
+    return t.nodeCount();
 }
-
 /*
  * Finds the edge with the smallest slack that is incident on tree and returns
  * it.
  */
 function findMinSlackEdge(t, g) {
-  const edges = g.edges();
-
-  return edges.reduce((acc, edge) => {
-    let edgeSlack = Number.POSITIVE_INFINITY;
-    if (t.hasNode(edge.v) !== t.hasNode(edge.w)) {
-      edgeSlack = slack(g, edge);
-    }
-
-    if (edgeSlack < acc[0]) {
-      return [edgeSlack, edge];
-    }
-
-    return acc;
-  }, [Number.POSITIVE_INFINITY, null])[1];
+    var edges = g.edges();
+    return edges.reduce(function (acc, edge) {
+        var edgeSlack = Number.POSITIVE_INFINITY;
+        if (t.hasNode(edge.v) !== t.hasNode(edge.w)) {
+            edgeSlack = (0, util_js_1.slack)(g, edge);
+        }
+        if (edgeSlack < acc[0]) {
+            return [edgeSlack, edge];
+        }
+        return acc;
+    }, [Number.POSITIVE_INFINITY, null])[1];
 }
-
 function shiftRanks(t, g, delta) {
-  t.nodes().forEach(v => g.node(v).rank += delta);
+    t.nodes().forEach(function (v) { return (g.node(v).rank += delta); });
 }
 
-},{"./util":26,"@dagrejs/graphlib":29}],24:[function(require,module,exports){
+},{"./util.js":26,"@dagrejs/graphlib":29}],24:[function(require,module,exports){
 "use strict";
 
 var rankUtil = require("./util");
@@ -2636,7 +2654,7 @@ const { applyWithChunking } = require("../util");
 
 module.exports = {
   longestPath: longestPath,
-  slack: slack
+  slack: slack,
 };
 
 /*
@@ -2670,7 +2688,7 @@ function longestPath(g) {
     }
     visited[v] = true;
 
-    let outEdgesMinLens = g.outEdges(v).map(e => {
+    let outEdgesMinLens = g.outEdges(v).map((e) => {
       if (e == null) {
         return Number.POSITIVE_INFINITY;
       }
@@ -2847,6 +2865,13 @@ function buildLayerMatrix(g) {
       layering[rank][node.order] = v;
     }
   });
+  for (let rank = 0; rank < layering.length; rank++) {
+    for (let order = 0; order < layering[rank].length; order++) {
+      if (layering[rank][order] === undefined) {
+        throw new Error(`Cannot construct layer matrix, because rank '${rank}' has gap in node with order '${order}'`);
+      }
+    }
+  }
   return layering;
 }
 
@@ -3032,7 +3057,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.1.6";
+module.exports = "1.1.7";
 
 },{}],29:[function(require,module,exports){
 /**
