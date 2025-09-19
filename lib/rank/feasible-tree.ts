@@ -32,7 +32,7 @@ module.exports = feasibleTree;
  * Returns a tree (undirected graph) that is constructed using only "tight"
  * edges.
  */
-function feasibleTree(g) {
+function feasibleTree(g: Graph): Graph {
   const t = new Graph({ directed: false });
 
   // Choose arbitrary node from which to start our tree
@@ -58,9 +58,9 @@ function feasibleTree(g) {
  * Finds a maximal tree of tight edges and returns the number of nodes in the
  * tree.
  */
-function tightTree(t, g) {
-  function dfs(v) {
-    g.nodeEdges(v).forEach((e) => {
+function tightTree(t: Graph, g: Graph) {
+  function dfs(v: string) {
+    g.nodeEdges(v)!.forEach((e) => {
       const edgeV = e.v;
       const w = v === edgeV ? e.w : edgeV;
       if (!t.hasNode(w) && !slack(g, e)) {
@@ -79,11 +79,11 @@ function tightTree(t, g) {
  * Finds the edge with the smallest slack that is incident on tree and returns
  * it.
  */
-function findMinSlackEdge(t, g) {
+function findMinSlackEdge(t: Graph, g: Graph): Edge | null {
   const edges = g.edges();
 
   return edges.reduce(
-    (acc, edge) => {
+    (acc: [number, null | Edge], edge: Edge): [number, null | Edge] => {
       let edgeSlack = Number.POSITIVE_INFINITY;
       if (t.hasNode(edge.v) !== t.hasNode(edge.w)) {
         edgeSlack = slack(g, edge);
@@ -99,7 +99,6 @@ function findMinSlackEdge(t, g) {
   )[1];
 }
 
-// function shiftRanks(t: Graph, g: Graph, delta: number) {
-function shiftRanks(t, g, delta) {
+function shiftRanks(t: Graph, g: Graph, delta: number) {
   t.nodes().forEach((v) => (g.node(v).rank += delta));
 }
