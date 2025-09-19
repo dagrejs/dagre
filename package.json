@@ -17,7 +17,7 @@
     "index.js",
     "index.d.ts",
     "dist/",
-    "lib/"
+    "lib/**/*.js"
   ],
   "types": "index.d.ts",
   "keywords": [

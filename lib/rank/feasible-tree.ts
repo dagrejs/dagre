@@ -44,7 +44,7 @@ function feasibleTree(g: Graph): Graph {
     const edge = findMinSlackEdge(t, g);
     if (edge === null) {
       throw new Error(
-        "failed to find min-slack edge to form rank-tight spanning tree"
+        "failed to find min-slack edge to form rank-tight spanning tree",
       );
     }
     const delta = t.hasNode(edge.v) ? slack(g, edge) : -slack(g, edge);
@@ -95,7 +95,7 @@ function findMinSlackEdge(t: Graph, g: Graph): Edge | null {
 
       return acc;
     },
-    [Number.POSITIVE_INFINITY, null]
+    [Number.POSITIVE_INFINITY, null],
   )[1];
 }
 
