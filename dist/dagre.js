@@ -2350,7 +2350,6 @@ function findMinSlackEdge(t, g) {
         return acc;
     }, [Number.POSITIVE_INFINITY, null])[1];
 }
-// function shiftRanks(t: Graph, g: Graph, delta: number) {
 function shiftRanks(t, g, delta) {
     t.nodes().forEach(function (v) { return (g.node(v).rank += delta); });
 }
