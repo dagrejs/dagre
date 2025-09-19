@@ -5,7 +5,11 @@
     "removeComments": false,
     "preserveConstEnums": true,
     "sourceMap": true,
-    "strict": true
+    "strict": true,
+    "outDir": "./build"
   },
-  "files": ["lib/rank/feasible-tree.ts"]
+
+  "files": [
+    "lib/rank/feasible-tree.ts"
+  ]
 }
