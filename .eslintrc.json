@@ -15,6 +15,7 @@
     "indent": [ "error", 2 ],
     "linebreak-style": [ "error", "unix" ],
     "no-prototype-builtins": 0,
-    "semi": [ "error", "always" ]
+    "semi": [ "error", "always" ],
+    "quotes": ["error", "double"]
   }
 }

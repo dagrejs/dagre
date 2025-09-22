@@ -1,6 +1,6 @@
 {
-  "name": "@dagrejs/dagre",
-  "version": "1.1.6-pre",
+  "name": "dagre-node",
+  "version": "1.1.16",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
@@ -47,6 +47,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dagrejs/dagre.git"
+    "url": "https://github.com/alexeyvalko/dagre-node.git"
   }
 }

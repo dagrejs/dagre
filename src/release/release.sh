@@ -28,7 +28,7 @@ echo Attemping to publish version: $VERSION
 
 # Publish to pages
 rm -rf $PAGES_DIR
-git clone git@github.com:dagrejs/dagrejs.github.io.git $PAGES_DIR
+git clone git@github.com:alexeyvalko/dagre-node.git$PAGES_DIR
 
 TMP_TARGET=$PAGES_DIR/project/$PROJECT/latest
 rm -rf $TMP_TARGET
