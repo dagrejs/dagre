@@ -2838,7 +2838,7 @@ function normalizeRanks(g) {
 
 function removeEmptyRanks(g) {
   // Ranks may not start at 0, so we need to offset them
-  let nodeRanks = g.nodes().map(v => g.node(v).rank);
+  let nodeRanks = g.nodes().map(v => g.node(v).rank).filter(rank => rank !== undefined);
   let offset = applyWithChunking(Math.min, nodeRanks);
 
   let layers = [];
@@ -2996,7 +2996,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.1.5";
+module.exports = "1.1.6-pre";
 
 },{}],29:[function(require,module,exports){
 /**
