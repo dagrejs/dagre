@@ -3032,7 +3032,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.1.7";
+module.exports = "1.1.8";
 
 },{}],29:[function(require,module,exports){
 /**
