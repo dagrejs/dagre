@@ -1161,6 +1161,8 @@ module.exports = buildLayerGraph;
  *    2. Base nodes in the input graph have a rank attribute
  *    3. Subgraph nodes in the input graph has minRank and maxRank attributes
  *    4. Edges have an assigned weight
+ *    5. If `nodesWithRank` is not undefined, it must contains only the nodes
+ *       which belong to `g` and belong to `rank`.
  *
  * Post-conditions:
  *
@@ -1175,12 +1177,16 @@ module.exports = buildLayerGraph;
  *    5. The weights for copied edges are aggregated as need, since the output
  *       graph is not a multi-graph.
  */
-function buildLayerGraph(g, rank, relationship) {
+function buildLayerGraph(g, rank, relationship, nodesWithRank) {
+  if (!nodesWithRank) {
+    nodesWithRank = g.nodes();
+  }
   let root = createRootNode(g),
-    result = new Graph({ compound: true }).setGraph({ root: root })
-      .setDefaultNodeLabel(v => g.node(v));
+    result = new Graph({ compound: true })
+      .setGraph({ root: root })
+      .setDefaultNodeLabel((v) => g.node(v));
 
-  g.nodes().forEach(v => {
+  nodesWithRank.forEach((v) => {
     let node = g.node(v),
       parent = g.parent(v);
 
@@ -1346,8 +1352,38 @@ function order(g, opts) {
 }
 
 function buildLayerGraphs(g, ranks, relationship) {
-  return ranks.map(function(rank) {
-    return buildLayerGraph(g, rank, relationship);
+  // Build an index mapping from rank to the nodes with that rank.
+  // This helps to avoid a quadratic search for all nodes with the same rank as
+  // the current node.
+  const nodesByRank = new Map();
+  const addNodeToRank = (rank, node) => {
+    if (!nodesByRank.has(rank)) {
+      nodesByRank.set(rank, []);
+    }
+    nodesByRank.get(rank).push(node);
+  };
+
+  // Visit the nodes in their original order in the graph, and add each
+  // node to the ranks(s) that it belongs to.
+  for (const v of g.nodes()) {
+    const node = g.node(v);
+    if (typeof node.rank === "number") {
+      addNodeToRank(node.rank, v);
+    }
+    // If there is a range of ranks, add it to each, but skip the `node.rank` which
+    // has already had the node added.
+    if (typeof node.minRank === "number" && typeof node.maxRank === "number") {
+      for (let r = node.minRank; r <= node.maxRank; r++) {
+        if (r !== node.rank) {
+          // Don't add this node to its `node.rank` twice.
+          addNodeToRank(r, v);
+        }
+      }
+    }
+  }
+
+  return ranks.map(function (rank) {
+    return buildLayerGraph(g, rank, relationship, nodesByRank.get(rank) || []);
   });
 }
 
@@ -2996,7 +3032,7 @@ function zipObject(props, values) {
 }
 
 },{"@dagrejs/graphlib":29}],28:[function(require,module,exports){
-module.exports = "1.1.5";
+module.exports = "1.1.7";
 
 },{}],29:[function(require,module,exports){
 /**
