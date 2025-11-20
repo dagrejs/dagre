@@ -3,13 +3,11 @@ MOD = dagre
 NPM = npm
 NYC = nyc
 BROWSERIFY = ./node_modules/browserify/bin/cmd.js
-JSHINT = ./node_modules/jshint/bin/jshint
 ESLINT = ./node_modules/eslint/bin/eslint.js
 KARMA = ./node_modules/karma/bin/karma
 MOCHA = ./node_modules/mocha/bin/_mocha
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 
-JSHINT_OPTS = --reporter node_modules/jshint-stylish/index.js
 MOCHA_OPTS = -R dot
 
 BUILD_DIR = build
@@ -47,8 +45,7 @@ bower.json: package.json src/release/make-bower.json.js
 	@src/release/make-bower.json.js > $@
 
 lint:
-	@$(JSHINT) $(JSHINT_OPTS) $(filter-out node_modules, $?)
-	@$(ESLINT) $(SRC_FILES) $(TEST_FILES)
+	@$(ESLINT) $(SRC_FILES) $(TEST_FILES) --ext .js,.ts
 
 $(BUILD_DIR)/$(MOD).js: index.js $(SRC_FILES) | unit-test
 	@$(BROWSERIFY) $< > $@ -s dagre

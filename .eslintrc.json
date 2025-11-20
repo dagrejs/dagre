@@ -16,5 +16,6 @@
     "linebreak-style": [ "error", "unix" ],
     "no-prototype-builtins": 0,
     "semi": [ "error", "always" ]
-  }
+  },
+  "ignorePatterns": ["dist/*", "build/*", "index.d.ts"]
 }

@@ -4,6 +4,7 @@
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
+    "David Newell",
     "Matthew Dahl (https://github.com/sandersky)"
   ],
   "license": "MIT",
@@ -31,8 +32,6 @@
     "browserify": "17.0.0",
     "chai": "4.3.6",
     "eslint": "8.35.0",
-    "jshint": "2.13.5",
-    "jshint-stylish": "2.2.1",
     "karma": "6.4.1",
     "karma-chrome-launcher": "3.1.1",
     "karma-mocha": "2.0.1",
