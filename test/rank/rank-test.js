@@ -1,4 +1,3 @@
-let expect = require("../chai").expect;
 let rank = require("../../lib/rank");
 let Graph = require("@dagrejs/graphlib").Graph;
 
@@ -27,14 +26,14 @@ describe("rank", () => {
         g.edges().forEach(e => {
           let vRank = g.node(e.v).rank;
           let wRank = g.node(e.w).rank;
-          expect(wRank - vRank).to.be.gte(g.edge(e).minlen);
+          expect(wRank - vRank).toBeGreaterThanOrEqual(g.edge(e).minlen);
         });
       });
 
       it("can rank a single node graph", () => {
         let g = new Graph().setGraph({}).setNode("a", {});
         rank(g, ranker);
-        expect(g.node("a").rank).to.equal(0);
+        expect(g.node("a").rank).toBe(0);
       });
     });
   });

@@ -3,8 +3,8 @@
   "env": {
     "browser": true,
     "es6": true,
-    "mocha": true,
-    "node": true
+    "node": true,
+    "jest": true
   },
   "parserOptions": {
     "ecmaVersion": "latest",

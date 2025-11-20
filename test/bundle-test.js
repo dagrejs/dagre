@@ -1,18 +1,17 @@
-/* global chai, dagre */
+const dagre = require("@dagrejs/dagre");
+
+const graphlib = dagre.graphlib;
 
 // These are smoke tests to make sure the bundles look like they are working
 // correctly.
-
-var expect = chai.expect;
-var graphlib = dagre.graphlib;
-
 describe("bundle", () => {
+
   it("exports dagre", () => {
-    expect(dagre).to.be.an("object");
-    expect(dagre.graphlib).to.be.an("object");
-    expect(dagre.layout).to.be.a("function");
-    expect(dagre.util).to.be.an("object");
-    expect(dagre.version).to.be.a("string");
+    expect(dagre).toBeInstanceOf(Object);
+    expect(dagre.graphlib).toBeInstanceOf(Object);
+    expect(dagre.layout).toBeInstanceOf(Function);
+    expect(dagre.util).toBeInstanceOf(Object);
+    expect(typeof dagre.version).toBe("string");
   });
 
   it("can do trivial layout", () => {
@@ -22,13 +21,13 @@ describe("bundle", () => {
     g.setEdge("a", "b", { label: "ab", width: 50, height: 100 });
 
     dagre.layout(g);
-    expect(g.node("a")).to.have.property("x");
-    expect(g.node("a")).to.have.property("y");
-    expect(g.node("a").x).to.be.gte(0);
-    expect(g.node("a").y).to.be.gte(0);
-    expect(g.edge("a", "b")).to.have.property("x");
-    expect(g.edge("a", "b")).to.have.property("y");
-    expect(g.edge("a", "b").x).to.be.gte(0);
-    expect(g.edge("a", "b").y).to.be.gte(0);
+    expect(g.node("a")).toHaveProperty("x");
+    expect(g.node("a")).toHaveProperty("y");
+    expect(g.node("a").x).toBeGreaterThanOrEqual(0);
+    expect(g.node("a").y).toBeGreaterThanOrEqual(0);
+    expect(g.edge("a", "b")).toHaveProperty("x");
+    expect(g.edge("a", "b")).toHaveProperty("y");
+    expect(g.edge("a", "b").x).toBeGreaterThanOrEqual(0);
+    expect(g.edge("a", "b").y).toBeGreaterThanOrEqual(0);
   });
 });

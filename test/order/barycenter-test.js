@@ -1,4 +1,3 @@
-let expect = require("../chai").expect;
 let barycenter = require("../../lib/order/barycenter");
 let Graph = require("@dagrejs/graphlib").Graph;
 
@@ -15,8 +14,8 @@ describe("order/barycenter", () => {
     g.setNode("x", {});
 
     let results = barycenter(g, ["x"]);
-    expect(results).to.have.length(1);
-    expect(results[0]).to.eql({ v: "x" });
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual({ v: "x" });
   });
 
   it("assigns the position of the sole predecessors", () => {
@@ -24,8 +23,8 @@ describe("order/barycenter", () => {
     g.setEdge("a", "x");
 
     let results = barycenter(g, ["x"]);
-    expect(results).to.have.length(1);
-    expect(results[0]).eqls({ v: "x", barycenter: 2, weight: 1 });
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual({ v: "x", barycenter: 2, weight: 1 });
   });
 
   it("assigns the average of multiple predecessors", () => {
@@ -35,8 +34,8 @@ describe("order/barycenter", () => {
     g.setEdge("b", "x");
 
     let results = barycenter(g, ["x"]);
-    expect(results).to.have.length(1);
-    expect(results[0]).eqls({ v: "x", barycenter: 3, weight: 2 });
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual({ v: "x", barycenter: 3, weight: 2 });
   });
 
   it("takes into account the weight of edges", () => {
@@ -46,8 +45,8 @@ describe("order/barycenter", () => {
     g.setEdge("b", "x");
 
     let results = barycenter(g, ["x"]);
-    expect(results).to.have.length(1);
-    expect(results[0]).eqls({ v: "x", barycenter: 2.5, weight: 4 });
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual({ v: "x", barycenter: 2.5, weight: 4 });
   });
 
   it("calculates barycenters for all nodes in the movable layer", () => {
@@ -61,9 +60,9 @@ describe("order/barycenter", () => {
     g.setEdge("c", "z");
 
     let results = barycenter(g, ["x", "y", "z"]);
-    expect(results).to.have.length(3);
-    expect(results[0]).eqls({ v: "x", barycenter: 1.5, weight: 2 });
-    expect(results[1]).eqls({ v: "y" });
-    expect(results[2]).eqls({ v: "z", barycenter: 2, weight: 3 });
+    expect(results).toHaveLength(3);
+    expect(results[0]).toEqual({ v: "x", barycenter: 1.5, weight: 2 });
+    expect(results[1]).toEqual({ v: "y" });
+    expect(results[2]).toEqual({ v: "z", barycenter: 2, weight: 3 });
   });
 });

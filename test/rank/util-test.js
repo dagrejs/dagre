@@ -1,4 +1,3 @@
-let expect = require("../chai").expect;
 let Graph = require("@dagrejs/graphlib").Graph;
 let normalizeRanks = require("../../lib/util").normalizeRanks;
 let rankUtil = require("../../lib/rank/util");
@@ -18,7 +17,7 @@ describe("rank/util", () => {
       g.setNode("a");
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
+      expect(g.node("a").rank).toBe(0);
     });
 
     it("can assign ranks to unconnected nodes", () => {
@@ -26,16 +25,16 @@ describe("rank/util", () => {
       g.setNode("b");
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(0);
+      expect(g.node("a").rank).toBe(0);
+      expect(g.node("b").rank).toBe(0);
     });
 
     it("can assign ranks to connected nodes", () => {
       g.setEdge("a", "b");
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(1);
+      expect(g.node("a").rank).toBe(0);
+      expect(g.node("b").rank).toBe(1);
     });
 
     it("can assign ranks for a diamond", () => {
@@ -43,10 +42,10 @@ describe("rank/util", () => {
       g.setPath(["a", "c", "d"]);
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(1);
-      expect(g.node("c").rank).to.equal(1);
-      expect(g.node("d").rank).to.equal(2);
+      expect(g.node("a").rank).toBe(0);
+      expect(g.node("b").rank).toBe(1);
+      expect(g.node("c").rank).toBe(1);
+      expect(g.node("d").rank).toBe(2);
     });
 
     it("uses the minlen attribute on the edge", () => {
@@ -55,11 +54,11 @@ describe("rank/util", () => {
       g.setEdge("c", "d", { minlen: 2 });
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
+      expect(g.node("a").rank).toBe(0);
       // longest path biases towards the lowest rank it can assign
-      expect(g.node("b").rank).to.equal(2);
-      expect(g.node("c").rank).to.equal(1);
-      expect(g.node("d").rank).to.equal(3);
+      expect(g.node("b").rank).toBe(2);
+      expect(g.node("c").rank).toBe(1);
+      expect(g.node("d").rank).toBe(3);
     });
   });
 });
