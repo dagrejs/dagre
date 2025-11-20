@@ -2,11 +2,8 @@ MOD = dagre
 
 NPM = npm
 NYC = nyc
-BROWSERIFY = ./node_modules/browserify/bin/cmd.js
-ESLINT = ./node_modules/eslint/bin/eslint.js
 KARMA = ./node_modules/karma/bin/karma
 MOCHA = ./node_modules/mocha/bin/_mocha
-UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 
 MOCHA_OPTS = -R dot
 
@@ -16,11 +13,11 @@ DIST_DIR = dist
 
 SRC_FILES = index.js lib/version.js $(shell find lib -type f -name '*.js')
 TEST_FILES = $(shell find test -type f -name '*.js' | grep -v 'bundle-test.js')
-BUILD_FILES = $(addprefix $(BUILD_DIR)/, $(MOD).js $(MOD).min.js)
+BUILD_FILES = $(addprefix $(DIST_DIR)/, $(MOD).cjs.js $(MOD).esm.js $(MOD).min.js $(MOD).js)
 
 DIRS = $(BUILD_DIR)
 
-.PHONY: all bench clean browser-test unit-test test dist
+.PHONY: all bench clean browser-test unit-test test dist lint build release
 
 all: unit-test lint
 
@@ -38,25 +35,22 @@ test: unit-test browser-test
 unit-test: $(SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
 	@$(NYC) $(MOCHA) --dir $(COVERAGE_DIR) -- $(MOCHA_OPTS) $(TEST_FILES) || $(MOCHA) $(MOCHA_OPTS) $(TEST_FILES)
 
-browser-test: $(BUILD_DIR)/$(MOD).js
+browser-test: $(BUILD_DIR)/$(MOD).min.js
 	$(KARMA) start --single-run $(KARMA_OPTS)
 
 bower.json: package.json src/release/make-bower.json.js
 	@src/release/make-bower.json.js > $@
 
 lint:
-	@$(ESLINT) $(SRC_FILES) $(TEST_FILES) --ext .js,.ts
+	@echo "Running lint check via npm (ESLint)..."
+	@$(NPM) run lint
 
-$(BUILD_DIR)/$(MOD).js: index.js $(SRC_FILES) | unit-test
-	@$(BROWSERIFY) $< > $@ -s dagre
+build:
+	@echo "Running project build via npm (esbuild)..."
+	@$(NPM) run build
 
-$(BUILD_DIR)/$(MOD).min.js: $(BUILD_DIR)/$(MOD).js
-	@$(UGLIFY) $< --comments '@license' > $@
-
-dist: $(BUILD_FILES) | bower.json test
-	@rm -rf $@
-	@mkdir -p $@
-	@cp $^ dist
+dist: build bower.json test
+	@echo "Dist files are built in 'dist/' by the 'build' target."
 
 release: dist
 	@echo

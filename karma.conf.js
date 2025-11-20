@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'build/dagre.js',
+      'dist/dagre.js',
 
       'node_modules/chai/chai.js',
       'test/bundle-test.js'
