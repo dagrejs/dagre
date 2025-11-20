@@ -1,4 +1,3 @@
-let expect = require("../chai").expect;
 let sort = require("../../lib/order/sort");
 
 describe("sort", () => {
@@ -7,7 +6,7 @@ describe("sort", () => {
       { vs: ["a"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
     ];
-    expect(sort(input)).eqls({
+    expect(sort(input)).toEqual({
       vs: ["b", "a"],
       barycenter: (2 * 3 + 1 * 2) / (3 + 2),
       weight: 3 + 2 });
@@ -18,7 +17,7 @@ describe("sort", () => {
       { vs: ["a", "c", "d"], i: 0, barycenter: 2, weight: 3 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 2 }
     ];
-    expect(sort(input)).eqls({
+    expect(sort(input)).toEqual({
       vs: ["b", "a", "c", "d"],
       barycenter: (2 * 3 + 1 * 2) / (3 + 2),
       weight: 3 + 2 });
@@ -29,7 +28,7 @@ describe("sort", () => {
       { vs: ["a"], i: 0, barycenter: 1, weight: 1 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 1 }
     ];
-    expect(sort(input)).eqls({
+    expect(sort(input)).toEqual({
       vs: ["a", "b"],
       barycenter: 1,
       weight: 2 });
@@ -40,7 +39,7 @@ describe("sort", () => {
       { vs: ["a"], i: 0, barycenter: 1, weight: 1 },
       { vs: ["b"], i: 1, barycenter: 1, weight: 1 }
     ];
-    expect(sort(input, true)).eqls({
+    expect(sort(input, true)).toEqual({
       vs: ["b", "a"],
       barycenter: 1,
       weight: 2 });
@@ -53,7 +52,7 @@ describe("sort", () => {
       { vs: ["c"], i: 2 },
       { vs: ["d"], i: 3, barycenter: 3, weight: 1 }
     ];
-    expect(sort(input)).eqls({
+    expect(sort(input)).toEqual({
       vs: ["a", "d", "c", "b"],
       barycenter: (2 + 6 + 3) / 3,
       weight: 3
@@ -67,7 +66,7 @@ describe("sort", () => {
       { vs: ["c"], i: 2 },
       { vs: ["d"], i: 1 }
     ];
-    expect(sort(input)).eqls({ vs: ["a", "d", "c", "b"] });
+    expect(sort(input)).toEqual({ vs: ["a", "d", "c", "b"] });
   });
 
   it("can handle a barycenter of 0", () => {
@@ -77,7 +76,7 @@ describe("sort", () => {
       { vs: ["c"], i: 2 },
       { vs: ["d"], i: 1 }
     ];
-    expect(sort(input)).eqls({
+    expect(sort(input)).toEqual({
       vs: ["a", "d", "c", "b"],
       barycenter: 0,
       weight: 1

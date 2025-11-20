@@ -1,4 +1,3 @@
-var expect = require("./chai").expect;
 var Graph = require("@dagrejs/graphlib").Graph;
 var parentDummyChains = require("../lib/parent-dummy-chains");
 
@@ -17,7 +16,7 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).to.be.undefined;
+    expect(g.parent("d1")).toBeUndefined();
   });
 
   it("uses the tail's parent for the first node if it is not the root", () => {
@@ -28,7 +27,7 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).equals("sg1");
+    expect(g.parent("d1")).toBe("sg1");
   });
 
   it("uses the heads's parent for the first node if tail's is root", () => {
@@ -39,7 +38,7 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).equals("sg1");
+    expect(g.parent("d1")).toBe("sg1");
   });
 
   it("handles a long chain starting in a subgraph", () => {
@@ -52,9 +51,9 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "d2", "d3", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).equals("sg1");
-    expect(g.parent("d2")).to.be.undefined;
-    expect(g.parent("d3")).to.be.undefined;
+    expect(g.parent("d1")).toBe("sg1");
+    expect(g.parent("d2")).toBeUndefined();
+    expect(g.parent("d3")).toBeUndefined();
   });
 
   it("handles a long chain ending in a subgraph", () => {
@@ -67,9 +66,9 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "d2", "d3", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).to.be.undefined;
-    expect(g.parent("d2")).to.be.undefined;
-    expect(g.parent("d3")).equals("sg1");
+    expect(g.parent("d1")).toBeUndefined();
+    expect(g.parent("d2")).toBeUndefined();
+    expect(g.parent("d3")).toBe("sg1");
   });
 
   it("handles nested subgraphs", () => {
@@ -89,11 +88,11 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "d2", "d3", "d4", "d5", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).equals("sg2");
-    expect(g.parent("d2")).equals("sg1");
-    expect(g.parent("d3")).to.be.undefined;
-    expect(g.parent("d4")).equals("sg3");
-    expect(g.parent("d5")).equals("sg4");
+    expect(g.parent("d1")).toBe("sg2");
+    expect(g.parent("d2")).toBe("sg1");
+    expect(g.parent("d3")).toBeUndefined();
+    expect(g.parent("d4")).toBe("sg3");
+    expect(g.parent("d5")).toBe("sg4");
   });
 
   it("handles overlapping rank ranges", () => {
@@ -108,9 +107,9 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "d2", "d3", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).equals("sg1");
-    expect(g.parent("d2")).equals("sg1");
-    expect(g.parent("d3")).equals("sg2");
+    expect(g.parent("d1")).toBe("sg1");
+    expect(g.parent("d2")).toBe("sg1");
+    expect(g.parent("d3")).toBe("sg2");
   });
 
   it("handles an LCA that is not the root of the graph #1", () => {
@@ -125,8 +124,8 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "d2", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).equals("sg1");
-    expect(g.parent("d2")).equals("sg2");
+    expect(g.parent("d1")).toBe("sg1");
+    expect(g.parent("d2")).toBe("sg2");
   });
 
   it("handles an LCA that is not the root of the graph #2", () => {
@@ -141,7 +140,7 @@ describe("parentDummyChains", () => {
     g.setPath(["a", "d1", "d2", "b"]);
 
     parentDummyChains(g);
-    expect(g.parent("d1")).equals("sg2");
-    expect(g.parent("d2")).equals("sg1");
+    expect(g.parent("d1")).toBe("sg2");
+    expect(g.parent("d2")).toBe("sg1");
   });
 });

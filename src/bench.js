@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
 let Benchmark = require("benchmark"),
-    sprintf = require("sprintf").sprintf;
+  sprintf = require("sprintf").sprintf;
 
 let Graph = require("graphlib").Graph,
-    rank = require("../lib/rank"),
-    layout = require("..").layout;
+  rank = require("../lib/rank"),
+  layout = require("..").layout;
 
 function runBenchmark(name, fn) {
   let options = {};
   options.onComplete = function(bench) {
     let target = bench.target,
-        hz = target.hz,
-        stats = target.stats,
-        rme = stats.rme,
-        samples = stats.sample.length,
-        msg = sprintf("    %25s: %13s ops/sec \xb1 %s%% (%3d run(s) sampled)",
-                      target.name,
-                      Benchmark.formatNumber(hz.toFixed(2)),
-                      rme.toFixed(2),
-                      samples);
+      hz = target.hz,
+      stats = target.stats,
+      rme = stats.rme,
+      samples = stats.sample.length,
+      msg = sprintf("    %25s: %13s ops/sec \xb1 %s%% (%3d run(s) sampled)",
+        target.name,
+        Benchmark.formatNumber(hz.toFixed(2)),
+        rme.toFixed(2),
+        samples);
     console.log(msg);
   };
   options.onError = function(bench) {

@@ -5,7 +5,7 @@
  */
 
 let fs = require("fs"),
-    semver = require("semver");
+  semver = require("semver");
 
 let packageFile = fs.readFileSync("package.json");
 let packageJson = JSON.parse(packageFile);
@@ -21,6 +21,6 @@ fs.writeFileSync("package.json", JSON.stringify(packageJson, undefined, 2));
 
 // Write an error message to stderr and then exit immediately with an error.
 function bail(msg) {
-  stderr.write(msg + "\n");
+  console.error(msg + "\n");
   process.exit(1);
 }
