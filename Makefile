@@ -38,9 +38,6 @@ unit-test: $(SRC_FILES) $(TEST_FILES) node_modules | $(BUILD_DIR)
 browser-test: $(BUILD_DIR)/$(MOD).min.js
 	$(KARMA) start --single-run $(KARMA_OPTS)
 
-bower.json: package.json src/release/make-bower.json.js
-	@src/release/make-bower.json.js > $@
-
 lint:
 	@echo "Running lint check via npm (ESLint)..."
 	@$(NPM) run lint
@@ -49,7 +46,7 @@ build:
 	@echo "Running project build via npm (esbuild)..."
 	@$(NPM) run build
 
-dist: build bower.json test
+dist: build test
 	@echo "Dist files are built in 'dist/' by the 'build' target."
 
 release: dist
