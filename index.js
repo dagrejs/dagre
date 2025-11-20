@@ -1,4 +1,6 @@
 /*
+@license
+
 Copyright (c) 2012-2014 Chris Pettitt
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

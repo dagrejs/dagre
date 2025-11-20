@@ -8,17 +8,21 @@
     "Matthew Dahl (https://github.com/sandersky)"
   ],
   "license": "MIT",
-  "main": "index.js",
+  "main": "dist/dagre.cjs.js",
+  "module": "dist/dagre.esm.js",
   "scripts": {
-    "lint": "make lint",
+    "build": "node build.js",
+    "lint": "eslint . --ext .js,.ts",
     "test": "make test"
   },
-  "files": [
-    "index.js",
-    "index.d.ts",
-    "dist/",
-    "lib/"
-  ],
+  "files": ["dist/"],
+  "exports": {
+    ".": {
+      "import": "./dist/dagre.esm.js",
+      "require": "./dist/dagre.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
   "types": "index.d.ts",
   "keywords": [
     "graph",
@@ -29,8 +33,8 @@
   },
   "devDependencies": {
     "benchmark": "2.1.4",
-    "browserify": "17.0.0",
     "chai": "4.3.6",
+    "esbuild": "^0.27.0",
     "eslint": "8.35.0",
     "karma": "6.4.1",
     "karma-chrome-launcher": "3.1.1",
@@ -41,8 +45,7 @@
     "nyc": "^15.1.0",
     "requirejs": "2.3.6",
     "semver": "7.3.7",
-    "sprintf": "0.1.5",
-    "uglify-js": "3.17.4"
+    "sprintf": "0.1.5"
   },
   "repository": {
     "type": "git",
