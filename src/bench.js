@@ -3,7 +3,7 @@
 let Benchmark = require("benchmark"),
   sprintf = require("sprintf").sprintf;
 
-let Graph = require("graphlib").Graph,
+let Graph = require("@dagrejs/graphlib").Graph,
   rank = require("../lib/rank"),
   layout = require("..").layout;
 

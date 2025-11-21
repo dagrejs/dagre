@@ -1,4 +1,5 @@
 const esbuild = require('esbuild');
+const fs = require('fs');
 const { dependencies } = require('./package.json');
 
 // Get all production dependencies to be marked as external (not bundled)
@@ -41,10 +42,9 @@ async function build() {
     globalName: 'dagre',
     platform: 'browser',
     external: [], 
-    minify: true,
   });
 
-  // 4. IIFE/UMD - For direct browser script tag
+  // 4. IIFE/UMD - For direct browser script tag, unminified
   await esbuild.build({
     ...sharedConfig,
     outfile: 'dist/dagre.js',
@@ -54,6 +54,8 @@ async function build() {
     external: [], 
     minify: false,
   });
+
+  fs.copyFileSync('index.d.ts', 'dist/dagre.d.ts');
   
   console.log('Build complete! 🚀');
 }
