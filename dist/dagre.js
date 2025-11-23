@@ -221,7 +221,9 @@ var dagre = (() => {
           }
         });
         g.edges().forEach((e) => {
-          simplified.setEdge(e, g.edge(e));
+          if (simplified.node(e.v) && simplified.node(e.w)) {
+            simplified.setEdge(e, g.edge(e));
+          }
         });
         return simplified;
       }
@@ -543,6 +545,9 @@ var dagre = (() => {
           let node = g.node(v);
           let origLabel = node.edgeLabel;
           let w;
+          if (!g.node(node.edgeObj.v) || !g.node(node.edgeObj.w)) {
+            return;
+          }
           g.setEdge(node.edgeObj, origLabel);
           while (node.dummy) {
             w = g.successors(v)[0];
@@ -939,8 +944,10 @@ var dagre = (() => {
         let top = util.addBorderNode(g, "_bt");
         let bottom = util.addBorderNode(g, "_bb");
         let label = g.node(v);
+        g.node(top).height = label.height / 2 || 0;
         g.setParent(top, v);
         label.borderTop = top;
+        g.node(bottom).height = label.height / 2 || 0;
         g.setParent(bottom, v);
         label.borderBottom = bottom;
         children.forEach((child) => {
@@ -960,6 +967,11 @@ var dagre = (() => {
             minlen,
             nestingEdge: true
           });
+        });
+        g.edges().forEach((edge) => {
+          if (edge.v === v || edge.w === v) {
+            g.setEdge(edge.v === v ? bottom : edge.v, edge.w === v ? top : edge.w, g.edge(edge));
+          }
         });
         if (!g.parent(v)) {
           g.setEdge(root, top, { weight: 0, minlen: height + depths[v] });
@@ -1111,7 +1123,7 @@ var dagre = (() => {
           visited[v] = true;
           let node = g.node(v);
           layers[node.rank].push(v);
-          g.successors(v).forEach(dfs);
+          g.successors(v).filter((s) => !g.children(s).length).forEach(dfs);
         }
         let orderedVs = simpleNodes.sort((a, b) => g.node(a).rank - g.node(b).rank);
         orderedVs.forEach(dfs);
