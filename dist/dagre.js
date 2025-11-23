@@ -1889,10 +1889,11 @@ var dagre = (() => {
       module.exports = layout;
       function layout(g, opts) {
         let time = opts && opts.debugTiming ? util.time : util.notime;
-        time("layout", () => {
+        return time("layout", () => {
           let layoutGraph = time("  buildLayoutGraph", () => buildLayoutGraph(g));
           time("  runLayout", () => runLayout(layoutGraph, time, opts));
           time("  updateInputGraph", () => updateInputGraph(g, layoutGraph));
+          return layoutGraph;
         });
       }
       function runLayout(g, time, opts) {
@@ -1931,6 +1932,7 @@ var dagre = (() => {
           if (inputLabel) {
             inputLabel.x = layoutLabel.x;
             inputLabel.y = layoutLabel.y;
+            inputLabel.order = layoutLabel.order;
             inputLabel.rank = layoutLabel.rank;
             if (layoutGraph.children(v).length) {
               inputLabel.width = layoutLabel.width;
