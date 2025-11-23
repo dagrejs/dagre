@@ -34,24 +34,23 @@ async function build() {
     platform: 'neutral',
   });
 
-  // 3. IIFE/UMD - For direct browser script tag
-  await esbuild.build({
+  const iifeConfig = {
     ...sharedConfig,
-    outfile: 'dist/dagre.min.js',
     format: 'iife',
     globalName: 'dagre',
     platform: 'browser',
-    external: [], 
+  };
+
+  // 3. IIFE/UMD - For direct browser script tag
+  await esbuild.build({
+    ...iifeConfig,
+    outfile: 'dist/dagre.min.js',
   });
 
   // 4. IIFE/UMD - For direct browser script tag, unminified
   await esbuild.build({
-    ...sharedConfig,
+    ...iifeConfig,
     outfile: 'dist/dagre.js',
-    format: 'iife',
-    globalName: 'dagre',
-    platform: 'browser',
-    external: [], 
     minify: false,
   });
 
