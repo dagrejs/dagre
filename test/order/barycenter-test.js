@@ -1,56 +1,55 @@
-var expect = require("../chai").expect;
-var barycenter = require("../../lib/order/barycenter");
-var Graph = require("../../lib/graphlib").Graph;
+let barycenter = require("../../lib/order/barycenter");
+let Graph = require("@dagrejs/graphlib").Graph;
 
-describe("order/barycenter", function() {
-  var g;
+describe("order/barycenter", () => {
+  let g;
 
-  beforeEach(function() {
+  beforeEach(() => {
     g = new Graph()
-      .setDefaultNodeLabel(function() { return {}; })
-      .setDefaultEdgeLabel(function() { return { weight: 1 }; });
+      .setDefaultNodeLabel(() => ({}))
+      .setDefaultEdgeLabel(() => ({ weight: 1 }));
   });
 
-  it("assigns an undefined barycenter for a node with no predecessors", function() {
+  it("assigns an undefined barycenter for a node with no predecessors", () => {
     g.setNode("x", {});
 
-    var results = barycenter(g, ["x"]);
-    expect(results).to.have.length(1);
-    expect(results[0]).to.eql({ v: "x" });
+    let results = barycenter(g, ["x"]);
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual({ v: "x" });
   });
 
-  it("assigns the position of the sole predecessors", function() {
+  it("assigns the position of the sole predecessors", () => {
     g.setNode("a", { order: 2 });
     g.setEdge("a", "x");
 
-    var results = barycenter(g, ["x"]);
-    expect(results).to.have.length(1);
-    expect(results[0]).eqls({ v: "x", barycenter: 2, weight: 1 });
+    let results = barycenter(g, ["x"]);
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual({ v: "x", barycenter: 2, weight: 1 });
   });
 
-  it("assigns the average of multiple predecessors", function() {
+  it("assigns the average of multiple predecessors", () => {
     g.setNode("a", { order: 2 });
     g.setNode("b", { order: 4 });
     g.setEdge("a", "x");
     g.setEdge("b", "x");
 
-    var results = barycenter(g, ["x"]);
-    expect(results).to.have.length(1);
-    expect(results[0]).eqls({ v: "x", barycenter: 3, weight: 2 });
+    let results = barycenter(g, ["x"]);
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual({ v: "x", barycenter: 3, weight: 2 });
   });
 
-  it("takes into account the weight of edges", function() {
+  it("takes into account the weight of edges", () => {
     g.setNode("a", { order: 2 });
     g.setNode("b", { order: 4 });
     g.setEdge("a", "x", { weight: 3 });
     g.setEdge("b", "x");
 
-    var results = barycenter(g, ["x"]);
-    expect(results).to.have.length(1);
-    expect(results[0]).eqls({ v: "x", barycenter: 2.5, weight: 4 });
+    let results = barycenter(g, ["x"]);
+    expect(results).toHaveLength(1);
+    expect(results[0]).toEqual({ v: "x", barycenter: 2.5, weight: 4 });
   });
 
-  it("calculates barycenters for all nodes in the movable layer", function() {
+  it("calculates barycenters for all nodes in the movable layer", () => {
     g.setNode("a", { order: 1 });
     g.setNode("b", { order: 2 });
     g.setNode("c", { order: 4 });
@@ -60,10 +59,10 @@ describe("order/barycenter", function() {
     g.setEdge("a", "z", { weight: 2 });
     g.setEdge("c", "z");
 
-    var results = barycenter(g, ["x", "y", "z"]);
-    expect(results).to.have.length(3);
-    expect(results[0]).eqls({ v: "x", barycenter: 1.5, weight: 2 });
-    expect(results[1]).eqls({ v: "y" });
-    expect(results[2]).eqls({ v: "z", barycenter: 2, weight: 3 });
+    let results = barycenter(g, ["x", "y", "z"]);
+    expect(results).toHaveLength(3);
+    expect(results[0]).toEqual({ v: "x", barycenter: 1.5, weight: 2 });
+    expect(results[1]).toEqual({ v: "y" });
+    expect(results[2]).toEqual({ v: "z", barycenter: 2, weight: 3 });
   });
 });

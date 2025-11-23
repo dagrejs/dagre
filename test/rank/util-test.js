@@ -1,65 +1,64 @@
-var expect = require("../chai").expect;
-var Graph = require("../../lib/graphlib").Graph;
-var normalizeRanks = require("../../lib/util").normalizeRanks;
-var rankUtil = require("../../lib/rank/util");
-var longestPath = rankUtil.longestPath;
+let Graph = require("@dagrejs/graphlib").Graph;
+let normalizeRanks = require("../../lib/util").normalizeRanks;
+let rankUtil = require("../../lib/rank/util");
+let longestPath = rankUtil.longestPath;
 
-describe("rank/util", function() {
-  describe("longestPath", function() {
-    var g;
+describe("rank/util", () => {
+  describe("longestPath", () => {
+    let g;
 
-    beforeEach(function() {
+    beforeEach(() => {
       g = new Graph()
-        .setDefaultNodeLabel(function() { return {}; })
-        .setDefaultEdgeLabel(function() { return { minlen: 1 }; });
+        .setDefaultNodeLabel(() => ({}))
+        .setDefaultEdgeLabel(() => ({ minlen: 1 }));
     });
 
-    it("can assign a rank to a single node graph", function() {
+    it("can assign a rank to a single node graph", () => {
       g.setNode("a");
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
+      expect(g.node("a").rank).toBe(0);
     });
 
-    it("can assign ranks to unconnected nodes", function() {
+    it("can assign ranks to unconnected nodes", () => {
       g.setNode("a");
       g.setNode("b");
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(0);
+      expect(g.node("a").rank).toBe(0);
+      expect(g.node("b").rank).toBe(0);
     });
 
-    it("can assign ranks to connected nodes", function() {
+    it("can assign ranks to connected nodes", () => {
       g.setEdge("a", "b");
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(1);
+      expect(g.node("a").rank).toBe(0);
+      expect(g.node("b").rank).toBe(1);
     });
 
-    it("can assign ranks for a diamond", function() {
+    it("can assign ranks for a diamond", () => {
       g.setPath(["a", "b", "d"]);
       g.setPath(["a", "c", "d"]);
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
-      expect(g.node("b").rank).to.equal(1);
-      expect(g.node("c").rank).to.equal(1);
-      expect(g.node("d").rank).to.equal(2);
+      expect(g.node("a").rank).toBe(0);
+      expect(g.node("b").rank).toBe(1);
+      expect(g.node("c").rank).toBe(1);
+      expect(g.node("d").rank).toBe(2);
     });
 
-    it("uses the minlen attribute on the edge", function() {
+    it("uses the minlen attribute on the edge", () => {
       g.setPath(["a", "b", "d"]);
       g.setEdge("a", "c");
       g.setEdge("c", "d", { minlen: 2 });
       longestPath(g);
       normalizeRanks(g);
-      expect(g.node("a").rank).to.equal(0);
+      expect(g.node("a").rank).toBe(0);
       // longest path biases towards the lowest rank it can assign
-      expect(g.node("b").rank).to.equal(2);
-      expect(g.node("c").rank).to.equal(1);
-      expect(g.node("d").rank).to.equal(3);
+      expect(g.node("b").rank).toBe(2);
+      expect(g.node("c").rank).toBe(1);
+      expect(g.node("d").rank).toBe(3);
     });
   });
 });

@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 
-var package = require("../../package.json");
-console.log("module.exports = \"" + package.version + "\";");
+let packagejson = require("../../package.json");
+console.log("module.exports = \"" + packagejson.version + "\";");

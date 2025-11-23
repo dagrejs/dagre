@@ -1,3 +1,5 @@
 build/
 node_modules/
 tmp/
+coverage/
+/.nyc_output

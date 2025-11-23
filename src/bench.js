@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
-var Benchmark = require("benchmark"),
-    sprintf = require("sprintf").sprintf;
+let Benchmark = require("benchmark"),
+  sprintf = require("sprintf").sprintf;
 
-var Graph = require("graphlib").Graph,
-    rank = require("../lib/rank"),
-    layout = require("..").layout;
+let Graph = require("@dagrejs/graphlib").Graph,
+  rank = require("../lib/rank"),
+  layout = require("..").layout;
 
 function runBenchmark(name, fn) {
-  var options = {};
+  let options = {};
   options.onComplete = function(bench) {
-    var target = bench.target,
-        hz = target.hz,
-        stats = target.stats,
-        rme = stats.rme,
-        samples = stats.sample.length,
-        msg = sprintf("    %25s: %13s ops/sec \xb1 %s%% (%3d run(s) sampled)",
-                      target.name,
-                      Benchmark.formatNumber(hz.toFixed(2)),
-                      rme.toFixed(2),
-                      samples);
+    let target = bench.target,
+      hz = target.hz,
+      stats = target.stats,
+      rme = stats.rme,
+      samples = stats.sample.length,
+      msg = sprintf("    %25s: %13s ops/sec \xb1 %s%% (%3d run(s) sampled)",
+        target.name,
+        Benchmark.formatNumber(hz.toFixed(2)),
+        rme.toFixed(2),
+        samples);
     console.log(msg);
   };
   options.onError = function(bench) {
@@ -34,7 +34,7 @@ function runBenchmark(name, fn) {
   new Benchmark(name, fn, options).run();
 }
 
-var g = new Graph()
+let g = new Graph()
   .setGraph({})
   .setDefaultNodeLabel(function() { return { width: 1, height: 1}; })
   .setDefaultEdgeLabel(function() { return { minlen: 1, weight: 1 }; })

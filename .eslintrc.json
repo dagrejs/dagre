@@ -1,13 +1,21 @@
 {
+  "extends": "eslint:recommended",
   "env": {
     "browser": true,
+    "es6": true,
     "node": true,
-    "mocha": true
+    "jest": true
   },
-  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "allowImportExportEverywhere": true
+  },
   "rules": {
     "indent": [ "error", 2 ],
     "linebreak-style": [ "error", "unix" ],
+    "no-prototype-builtins": 0,
     "semi": [ "error", "always" ]
-  }
+  },
+  "ignorePatterns": ["dist/*", "build/*", "index.d.ts"]
 }
