@@ -1667,16 +1667,18 @@ var dagre = (() => {
       function horizontalCompaction(g, layering, root, align, reverseSep) {
         let xs = {}, blockG = buildBlockGraph(g, layering, root, reverseSep), borderType = reverseSep ? "borderLeft" : "borderRight";
         function iterate(setXsFunc, nextNodesFunc) {
-          let stack = blockG.nodes();
+          const stack = blockG.nodes().slice();
+          const visited = {};
           let elem = stack.pop();
-          let visited = {};
           while (elem) {
             if (visited[elem]) {
               setXsFunc(elem);
             } else {
               visited[elem] = true;
               stack.push(elem);
-              stack = stack.concat(nextNodesFunc(elem));
+              for (const nextElem of nextNodesFunc(elem)) {
+                stack.push(nextElem);
+              }
             }
             elem = stack.pop();
           }
