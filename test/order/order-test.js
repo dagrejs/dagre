@@ -1,4 +1,3 @@
-let expect = require("../chai").expect;
 let Graph = require("@dagrejs/graphlib").Graph;
 let order = require("../../lib/order");
 let crossCount = require("../../lib/order/cross-count");
@@ -21,7 +20,7 @@ describe("order", () => {
     g.setPath(["a", "e", "f"]);
     order(g);
     let layering = util.buildLayerMatrix(g);
-    expect(crossCount(g, layering)).to.equal(0);
+    expect(crossCount(g, layering)).toBe(0);
   });
 
   it("can solve a simple graph", () => {
@@ -31,7 +30,7 @@ describe("order", () => {
     ["c", "g"].forEach(v => g.setNode(v, { rank: 3 }));
     order(g);
     let layering = util.buildLayerMatrix(g);
-    expect(crossCount(g, layering)).to.equal(0);
+    expect(crossCount(g, layering)).toBe(0);
   });
 
   it("can minimize crossings", () => {
@@ -41,7 +40,7 @@ describe("order", () => {
     g.setNode("d", { rank: 4 });
     order(g);
     let layering = util.buildLayerMatrix(g);
-    expect(crossCount(g, layering)).to.be.lte(1);
+    expect(crossCount(g, layering)).toBeLessThanOrEqual(1);
   });
 
   it('can skip the optimal ordering', () => {
@@ -57,6 +56,6 @@ describe("order", () => {
 
     order(g, opts);
     var layering = util.buildLayerMatrix(g);
-    expect(crossCount(g, layering)).to.equal(1);
+    expect(crossCount(g, layering)).toBe(1);
   });
 });

@@ -14,11 +14,11 @@ jobs:
         node-version: [18.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: browser-actions/setup-chrome@latest
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
@@ -27,12 +27,13 @@ jobs:
     - name: Install dependencies
       run: |
         npm install
-        sudo apt-get install graphviz xvfb
 
     - name: Lint
       run: |
         make lint
 
+    - name: Build
+      run: make build
+
     - name: Test
-      run: |
-        KARMA_OPTS="--browsers Chrome" xvfb-run --auto-servernum make -e test
+      run: make test

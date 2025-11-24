@@ -1,4 +1,3 @@
-var expect = require("./chai").expect;
 var position = require("../lib/position");
 var Graph = require("@dagrejs/graphlib").Graph;
 
@@ -20,7 +19,7 @@ describe("position", () => {
     g.setNode("b", { width: 50, height:  80, rank: 1, order: 0 });
     g.setEdge("a", "b");
     position(g);
-    expect(g.node("b").y).to.equal(100 + 1000 + 80 / 2);
+    expect(g.node("b").y).toBe(100 + 1000 + 80 / 2);
   });
 
   it("use the largest height in each rank with ranksep", () => {
@@ -30,9 +29,9 @@ describe("position", () => {
     g.setNode("c", { width: 50, height:  90, rank: 1, order: 0 });
     g.setEdge("a", "c");
     position(g);
-    expect(g.node("a").y).to.equal(100 / 2);
-    expect(g.node("b").y).to.equal(100 / 2); // Note we used 100 and not 80 here
-    expect(g.node("c").y).to.equal(100 + 1000 + 90 / 2);
+    expect(g.node("a").y).toBe(100 / 2);
+    expect(g.node("b").y).toBe(100 / 2); // Note we used 100 and not 80 here
+    expect(g.node("c").y).toBe(100 + 1000 + 90 / 2);
   });
 
   it("respects nodesep", () => {
@@ -40,7 +39,7 @@ describe("position", () => {
     g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
     g.setNode("b", { width: 70, height:  80, rank: 0, order: 1 });
     position(g);
-    expect(g.node("b").x).to.equal(g.node("a").x + 50 / 2 + 1000 + 70 / 2);
+    expect(g.node("b").x).toBe(g.node("a").x + 50 / 2 + 1000 + 70 / 2);
   });
 
   it("should not try to position the subgraph node itself", () => {
@@ -48,7 +47,7 @@ describe("position", () => {
     g.setNode("sg1", {});
     g.setParent("a", "sg1");
     position(g);
-    expect(g.node("sg1")).to.not.have.property("x");
-    expect(g.node("sg1")).to.not.have.property("y");
+    expect(g.node("sg1")).not.toHaveProperty("x");
+    expect(g.node("sg1")).not.toHaveProperty("y");
   });
 });

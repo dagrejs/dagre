@@ -21,15 +21,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-
-module.exports = {
-  graphlib: require("@dagrejs/graphlib"),
-
-  layout: require("./lib/layout"),
-  debug: require("./lib/debug"),
-  util: {
-    time: require("./lib/util").time,
-    notime: require("./lib/util").notime
-  },
-  version: require("./lib/version")
-};

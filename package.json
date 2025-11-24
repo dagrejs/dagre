@@ -1,24 +1,31 @@
 {
   "name": "@dagrejs/dagre",
-  "version": "1.1.6-pre",
+  "version": "2.0.1-pre",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
+    "David Newell",
     "Matthew Dahl (https://github.com/sandersky)"
   ],
   "license": "MIT",
-  "main": "index.js",
+  "main": "dist/dagre.cjs.js",
+  "module": "dist/dagre.esm.js",
   "scripts": {
-    "lint": "make lint",
-    "test": "make test"
+    "build": "node build.js",
+    "lint": "eslint . --ext .js,.ts",
+    "test": "jest"
   },
   "files": [
-    "index.js",
-    "index.d.ts",
-    "dist/",
-    "lib/"
+    "dist/"
   ],
-  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/dagre.esm.js",
+      "require": "./dist/dagre.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/dagre.d.ts",
   "keywords": [
     "graph",
     "layout"
@@ -28,22 +35,10 @@
   },
   "devDependencies": {
     "benchmark": "2.1.4",
-    "browserify": "17.0.0",
-    "chai": "4.3.6",
+    "esbuild": "^0.27.0",
     "eslint": "8.35.0",
-    "jshint": "2.13.5",
-    "jshint-stylish": "2.2.1",
-    "karma": "6.4.1",
-    "karma-chrome-launcher": "3.1.1",
-    "karma-mocha": "2.0.1",
-    "karma-requirejs": "1.1.0",
-    "karma-safari-launcher": "1.0.0",
-    "mocha": "10.1.0",
-    "nyc": "^15.1.0",
-    "requirejs": "2.3.6",
-    "semver": "7.3.7",
-    "sprintf": "0.1.5",
-    "uglify-js": "3.17.4"
+    "jest": "^30.2.0",
+    "semver": "7.3.7"
   },
   "repository": {
     "type": "git",

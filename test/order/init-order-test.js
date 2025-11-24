@@ -1,4 +1,3 @@
-let expect = require("../chai").expect;
 let Graph = require("@dagrejs/graphlib").Graph;
 let initOrder = require("../../lib/order/init-order");
 
@@ -19,9 +18,9 @@ describe("order/initOrder", () => {
     g.setEdge("a", "e");
 
     let layering = initOrder(g);
-    expect(layering[0]).to.eql(["a"]);
-    expect(layering[1].sort()).to.eql(["b", "e"]);
-    expect(layering[2].sort()).to.eql(["c", "d"]);
+    expect(layering[0]).toEqual(["a"]);
+    expect(layering[1].sort()).toEqual(["b", "e"]);
+    expect(layering[2].sort()).toEqual(["c", "d"]);
   });
 
   it("assigns non-overlapping orders for each rank in a DAG", () => {
@@ -32,9 +31,9 @@ describe("order/initOrder", () => {
     g.setPath(["a", "c", "d"]);
 
     let layering = initOrder(g);
-    expect(layering[0]).to.eql(["a"]);
-    expect(layering[1].sort()).to.eql(["b", "c"]);
-    expect(layering[2].sort()).to.eql(["d"]);
+    expect(layering[0]).toEqual(["a"]);
+    expect(layering[1].sort()).toEqual(["b", "c"]);
+    expect(layering[2].sort()).toEqual(["d"]);
   });
 
   it("does not assign an order to subgraph nodes", () => {
@@ -43,6 +42,6 @@ describe("order/initOrder", () => {
     g.setParent("a", "sg1");
 
     let layering = initOrder(g);
-    expect(layering).to.eql([["a"]]);
+    expect(layering).toEqual([["a"]]);
   });
 });
