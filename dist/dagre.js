@@ -1465,26 +1465,29 @@ var dagre = (() => {
       var Graph = __require("@dagrejs/graphlib").Graph;
       var util = require_util();
       module.exports = order;
-      function order(g, opts) {
-        if (opts && typeof opts.customOrder === "function") {
+      function order(g, opts = {}) {
+        if (typeof opts.customOrder === "function") {
           opts.customOrder(g, order);
           return;
         }
         let maxRank = util.maxRank(g), downLayerGraphs = buildLayerGraphs(g, util.range(1, maxRank + 1), "inEdges"), upLayerGraphs = buildLayerGraphs(g, util.range(maxRank - 1, -1, -1), "outEdges");
         let layering = initOrder(g);
         assignOrder(g, layering);
-        if (opts && opts.disableOptimalOrderHeuristic) {
+        if (opts.disableOptimalOrderHeuristic) {
           return;
         }
         let bestCC = Number.POSITIVE_INFINITY, best;
+        const constraints = opts.constraints || [];
         for (let i = 0, lastBest = 0; lastBest < 4; ++i, ++lastBest) {
-          sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2);
+          sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2, constraints);
           layering = util.buildLayerMatrix(g);
           let cc = crossCount(g, layering);
           if (cc < bestCC) {
             lastBest = 0;
             best = Object.assign({}, layering);
             bestCC = cc;
+          } else if (cc === bestCC) {
+            best = structuredClone(layering);
           }
         }
         assignOrder(g, best);
@@ -1514,9 +1517,10 @@ var dagre = (() => {
           return buildLayerGraph(g, rank, relationship, nodesByRank.get(rank) || []);
         });
       }
-      function sweepLayerGraphs(layerGraphs, biasRight) {
+      function sweepLayerGraphs(layerGraphs, biasRight, constraints) {
         let cg = new Graph();
         layerGraphs.forEach(function(lg) {
+          constraints.forEach((con) => cg.setEdge(con.left, con.right));
           let root = lg.graph().root;
           let sorted = sortSubgraph(lg, root, cg, biasRight);
           sorted.vs.forEach((v, i) => lg.node(v).order = i);
@@ -1887,8 +1891,8 @@ var dagre = (() => {
       var util = require_util();
       var Graph = __require("@dagrejs/graphlib").Graph;
       module.exports = layout;
-      function layout(g, opts) {
-        let time = opts && opts.debugTiming ? util.time : util.notime;
+      function layout(g, opts = {}) {
+        const time = opts.debugTiming ? util.time : util.notime;
         return time("layout", () => {
           let layoutGraph = time("  buildLayoutGraph", () => buildLayoutGraph(g));
           time("  runLayout", () => runLayout(layoutGraph, time, opts));
