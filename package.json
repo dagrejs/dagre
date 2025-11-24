@@ -20,6 +20,7 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/dagre.d.ts",
       "import": "./dist/dagre.esm.js",
       "require": "./dist/dagre.cjs.js"
     },
