@@ -242,9 +242,9 @@ describe("util", () => {
         .setNode("sg", {})
         .setParent("a", "sg");
       util.removeEmptyRanks(g);
-      expect(g.node("a").rank).equals(0);
-      expect(g.node("b").rank).equals(2);
-      expect(g.node("sg").rank).equals(undefined);
+      expect(g.node("a").rank).toBe(0);
+      expect(g.node("b").rank).toBe(2);
+      expect(g.node("sg").rank).toBe(undefined);
     });
   });
 

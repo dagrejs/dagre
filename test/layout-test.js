@@ -226,7 +226,7 @@ describe("layout", () => {
     g.setNode("sg", {});
     g.setParent("c", "sg");
     layout(g);
-    expect(g.node("b").y - g.node("a").y).to.equal(100);
+    expect(g.node("b").y - g.node("a").y).toBe(100);
   });
 
   it("can layout subgraphs with different rankdirs", () => {
