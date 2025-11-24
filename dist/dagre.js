@@ -299,7 +299,7 @@ var dagre = (() => {
         });
       }
       function removeEmptyRanks(g) {
-        let nodeRanks = g.nodes().map((v) => g.node(v).rank);
+        let nodeRanks = g.nodes().map((v) => g.node(v).rank).filter((rank) => rank !== void 0);
         let offset = applyWithChunking(Math.min, nodeRanks);
         let layers = [];
         g.nodes().forEach((v) => {

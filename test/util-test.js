@@ -233,6 +233,19 @@ describe("util", () => {
       expect(g.node("a").rank).toBe(0);
       expect(g.node("b").rank).toBe(2);
     });
+
+    it("Handles parents with undefined ranks", () => {
+      var g = new Graph({ compound: true })
+        .setGraph({ nodeRankFactor: 3 })
+        .setNode("a", { rank: 0 })
+        .setNode("b", { rank: 6 })
+        .setNode("sg", {})
+        .setParent("a", "sg");
+      util.removeEmptyRanks(g);
+      expect(g.node("a").rank).toBe(0);
+      expect(g.node("b").rank).toBe(2);
+      expect(g.node("sg").rank).toBe(undefined);
+    });
   });
 
   describe("range", () => {

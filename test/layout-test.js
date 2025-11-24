@@ -218,6 +218,17 @@ describe("layout", () => {
     expect(g.node("x").y).toBe(g.node("y").y);
   });
 
+  it("minimizes separation between nodes not adjacent to subgraphs", () => {
+    ["a", "b", "c"].forEach(v => {
+      g.setNode(v, { width: 50, height: 50 });
+    });
+    g.setPath(["a", "b", "c"]);
+    g.setNode("sg", {});
+    g.setParent("c", "sg");
+    layout(g);
+    expect(g.node("b").y - g.node("a").y).toBe(100);
+  });
+
   it("can layout subgraphs with different rankdirs", () => {
     g.setNode("a", { width: 50, height: 50 });
     g.setNode("sg", {});
