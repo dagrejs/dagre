@@ -1,9 +1,9 @@
-import { Graph, Node as GraphNode, Edge as GraphEdge } from '@dagrejs/graphlib';
+import { Graph as ImportedGraph, Node as GraphNode, Edge as GraphEdge } from '@dagrejs/graphlib';
 
 // --- Graphlib Exports (Public API of dagre.graphlib) ---
 
 export namespace graphlib {
-  export class Graph<T = {}> extends Graph<T> {}
+  export type Graph<T = {}> = ImportedGraph<T>;
 
   export namespace json {
     function read(graph: any): Graph;
