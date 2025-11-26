@@ -4,8 +4,8 @@ let Benchmark = require("benchmark"),
   sprintf = require("sprintf").sprintf;
 
 let Graph = require("@dagrejs/graphlib").Graph,
-    rank = require("../lib/rank"),
-    layout = require("..").layout;
+  rank = require("../lib/rank"),
+  layout = require("..").layout;
 
 function runBenchmark(name, fn) {
   let options = {};
