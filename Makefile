@@ -10,7 +10,7 @@ BUILD_FILES = $(addprefix $(DIST_DIR)/, $(MOD).cjs.js $(MOD).esm.js $(MOD).min.j
 
 .PHONY: all bench clean test dist lint build release node_modules
 
-all: unit-test lint
+all: build test
 
 bench: test
 	@src/bench.js
