@@ -32,7 +32,7 @@
     "layout"
   ],
   "dependencies": {
-    "@dagrejs/graphlib": "2.2.4"
+    "@dagrejs/graphlib": "dagrejs/graphlib#updeps"
   },
   "devDependencies": {
     "benchmark": "2.1.4",
