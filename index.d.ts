@@ -3,7 +3,7 @@ import { Graph as ImportedGraph, Node as GraphNode, Edge as GraphEdge } from '@d
 // --- Graphlib Exports (Public API of dagre.graphlib) ---
 
 export namespace graphlib {
-  export class Graph<T = {}> extends ImportedGraph<T> {}
+  export import Graph = ImportedGraph;
 
   export namespace json {
     function read(graph: any): Graph;
