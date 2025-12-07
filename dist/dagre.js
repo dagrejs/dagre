@@ -2269,7 +2269,7 @@ var dagre = (() => {
   // lib/version.js
   var require_version = __commonJS({
     "lib/version.js"(exports, module) {
-      module.exports = "2.0.1";
+      module.exports = "2.0.2-pre";
     }
   });
 
