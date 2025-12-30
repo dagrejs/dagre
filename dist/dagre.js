@@ -1858,6 +1858,7 @@ var dagre = (() => {
       function positionY(g) {
         let layering = util.buildLayerMatrix(g);
         let rankSep = g.graph().ranksep;
+        let rankAlign = g.graph().rankalign;
         let prevY = 0;
         layering.forEach((layer) => {
           const maxHeight = layer.reduce((acc, v) => {
@@ -1868,7 +1869,16 @@ var dagre = (() => {
               return height;
             }
           }, 0);
-          layer.forEach((v) => g.node(v).y = prevY + maxHeight / 2);
+          layer.forEach((v) => {
+            let node = g.node(v);
+            if (rankAlign === "top") {
+              node.y = prevY + node.height / 2;
+            } else if (rankAlign === "bottom") {
+              node.y = prevY + maxHeight - node.height / 2;
+            } else {
+              node.y = prevY + maxHeight / 2;
+            }
+          });
           prevY += maxHeight + rankSep;
         });
       }
@@ -1959,8 +1969,8 @@ var dagre = (() => {
         inputGraph.graph().height = layoutGraph.graph().height;
       }
       var graphNumAttrs = ["nodesep", "edgesep", "ranksep", "marginx", "marginy"];
-      var graphDefaults = { ranksep: 50, edgesep: 20, nodesep: 50, rankdir: "tb" };
-      var graphAttrs = ["acyclicer", "ranker", "rankdir", "align"];
+      var graphDefaults = { ranksep: 50, edgesep: 20, nodesep: 50, rankdir: "tb", rankalign: "center" };
+      var graphAttrs = ["acyclicer", "ranker", "rankdir", "align", "rankalign"];
       var nodeNumAttrs = ["width", "height", "rank"];
       var nodeDefaults = { width: 0, height: 0 };
       var edgeNumAttrs = ["minlen", "weight", "width", "height", "labeloffset"];
