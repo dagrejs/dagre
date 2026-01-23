@@ -51,6 +51,7 @@ export interface GraphLabel {
   marginy?: number | undefined;
   acyclicer?: string | undefined;
   ranker?: string | undefined;
+  rankalign?: 'top' | 'center' | 'bottom' | undefined;
 }
 
 export interface NodeConfig {
