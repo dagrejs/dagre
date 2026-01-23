@@ -50,4 +50,31 @@ describe("position", () => {
     expect(g.node("sg1")).not.toHaveProperty("x");
     expect(g.node("sg1")).not.toHaveProperty("y");
   });
+
+  it("aligns nodes to top of rank when rankalign is top", () => {
+    g.graph().rankalign = "top";
+    g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
+    g.setNode("b", { width: 50, height: 60, rank: 0, order: 1 });
+    position(g);
+    expect(g.node("a").y).toBe(100 / 2);
+    expect(g.node("b").y).toBe(60 / 2);
+  });
+
+  it("aligns nodes to bottom of rank when rankalign is bottom", () => {
+    g.graph().rankalign = "bottom";
+    g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
+    g.setNode("b", { width: 50, height: 60, rank: 0, order: 1 });
+    position(g);
+    expect(g.node("a").y).toBe(100 - 100 / 2);
+    expect(g.node("b").y).toBe(100 - 60 / 2);
+  });
+
+  it("aligns nodes to center of rank when rankalign is center", () => {
+    g.graph().rankalign = "center";
+    g.setNode("a", { width: 50, height: 100, rank: 0, order: 0 });
+    g.setNode("b", { width: 50, height: 60, rank: 0, order: 1 });
+    position(g);
+    expect(g.node("a").y).toBe(100 / 2);
+    expect(g.node("b").y).toBe(100 / 2);
+  });
 });
