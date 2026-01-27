@@ -32,6 +32,8 @@ async function build() {
     outfile: 'dist/dagre.esm.js',
     format: 'esm',
     platform: 'neutral',
+    // Bundles dependencies inline to avoid dynamic require() wrappers
+    external: [],
   });
 
   const iifeConfig = {
@@ -55,7 +57,7 @@ async function build() {
   });
 
   fs.copyFileSync('index.d.ts', 'dist/dagre.d.ts');
-  
+
   console.log('Build complete! 🚀');
 }
 
