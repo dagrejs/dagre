@@ -19,6 +19,7 @@ const config = {
   
   moduleNameMapper: {
     '^@dagrejs/dagre$': '<rootDir>/dist/dagre.cjs.js',
+    "^@dagrejs/graphlib$": "<rootDir>/node_modules/@dagrejs/graphlib",
   },
 
   watchAll: false,
