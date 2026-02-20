@@ -71,6 +71,7 @@ export interface EdgeConfig {
 export interface LayoutConfig {
   customOrder?: (graph: graphlib.Graph, order: (graph: graphlib.Graph, opts: configUnion) => void) => void;
   disableOptimalOrderHeuristic?: boolean;
+  constraints?: Array<{ left: string; right: string }>
 }
 
 type configUnion = GraphLabel & NodeConfig & EdgeConfig & LayoutConfig;
