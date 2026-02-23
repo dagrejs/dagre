@@ -4,3 +4,6 @@ tmp/
 coverage/
 /.nyc_output
 *.swp
+/.idea/
+lib/version.ts
+dist/
