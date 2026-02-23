@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dagre Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #7f8c8d;
+        }
+
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .controls label {
+            font-weight: 600;
+            margin-right: 10px;
+            color: #2c3e50;
+        }
+
+        .controls select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .controls select:hover {
+            border-color: #3498db;
+        }
+
+        .controls select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+
+        .control-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .direction-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .direction-btn {
+            padding: 6px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            background: white;
+            color: #7f8c8d;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .direction-btn:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .direction-btn.active {
+            background: #3498db;
+            border-color: #2980b9;
+            color: white;
+        }
+
+        input[type="range"] {
+            width: 120px;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-value {
+            min-width: 45px;
+            text-align: right;
+            color: #7f8c8d;
+            font-size: 0.8em;
+        }
+
+        .demo-area {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .code-panel {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: auto;
+            max-height: 600px;
+        }
+
+        .code-panel h3 {
+            color: #f8f8f2;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .code-panel pre {
+            margin: 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .code-panel .keyword {
+            color: #ff79c6;
+        }
+
+        .code-panel .string {
+            color: #f1fa8c;
+        }
+
+        .code-panel .comment {
+            color: #6272a4;
+        }
+
+        .code-panel .function {
+            color: #50fa7b;
+        }
+
+        .code-panel .number {
+            color: #bd93f9;
+        }
+
+        .svg-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .svg-panel h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .svg-container {
+            flex: 1;
+            min-height: 500px;
+            border: 2px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        svg:active {
+            cursor: grabbing;
+        }
+
+        .node rect {
+            fill: #3498db;
+            stroke: #2980b9;
+            stroke-width: 2px;
+            rx: 5px;
+            ry: 5px;
+            transition: fill 0.3s;
+        }
+
+        .node:hover rect {
+            fill: #5dade2;
+        }
+
+        .node text {
+            fill: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        path.edge {
+            fill: none;
+            stroke: #7f8c8d;
+            stroke-width: 2px;
+        }
+
+        marker {
+            fill: #7f8c8d;
+        }
+
+        .edge-label {
+            fill: white;
+            stroke: #7f8c8d;
+            stroke-width: 1px;
+        }
+
+        .edge-label text {
+            fill: #2c3e50;
+            font-size: 12px;
+            text-anchor: middle;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: #7f8c8d;
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .demo-area {
+                grid-template-columns: 1fr;
+            }
+
+            .code-panel {
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dagre Interactive Demo</h1>
+            <p class="subtitle">Directed graph layout library for JavaScript/TypeScript</p>
+        </header>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="example-select">Example:</label>
+                <select id="example-select">
+                    <option value="simple">Simple Hierarchy</option>
+                    <option value="horizontal">Horizontal Layout</option>
+                    <option value="complex">Complex Network</option>
+                    <option value="cycles">Graph with Cycles</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">Direction</span>
+                <div class="direction-buttons">
+                    <button class="direction-btn active" data-direction="TB">↓ TB</button>
+                    <button class="direction-btn" data-direction="BT">↑ BT</button>
+                    <button class="direction-btn" data-direction="LR">→ LR</button>
+                    <button class="direction-btn" data-direction="RL">← RL</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">Node</span>
+                <input type="range" id="node-spacing" min="10" max="150" value="50" step="5">
+                <span class="slider-value"><span id="node-spacing-value">50</span>px</span>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label">Rank</span>
+                <input type="range" id="rank-spacing" min="20" max="300" value="50" step="10">
+                <span class="slider-value"><span id="rank-spacing-value">50</span>px</span>
+            </div>
+        </div>
+
+        <div class="demo-area">
+            <div class="code-panel">
+                <h3>Code Example</h3>
+                <pre id="code-display"></pre>
+            </div>
+
+            <div class="svg-panel">
+                <h3 id="graph-title">Graph Visualization</h3>
+                <div class="svg-container">
+                    <svg id="graph-svg">
+                        <defs>
+                            <marker id="arrowhead"
+                                    markerWidth="10"
+                                    markerHeight="10"
+                                    refX="9"
+                                    refY="3"
+                                    orient="auto"
+                                    markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#7f8c8d"/>
+                            </marker>
+                        </defs>
+                        <g class="viewport">
+                            <g class="edges"></g>
+                            <g class="nodes"></g>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>
+                Powered by <a href="https://github.com/dagrejs/dagre" target="_blank">Dagre</a> |
+                <a href="https://d3js.org" target="_blank">D3.js</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="dist/dagre.js"></script>
+    <script>
+        // Current graph settings
+        let currentSettings = {
+            direction: 'TB',
+            nodeSpacing: 50,
+            rankSpacing: 50
+        };
+
+        let currentExample = 'simple';
+
+        // Example definitions
+        const examples = {
+            simple: {
+                name: 'Simple Hierarchy (Top-to-Bottom)',
+                description: 'Basic flowchart demonstrating default top-to-bottom layout',
+                code: `const g = new dagre.graphlib.Graph();
+
+// Configure graph layout
+g.setGraph({
+    rankdir: "TB",  // Top-to-bottom
+    nodesep: 50,
+    ranksep: 50
+});
+
+// Add nodes with dimensions
+g.setNode("start", { width: 80, height: 40, label: "Start" });
+g.setNode("plan", { width: 80, height: 40, label: "Plan" });
+g.setNode("develop", { width: 80, height: 40, label: "Develop" });
+g.setNode("test", { width: 80, height: 40, label: "Test" });
+g.setNode("review", { width: 80, height: 40, label: "Review" });
+g.setNode("deploy", { width: 80, height: 40, label: "Deploy" });
+
+// Add edges
+g.setEdge("start", "plan", {});
+g.setEdge("plan", "develop", {});
+g.setEdge("develop", "test", {});
+g.setEdge("test", "review", {});
+g.setEdge("review", "deploy", {});
+g.setEdge("review", "develop", {});
+
+// Run layout
+dagre.layout(g);`,
+                buildGraph: function() {
+                    const g = new dagre.graphlib.Graph();
+                    g.setGraph({
+                        rankdir: currentSettings.direction,
+                        nodesep: currentSettings.nodeSpacing,
+                        ranksep: currentSettings.rankSpacing
+                    });
+
+                    g.setNode("start", { width: 80, height: 40, label: "Start" });
+                    g.setNode("plan", { width: 80, height: 40, label: "Plan" });
+                    g.setNode("develop", { width: 80, height: 40, label: "Develop" });
+                    g.setNode("test", { width: 80, height: 40, label: "Test" });
+                    g.setNode("review", { width: 80, height: 40, label: "Review" });
+                    g.setNode("deploy", { width: 80, height: 40, label: "Deploy" });
+
+                    g.setEdge("start", "plan", {});
+                    g.setEdge("plan", "develop", {});
+                    g.setEdge("develop", "test", {});
+                    g.setEdge("test", "review", {});
+                    g.setEdge("review", "deploy", {});
+                    g.setEdge("review", "develop", {});
+
+                    return g;
+                }
+            },
+
+            horizontal: {
+                name: 'Horizontal Layout (Left-to-Right)',
+                description: 'State machine with left-to-right flow',
+                code: `const g = new dagre.graphlib.Graph();
+
+// Configure horizontal layout
+g.setGraph({
+    rankdir: "LR",  // Left-to-right
+    nodesep: 40,
+    ranksep: 60
+});
+
+// Add state nodes
+g.setNode("idle", { width: 70, height: 40, label: "Idle" });
+g.setNode("pending", { width: 70, height: 40, label: "Pending" });
+g.setNode("active", { width: 70, height: 40, label: "Active" });
+g.setNode("paused", { width: 70, height: 40, label: "Paused" });
+g.setNode("completed", { width: 90, height: 40, label: "Completed" });
+g.setNode("failed", { width: 70, height: 40, label: "Failed" });
+
+// Add transitions
+g.setEdge("idle", "pending", { label: "start", width: 35, height: 20 });
+g.setEdge("pending", "active", { label: "begin", width: 35, height: 20 });
+g.setEdge("active", "paused", { label: "pause", width: 40, height: 20 });
+g.setEdge("paused", "active", { label: "resume", width: 50, height: 20 });
+g.setEdge("active", "completed", { label: "finish", width: 40, height: 20 });
+g.setEdge("active", "failed", { label: "error", width: 35, height: 20 });
+g.setEdge("failed", "idle", {});
+
+// Run layout
+dagre.layout(g);`,
+                buildGraph: function() {
+                    const g = new dagre.graphlib.Graph();
+                    g.setGraph({
+                        rankdir: currentSettings.direction,
+                        nodesep: currentSettings.nodeSpacing,
+                        ranksep: currentSettings.rankSpacing
+                    });
+
+                    g.setNode("idle", { width: 70, height: 40, label: "Idle" });
+                    g.setNode("pending", { width: 70, height: 40, label: "Pending" });
+                    g.setNode("active", { width: 70, height: 40, label: "Active" });
+                    g.setNode("paused", { width: 70, height: 40, label: "Paused" });
+                    g.setNode("completed", { width: 90, height: 40, label: "Completed" });
+                    g.setNode("failed", { width: 70, height: 40, label: "Failed" });
+
+                    g.setEdge("idle", "pending", { label: "start", width: 35, height: 20 });
+                    g.setEdge("pending", "active", { label: "begin", width: 35, height: 20 });
+                    g.setEdge("active", "paused", { label: "pause", width: 40, height: 20 });
+                    g.setEdge("paused", "active", { label: "resume", width: 50, height: 20 });
+                    g.setEdge("active", "completed", { label: "finish", width: 40, height: 20 });
+                    g.setEdge("active", "failed", { label: "error", width: 35, height: 20 });
+                    g.setEdge("failed", "idle", {});
+
+                    return g;
+                }
+            },
+
+            complex: {
+                name: 'Complex Network',
+                description: 'Organization chart with multiple branches',
+                code: `const g = new dagre.graphlib.Graph();
+
+// Configure layout
+g.setGraph({
+    rankdir: "TB",
+    nodesep: 60,
+    ranksep: 80
+});
+
+// Add nodes with varying sizes
+g.setNode("ceo", { width: 100, height: 50, label: "CEO" });
+g.setNode("cto", { width: 90, height: 45, label: "CTO" });
+g.setNode("cfo", { width: 90, height: 45, label: "CFO" });
+g.setNode("coo", { width: 90, height: 45, label: "COO" });
+g.setNode("dev", { width: 80, height: 40, label: "Dev Team" });
+g.setNode("qa", { width: 80, height: 40, label: "QA Team" });
+g.setNode("finance", { width: 80, height: 40, label: "Finance" });
+g.setNode("hr", { width: 80, height: 40, label: "HR" });
+g.setNode("ops", { width: 80, height: 40, label: "Operations" });
+g.setNode("sales", { width: 80, height: 40, label: "Sales" });
+
+// Add relationships
+g.setEdge("ceo", "cto", {});
+g.setEdge("ceo", "cfo", {});
+g.setEdge("ceo", "coo", {});
+g.setEdge("cto", "dev", {});
+g.setEdge("cto", "qa", {});
+g.setEdge("cfo", "finance", {});
+g.setEdge("coo", "hr", {});
+g.setEdge("coo", "ops", {});
+g.setEdge("coo", "sales", {});
+
+// Run layout
+dagre.layout(g);`,
+                buildGraph: function() {
+                    const g = new dagre.graphlib.Graph();
+                    g.setGraph({
+                        rankdir: currentSettings.direction,
+                        nodesep: currentSettings.nodeSpacing,
+                        ranksep: currentSettings.rankSpacing
+                    });
+
+                    g.setNode("ceo", { width: 100, height: 50, label: "CEO" });
+                    g.setNode("cto", { width: 90, height: 45, label: "CTO" });
+                    g.setNode("cfo", { width: 90, height: 45, label: "CFO" });
+                    g.setNode("coo", { width: 90, height: 45, label: "COO" });
+                    g.setNode("dev", { width: 80, height: 40, label: "Dev Team" });
+                    g.setNode("qa", { width: 80, height: 40, label: "QA Team" });
+                    g.setNode("finance", { width: 80, height: 40, label: "Finance" });
+                    g.setNode("hr", { width: 80, height: 40, label: "HR" });
+                    g.setNode("ops", { width: 80, height: 40, label: "Operations" });
+                    g.setNode("sales", { width: 80, height: 40, label: "Sales" });
+
+                    g.setEdge("ceo", "cto", {});
+                    g.setEdge("ceo", "cfo", {});
+                    g.setEdge("ceo", "coo", {});
+                    g.setEdge("cto", "dev", {});
+                    g.setEdge("cto", "qa", {});
+                    g.setEdge("cfo", "finance", {});
+                    g.setEdge("coo", "hr", {});
+                    g.setEdge("coo", "ops", {});
+                    g.setEdge("coo", "sales", {});
+
+                    return g;
+                }
+            },
+
+            cycles: {
+                name: 'Graph with Cycles',
+                description: 'Demonstrates cycle handling and backward edges',
+                code: `const g = new dagre.graphlib.Graph();
+
+// Configure layout
+g.setGraph({
+    rankdir: "TB",
+    nodesep: 50,
+    ranksep: 70
+});
+
+// Add nodes
+g.setNode("a", { width: 60, height: 40, label: "A" });
+g.setNode("b", { width: 60, height: 40, label: "B" });
+g.setNode("c", { width: 60, height: 40, label: "C" });
+g.setNode("d", { width: 60, height: 40, label: "D" });
+g.setNode("e", { width: 60, height: 40, label: "E" });
+g.setNode("f", { width: 60, height: 40, label: "F" });
+
+// Add edges with cycles
+g.setEdge("a", "b", { weight: 2 });
+g.setEdge("b", "c", { weight: 1 });
+g.setEdge("c", "d", { weight: 1 });
+g.setEdge("d", "e", { weight: 1 });
+g.setEdge("e", "f", { weight: 1 });
+g.setEdge("c", "a", { label: "cycle", weight: 1, width: 35, height: 20 });
+g.setEdge("d", "b", { label: "back", weight: 1, width: 35, height: 20 });
+g.setEdge("f", "a", { label: "loop", weight: 1, width: 35, height: 20 });
+
+// Run layout (automatically handles cycles)
+dagre.layout(g);`,
+                buildGraph: function() {
+                    const g = new dagre.graphlib.Graph();
+                    g.setGraph({
+                        rankdir: currentSettings.direction,
+                        nodesep: currentSettings.nodeSpacing,
+                        ranksep: currentSettings.rankSpacing
+                    });
+
+                    g.setNode("a", { width: 60, height: 40, label: "A" });
+                    g.setNode("b", { width: 60, height: 40, label: "B" });
+                    g.setNode("c", { width: 60, height: 40, label: "C" });
+                    g.setNode("d", { width: 60, height: 40, label: "D" });
+                    g.setNode("e", { width: 60, height: 40, label: "E" });
+                    g.setNode("f", { width: 60, height: 40, label: "F" });
+
+                    g.setEdge("a", "b", { weight: 2 });
+                    g.setEdge("b", "c", { weight: 1 });
+                    g.setEdge("c", "d", { weight: 1 });
+                    g.setEdge("d", "e", { weight: 1 });
+                    g.setEdge("e", "f", { weight: 1 });
+                    g.setEdge("c", "a", { label: "cycle", weight: 1, width: 35, height: 20 });
+                    g.setEdge("d", "b", { label: "back", weight: 1, width: 35, height: 20 });
+                    g.setEdge("f", "a", { label: "loop", weight: 1, width: 35, height: 20 });
+
+                    return g;
+                }
+            }
+        };
+
+        // Syntax highlighting function
+        function highlightCode(code) {
+            return code
+                .replace(/\b(const|let|var|new|function|return)\b/g, '<span class="keyword">$1</span>')
+                .replace(/"([^"]*)"/g, '<span class="string">"$1"</span>')
+                .replace(/\/\/(.*)/g, '<span class="comment">//$1</span>')
+                .replace(/\b(\d+)\b/g, '<span class="number">$1</span>')
+                .replace(/\.(setNode|setEdge|setGraph|layout)\b/g, '.<span class="function">$1</span>');
+        }
+
+        // Render graph function
+        function renderGraph(graph) {
+            // Run dagre layout
+            dagre.layout(graph);
+
+            // Get SVG elements
+            const svg = d3.select('#graph-svg');
+            const viewport = svg.select('.viewport');
+            const nodesGroup = viewport.select('.nodes');
+            const edgesGroup = viewport.select('.edges');
+
+            // Clear previous content
+            nodesGroup.selectAll('*').remove();
+            edgesGroup.selectAll('*').remove();
+
+            // Render edges
+            graph.edges().forEach(e => {
+                const edge = graph.edge(e);
+
+                if (!edge || !edge.points || edge.points.length === 0) {
+                    console.warn('Edge missing points:', e, edge);
+                    return;
+                }
+
+                const points = edge.points;
+
+                // Create edge path (dagre provides the points, just connect them)
+                const line = d3.line()
+                    .x(d => d.x)
+                    .y(d => d.y);
+
+                edgesGroup.append('path')
+                    .attr('class', 'edge')
+                    .attr('d', line(points))
+                    .attr('marker-end', 'url(#arrowhead)');
+
+                // Add edge label if present
+                if (edge.label && edge.x !== undefined && edge.y !== undefined) {
+                    const labelGroup = edgesGroup.append('g')
+                        .attr('class', 'edge-label')
+                        .attr('transform', `translate(${edge.x}, ${edge.y})`);
+
+                    const text = labelGroup.append('text')
+                        .text(edge.label)
+                        .attr('dy', '0.35em');
+
+                    const bbox = text.node().getBBox();
+                    const padding = 4;
+
+                    labelGroup.insert('rect', 'text')
+                        .attr('x', bbox.x - padding)
+                        .attr('y', bbox.y - padding)
+                        .attr('width', bbox.width + 2 * padding)
+                        .attr('height', bbox.height + 2 * padding)
+                        .attr('rx', 3);
+                }
+            });
+
+            // Render nodes
+            graph.nodes().forEach(v => {
+                const node = graph.node(v);
+                const nodeGroup = nodesGroup.append('g')
+                    .attr('class', 'node')
+                    .attr('transform', `translate(${node.x}, ${node.y})`);
+
+                nodeGroup.append('rect')
+                    .attr('x', -node.width / 2)
+                    .attr('y', -node.height / 2)
+                    .attr('width', node.width)
+                    .attr('height', node.height);
+
+                nodeGroup.append('text')
+                    .attr('dy', '0.35em')
+                    .text(node.label || v);
+            });
+
+            // Calculate graph bounds
+            const graphLabel = graph.graph();
+            const graphWidth = graphLabel.width || 800;
+            const graphHeight = graphLabel.height || 600;
+
+            // Center and fit the graph
+            const svgElement = document.getElementById('graph-svg');
+            const containerWidth = svgElement.clientWidth;
+            const containerHeight = svgElement.clientHeight;
+
+            const scale = Math.min(
+                (containerWidth - 40) / graphWidth,
+                (containerHeight - 40) / graphHeight,
+                1
+            );
+
+            const translateX = (containerWidth - graphWidth * scale) / 2;
+            const translateY = (containerHeight - graphHeight * scale) / 2;
+
+            viewport.attr('transform', `translate(${translateX}, ${translateY}) scale(${scale})`);
+
+            // Setup zoom behavior
+            const zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
+                .on('zoom', (event) => {
+                    viewport.attr('transform', event.transform);
+                });
+
+            svg.call(zoom);
+        }
+
+        // Update controls to match current settings
+        function updateControls() {
+            // Update direction buttons
+            document.querySelectorAll('.direction-btn').forEach(btn => {
+                if (btn.dataset.direction === currentSettings.direction) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Update sliders
+            document.getElementById('node-spacing').value = currentSettings.nodeSpacing;
+            document.getElementById('node-spacing-value').textContent = currentSettings.nodeSpacing;
+            document.getElementById('rank-spacing').value = currentSettings.rankSpacing;
+            document.getElementById('rank-spacing-value').textContent = currentSettings.rankSpacing;
+        }
+
+        // Load example function
+        function loadExample(exampleKey) {
+            currentExample = exampleKey;
+            const example = examples[exampleKey];
+
+            // Update title
+            document.getElementById('graph-title').textContent = example.name;
+
+            // Update code display
+            document.getElementById('code-display').innerHTML = highlightCode(example.code);
+
+            // Build and render graph
+            const graph = example.buildGraph();
+            renderGraph(graph);
+        }
+
+        // Event listener for example selector
+        document.getElementById('example-select').addEventListener('change', (e) => {
+            loadExample(e.target.value);
+        });
+
+        // Event listeners for direction buttons
+        document.querySelectorAll('.direction-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentSettings.direction = btn.dataset.direction;
+                updateControls();
+                loadExample(currentExample);
+            });
+        });
+
+        // Event listener for node spacing slider
+        document.getElementById('node-spacing').addEventListener('input', (e) => {
+            currentSettings.nodeSpacing = parseInt(e.target.value);
+            document.getElementById('node-spacing-value').textContent = currentSettings.nodeSpacing;
+            loadExample(currentExample);
+        });
+
+        // Event listener for rank spacing slider
+        document.getElementById('rank-spacing').addEventListener('input', (e) => {
+            currentSettings.rankSpacing = parseInt(e.target.value);
+            document.getElementById('rank-spacing-value').textContent = currentSettings.rankSpacing;
+            loadExample(currentExample);
+        });
+
+        // Load initial example
+        loadExample('simple');
+    </script>
+</body>
+</html>
