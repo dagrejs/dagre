@@ -6,4 +6,3 @@ coverage/
 *.swp
 /.idea/
 lib/version.ts
-dist/
