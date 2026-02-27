@@ -40,6 +40,7 @@ async function build(): Promise<void> {
         format: 'iife',
         globalName: 'dagre',
         platform: 'browser',
+        external: [],
     };
 
     // 3. IIFE/UMD - For direct browser script tag
