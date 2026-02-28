@@ -4,7 +4,10 @@
     "module": "CommonJS",
     "types": [
       "jest"
-    ]
+    ],
+    "paths": {
+      "@dagrejs/dagre": ["./dist/types/index.d.ts"]
+    }
   },
   "include": [
     "lib/**/*",

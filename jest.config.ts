@@ -13,7 +13,8 @@ const config: Config = {
         '!lib/version.ts'
     ],
     moduleNameMapper: {
-        '^(\\.{1,2}/.*)\\.js$': '$1'
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^@dagrejs/dagre$': '<rootDir>/dist/dagre.cjs.js'
     },
     transform: {
         '^.+\\.ts$': ['ts-jest', {
