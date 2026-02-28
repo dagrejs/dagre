@@ -108,6 +108,7 @@ export interface EdgeConfig {
 export interface LayoutConfig {
     customOrder?: (graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, order: (graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, opts: LayoutOptions) => void) => void;
     disableOptimalOrderHeuristic?: boolean;
+    constraints?: Array<{ left: string; right: string }>
 }
 
 // Order constraint for ordering heuristic
