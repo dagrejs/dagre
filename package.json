@@ -1,6 +1,6 @@
 {
   "name": "@dagrejs/dagre",
-  "version": "2.0.5-pre",
+  "version": "3.0.0-pre",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
@@ -11,22 +11,29 @@
   "main": "dist/dagre.cjs.js",
   "module": "dist/dagre.esm.js",
   "scripts": {
-    "build": "node build.js",
-    "lint": "eslint . --ext .js,.ts",
-    "test": "jest"
+    "build": "npm run version:make && npm run build:types && tsx build.ts",
+    "build:types": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "test": "jest",
+    "version:make": "tsx src/release/make-version.ts > lib/version.ts",
+    "version:check": "tsx src/release/check-version.ts",
+    "version:bump": "tsx src/release/bump-version.ts",
+    "bench": "tsx src/bench.ts",
+    "prepublishOnly": "npm run typecheck && npm run lint && npm test && npm run build"
   },
   "files": [
     "dist/"
   ],
   "exports": {
     ".": {
-      "types": "./dist/dagre.d.ts",
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/dagre.esm.js",
       "require": "./dist/dagre.cjs.js"
     },
     "./package.json": "./package.json"
   },
-  "types": "./dist/dagre.d.ts",
+  "types": "./dist/types/index.d.ts",
   "keywords": [
     "graph",
     "layout"
@@ -35,11 +42,25 @@
     "@dagrejs/graphlib": "3.0.4"
   },
   "devDependencies": {
-    "benchmark": "2.1.4",
-    "esbuild": "^0.27.0",
-    "eslint": "8.35.0",
+    "@eslint/js": "^10.0.1",
+    "@types/benchmark": "^2.1.5",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.3.0",
+    "@types/semver": "^7.7.1",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "benchmark": "^2.1.4",
+    "esbuild": "^0.27.3",
+    "eslint": "^10.0.1",
+    "globals": "^17.3.0",
     "jest": "^30.2.0",
-    "semver": "7.3.7"
+    "jiti": "^2.6.1",
+    "semver": "^7.7.4",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0"
   },
   "repository": {
     "type": "git",

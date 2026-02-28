@@ -5,239 +5,252 @@
 
 <script src="../build/dagre.js"></script>
 <script src="http://cpettitt.github.io/project/graphlib-dot/latest/graphlib-dot.js"></script>
-<script src="http://d3js.org/d3.v3.js" charset="utf-8"></script>
+<script charset="utf-8" src="http://d3js.org/d3.v3.js"></script>
 
 <style>
-body {
-  color: #333;
-}
+    body {
+        color: #333;
+    }
 
-#wrapper {
-  width: 1000px;
-  margin: 0 auto;
-}
+    #wrapper {
+        width: 1000px;
+        margin: 0 auto;
+    }
 
-#inputPanel {
-  width: 350px;
-  float: left;
-  padding-right: 10%
-}
+    #inputPanel {
+        width: 350px;
+        float: left;
+        padding-right: 10%
+    }
 
-#inputPanel textarea {
-  width: 100%;
-  resize: vertical;
-}
+    #inputPanel textarea {
+        width: 100%;
+        resize: vertical;
+    }
 
-textarea.error {
-  color: #f33;
-  border: 1px solid #f33;
-}
+    textarea.error {
+        color: #f33;
+        border: 1px solid #f33;
+    }
 
-#resultPanel {
-  width: 550px;
-  float: left;
-}
+    #resultPanel {
+        width: 550px;
+        float: left;
+    }
 
-#resultPanel svg {
-  border: 1px solid #333;
-}
+    #resultPanel svg {
+        border: 1px solid #333;
+    }
 </style>
 
 <style>
-.node rect {
-  stroke: #333;
-  fill: #fff;
-}
+    .node rect {
+        stroke: #333;
+        fill: #fff;
+    }
 
-.subgraph rect {
-  stroke: #333;
-  fill: #333;
-  fill-opacity: 0.15;
-}
+    .subgraph rect {
+        stroke: #333;
+        fill: #333;
+        fill-opacity: 0.15;
+    }
 
-.edge rect {
-  fill: #fff;
-}
+    .edge rect {
+        fill: #fff;
+    }
 
-path.edge {
-  stroke: #333;
-  fill: none;
-}
+    path.edge {
+        stroke: #333;
+        fill: none;
+    }
 </style>
 
 <div id="wrapper">
-  <h1>Dagre Debug Console</h1>
+    <h1>Dagre Debug Console</h1>
 
-  <div id="inputPanel">
-    <textarea rows=25 onkeyup="renderDot();"></textarea>
-    <input type="checkbox" id="timing" name="timing">Enable timing instrumentation</input>
-  </div>
+    <div id="inputPanel">
+        <textarea onkeyup="renderDot();" rows=25></textarea>
+        <input id="timing" name="timing" type="checkbox">Enable timing instrumentation</input>
+    </div>
 
-  <div id="resultPanel">
-    <svg id="svg" width="550px" height="550px">
-      <defs>
-        <marker id="arrowhead" viewBox="0 0 10 10" refx=8 refy=5
-                markerUnits="strokeWidth" markerWidth=8 markerHeight=5
-                orient="auto">
-          <path d="M 0 0 L 10 5 L 0 10 z"/>
-        </marker>
-      </defs>
-    </svg>
-  </div>
+    <div id="resultPanel">
+        <svg height="550px" id="svg" width="550px">
+            <defs>
+                <marker id="arrowhead" markerHeight=5 markerUnits="strokeWidth" markerWidth=8
+                        orient="auto" refx=8 refy=5
+                        viewBox="0 0 10 10">
+                    <path d="M 0 0 L 10 5 L 0 10 z"/>
+                </marker>
+            </defs>
+        </svg>
+    </div>
 </div>
 
 <script>
-var debugTiming = false,
-    time = dagre.util.notime,
-    lastDotStr = "",
-    input = document.querySelector("#inputPanel textarea");
-function renderDot() {
-  debugTiming = d3.select("#timing").property("checked"),
-  time = debugTiming ? dagre.util.time : dagre.util.notime;
+    let debugTiming = false,
+        time = dagre.util.notime,
+        lastDotStr = "",
+        input = document.querySelector("#inputPanel textarea");
 
-  var dotStr = input.value;
-  if (dotStr !== lastDotStr) {
-    lastDotStr = dotStr;
-    input.className = "";
-    try {
-      var g = time("DOT parsing", function() { return graphlibDot.read(dotStr); });
-      time("render", function() { render(g); });
-    } catch (e) {
-      input.className = "error";
-      throw e;
+    function renderDot() {
+        debugTiming = d3.select("#timing").property("checked"),
+            time = debugTiming ? dagre.util.time : dagre.util.notime;
+
+        let dotStr = input.value;
+        if (dotStr !== lastDotStr) {
+            lastDotStr = dotStr;
+            input.className = "";
+            try {
+                let g = time("DOT parsing", function () {
+                    return graphlibDot.read(dotStr);
+                });
+                time("render", function () {
+                    render(g);
+                });
+            } catch (e) {
+                input.className = "error";
+                throw e;
+            }
+        }
     }
-  }
-}
 
-input.onkeydown = function(e) {
-  if (e.keyCode === 9) {
-    e.preventDefault();
-    var s = this.selectionStart;
-    this.value = this.value.substring(0,this.selectionStart) + "    " +
-                 this.value.substring(this.selectionEnd);
-    this.selectionEnd = s + 4;
-  }
-}
-
-function render(g) {
-  var svg = d3.select("svg");
-  svg.selectAll("g").remove();
-  var group = svg.append("g");
-  time("preLayout", function() { preLayout(g, group) });
-  dagre.layout(g, { debugTiming: debugTiming });
-  time("postLayout", function() { postLayout(g, svg, group); });
-}
-
-function preLayout(g, svg) {
-  _.forEach(g.edges(), function(e) {
-    var edge = g.edge(e);
-    if (edge.label) {
-      var group = appendLabel(svg, edge.label, edge, 0, 0);
-      group.attr("id", "edge-" + edgeObjToId(e)).classed("edge", true);
+    input.onkeydown = function (e) {
+        if (e.keyCode === 9) {
+            e.preventDefault();
+            let s = this.selectionStart;
+            this.value = this.value.substring(0, this.selectionStart) + "    " +
+                this.value.substring(this.selectionEnd);
+            this.selectionEnd = s + 4;
+        }
     }
-  });
 
-  _.forEach(g.nodes(), function(v) {
-    if (g.children(v).length) {
-      return;
+    function render(g) {
+        let svg = d3.select("svg");
+        svg.selectAll("g").remove();
+        let group = svg.append("g");
+        time("preLayout", function () {
+            preLayout(g, group)
+        });
+        dagre.layout(g, {debugTiming: debugTiming});
+        time("postLayout", function () {
+            postLayout(g, svg, group);
+        });
     }
-    var node = g.node(v),
-        group = appendLabel(svg, node.label || v, node, 10, 10);
-    group.attr("id", "node-" + id(v)).classed("node", true);
-  });
-}
 
-function appendLabel(target, label, graphObj, marginX, marginY) {
-  var group = target.append("g"),
-      rect = group.append("rect"),
-      text = group.append("text").attr("text-anchor", "left");
-  text
-    .append("tspan")
-    .attr("dy", "1em")
-    .text(label);
+    function preLayout(g, svg) {
+        _.forEach(g.edges(), function (e) {
+            let edge = g.edge(e);
+            if (edge.label) {
+                let group = appendLabel(svg, edge.label, edge, 0, 0);
+                group.attr("id", "edge-" + edgeObjToId(e)).classed("edge", true);
+            }
+        });
 
-  var textBBox = text.node().getBBox();
-  text.attr("transform",
+        _.forEach(g.nodes(), function (v) {
+            if (g.children(v).length) {
+                return;
+            }
+            let node = g.node(v),
+                group = appendLabel(svg, node.label || v, node, 10, 10);
+            group.attr("id", "node-" + id(v)).classed("node", true);
+        });
+    }
+
+    function appendLabel(target, label, graphObj, marginX, marginY) {
+        let group = target.append("g"),
+            rect = group.append("rect"),
+            text = group.append("text").attr("text-anchor", "left");
+        text
+            .append("tspan")
+            .attr("dy", "1em")
+            .text(label);
+
+        let textBBox = text.node().getBBox();
+        text.attr("transform",
             "translate(" + (-textBBox.width / 2) + "," +
-                           (-textBBox.height / 2) + ")");
+            (-textBBox.height / 2) + ")");
 
-  var bbox = group.node().getBBox();
-  rect
-    .attr("rx", 5)
-    .attr("ry", 5)
-    .attr("x", -(bbox.width / 2 + marginX))
-    .attr("y", -(bbox.height / 2 + marginY))
-    .attr("width", bbox.width + 2 * marginX)
-    .attr("height", bbox.height + 2 * marginY)
-    .attr("fill", "#fff");
-  bbox = group.node().getBBox();
+        let bbox = group.node().getBBox();
+        rect
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .attr("x", -(bbox.width / 2 + marginX))
+            .attr("y", -(bbox.height / 2 + marginY))
+            .attr("width", bbox.width + 2 * marginX)
+            .attr("height", bbox.height + 2 * marginY)
+            .attr("fill", "#fff");
+        bbox = group.node().getBBox();
 
-  graphObj.width = bbox.width;
-  graphObj.height = bbox.height;
+        graphObj.width = bbox.width;
+        graphObj.height = bbox.height;
 
-  return group;
-}
-
-function postLayout(g, root, svg) {
-  root.insert("rect", ":first-child")
-    .attr("width", "100%")
-    .attr("height", "100%")
-    .style("fill", "none")
-    .style("pointer-events", "all");
-  root.call(d3.behavior.zoom().on("zoom", function() {
-    svg.attr("transform", "translate(" + d3.event.translate + ")" +
-                            "scale(" + d3.event.scale + ")");
-  }));
-
-  _.forEach(g.edges(), function(e) {
-    var group = svg.select("g#edge-" + edgeObjToId(e));
-    if (!group.empty()) {
-      var edge = g.edge(e);
-      group.attr("transform", "translate(" + edge.x + "," + edge.y + ")");
+        return group;
     }
-  });
 
-  _.forEach(g.nodes(), function(v) {
-    var group = svg.select("g#node-" + id(v)),
-        node = g.node(v);
-    group.attr("transform", "translate(" + node.x + "," + node.y + ")");
-  });
+    function postLayout(g, root, svg) {
+        root.insert("rect", ":first-child")
+            .attr("width", "100%")
+            .attr("height", "100%")
+            .style("fill", "none")
+            .style("pointer-events", "all");
+        root.call(d3.behavior.zoom().on("zoom", function () {
+            svg.attr("transform", "translate(" + d3.event.translate + ")" +
+                "scale(" + d3.event.scale + ")");
+        }));
 
-  _.forEach(g.edges(), function(e) {
-    var points = g.edge(e).points,
-        path = svg.insert("path", ":first-child")
-                .classed("edge", true)
-                .attr("marker-end", "url(#arrowhead)"),
-        line = d3.svg.line()
-                .x(function(d) { return d.x; })
-                .y(function(d) { return d.y; });
-    path.attr("d", line(points));
-  });
+        _.forEach(g.edges(), function (e) {
+            let group = svg.select("g#edge-" + edgeObjToId(e));
+            if (!group.empty()) {
+                let edge = g.edge(e);
+                group.attr("transform", "translate(" + edge.x + "," + edge.y + ")");
+            }
+        });
 
-  function dfsChildren(v) {
-    var children = g.children(v);
-    if (children.length) {
-      _.forEach(children, dfsChildren);
+        _.forEach(g.nodes(), function (v) {
+            let group = svg.select("g#node-" + id(v)),
+                node = g.node(v);
+            group.attr("transform", "translate(" + node.x + "," + node.y + ")");
+        });
 
-      var node = g.node(v);
-      svg.insert("g", ":first-child")
-         .classed("subgraph", true)
-         .attr("transform", "translate(" + (node.x - node.width / 2) + "," +
-                                       (node.y - node.height / 2) + ")")
-         .append("rect")
-           .attr("width", node.width)
-           .attr("height", node.height);
+        _.forEach(g.edges(), function (e) {
+            let points = g.edge(e).points,
+                path = svg.insert("path", ":first-child")
+                    .classed("edge", true)
+                    .attr("marker-end", "url(#arrowhead)"),
+                line = d3.svg.line()
+                    .x(function (d) {
+                        return d.x;
+                    })
+                    .y(function (d) {
+                        return d.y;
+                    });
+            path.attr("d", line(points));
+        });
+
+        function dfsChildren(v) {
+            let children = g.children(v);
+            if (children.length) {
+                _.forEach(children, dfsChildren);
+
+                let node = g.node(v);
+                svg.insert("g", ":first-child")
+                    .classed("subgraph", true)
+                    .attr("transform", "translate(" + (node.x - node.width / 2) + "," +
+                        (node.y - node.height / 2) + ")")
+                    .append("rect")
+                    .attr("width", node.width)
+                    .attr("height", node.height);
+            }
+        };
+        _.forEach(g.children(), dfsChildren);
     }
-  };
-  _.forEach(g.children(), dfsChildren);
-}
 
-function edgeObjToId(e) {
-  // Not particularly safe, but good enough for our needs.
-  return id(e.v) + "-" + id(e.w) + "-" + id(e.name);
-}
+    function edgeObjToId(e) {
+        // Not particularly safe, but good enough for our needs.
+        return id(e.v) + "-" + id(e.w) + "-" + id(e.name);
+    }
 
-function id(str) {
-  return str ? str.replace(/[^a-zA-z0-9-]/g, "_") : "";
-}
+    function id(str) {
+        return str ? str.replace(/[^a-zA-z0-9-]/g, "_") : "";
+    }
 </script>
