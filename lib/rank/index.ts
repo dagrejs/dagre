@@ -1,0 +1,59 @@
+﻿import {longestPath} from "./util";
+import feasibleTree from "./feasible-tree";
+import networkSimplex from "./network-simplex";
+import type {EdgeLabel, Graph, GraphLabel, NodeLabel, RankerFunction} from "../types";
+
+export default rank;
+
+/*
+ * Assigns a rank to each node in the input graph that respects the "minlen"
+ * constraint specified on edges between nodes.
+ *
+ * This basic structure is derived from Gansner, et al., "A Technique for
+ * Drawing Directed Graphs."
+ *
+ * Pre-conditions:
+ *
+ *    1. Graph must be a connected DAG
+ *    2. Graph nodes must be objects
+ *    3. Graph edges must have "weight" and "minlen" attributes
+ *
+ * Post-conditions:
+ *
+ *    1. Graph nodes will have a "rank" attribute based on the results of the
+ *       algorithm. Ranks can start at any index (including negative), we'll
+ *       fix them up later.
+ */
+function rank(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
+    const ranker: RankerFunction | string | undefined = graph.graph().ranker;
+    if (typeof ranker === 'function') {
+        return (ranker as RankerFunction)(graph);
+    }
+    switch (ranker) {
+    case "network-simplex":
+        networkSimplexRanker(graph);
+        break;
+    case "tight-tree":
+        tightTreeRanker(graph);
+        break;
+    case "longest-path":
+        longestPathRanker(graph);
+        break;
+    case "none":
+        break;
+    default:
+        networkSimplexRanker(graph);
+    }
+}
+
+// A fast and simple ranker, but results are far from optimal.
+const longestPathRanker: RankerFunction = longestPath;
+
+function tightTreeRanker(g: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
+    longestPath(g);
+    feasibleTree(g);
+}
+
+function networkSimplexRanker(g: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
+    networkSimplex(g);
+}
