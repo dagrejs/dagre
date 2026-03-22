@@ -771,7 +771,7 @@ var dagre = (() => {
   var GRAPH_NODE = "\0";
 
   // lib/version.ts
-  var version = "3.0.0-pre";
+  var version = "3.0.0";
 
   // lib/data/list.ts
   var List = class {
