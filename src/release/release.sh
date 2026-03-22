@@ -60,8 +60,8 @@ npm publish --access=public
 echo Published to npm
 
 # Update patch level version + commit
-./src/release/bump-version.js
-make lib/version.js
+npm run version:bump
+npm run version:make
 git commit package.json lib/version.js -m "Bump version and set as pre-release"
 git push origin
 echo Updated patch version

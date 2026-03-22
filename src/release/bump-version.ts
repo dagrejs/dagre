@@ -15,11 +15,16 @@ if (!('version' in packageJson)) {
 }
 
 const ver = semver.parse(packageJson.version!);
-if (ver) {
-    packageJson.version = ver.inc('patch').toString() + '-pre';
+
+if (!ver) {
+    bail('ERROR: Could not parse version');
 }
 
+packageJson.version = ver.inc('patch')!.toString() + '-pre';
+
 fs.writeFileSync('package.json', JSON.stringify(packageJson, undefined, 2));
+
+console.log('Bumped version to:', packageJson.version);
 
 // Write an error message to stderr and then exit immediately with an error.
 function bail(msg: string): never {
