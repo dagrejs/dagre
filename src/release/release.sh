@@ -1,4 +1,6 @@
 # Fail on error
+
+# Fail on error
 set -e
 [ -n "$DEBUG"] && set -x
 
@@ -14,7 +16,7 @@ PAGES_DIR=/tmp/$PROJECT-pages
 DIST_DIR=$2
 
 # Check version. Is this a release? If not abort
-VERSION=$(./src/release/check-version.ts)
+VERSION=$(npm run version:check --silent)
 SHORT_VERSION=$(echo $VERSION | cut -f1 -d-)
 
 echo Attemping to publish version: $VERSION

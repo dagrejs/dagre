@@ -19,9 +19,14 @@ if (!('version' in packageJson)) {
 const ver = semver.parse(packageJson.version!);
 const preRelease = process.env.PRE_RELEASE;
 
-if (ver && ver.prerelease.length > 0 && !preRelease) {
+if (!ver) {
+    bail('ERROR: Could not parse version');
+}
+
+if (ver.prerelease.length > 0 && !preRelease) {
     bail('ERROR: version is a pre-release: ' + ver);
 }
+
 
 console.log(ver?.toString());
 
