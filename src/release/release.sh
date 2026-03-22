@@ -14,7 +14,7 @@ PAGES_DIR=/tmp/$PROJECT-pages
 DIST_DIR=$2
 
 # Check version. Is this a release? If not abort
-VERSION=$(./src/release/check-version.js)
+VERSION=$(./src/release/check-version.ts)
 SHORT_VERSION=$(echo $VERSION | cut -f1 -d-)
 
 echo Attemping to publish version: $VERSION
