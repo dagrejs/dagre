@@ -37,6 +37,10 @@ export interface NodeLabel {
     shape?: string;
     edgeLabel?: EdgeLabel;
     edgeObj?: Edge;
+    /**
+     * Optional direction for clusters/subgraphs. If set, overrides the global graph direction for this cluster.
+     */
+    rankdir?: 'TB' | 'BT' | 'LR' | 'RL';
 
     [key: string]: unknown;
 }

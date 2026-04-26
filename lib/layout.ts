@@ -30,15 +30,45 @@ interface EdgeProxyNodeLabel extends Omit<NodeLabel, 'e'> {
     e: Edge;
 }
 
+
 export function layout(g: Graph<GraphLabel, NodeLabel, EdgeLabel>, opts: LayoutOptions = {}): Graph<GraphLabel, NodeLabel, EdgeLabel> {
     const time = opts.debugTiming ? util.time : util.notime;
     return time("layout", () => {
-        const layoutGraph =
-            time("  buildLayoutGraph", () => buildLayoutGraph(g));
-        time("  runLayout", () => runLayout(layoutGraph, time, opts));
+        const layoutGraph = time("  buildLayoutGraph", () => buildLayoutGraph(g));
+        // Recursively layout clusters with their own rankdir
+        recursiveClusterLayout(layoutGraph, time, opts);
         time("  updateInputGraph", () => updateInputGraph(g, layoutGraph));
         return layoutGraph;
     });
+}
+
+// Recursively layout clusters/subgraphs with their own rankdir
+function recursiveClusterLayout(g: Graph<GraphLabel, NodeLabel, EdgeLabel>, time: <T>(name: string, fn: () => T) => T, opts: LayoutOptions): void {
+    // Find clusters (nodes with children)
+    g.nodes().forEach(v => {
+        if (g.children(v).length) {
+            const node = g.node(v);
+            if (node && node.rankdir) {
+                // Create a subgraph for the cluster
+                const subgraph = g.filterNodes(u => g.parent(u) === v || u === v);
+                // Set the subgraph's direction
+                subgraph.setGraph(Object.assign({}, g.graph(), { rankdir: node.rankdir }));
+                // Recursively layout the subgraph
+                runLayout(subgraph, time, opts);
+                // Copy positions back to the main graph
+                subgraph.nodes().forEach(u => {
+                    const subNode = subgraph.node(u);
+                    const mainNode = g.node(u);
+                    if (mainNode && subNode) {
+                        mainNode.x = subNode.x;
+                        mainNode.y = subNode.y;
+                    }
+                });
+            }
+        }
+    });
+    // Run the main layout for the top-level graph
+    runLayout(g, time, opts);
 }
 
 function runLayout(

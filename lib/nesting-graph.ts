@@ -45,7 +45,17 @@ function run(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
     const weight: number = sumWeights(graph) + 1;
 
     // Create border nodes and link them up
-    graph.children(GRAPH_NODE).forEach(child => dfs(graph, root, nodeSep, weight, height, depths, child));
+    graph.children(GRAPH_NODE).forEach(child => {
+        // Propagate rankdir from cluster node if present
+        const node = graph.node(child);
+        if (node && node.rankdir) {
+            // Store rankdir on the subgraph root for later recursive layout
+            const graphLabel = graph.graph() as any;
+            if (!graphLabel.subgraphRankdirs) graphLabel.subgraphRankdirs = {};
+            graphLabel.subgraphRankdirs[child] = node.rankdir;
+        }
+        dfs(graph, root, nodeSep, weight, height, depths, child);
+    });
 
     // Save the multiplier for node layers for later removal of empty border
     // layers.
