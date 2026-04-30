@@ -5,11 +5,11 @@ import type {EdgeLabel, GraphLabel, NodeLabel} from "../types";
 
 export {position};
 
-function position(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
+function position(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, corePath: string[] | undefined): void {
     graph = util.asNonCompoundGraph(graph);
 
     positionY(graph);
-    Object.entries(positionX(graph)).forEach(([v, x]) => graph.node(v).x = x);
+    Object.entries(positionX(graph, corePath)).forEach(([v, x]) => graph.node(v).x = x);
 }
 
 function positionY(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {

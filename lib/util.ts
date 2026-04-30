@@ -1,5 +1,5 @@
 import {Graph} from "./graph-lib";
-import type {EdgeLabel, GraphLabel, NodeLabel, PartitionResult, Point} from "./types";
+import type {EdgeLabel, GraphLabel, NodeCollection, NodeLabel, PartitionResult, Point} from "./types";
 
 export {
     addBorderNode,
@@ -7,6 +7,7 @@ export {
     applyWithChunking,
     asNonCompoundGraph,
     buildLayerMatrix,
+    compareByOldOrder,
     intersectRect,
     mapValues,
     maxRank,
@@ -357,3 +358,31 @@ function zipObject<T>(props: string[], values: T[]): { [key: string]: T } {
 
 // TODO: Remove it when the type is fixed in graphlib. from children(v: string): string[] to children(v?: string): string[];
 export const GRAPH_NODE = "\x00";
+
+function compareByOldOrder(oldNodes: NodeCollection, nodeA: NodeLabel, nodeB: NodeLabel) {
+    // early return 0 (equal) if any data is missing, or nodes are not edges
+    if (!(oldNodes && nodeA && nodeB &&
+        nodeA.dummy === "edge" && nodeB.dummy === "edge" &&
+        nodeA.edgeObj && nodeB.edgeObj &&
+        oldNodes[nodeA.edgeObj.v] && oldNodes[nodeB.edgeObj.v] && oldNodes[nodeA.edgeObj.w] && oldNodes[nodeB.edgeObj.w])) {
+        return 0;
+    }
+    // by default, we assume that we are looking in the forward direction (start -> end)
+    let isForward = true;
+    // if both edges have the same target, we are in the backwards direction (end -> start)
+    // since this comparison is only ever used on a rank immediately after a proper node from which multiple edges emerge
+    // that proper node is the common v (source) in the forward direction or the common w (target) in the backwards direction
+    if (nodeA.edgeObj.w === nodeB.edgeObj.w) {
+        isForward = false;
+    }
+    const targetRank = isForward? oldNodes[nodeA.edgeObj.v]?.rank ?? NaN + 1 : oldNodes[nodeA.edgeObj.w]?.rank ?? NaN - 1;
+
+    const oldA = Object.entries(oldNodes).find(n => n[1].edgeObj?.v === nodeA.edgeObj!.v && n[1].edgeObj?.w === nodeA.edgeObj!.w && n[1].rank === targetRank);
+    const oldB = Object.entries(oldNodes).find(n => n[1].edgeObj?.v === nodeB.edgeObj!.v && n[1].edgeObj?.w === nodeB.edgeObj!.w && n[1].rank === targetRank);
+    if (!oldA || !oldB) {
+        return 0;
+    }
+    const oldOrderA = oldA[1].order ?? NaN;
+    const oldOrderB = oldB[1].order ?? NaN;
+    return isNaN(oldOrderA - oldOrderB) ? 0 : oldOrderA - oldOrderB;
+}

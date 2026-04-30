@@ -1,7 +1,7 @@
 import barycenter from "./barycenter";
-import resolveConflicts from "./resolve-conflicts";
+import resolveConflicts, {ResolvedEntry} from "./resolve-conflicts";
 import sort from "./sort";
-import type {Graph} from '../types';
+import type {Graph, NodeCollection} from '../types';
 
 interface SubgraphResult {
     vs: string[];
@@ -15,7 +15,7 @@ interface BarycenterEntry {
     weight?: number;
 }
 
-export default function sortSubgraph(graph: Graph, v: string, constraintGraph: Graph, biasRight?: boolean): SubgraphResult {
+export default function sortSubgraph(graph: Graph, v: string, constraintGraph: Graph, oldNodes: NodeCollection, biasRight?: boolean): {result: SubgraphResult, usedBias: boolean} {
     let movable = graph.children(v);
     const node = graph.node(v);
     const bl: string | undefined = node ? (node.borderLeft) : undefined;
@@ -29,7 +29,7 @@ export default function sortSubgraph(graph: Graph, v: string, constraintGraph: G
     const barycenters = barycenter(graph, movable);
     barycenters.forEach(entry => {
         if (graph.children(entry.v).length) {
-            const subgraphResult = sortSubgraph(graph, entry.v, constraintGraph, biasRight);
+            const {result: subgraphResult} = sortSubgraph(graph, entry.v, constraintGraph, oldNodes, biasRight);
             subgraphs[entry.v] = subgraphResult;
             if (Object.hasOwn(subgraphResult, "barycenter")) {
                 mergeBarycenters(entry, subgraphResult);
@@ -40,7 +40,41 @@ export default function sortSubgraph(graph: Graph, v: string, constraintGraph: G
     const entries = resolveConflicts(barycenters, constraintGraph);
     expandSubgraphs(entries, subgraphs);
 
-    const result = sort(entries, biasRight);
+    const reversedPairs: Record<string, ResolvedEntry> = {};
+    let usedBias = false;
+    for (let i = 0; i < entries.length; i++) {
+        for (let j = i + 1; j < entries.length; j++) {
+            if (!entries[i] || !entries[j] || !entries[i]?.barycenter || !entries[j]?.barycenter) {
+                continue;
+            }
+            if (entries[i]?.barycenter === entries[j]!.barycenter) {
+                const nameI = entries[i]?.vs[0] ?? "";
+                const nameJ = entries[j]?.vs[0] ?? "";
+                const nodeI = graph.node(nameI);
+                const nodeJ = graph.node(nameJ);
+
+                if (nodeI.dummy === "edge" && nodeJ.dummy === "edge" &&
+                    nodeI.edgeObj?.v === nodeJ.edgeObj?.v &&
+                    nodeI.edgeObj?.w === nodeJ.edgeObj?.w) {
+                    if (nodeI.edgeLabel.reversed) {
+                        reversedPairs[nameJ] = entries[i]!;
+                        entries.splice(i, 1);
+                        i--;
+                        break;
+                    } else {
+                        reversedPairs[nameI] = entries[j]!;
+                        entries.splice(j, 1);
+                        j--;
+                    }
+
+                } else {
+                    usedBias = true;
+                }
+            }
+        }
+    }
+
+    const result = sort(entries, reversedPairs, oldNodes, graph, biasRight);
 
     if (bl && br) {
         result.vs = [bl, result.vs, br].flat(1) as string[];
@@ -59,7 +93,7 @@ export default function sortSubgraph(graph: Graph, v: string, constraintGraph: G
         }
     }
 
-    return result;
+    return {result: result, usedBias: usedBias};
 }
 
 function expandSubgraphs(entries: { vs: string[] }[], subgraphs: { [key: string]: SubgraphResult }): void {

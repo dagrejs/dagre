@@ -5,10 +5,10 @@ import buildLayerGraph from "./build-layer-graph";
 import addSubgraphConstraints from "./add-subgraph-constraints";
 import {Graph} from "../graph-lib";
 import * as util from "../util";
-import type {Graph as GraphType, OrderConstraint} from '../types';
+import type {Graph as GraphType, NodeCollection, OrderConstraint} from '../types';
 
 interface OrderOptions {
-    customOrder?: (graph: GraphType, order: (g: GraphType, opts: OrderOptions) => void) => void;
+    customOrder?: (graph: GraphType, order: (g: GraphType, opts: OrderOptions, oldNodes: NodeCollection) => void) => void;
     disableOptimalOrderHeuristic?: boolean;
     constraints?: OrderConstraint[];
 }
@@ -28,7 +28,7 @@ interface OrderOptions {
  *    1. Graph nodes will have an "order" attribute based on the results of the
  *       algorithm.
  */
-export default function order(graph: GraphType, opts: OrderOptions = {}): void {
+export default function order(graph: GraphType, opts: OrderOptions = {}, oldNodes: NodeCollection): void {
     if (typeof opts.customOrder === 'function') {
         opts.customOrder(graph, order);
         return;
@@ -38,7 +38,7 @@ export default function order(graph: GraphType, opts: OrderOptions = {}): void {
     const downLayerGraphs = buildLayerGraphs(graph, util.range(1, maxRank + 1), "inEdges");
     const upLayerGraphs = buildLayerGraphs(graph, util.range(maxRank - 1, -1, -1), "outEdges");
 
-    let layering = initOrder(graph);
+    let layering = initOrder(graph, oldNodes);
     assignOrder(graph, layering);
 
     if (opts.disableOptimalOrderHeuristic) {
@@ -50,7 +50,7 @@ export default function order(graph: GraphType, opts: OrderOptions = {}): void {
 
     const constraints = opts.constraints || [];
     for (let i = 0, lastBest = 0; lastBest < 4; ++i, ++lastBest) {
-        sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2, constraints);
+        sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2, constraints, oldNodes);
 
         layering = util.buildLayerMatrix(graph);
         const cc = crossCount(graph, layering);
@@ -102,13 +102,17 @@ function buildLayerGraphs(graph: GraphType, ranks: number[], relationship: "inEd
     });
 }
 
-function sweepLayerGraphs(layerGraphs: GraphType[], biasRight: boolean, constraints: OrderConstraint[]): void {
+function sweepLayerGraphs(layerGraphs: GraphType[], switchBias: boolean, constraints: OrderConstraint[], oldNodes: NodeCollection): void {
+    let biasRight: boolean = true;
     const cg = new Graph() as GraphType;
     layerGraphs.forEach(function (lg) {
         constraints.forEach(con => cg.setEdge(con.left, con.right));
 
         const root = (lg.graph() as { root: string }).root;
-        const sorted = sortSubgraph(lg, root, cg, biasRight);
+        const {result: sorted, usedBias} = sortSubgraph(lg, root, cg, oldNodes, biasRight);
+        if (switchBias && usedBias) {
+            biasRight = !biasRight;
+        }
         sorted.vs.forEach((v, i) => lg.node(v).order = i);
         addSubgraphConstraints(lg, cg, sorted.vs);
     });

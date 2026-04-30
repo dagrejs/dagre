@@ -189,7 +189,8 @@ function verticalAlignment(
     graph: Graph<GraphLabel, NodeLabel, EdgeLabel>,
     layering: string[][],
     conflicts: Conflicts,
-    neighborFn: (v: string) => string[]
+    neighborFn: (v: string) => string[],
+    corePath: string[] | undefined,
 ): AlignmentResult {
     const root: { [key: string]: string } = {};
     const align: { [key: string]: string } = {};
@@ -207,10 +208,27 @@ function verticalAlignment(
     });
 
     layering.forEach(layer => {
-        let prevIdx = -1;
-        layer.forEach(v => {
-            const wsRaw = neighborFn(v);
+        let prevIdx: number = -1;
+        let alreadyAlignedIndex: number = -1;
+        let hasShifted:boolean = false;
+        let modifiedLayer = layer;
+        const coreNodeIndex: number = layer.findIndex(v => {
+            return corePath?.includes(v) ||
+                (isInCorePath(v, graph, corePath));
+        });
+        if (coreNodeIndex > 0) { // -1 = not found; 0 changes nothing
+            // shallow copy because the original layering is used afterward
+            modifiedLayer = [layer[coreNodeIndex]!, ...layer.slice(0, coreNodeIndex), ...layer.slice(coreNodeIndex + 1)];
+            hasShifted = true;
+        }
+        modifiedLayer.forEach(v => {
+            let wsRaw = neighborFn(v);
             if (wsRaw && wsRaw.length) {
+                if (corePath?.includes(v)) {
+                    wsRaw = wsRaw.filter((w) =>{
+                        return isInCorePath(w, graph, corePath);
+                    });
+                }
                 const ws: string[] = wsRaw.sort((a, b) => {
                     const posA = pos[a];
                     const posB = pos[b];
@@ -223,12 +241,19 @@ function verticalAlignment(
                     const posW = pos[w];
                     if (posW !== undefined && align[v] === v &&
                         prevIdx < posW &&
+                        pos[w] !== alreadyAlignedIndex &&
                         !hasConflict(conflicts, v, w)) {
                         const rootW = root[w];
                         if (rootW !== undefined) {
                             align[w] = v;
                             align[v] = root[v] = rootW;
                             prevIdx = posW;
+                            if (hasShifted) {
+                                // if a core process node was shifted to the front of the layer
+                                prevIdx = -1; // make sure the alignment can continue as usual after
+                                alreadyAlignedIndex = pos[w] ?? -1; // but do not align another node to the same one
+                                hasShifted = false; // only do this once
+                            }
                         }
                     }
                 }
@@ -439,7 +464,7 @@ function balance(xss: XssMap, align: string | undefined = undefined): PositionMa
     });
 }
 
-function positionX(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): PositionMap {
+function positionX(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, corePath: string[] | undefined): PositionMap {
     const layering: string[][] = util.buildLayerMatrix(graph);
     const conflicts: Conflicts = Object.assign(
         findType1Conflicts(graph, layering),
@@ -460,7 +485,7 @@ function positionX(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): PositionMap 
                 const result = vert === "u" ? graph.predecessors(v) : graph.successors(v);
                 return result || [];
             };
-            const align: AlignmentResult = verticalAlignment(graph, adjustedLayering, conflicts, neighborFn);
+            const align: AlignmentResult = verticalAlignment(graph, adjustedLayering, conflicts, neighborFn, corePath);
             let xs: PositionMap = horizontalCompaction(graph, adjustedLayering,
                 align.root, align.align, horiz === "r");
             if (horiz === "r") {
@@ -523,4 +548,17 @@ function sep(nodeSep: number, edgeSep: number, reverseSep: boolean): (g: Graph<G
 
 function width(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, v: string): number {
     return (graph.node(v) as NodeLabel).width;
+}
+
+function isInCorePath(v: string, graph: Graph, corePath: string[] | undefined) {
+    if (!corePath) return false;
+    const edge = graph.node(v)?.edgeObj;
+    if (!edge || graph.node(v).edgeLabel.reversed) return false;
+
+    const sourceIndex = corePath.indexOf(edge?.v);
+    const targetIndex = corePath.indexOf(edge?.w);
+
+    return sourceIndex !== -1 && targetIndex !== -1 &&
+        sourceIndex === (targetIndex + 1) % corePath.length ||
+        sourceIndex === (targetIndex - 1) % corePath.length;
 }
