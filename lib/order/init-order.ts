@@ -1,5 +1,5 @@
 import * as util from "../util";
-import type {Graph} from '../types';
+import type {Graph, NodeCollection} from '../types';
 
 /*
  * Assigns an initial order value for each node by performing a DFS search
@@ -12,7 +12,7 @@ import type {Graph} from '../types';
  * Returns a layering matrix with an array per layer and each layer sorted by
  * the order of its nodes.
  */
-export default function initOrder(graph: Graph): string[][] {
+export default function initOrder(graph: Graph, oldNodes: NodeCollection): string[][] {
     const visited: { [key: string]: boolean } = {};
     const simpleNodes = graph.nodes().filter(v => !graph.children(v).length);
     const simpleNodesRanks = simpleNodes.map(v => graph.node(v).rank);
@@ -26,12 +26,20 @@ export default function initOrder(graph: Graph): string[][] {
         layers[node.rank]!.push(v);
         const successors = graph.successors(v);
         if (successors) {
-            successors.forEach(dfs);
+            const sortedSuccessors = [...successors].sort((a: string, b: string) => compareOldOrder(a, b));
+            sortedSuccessors.forEach(dfs);
         }
     }
 
     const orderedVs = simpleNodes.sort((a, b) => graph.node(a).rank - graph.node(b).rank);
     orderedVs.forEach(dfs);
+
+    function compareOldOrder(a: string, b: string) {
+        const nodeA = graph.node(a);
+        const nodeB = graph.node(b);
+
+        return util.compareByOldOrder(oldNodes, nodeA, nodeB);
+    }
 
     return layers;
 }
