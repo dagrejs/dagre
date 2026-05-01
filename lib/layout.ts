@@ -30,14 +30,126 @@ interface EdgeProxyNodeLabel extends Omit<NodeLabel, 'e'> {
     e: Edge;
 }
 
+
 export function layout(g: Graph<GraphLabel, NodeLabel, EdgeLabel>, opts: LayoutOptions = {}): Graph<GraphLabel, NodeLabel, EdgeLabel> {
     const time = opts.debugTiming ? util.time : util.notime;
     return time("layout", () => {
-        const layoutGraph =
-            time("  buildLayoutGraph", () => buildLayoutGraph(g));
+        const layoutGraph = time("  buildLayoutGraph", () => buildLayoutGraph(g));
         time("  runLayout", () => runLayout(layoutGraph, time, opts));
+        // After the main layout completes, re-layout clusters that have their own rankdir
+        time("  applyClusterDirections", () => applyClusterDirections(layoutGraph, time, opts));
         time("  updateInputGraph", () => updateInputGraph(g, layoutGraph));
         return layoutGraph;
+    });
+}
+
+/**
+ * Returns all descendant node IDs of a given cluster node (all depths).
+ */
+function getAllDescendants(g: Graph<GraphLabel, NodeLabel, EdgeLabel>, v: string): string[] {
+    const result: string[] = [];
+    function collect(node: string): void {
+        g.children(node).forEach(child => {
+            result.push(child);
+            if (g.children(child).length) collect(child);
+        });
+    }
+    collect(v);
+    return result;
+}
+
+/**
+ * After the main layout has assigned positions to all nodes, re-layout any
+ * clusters (compound nodes) that carry a `rankdir` different from the top-level
+ * graph. Each such cluster's descendants are laid out in a fresh sub-graph with
+ * the cluster's own direction, then the resulting positions are translated so
+ * that the sub-layout is centred at the cluster's position in the main graph.
+ */
+function applyClusterDirections(
+    g: Graph<GraphLabel, NodeLabel, EdgeLabel>,
+    time: <T>(name: string, fn: () => T) => T,
+    opts: LayoutOptions
+): void {
+    const graphRankdir = ((g.graph().rankdir as string) || "TB").toUpperCase();
+
+    g.nodes().forEach(v => {
+        if (!g.children(v).length) return;
+        const node = g.node(v);
+        if (!node?.rankdir) return;
+        const clusterRankdir = (node.rankdir as string).toUpperCase();
+        if (clusterRankdir === graphRankdir) return;
+
+        const descendants = getAllDescendants(g, v);
+        if (!descendants.length) return;
+
+        // Build a fresh sub-graph so runLayout doesn't corrupt the main graph
+        const subGraph = new Graph<GraphLabel, NodeLabel, EdgeLabel>({ multigraph: true, compound: true });
+        subGraph.setGraph({
+            rankdir: node.rankdir,
+            ranksep: (g.graph().ranksep as number) ?? 50,
+            edgesep: (g.graph().edgesep as number) ?? 20,
+            nodesep: (g.graph().nodesep as number) ?? 50,
+        });
+        subGraph.setDefaultEdgeLabel(() => ({}));
+
+        descendants.forEach(u => {
+            const nl = g.node(u);
+            subGraph.setNode(u, { width: nl?.width ?? 50, height: nl?.height ?? 50 });
+            const parent = g.parent(u);
+            if (parent && parent !== v && descendants.includes(parent)) {
+                subGraph.setParent(u, parent);
+            }
+        });
+
+        g.edges().forEach(e => {
+            if (descendants.includes(e.v) && descendants.includes(e.w)) {
+                const el = g.edge(e);
+                subGraph.setEdge(e.v, e.w, {
+                    weight: (el?.weight as number) ?? 1,
+                    minlen: (el?.minlen as number) ?? 1,
+                    width: (el?.width as number) ?? 0,
+                    height: (el?.height as number) ?? 0,
+                    labeloffset: (el?.labeloffset as number) ?? 10,
+                    labelpos: ((el?.labelpos as string) ?? "r") as "l" | "c" | "r",
+                });
+            }
+        });
+
+        // Layout the sub-graph with the cluster's own direction
+        runLayout(subGraph, time, opts);
+
+        // Compute the sub-graph bounding box
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        descendants.forEach(u => {
+            const n = subGraph.node(u);
+            if (n?.x !== undefined && n?.y !== undefined) {
+                const hw = (n.width ?? 0) / 2;
+                const hh = (n.height ?? 0) / 2;
+                minX = Math.min(minX, n.x - hw);
+                minY = Math.min(minY, n.y - hh);
+                maxX = Math.max(maxX, n.x + hw);
+                maxY = Math.max(maxY, n.y + hh);
+            }
+        });
+
+        // Translate sub-layout so it is centred at the cluster's main-graph position
+        const clusterNode = g.node(v);
+        if (!clusterNode) return;
+        const offsetX = (clusterNode.x ?? 0) - (maxX + minX) / 2;
+        const offsetY = (clusterNode.y ?? 0) - (maxY + minY) / 2;
+
+        descendants.forEach(u => {
+            const subNode = subGraph.node(u);
+            const mainNode = g.node(u);
+            if (mainNode && subNode?.x !== undefined && subNode?.y !== undefined) {
+                mainNode.x = subNode.x + offsetX;
+                mainNode.y = subNode.y + offsetY;
+            }
+        });
+
+        // Update cluster bounding box to match sub-layout
+        clusterNode.width = Math.max(clusterNode.width ?? 0, maxX - minX);
+        clusterNode.height = Math.max(clusterNode.height ?? 0, maxY - minY);
     });
 }
 
@@ -152,6 +264,10 @@ function buildLayoutGraph(inputGraph: Graph<GraphLabel, NodeLabel, EdgeLabel>): 
                 newNode[k] = (nodeDefaults)[k];
             }
         });
+        // Preserve per-cluster direction so applyClusterDirections can use it
+        if (node.rankdir) {
+            newNode.rankdir = node.rankdir as 'TB' | 'BT' | 'LR' | 'RL';
+        }
 
         g.setNode(v, newNode);
         const parent = inputGraph.parent(v);
