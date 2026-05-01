@@ -296,6 +296,104 @@ describe("layout", () => {
             b: {x: 50 + 200 + 75 / 2, y: 200 / 2}
         });
     });
+
+    describe("per-cluster direction (rankdir on cluster nodes)", () => {
+        it("lays out cluster nodes horizontally (LR) inside a TB graph", () => {
+            g.graph().rankdir = "TB";
+            g.setNode("a", {width: 50, height: 50});
+            g.setNode("b", {width: 50, height: 50});
+            g.setNode("sg", {rankdir: "LR"});
+            g.setParent("a", "sg");
+            g.setParent("b", "sg");
+            g.setEdge("a", "b");
+            layout(g);
+            const aNode = g.node("a");
+            const bNode = g.node("b");
+            // In LR sub-layout, a and b should differ in x (horizontal axis)
+            expect(Math.abs(aNode.x - bNode.x)).toBeGreaterThan(0);
+            // …and be on roughly the same horizontal band (y difference < one node height)
+            expect(Math.abs(aNode.y - bNode.y)).toBeLessThan(50);
+        });
+
+        it("lays out cluster nodes vertically (TB) inside an LR graph", () => {
+            g.graph().rankdir = "LR";
+            g.setNode("a", {width: 50, height: 50});
+            g.setNode("b", {width: 50, height: 50});
+            g.setNode("sg", {rankdir: "TB"});
+            g.setParent("a", "sg");
+            g.setParent("b", "sg");
+            g.setEdge("a", "b");
+            layout(g);
+            const aNode = g.node("a");
+            const bNode = g.node("b");
+            // In TB sub-layout, a and b should differ in y (vertical axis)
+            expect(Math.abs(aNode.y - bNode.y)).toBeGreaterThan(0);
+            // …and be on roughly the same vertical band (x difference < one node width)
+            expect(Math.abs(aNode.x - bNode.x)).toBeLessThan(50);
+        });
+
+        it("respects cluster rankdir even when the cluster has external connections", () => {
+            g.graph().rankdir = "TB";
+            g.setNode("a", {width: 50, height: 50});
+            g.setNode("b", {width: 50, height: 50});
+            g.setNode("c", {width: 50, height: 50}); // external node
+            g.setNode("sg", {rankdir: "LR"});
+            g.setParent("a", "sg");
+            g.setParent("b", "sg");
+            g.setEdge("a", "b");
+            g.setEdge("b", "c"); // edge leaving the subgraph
+            layout(g);
+            const aNode = g.node("a");
+            const bNode = g.node("b");
+            // a and b should still be laid out LR (differ in x, same y band)
+            expect(Math.abs(aNode.x - bNode.x)).toBeGreaterThan(0);
+            expect(Math.abs(aNode.y - bNode.y)).toBeLessThan(50);
+        });
+
+        it("leaves clusters without rankdir in the parent graph direction", () => {
+            g.graph().rankdir = "TB";
+            g.setNode("a", {width: 50, height: 50});
+            g.setNode("b", {width: 50, height: 50});
+            g.setNode("sg", {}); // no rankdir
+            g.setParent("a", "sg");
+            g.setParent("b", "sg");
+            g.setEdge("a", "b");
+            // Should not throw and positions should exist
+            expect(() => layout(g)).not.toThrow();
+            expect(g.node("a").x).toBeDefined();
+            expect(g.node("b").x).toBeDefined();
+        });
+
+        it("is a no-op for clusters whose rankdir matches the parent graph", () => {
+            g.graph().rankdir = "TB";
+            g.setNode("a", {width: 50, height: 50});
+            g.setNode("b", {width: 50, height: 50});
+            g.setNode("sg", {rankdir: "TB"});
+            g.setParent("a", "sg");
+            g.setParent("b", "sg");
+            g.setEdge("a", "b");
+            expect(() => layout(g)).not.toThrow();
+            expect(g.node("a").x).toBeDefined();
+            expect(g.node("b").x).toBeDefined();
+        });
+
+        it("handles sibling clusters with different directions", () => {
+            g.graph().rankdir = "TB";
+            ["a1", "a2", "b1", "b2"].forEach(v => g.setNode(v, {width: 50, height: 50}));
+            g.setNode("sgA", {rankdir: "LR"});
+            g.setNode("sgB", {rankdir: "TB"});
+            g.setParent("a1", "sgA");
+            g.setParent("a2", "sgA");
+            g.setParent("b1", "sgB");
+            g.setParent("b2", "sgB");
+            g.setEdge("a1", "a2");
+            g.setEdge("b1", "b2");
+            g.setEdge("a2", "b1"); // cross-cluster edge
+            expect(() => layout(g)).not.toThrow();
+            // sgA uses LR: a1 and a2 should differ in x
+            expect(Math.abs(g.node("a1").x - g.node("a2").x)).toBeGreaterThan(0);
+        });
+    });
 });
 
 function extractCoordinates(g: Graph) {
