@@ -37,6 +37,22 @@ describe("crossCount", () => {
         expect(crossCount(g, [["a1", "a2"], ["b2", "b1"], ["c1", "c2"]])).toBe(2);
     });
 
+    it("counts crossings for edges leaving the same node from different offsets", () => {
+        g.setEdge("a", "b", {weight: 1, tailport: {x: -10, y: 0}});
+        g.setEdge("a", "c", {weight: 1, tailport: {x: 10, y: 0}});
+
+        expect(crossCount(g, [["a"], ["b", "c"]])).toBe(0);
+        expect(crossCount(g, [["a"], ["c", "b"]])).toBe(1);
+    });
+
+    it("counts crossings for edges entering the same node from different offsets", () => {
+        g.setEdge("a", "c", {weight: 1, headport: {x: 10, y: 0}});
+        g.setEdge("b", "c", {weight: 1, headport: {x: -10, y: 0}});
+
+        expect(crossCount(g, [["a", "b"], ["c"]])).toBe(1);
+        expect(crossCount(g, [["b", "a"], ["c"]])).toBe(0);
+    });
+
     it("works for graph #1", () => {
         g.setPath(["a", "b", "c"]);
         g.setPath(["d", "e", "c"]);

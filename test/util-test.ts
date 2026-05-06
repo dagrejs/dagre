@@ -140,6 +140,24 @@ describe("util", () => {
             const rect = {x: 0, y: 0, width: 1, height: 1};
             expect(() => util.intersectRect(rect, {x: 0, y: 0})).toThrow();
         });
+
+        it("applies x-port offset for top/bottom intersections", () => {
+            const rect = {x: 0, y: 0, width: 200, height: 400};
+            expect(util.intersectRect(rect, {x: 0, y: 500}, {x: 25, y: 100})).toEqual({x: 25, y: 200});
+            expect(util.intersectRect(rect, {x: 0, y: -500}, {x: -25, y: 100})).toEqual({x: -25, y: -200});
+        });
+
+        it("applies y-port offset for left/right intersections", () => {
+            const rect = {x: 0, y: 0, width: 200, height: 400};
+            expect(util.intersectRect(rect, {x: 500, y: 0}, {x: 25, y: 100})).toEqual({x: 100, y: 100});
+            expect(util.intersectRect(rect, {x: -500, y: 0}, {x: 25, y: -100})).toEqual({x: -100, y: -100});
+        });
+
+        it("clamps port offsets to the edge of the node", () => {
+            const rect = {x: 0, y: 0, width: 200, height: 400};
+            expect(util.intersectRect(rect, {x: 0, y: 500}, {x: 500, y: 0})).toEqual({x: 100, y: 200});
+            expect(util.intersectRect(rect, {x: 500, y: 0}, {x: 0, y: 500})).toEqual({x: 100, y: 200});
+        });
     });
 
     describe("buildLayerMatrix", () => {

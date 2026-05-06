@@ -30,22 +30,83 @@ interface SouthEntry {
     weight: number;
 }
 
+function sourcePortPos(port: unknown): number | undefined {
+    if (!port || typeof port !== "object") {
+        return undefined;
+    }
+
+    const maybePoint = port as {x?: number; y?: number};
+    if (typeof maybePoint.x === "number" && maybePoint.x !== 0) {
+        return maybePoint.x;
+    }
+    if (typeof maybePoint.y === "number") {
+        return maybePoint.y;
+    }
+    if (typeof maybePoint.x === "number") {
+        return maybePoint.x;
+    }
+
+    return undefined;
+}
+
 function twoLayerCrossCount(graph: Graph, northLayer: string[], southLayer: string[]): number {
     // Sort all of the edges between the north and south layers by their position
     // in the north layer and then the south. Map these edges to the position of
     // their head in the south layer.
     const southPos: { [key: string]: number } = zipObject(southLayer, southLayer.map((v, i) => i));
+    const southNodeBuckets = new Map<string, Set<number | undefined>>();
+    southLayer.forEach(v => southNodeBuckets.set(v, new Set([undefined])));
+
+    northLayer.forEach(v => {
+        const edges = graph.outEdges(v);
+        if (!edges) return;
+        edges.forEach(e => {
+            const bucket = southNodeBuckets.get(e.w);
+            if (!bucket) return;
+            bucket.add(sourcePortPos(graph.edge(e).headport));
+        });
+    });
+
+    const southEndpointPos = new Map<string, number>();
+    let nextEndpointPos = 0;
+    southLayer.forEach(v => {
+        const bucket = Array.from(southNodeBuckets.get(v) || new Set<number | undefined>([undefined]))
+            .sort((a, b) => (a ?? 0) - (b ?? 0));
+        bucket.forEach(headPos => {
+            southEndpointPos.set(`${v}:${String(headPos)}`, nextEndpointPos++);
+        });
+    });
+
+    const edgeSouthPos = (w: string, headPos: number | undefined): number => {
+        const endpointPos = southEndpointPos.get(`${w}:${String(headPos)}`);
+        if (endpointPos !== undefined) {
+            return endpointPos;
+        }
+        return southPos[w]!;
+    };
+
     const southEntries: SouthEntry[] = northLayer.flatMap(v => {
         const edges = graph.outEdges(v);
         if (!edges) return [];
         return edges.map(e => {
-            return {pos: southPos[e.w]!, weight: graph.edge(e).weight};
-        }).sort((a, b) => a.pos - b.pos);
+            const edgeLabel = graph.edge(e);
+            const headPos = sourcePortPos(edgeLabel.headport);
+            return {
+                pos: edgeSouthPos(e.w, headPos),
+                weight: edgeLabel.weight,
+                tailPos: sourcePortPos(edgeLabel.tailport)
+            };
+        }).sort((a, b) => {
+            if (a.tailPos !== undefined && b.tailPos !== undefined && a.tailPos !== b.tailPos) {
+                return a.tailPos - b.tailPos;
+            }
+            return a.pos - b.pos;
+        }).map(({pos, weight}) => ({pos, weight}));
     });
 
     // Build the accumulator tree
     let firstIndex = 1;
-    while (firstIndex < southLayer.length) firstIndex <<= 1;
+    while (firstIndex < nextEndpointPos) firstIndex <<= 1;
     const treeSize = 2 * firstIndex - 1;
     firstIndex -= 1;
     const tree = new Array(treeSize).fill(0);
