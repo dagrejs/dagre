@@ -70,7 +70,7 @@ function runLayout(
     time("    fixupEdgeLabelCoords", () => fixupEdgeLabelCoords(g));
     time("    undoCoordinateSystem", () => coordinateSystem.undo(g));
     time("    translateGraph", () => translateGraph(g));
-    time("    assignNodeIntersects", () => assignNodeIntersects(g));
+    time("    assignNodeIntersectsassignNodeIntersects", () => assignNodeIntersects(g));
     time("    reversePoints", () => reversePointsForReversedEdges(g));
     time("    acyclic.undo", () => acyclic.undo(g));
 }
@@ -163,6 +163,7 @@ function buildLayoutGraph(inputGraph: Graph<GraphLabel, NodeLabel, EdgeLabel>): 
     inputGraph.edges().forEach(e => {
         const edge = canonicalize(inputGraph.edge(e));
         g.setEdge(e, Object.assign({},
+            edge,
             edgeDefaults,
             selectNumberAttrs(edge, edgeNumAttrs),
             util.pick(edge, edgeAttrs)));

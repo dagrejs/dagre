@@ -61,6 +61,16 @@ describe("layout", () => {
         expect(g.edge("a", "b").y).toEqual(100 + 150 + 70 / 2);
     });
 
+    it("preserves custom edge label properties set via setEdge", () => {
+        g.setNode("a", {width: 50, height: 100});
+        g.setNode("b", {width: 75, height: 200});
+        g.setEdge("a", "b", {label: "my-edge-label", width: 10, height: 10, labelpos: "c"});
+
+        layout(g);
+
+        expect(g.edge("a", "b").label).toBe("my-edge-label");
+    });
+
     describe("can layout an edge with a long label, with rankdir =", () => {
         ["TB", "BT", "LR", "RL"].forEach(rankdir => {
             it(rankdir, () => {

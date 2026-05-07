@@ -30,6 +30,11 @@ interface SouthEntry {
     weight: number;
 }
 
+interface SouthEntryWithMeta extends SouthEntry {
+    edgeId: string;
+    hasPortOffset: boolean;
+}
+
 function sourcePortPos(port: unknown): number | undefined {
     if (!port || typeof port !== "object") {
         return undefined;
@@ -48,6 +53,21 @@ function sourcePortPos(port: unknown): number | undefined {
 
     return undefined;
 }
+
+function hasPortOffset(port: unknown): boolean {
+    if (!port || typeof port !== "object") {
+        return false;
+    }
+
+    const maybePoint = port as {x?: number; y?: number};
+    return (typeof maybePoint.x === "number" && maybePoint.x !== 0)
+        || (typeof maybePoint.y === "number" && maybePoint.y !== 0);
+}
+
+function edgeId(e: {v: string; w: string; name?: string}): string {
+    return e.name !== undefined ? `${e.v}->${e.w}#${String(e.name)}` : `${e.v}->${e.w}`;
+}
+
 
 function twoLayerCrossCount(graph: Graph, northLayer: string[], southLayer: string[]): number {
     // Sort all of the edges between the north and south layers by their position
@@ -85,7 +105,7 @@ function twoLayerCrossCount(graph: Graph, northLayer: string[], southLayer: stri
         return southPos[w]!;
     };
 
-    const southEntries: SouthEntry[] = northLayer.flatMap(v => {
+    const southEntriesWithMeta: SouthEntryWithMeta[] = northLayer.flatMap(v => {
         const edges = graph.outEdges(v);
         if (!edges) return [];
         return edges.map(e => {
@@ -94,15 +114,19 @@ function twoLayerCrossCount(graph: Graph, northLayer: string[], southLayer: stri
             return {
                 pos: edgeSouthPos(e.w, headPos),
                 weight: edgeLabel.weight,
-                tailPos: sourcePortPos(edgeLabel.tailport)
+                tailPos: sourcePortPos(edgeLabel.tailport),
+                edgeId: edgeId(e),
+                hasPortOffset: hasPortOffset(edgeLabel.tailport) || hasPortOffset(edgeLabel.headport)
             };
         }).sort((a, b) => {
             if (a.tailPos !== undefined && b.tailPos !== undefined && a.tailPos !== b.tailPos) {
                 return a.tailPos - b.tailPos;
             }
             return a.pos - b.pos;
-        }).map(({pos, weight}) => ({pos, weight}));
+        }).map(({pos, weight, edgeId, hasPortOffset}) => ({pos, weight, edgeId, hasPortOffset}));
     });
+
+    const southEntries: SouthEntry[] = southEntriesWithMeta.map(({pos, weight}) => ({pos, weight}));
 
     // Build the accumulator tree
     let firstIndex = 1;

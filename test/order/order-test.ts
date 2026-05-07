@@ -43,6 +43,32 @@ describe("order", () => {
         expect(crossCount(g, layering)).toBeLessThanOrEqual(1);
     });
 
+    it("minimizes crossings caused by tailport offsets from the same source", () => {
+        g.setNode("a", {rank: 1});
+        // Intentionally insert in the opposite order of port offsets.
+        g.setNode("c", {rank: 2});
+        g.setNode("d", {rank: 2});
+        g.setEdge("a", "d", {weight: 1, tailport: {x: -10, y: 0}});
+        g.setEdge("a", "c", {weight: 1, tailport: {x: 10, y: 0}});
+
+        order(g);
+        const layering = buildLayerMatrix(g);
+        expect(crossCount(g, layering)).toBe(0);
+    });
+
+    it("minimizes crossings caused by headport offsets into the same target", () => {
+        // Intentionally insert in the opposite order of incoming headport offsets.
+        g.setNode("a", {rank: 1});
+        g.setNode("b", {rank: 1});
+        g.setNode("c", {rank: 2});
+        g.setEdge("a", "c", {weight: 1, headport: {x: 10, y: 0}});
+        g.setEdge("b", "c", {weight: 1, headport: {x: -10, y: 0}});
+
+        order(g);
+        const layering = buildLayerMatrix(g);
+        expect(crossCount(g, layering)).toBe(0);
+    });
+
     it('can skip the optimal ordering', () => {
         g.setNode("a", {rank: 1});
         ["b", "d"].forEach(v => g.setNode(v, {rank: 2}));
