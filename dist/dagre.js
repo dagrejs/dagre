@@ -583,7 +583,7 @@ var dagre = (() => {
     });
     return simplified;
   }
-  function intersectRect(rect, point) {
+  function intersectRect(rect, point, port) {
     const x2 = rect.x;
     const y2 = rect.y;
     const dx = point.x - x2;
@@ -607,7 +607,24 @@ var dagre = (() => {
       sx = w2;
       sy = w2 * dy / dx;
     }
-    return { x: x2 + sx, y: y2 + sy };
+    const intersection = { x: x2 + sx, y: y2 + sy };
+    if (!port) {
+      return intersection;
+    }
+    const minX = x2 - rect.width / 2;
+    const maxX = x2 + rect.width / 2;
+    const minY = y2 - rect.height / 2;
+    const maxY = y2 + rect.height / 2;
+    if (Math.abs(intersection.y - minY) < 1e-9 || Math.abs(intersection.y - maxY) < 1e-9) {
+      return {
+        x: Math.max(minX, Math.min(maxX, intersection.x + (port.x || 0))),
+        y: intersection.y
+      };
+    }
+    return {
+      x: intersection.x,
+      y: Math.max(minY, Math.min(maxY, intersection.y + (port.y || 0)))
+    };
   }
   function buildLayerMatrix(graph) {
     const layering = range(maxRank(graph) + 1).map(() => []);
@@ -771,7 +788,7 @@ var dagre = (() => {
   var GRAPH_NODE = "\0";
 
   // lib/version.ts
-  var version = "3.0.0";
+  var version = "3.0.1-pre";
 
   // lib/data/list.ts
   var List = class {
@@ -925,6 +942,11 @@ var dagre = (() => {
   }
 
   // lib/acyclic.ts
+  function swapPorts(label) {
+    const tailport = label.tailport;
+    label.tailport = label.headport;
+    label.headport = tailport;
+  }
   function run(graph) {
     const fas = graph.graph().acyclicer === "greedy" ? greedyFAS(graph, weightFn(graph)) : dfsFAS(graph);
     fas.forEach((e) => {
@@ -932,6 +954,7 @@ var dagre = (() => {
       graph.removeEdge(e);
       label.forwardName = e.name;
       label.reversed = true;
+      swapPorts(label);
       graph.setEdge(e.w, e.v, label, uniqueId("rev"));
     });
     function weightFn(g) {
@@ -968,6 +991,7 @@ var dagre = (() => {
       if (label.reversed) {
         graph.removeEdge(e);
         const forwardName = label.forwardName;
+        swapPorts(label);
         delete label.reversed;
         delete label.forwardName;
         graph.setEdge(e.w, e.v, label, forwardName);
@@ -1009,13 +1033,21 @@ var dagre = (() => {
         attrs.dummy = "edge-label";
         attrs.labelpos = edgeLabel.labelpos;
       }
-      graph.setEdge(v2, dummy, { weight: edgeLabel.weight }, name);
+      graph.setEdge(v2, dummy, {
+        weight: edgeLabel.weight,
+        tailport: edgeLabel.tailport,
+        headport: edgeLabel.headport
+      }, name);
       if (i === 0) {
         graph.graph().dummyChains.push(dummy);
       }
       v2 = dummy;
     }
-    graph.setEdge(v2, w2, { weight: edgeLabel.weight }, name);
+    graph.setEdge(v2, w2, {
+      weight: edgeLabel.weight,
+      tailport: edgeLabel.tailport,
+      headport: edgeLabel.headport
+    }, name);
   }
   function undo2(graph) {
     graph.graph().dummyChains.forEach((v2) => {
@@ -1577,17 +1609,83 @@ var dagre = (() => {
     }
     return cc;
   }
+  function sourcePortPos(port) {
+    if (!port || typeof port !== "object") {
+      return void 0;
+    }
+    const maybePoint = port;
+    if (typeof maybePoint.x === "number" && maybePoint.x !== 0) {
+      return maybePoint.x;
+    }
+    if (typeof maybePoint.y === "number") {
+      return maybePoint.y;
+    }
+    if (typeof maybePoint.x === "number") {
+      return maybePoint.x;
+    }
+    return void 0;
+  }
+  function hasPortOffset(port) {
+    if (!port || typeof port !== "object") {
+      return false;
+    }
+    const maybePoint = port;
+    return typeof maybePoint.x === "number" && maybePoint.x !== 0 || typeof maybePoint.y === "number" && maybePoint.y !== 0;
+  }
+  function edgeId(e) {
+    return e.name !== void 0 ? `${e.v}->${e.w}#${String(e.name)}` : `${e.v}->${e.w}`;
+  }
   function twoLayerCrossCount(graph, northLayer, southLayer) {
     const southPos = zipObject(southLayer, southLayer.map((v2, i) => i));
-    const southEntries = northLayer.flatMap((v2) => {
+    const southNodeBuckets = /* @__PURE__ */ new Map();
+    southLayer.forEach((v2) => southNodeBuckets.set(v2, /* @__PURE__ */ new Set([void 0])));
+    northLayer.forEach((v2) => {
+      const edges = graph.outEdges(v2);
+      if (!edges) return;
+      edges.forEach((e) => {
+        const bucket = southNodeBuckets.get(e.w);
+        if (!bucket) return;
+        bucket.add(sourcePortPos(graph.edge(e).headport));
+      });
+    });
+    const southEndpointPos = /* @__PURE__ */ new Map();
+    let nextEndpointPos = 0;
+    southLayer.forEach((v2) => {
+      const bucket = Array.from(southNodeBuckets.get(v2) || /* @__PURE__ */ new Set([void 0])).sort((a, b2) => (a != null ? a : 0) - (b2 != null ? b2 : 0));
+      bucket.forEach((headPos) => {
+        southEndpointPos.set(`${v2}:${String(headPos)}`, nextEndpointPos++);
+      });
+    });
+    const edgeSouthPos = (w2, headPos) => {
+      const endpointPos = southEndpointPos.get(`${w2}:${String(headPos)}`);
+      if (endpointPos !== void 0) {
+        return endpointPos;
+      }
+      return southPos[w2];
+    };
+    const southEntriesWithMeta = northLayer.flatMap((v2) => {
       const edges = graph.outEdges(v2);
       if (!edges) return [];
       return edges.map((e) => {
-        return { pos: southPos[e.w], weight: graph.edge(e).weight };
-      }).sort((a, b2) => a.pos - b2.pos);
+        const edgeLabel = graph.edge(e);
+        const headPos = sourcePortPos(edgeLabel.headport);
+        return {
+          pos: edgeSouthPos(e.w, headPos),
+          weight: edgeLabel.weight,
+          tailPos: sourcePortPos(edgeLabel.tailport),
+          edgeId: edgeId(e),
+          hasPortOffset: hasPortOffset(edgeLabel.tailport) || hasPortOffset(edgeLabel.headport)
+        };
+      }).sort((a, b2) => {
+        if (a.tailPos !== void 0 && b2.tailPos !== void 0 && a.tailPos !== b2.tailPos) {
+          return a.tailPos - b2.tailPos;
+        }
+        return a.pos - b2.pos;
+      }).map(({ pos, weight, edgeId: edgeId2, hasPortOffset: hasPortOffset2 }) => ({ pos, weight, edgeId: edgeId2, hasPortOffset: hasPortOffset2 }));
     });
+    const southEntries = southEntriesWithMeta.map(({ pos, weight }) => ({ pos, weight }));
     let firstIndex = 1;
-    while (firstIndex < southLayer.length) firstIndex <<= 1;
+    while (firstIndex < nextEndpointPos) firstIndex <<= 1;
     const treeSize = 2 * firstIndex - 1;
     firstIndex -= 1;
     const tree = new Array(treeSize).fill(0);
@@ -1899,6 +1997,8 @@ var dagre = (() => {
     for (let i = 0, lastBest = 0; lastBest < 4; ++i, ++lastBest) {
       sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2, constraints);
       layering = buildLayerMatrix(graph);
+      layering = transposeLayering(graph, layering, constraints);
+      assignOrder(graph, layering);
       const cc = crossCount(graph, layering);
       if (cc < bestCC) {
         lastBest = 0;
@@ -1947,6 +2047,33 @@ var dagre = (() => {
   }
   function assignOrder(graph, layering) {
     Object.values(layering).forEach((layer) => layer.forEach((v2, i) => graph.node(v2).order = i));
+  }
+  function transposeLayering(graph, layering, constraints) {
+    const constraintSet = new Set(constraints.map((con) => `${con.left}->${con.right}`));
+    let improved = true;
+    let bestCC = crossCount(graph, layering);
+    while (improved) {
+      improved = false;
+      for (let rank2 = 0; rank2 < layering.length; rank2++) {
+        const layer = layering[rank2];
+        for (let i = 0; i < layer.length - 1; i++) {
+          const left = layer[i];
+          const right = layer[i + 1];
+          if (constraintSet.has(`${left}->${right}`)) {
+            continue;
+          }
+          [layer[i], layer[i + 1]] = [right, left];
+          const cc = crossCount(graph, layering);
+          if (cc < bestCC) {
+            bestCC = cc;
+            improved = true;
+          } else {
+            [layer[i], layer[i + 1]] = [left, right];
+          }
+        }
+      }
+    }
+    return layering;
   }
 
   // lib/position/bk.ts
@@ -2396,7 +2523,7 @@ var dagre = (() => {
     time2("    fixupEdgeLabelCoords", () => fixupEdgeLabelCoords(g));
     time2("    undoCoordinateSystem", () => undo3(g));
     time2("    translateGraph", () => translateGraph(g));
-    time2("    assignNodeIntersects", () => assignNodeIntersects(g));
+    time2("    assignNodeIntersectsassignNodeIntersects", () => assignNodeIntersects(g));
     time2("    reversePoints", () => reversePointsForReversedEdges(g));
     time2("    acyclic.undo", () => undo(g));
   }
@@ -2441,7 +2568,7 @@ var dagre = (() => {
     labeloffset: 10,
     labelpos: "r"
   };
-  var edgeAttrs = ["labelpos"];
+  var edgeAttrs = ["labelpos", "tailport", "headport"];
   function buildLayoutGraph(inputGraph) {
     const g = new p({ multigraph: true, compound: true });
     const graph = canonicalize(inputGraph.graph());
@@ -2469,6 +2596,7 @@ var dagre = (() => {
       const edge = canonicalize(inputGraph.edge(e));
       g.setEdge(e, Object.assign(
         {},
+        edge,
         edgeDefaults,
         selectNumberAttrs(edge, edgeNumAttrs),
         pick(edge, edgeAttrs)
@@ -2586,8 +2714,8 @@ var dagre = (() => {
         p1 = edge.points[0];
         p2 = edge.points[edge.points.length - 1];
       }
-      edge.points.unshift(intersectRect(nodeV, p1));
-      edge.points.push(intersectRect(nodeW, p2));
+      edge.points.unshift(intersectRect(nodeV, p1, edge.tailport));
+      edge.points.push(intersectRect(nodeW, p2, edge.headport));
     });
   }
   function fixupEdgeLabelCoords(g) {
