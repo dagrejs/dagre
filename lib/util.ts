@@ -110,7 +110,7 @@ function predecessorWeights(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): {
  * Finds where a line starting at point ({x, y}) would intersect a rectangle
  * ({x, y, width, height}) if it were pointing at the rectangle's center.
  */
-function intersectRect(rect: NodeLabel, point: Point, port?: Point): Point {
+function intersectRect(rect: NodeLabel, point: Point): Point {
     const x: number = rect.x!;
     const y: number = rect.y!;
 
@@ -142,27 +142,7 @@ function intersectRect(rect: NodeLabel, point: Point, port?: Point): Point {
         sy = w * dy / dx;
     }
 
-    const intersection = {x: x + sx, y: y + sy};
-    if (!port) {
-        return intersection;
-    }
-
-    const minX = x - rect.width / 2;
-    const maxX = x + rect.width / 2;
-    const minY = y - rect.height / 2;
-    const maxY = y + rect.height / 2;
-
-    if (Math.abs(intersection.y - minY) < 1e-9 || Math.abs(intersection.y - maxY) < 1e-9) {
-        return {
-            x: Math.max(minX, Math.min(maxX, intersection.x + (port.x || 0))),
-            y: intersection.y
-        };
-    }
-
-    return {
-        x: intersection.x,
-        y: Math.max(minY, Math.min(maxY, intersection.y + (port.y || 0)))
-    };
+    return {x: x + sx, y: y + sy};
 }
 
 /*

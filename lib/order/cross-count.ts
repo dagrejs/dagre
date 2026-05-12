@@ -1,5 +1,6 @@
 import {zipObject} from "../util";
 import type {Graph} from '../types';
+import {Edge} from "@dagrejs/graphlib";
 
 /*
  * A function that takes a layering (an array of layers, each with an array of
@@ -30,42 +31,15 @@ interface SouthEntry {
     weight: number;
 }
 
-interface SouthEntryWithMeta extends SouthEntry {
-    edgeId: string;
-    hasPortOffset: boolean;
+
+function tailOffset(graph: Graph, edge: Edge): number {
+    const offset = graph.edge(edge).tailport;
+    return offset === undefined ? 0 : offset;
 }
 
-function sourcePortPos(port: unknown): number | undefined {
-    if (!port || typeof port !== "object") {
-        return undefined;
-    }
-
-    const maybePoint = port as {x?: number; y?: number};
-    if (typeof maybePoint.x === "number" && maybePoint.x !== 0) {
-        return maybePoint.x;
-    }
-    if (typeof maybePoint.y === "number") {
-        return maybePoint.y;
-    }
-    if (typeof maybePoint.x === "number") {
-        return maybePoint.x;
-    }
-
-    return undefined;
-}
-
-function hasPortOffset(port: unknown): boolean {
-    if (!port || typeof port !== "object") {
-        return false;
-    }
-
-    const maybePoint = port as {x?: number; y?: number};
-    return (typeof maybePoint.x === "number" && maybePoint.x !== 0)
-        || (typeof maybePoint.y === "number" && maybePoint.y !== 0);
-}
-
-function edgeId(e: {v: string; w: string; name?: string}): string {
-    return e.name !== undefined ? `${e.v}->${e.w}#${String(e.name)}` : `${e.v}->${e.w}`;
+function headOffset(graph: Graph, edge: Edge): number {
+    const offset = graph.edge(edge).headport;
+    return offset === undefined ? 0 : offset;
 }
 
 
@@ -73,64 +47,43 @@ function twoLayerCrossCount(graph: Graph, northLayer: string[], southLayer: stri
     // Sort all of the edges between the north and south layers by their position
     // in the north layer and then the south. Map these edges to the position of
     // their head in the south layer.
-    const southPos: { [key: string]: number } = zipObject(southLayer, southLayer.map((v, i) => i));
-    const southNodeBuckets = new Map<string, Set<number | undefined>>();
-    southLayer.forEach(v => southNodeBuckets.set(v, new Set([undefined])));
 
-    northLayer.forEach(v => {
-        const edges = graph.outEdges(v);
-        if (!edges) return;
-        edges.forEach(e => {
-            const bucket = southNodeBuckets.get(e.w);
-            if (!bucket) return;
-            bucket.add(sourcePortPos(graph.edge(e).headport));
-        });
+    // Split southLayer into multiple entries where there are multiple headPort values for any given layer
+    // Turns e.g. 'node1, node2, node3' into e.g. 'node1_0, node1_12, node2_0, node3_0'
+    const northSet = new Set(northLayer);
+    const splitSouthLayer: string[] = southLayer.flatMap((w: string) => {
+        const edges = graph.inEdges(w);
+        if (!edges) return [];
+        const offsets = Array.from(new Set(
+            edges
+                .filter(e => northSet.has(e.v))
+                .map(e => headOffset(graph, e))
+        )).sort((a, b) => a - b);
+        return offsets.map(offset => w + "_" + offset);
     });
 
-    const southEndpointPos = new Map<string, number>();
-    let nextEndpointPos = 0;
-    southLayer.forEach(v => {
-        const bucket = Array.from(southNodeBuckets.get(v) || new Set<number | undefined>([undefined]))
-            .sort((a, b) => (a ?? 0) - (b ?? 0));
-        bucket.forEach(headPos => {
-            southEndpointPos.set(`${v}:${String(headPos)}`, nextEndpointPos++);
-        });
-    });
+    const southPos: { [key: string]: number } = zipObject(splitSouthLayer, splitSouthLayer.map((v, i) => i));
+    const southSet = new Set(southLayer);
 
-    const edgeSouthPos = (w: string, headPos: number | undefined): number => {
-        const endpointPos = southEndpointPos.get(`${w}:${String(headPos)}`);
-        if (endpointPos !== undefined) {
-            return endpointPos;
-        }
-        return southPos[w]!;
-    };
-
-    const southEntriesWithMeta: SouthEntryWithMeta[] = northLayer.flatMap(v => {
+    const southEntries: SouthEntry[] = northLayer.flatMap(v => {
         const edges = graph.outEdges(v);
         if (!edges) return [];
-        return edges.map(e => {
-            const edgeLabel = graph.edge(e);
-            const headPos = sourcePortPos(edgeLabel.headport);
-            return {
-                pos: edgeSouthPos(e.w, headPos),
-                weight: edgeLabel.weight,
-                tailPos: sourcePortPos(edgeLabel.tailport),
-                edgeId: edgeId(e),
-                hasPortOffset: hasPortOffset(edgeLabel.tailport) || hasPortOffset(edgeLabel.headport)
-            };
-        }).sort((a, b) => {
-            if (a.tailPos !== undefined && b.tailPos !== undefined && a.tailPos !== b.tailPos) {
-                return a.tailPos - b.tailPos;
-            }
-            return a.pos - b.pos;
-        }).map(({pos, weight, edgeId, hasPortOffset}) => ({pos, weight, edgeId, hasPortOffset}));
-    });
+        return edges
+            .filter(e => southSet.has(e.w))
+            .sort((a, b) => {
+                const tailCmp = tailOffset(graph, a) - tailOffset(graph, b);
+                if (tailCmp) return tailCmp;
 
-    const southEntries: SouthEntry[] = southEntriesWithMeta.map(({pos, weight}) => ({pos, weight}));
+                return southPos[a.w + "_" + headOffset(graph, a)]! - southPos[b.w + "_" + headOffset(graph, b)]!;
+            })
+            .map(e => {
+                return {pos: southPos[e.w + "_" + headOffset(graph, e)]!, weight: graph.edge(e).weight};
+            });
+    });
 
     // Build the accumulator tree
     let firstIndex = 1;
-    while (firstIndex < nextEndpointPos) firstIndex <<= 1;
+    while (firstIndex < splitSouthLayer.length) firstIndex <<= 1;
     const treeSize = 2 * firstIndex - 1;
     firstIndex -= 1;
     const tree = new Array(treeSize).fill(0);
@@ -150,6 +103,5 @@ function twoLayerCrossCount(graph: Graph, northLayer: string[], southLayer: stri
         }
         cc += entry.weight * weightSum;
     });
-
     return cc;
 }

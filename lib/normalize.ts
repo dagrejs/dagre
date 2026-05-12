@@ -61,8 +61,7 @@ function normalizeEdge(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, e: Edge):
         }
         graph.setEdge(v, dummy, {
             weight: edgeLabel.weight,
-            tailport: edgeLabel.tailport,
-            headport: edgeLabel.headport
+            tailport: i === 0 ? edgeLabel.tailport : undefined
         }, name);
         if (i === 0) {
             graph.graph().dummyChains!.push(dummy);
@@ -72,7 +71,6 @@ function normalizeEdge(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, e: Edge):
 
     graph.setEdge(v, w, {
         weight: edgeLabel.weight,
-        tailport: edgeLabel.tailport,
         headport: edgeLabel.headport
     }, name);
 }

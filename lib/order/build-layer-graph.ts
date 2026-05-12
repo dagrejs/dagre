@@ -66,8 +66,16 @@ export default function buildLayerGraph(
                 edges.forEach(e => {
                     const u = e.v === v ? e.w : e.v;
                     const edge = result.edge(u, v);
-                    const weight = edge !== undefined ? edge.weight : 0;
-                    result.setEdge(u, v, {weight: graph.edge(e).weight + weight});
+                    const prevWeight = edge !== undefined ? edge.weight : 0;
+                    const currLabel = graph.edge(e);
+                    const currWeight = currLabel.weight;
+                    const nextWeight = currWeight + prevWeight;
+                    const prevHeadport = edge !== undefined && edge.headport !== undefined ? edge.headport : 0;
+                    const currHeadport = currLabel.headport === undefined ? 0 : currLabel.headport;
+                    result.setEdge(u, v, {
+                        weight: nextWeight,
+                        headport: (prevHeadport * prevWeight + currHeadport * currWeight) / nextWeight
+                    });
                 });
             }
 

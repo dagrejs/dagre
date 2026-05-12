@@ -307,8 +307,8 @@ function assignNodeIntersects(g: Graph<GraphLabel, NodeLabel, EdgeLabel>): void 
             p1 = edge.points[0]!;
             p2 = edge.points[edge.points.length - 1]!;
         }
-        edge.points.unshift(util.intersectRect(nodeV, p1, edge.tailport));
-        edge.points.push(util.intersectRect(nodeW, p2, edge.headport));
+        edge.points.unshift(util.intersectRect(nodeV, p1));
+        edge.points.push(util.intersectRect(nodeW, p2));
     });
 }
 
