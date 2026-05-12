@@ -35,8 +35,8 @@ export interface NodeLabel {
 }
 export interface EdgeLabel {
     points?: Point[];
-    tailport?: Point;
-    headport?: Point;
+    tailport?: number;
+    headport?: number;
     width?: number;
     height?: number;
     minlen?: number;
@@ -85,8 +85,8 @@ export interface NodeConfig {
 export interface EdgeConfig {
     minlen?: number;
     weight?: number;
-    tailport?: Point;
-    headport?: Point;
+    tailport?: number;
+    headport?: number;
     width?: number;
     height?: number;
     labelpos?: 'l' | 'c' | 'r';

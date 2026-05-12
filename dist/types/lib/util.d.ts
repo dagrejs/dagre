@@ -14,7 +14,7 @@ declare function predecessorWeights(graph: Graph<GraphLabel, NodeLabel, EdgeLabe
         [key: string]: number;
     };
 };
-declare function intersectRect(rect: NodeLabel, point: Point, port?: Point): Point;
+declare function intersectRect(rect: NodeLabel, point: Point): Point;
 declare function buildLayerMatrix(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): string[][];
 declare function normalizeRanks(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void;
 declare function removeEmptyRanks(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void;
