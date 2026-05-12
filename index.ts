@@ -59,6 +59,15 @@ const dagre = {
     layout,
     debug,
     util: {time, notime},
+} as {
+    graphlib: typeof graphlib;
+    version: string;
+    layout: typeof layout;
+    debug: typeof debug;
+    util: {
+        time: typeof time;
+        notime: typeof notime;
+    };
 };
 
 export default dagre;

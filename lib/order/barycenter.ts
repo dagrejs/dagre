@@ -15,8 +15,9 @@ export default function barycenter(graph: Graph, movable: string[] = []): Baryce
             const result = inV.reduce((acc, e) => {
                 const edge = graph.edge(e);
                 const nodeU = graph.node(e.v);
+                const headport = edge.headport === undefined ? 0 : edge.headport;
                 return {
-                    sum: acc.sum + (edge.weight * nodeU.order),
+                    sum: acc.sum + (edge.weight * (nodeU.order + headport)),
                     weight: acc.weight + edge.weight
                 };
             }, {sum: 0, weight: 0});

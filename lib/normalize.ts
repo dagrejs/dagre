@@ -59,14 +59,20 @@ function normalizeEdge(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, e: Edge):
             attrs.dummy = "edge-label";
             attrs.labelpos = edgeLabel.labelpos;
         }
-        graph.setEdge(v, dummy, {weight: edgeLabel.weight}, name);
+        graph.setEdge(v, dummy, {
+            weight: edgeLabel.weight,
+            tailport: i === 0 ? edgeLabel.tailport : undefined
+        }, name);
         if (i === 0) {
             graph.graph().dummyChains!.push(dummy);
         }
         v = dummy;
     }
 
-    graph.setEdge(v, w, {weight: edgeLabel.weight}, name);
+    graph.setEdge(v, w, {
+        weight: edgeLabel.weight,
+        headport: edgeLabel.headport
+    }, name);
 }
 
 function undo(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {

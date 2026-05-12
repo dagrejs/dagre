@@ -5,6 +5,12 @@ import type {Edge, EdgeLabel, GraphLabel, NodeLabel, WeightFunction} from "./typ
 
 export {run, undo};
 
+function swapPorts(label: EdgeLabel): void {
+    const tailport = label.tailport;
+    label.tailport = label.headport;
+    label.headport = tailport;
+}
+
 function run(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
     const fas = (graph.graph().acyclicer === "greedy"
         ? greedyFAS(graph, weightFn(graph))
@@ -14,6 +20,7 @@ function run(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
         graph.removeEdge(e);
         label.forwardName = e.name;
         label.reversed = true;
+        swapPorts(label);
         graph.setEdge(e.w, e.v, label, uniqueId("rev"));
     });
 
@@ -56,6 +63,7 @@ function undo(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
             graph.removeEdge(e);
 
             const forwardName = label.forwardName;
+            swapPorts(label);
             delete label.reversed;
             delete label.forwardName;
             graph.setEdge(e.w, e.v, label, forwardName);

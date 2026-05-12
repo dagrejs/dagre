@@ -1,5 +1,6 @@
 import {zipObject} from "../util";
 import type {Graph} from '../types';
+import {Edge} from "@dagrejs/graphlib";
 
 /*
  * A function that takes a layering (an array of layers, each with an array of
@@ -30,22 +31,59 @@ interface SouthEntry {
     weight: number;
 }
 
+
+function tailOffset(graph: Graph, edge: Edge): number {
+    const offset = graph.edge(edge).tailport;
+    return offset === undefined ? 0 : offset;
+}
+
+function headOffset(graph: Graph, edge: Edge): number {
+    const offset = graph.edge(edge).headport;
+    return offset === undefined ? 0 : offset;
+}
+
+
 function twoLayerCrossCount(graph: Graph, northLayer: string[], southLayer: string[]): number {
     // Sort all of the edges between the north and south layers by their position
     // in the north layer and then the south. Map these edges to the position of
     // their head in the south layer.
-    const southPos: { [key: string]: number } = zipObject(southLayer, southLayer.map((v, i) => i));
+
+    // Split southLayer into multiple entries where there are multiple headPort values for any given layer
+    // Turns e.g. 'node1, node2, node3' into e.g. 'node1_0, node1_12, node2_0, node3_0'
+    const northSet = new Set(northLayer);
+    const splitSouthLayer: string[] = southLayer.flatMap((w: string) => {
+        const edges = graph.inEdges(w);
+        if (!edges) return [];
+        const offsets = Array.from(new Set(
+            edges
+                .filter(e => northSet.has(e.v))
+                .map(e => headOffset(graph, e))
+        )).sort((a, b) => a - b);
+        return offsets.map(offset => w + "_" + offset);
+    });
+
+    const southPos: { [key: string]: number } = zipObject(splitSouthLayer, splitSouthLayer.map((v, i) => i));
+    const southSet = new Set(southLayer);
+
     const southEntries: SouthEntry[] = northLayer.flatMap(v => {
         const edges = graph.outEdges(v);
         if (!edges) return [];
-        return edges.map(e => {
-            return {pos: southPos[e.w]!, weight: graph.edge(e).weight};
-        }).sort((a, b) => a.pos - b.pos);
+        return edges
+            .filter(e => southSet.has(e.w))
+            .sort((a, b) => {
+                const tailCmp = tailOffset(graph, a) - tailOffset(graph, b);
+                if (tailCmp) return tailCmp;
+
+                return southPos[a.w + "_" + headOffset(graph, a)]! - southPos[b.w + "_" + headOffset(graph, b)]!;
+            })
+            .map(e => {
+                return {pos: southPos[e.w + "_" + headOffset(graph, e)]!, weight: graph.edge(e).weight};
+            });
     });
 
     // Build the accumulator tree
     let firstIndex = 1;
-    while (firstIndex < southLayer.length) firstIndex <<= 1;
+    while (firstIndex < splitSouthLayer.length) firstIndex <<= 1;
     const treeSize = 2 * firstIndex - 1;
     firstIndex -= 1;
     const tree = new Array(treeSize).fill(0);
@@ -65,6 +103,5 @@ function twoLayerCrossCount(graph: Graph, northLayer: string[], southLayer: stri
         }
         cc += entry.weight * weightSum;
     });
-
     return cc;
 }

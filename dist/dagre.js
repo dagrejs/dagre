@@ -771,7 +771,7 @@ var dagre = (() => {
   var GRAPH_NODE = "\0";
 
   // lib/version.ts
-  var version = "3.0.0";
+  var version = "3.0.1-pre";
 
   // lib/data/list.ts
   var List = class {
@@ -925,6 +925,11 @@ var dagre = (() => {
   }
 
   // lib/acyclic.ts
+  function swapPorts(label) {
+    const tailport = label.tailport;
+    label.tailport = label.headport;
+    label.headport = tailport;
+  }
   function run(graph) {
     const fas = graph.graph().acyclicer === "greedy" ? greedyFAS(graph, weightFn(graph)) : dfsFAS(graph);
     fas.forEach((e) => {
@@ -932,6 +937,7 @@ var dagre = (() => {
       graph.removeEdge(e);
       label.forwardName = e.name;
       label.reversed = true;
+      swapPorts(label);
       graph.setEdge(e.w, e.v, label, uniqueId("rev"));
     });
     function weightFn(g) {
@@ -968,6 +974,7 @@ var dagre = (() => {
       if (label.reversed) {
         graph.removeEdge(e);
         const forwardName = label.forwardName;
+        swapPorts(label);
         delete label.reversed;
         delete label.forwardName;
         graph.setEdge(e.w, e.v, label, forwardName);
@@ -1009,13 +1016,19 @@ var dagre = (() => {
         attrs.dummy = "edge-label";
         attrs.labelpos = edgeLabel.labelpos;
       }
-      graph.setEdge(v2, dummy, { weight: edgeLabel.weight }, name);
+      graph.setEdge(v2, dummy, {
+        weight: edgeLabel.weight,
+        tailport: i === 0 ? edgeLabel.tailport : void 0
+      }, name);
       if (i === 0) {
         graph.graph().dummyChains.push(dummy);
       }
       v2 = dummy;
     }
-    graph.setEdge(v2, w2, { weight: edgeLabel.weight }, name);
+    graph.setEdge(v2, w2, {
+      weight: edgeLabel.weight,
+      headport: edgeLabel.headport
+    }, name);
   }
   function undo2(graph) {
     graph.graph().dummyChains.forEach((v2) => {
@@ -1577,17 +1590,39 @@ var dagre = (() => {
     }
     return cc;
   }
+  function tailOffset(graph, edge) {
+    const offset = graph.edge(edge).tailport;
+    return offset === void 0 ? 0 : offset;
+  }
+  function headOffset(graph, edge) {
+    const offset = graph.edge(edge).headport;
+    return offset === void 0 ? 0 : offset;
+  }
   function twoLayerCrossCount(graph, northLayer, southLayer) {
-    const southPos = zipObject(southLayer, southLayer.map((v2, i) => i));
+    const northSet = new Set(northLayer);
+    const splitSouthLayer = southLayer.flatMap((w2) => {
+      const edges = graph.inEdges(w2);
+      if (!edges) return [];
+      const offsets = Array.from(new Set(
+        edges.filter((e) => northSet.has(e.v)).map((e) => headOffset(graph, e))
+      )).sort((a, b2) => a - b2);
+      return offsets.map((offset) => w2 + "_" + offset);
+    });
+    const southPos = zipObject(splitSouthLayer, splitSouthLayer.map((v2, i) => i));
+    const southSet = new Set(southLayer);
     const southEntries = northLayer.flatMap((v2) => {
       const edges = graph.outEdges(v2);
       if (!edges) return [];
-      return edges.map((e) => {
-        return { pos: southPos[e.w], weight: graph.edge(e).weight };
-      }).sort((a, b2) => a.pos - b2.pos);
+      return edges.filter((e) => southSet.has(e.w)).sort((a, b2) => {
+        const tailCmp = tailOffset(graph, a) - tailOffset(graph, b2);
+        if (tailCmp) return tailCmp;
+        return southPos[a.w + "_" + headOffset(graph, a)] - southPos[b2.w + "_" + headOffset(graph, b2)];
+      }).map((e) => {
+        return { pos: southPos[e.w + "_" + headOffset(graph, e)], weight: graph.edge(e).weight };
+      });
     });
     let firstIndex = 1;
-    while (firstIndex < southLayer.length) firstIndex <<= 1;
+    while (firstIndex < splitSouthLayer.length) firstIndex <<= 1;
     const treeSize = 2 * firstIndex - 1;
     firstIndex -= 1;
     const tree = new Array(treeSize).fill(0);
@@ -1618,8 +1653,9 @@ var dagre = (() => {
         const result = inV.reduce((acc, e) => {
           const edge = graph.edge(e);
           const nodeU = graph.node(e.v);
+          const headport = edge.headport === void 0 ? 0 : edge.headport;
           return {
-            sum: acc.sum + edge.weight * nodeU.order,
+            sum: acc.sum + edge.weight * (nodeU.order + headport),
             weight: acc.weight + edge.weight
           };
         }, { sum: 0, weight: 0 });
@@ -1833,8 +1869,16 @@ var dagre = (() => {
           edges.forEach((e) => {
             const u = e.v === v2 ? e.w : e.v;
             const edge = result.edge(u, v2);
-            const weight = edge !== void 0 ? edge.weight : 0;
-            result.setEdge(u, v2, { weight: graph.edge(e).weight + weight });
+            const prevWeight = edge !== void 0 ? edge.weight : 0;
+            const currLabel = graph.edge(e);
+            const currWeight = currLabel.weight;
+            const nextWeight = currWeight + prevWeight;
+            const prevHeadport = edge !== void 0 && edge.headport !== void 0 ? edge.headport : 0;
+            const currHeadport = currLabel.headport === void 0 ? 0 : currLabel.headport;
+            result.setEdge(u, v2, {
+              weight: nextWeight,
+              headport: (prevHeadport * prevWeight + currHeadport * currWeight) / nextWeight
+            });
           });
         }
         if (Object.hasOwn(node, "minRank")) {
@@ -1899,6 +1943,8 @@ var dagre = (() => {
     for (let i = 0, lastBest = 0; lastBest < 4; ++i, ++lastBest) {
       sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2, constraints);
       layering = buildLayerMatrix(graph);
+      layering = transposeLayering(graph, layering, constraints);
+      assignOrder(graph, layering);
       const cc = crossCount(graph, layering);
       if (cc < bestCC) {
         lastBest = 0;
@@ -1947,6 +1993,33 @@ var dagre = (() => {
   }
   function assignOrder(graph, layering) {
     Object.values(layering).forEach((layer) => layer.forEach((v2, i) => graph.node(v2).order = i));
+  }
+  function transposeLayering(graph, layering, constraints) {
+    const constraintSet = new Set(constraints.map((con) => `${con.left}->${con.right}`));
+    let improved = true;
+    let bestCC = crossCount(graph, layering);
+    while (improved) {
+      improved = false;
+      for (let rank2 = 0; rank2 < layering.length; rank2++) {
+        const layer = layering[rank2];
+        for (let i = 0; i < layer.length - 1; i++) {
+          const left = layer[i];
+          const right = layer[i + 1];
+          if (constraintSet.has(`${left}->${right}`)) {
+            continue;
+          }
+          [layer[i], layer[i + 1]] = [right, left];
+          const cc = crossCount(graph, layering);
+          if (cc < bestCC) {
+            bestCC = cc;
+            improved = true;
+          } else {
+            [layer[i], layer[i + 1]] = [left, right];
+          }
+        }
+      }
+    }
+    return layering;
   }
 
   // lib/position/bk.ts
@@ -2396,7 +2469,7 @@ var dagre = (() => {
     time2("    fixupEdgeLabelCoords", () => fixupEdgeLabelCoords(g));
     time2("    undoCoordinateSystem", () => undo3(g));
     time2("    translateGraph", () => translateGraph(g));
-    time2("    assignNodeIntersects", () => assignNodeIntersects(g));
+    time2("    assignNodeIntersectsassignNodeIntersects", () => assignNodeIntersects(g));
     time2("    reversePoints", () => reversePointsForReversedEdges(g));
     time2("    acyclic.undo", () => undo(g));
   }
@@ -2441,7 +2514,7 @@ var dagre = (() => {
     labeloffset: 10,
     labelpos: "r"
   };
-  var edgeAttrs = ["labelpos"];
+  var edgeAttrs = ["labelpos", "tailport", "headport"];
   function buildLayoutGraph(inputGraph) {
     const g = new p({ multigraph: true, compound: true });
     const graph = canonicalize(inputGraph.graph());
@@ -2469,6 +2542,7 @@ var dagre = (() => {
       const edge = canonicalize(inputGraph.edge(e));
       g.setEdge(e, Object.assign(
         {},
+        edge,
         edgeDefaults,
         selectNumberAttrs(edge, edgeNumAttrs),
         pick(edge, edgeAttrs)

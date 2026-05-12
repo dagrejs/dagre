@@ -53,6 +53,8 @@ export default function order(graph: GraphType, opts: OrderOptions = {}): void {
         sweepLayerGraphs(i % 2 ? downLayerGraphs : upLayerGraphs, i % 4 >= 2, constraints);
 
         layering = util.buildLayerMatrix(graph);
+        layering = transposeLayering(graph, layering, constraints);
+        assignOrder(graph, layering);
         const cc = crossCount(graph, layering);
         if (cc < bestCC) {
             lastBest = 0;
@@ -116,4 +118,35 @@ function sweepLayerGraphs(layerGraphs: GraphType[], biasRight: boolean, constrai
 
 function assignOrder(graph: GraphType, layering: string[][]): void {
     Object.values(layering).forEach(layer => layer.forEach((v, i) => graph.node(v).order = i));
+}
+
+function transposeLayering(graph: GraphType, layering: string[][], constraints: OrderConstraint[]): string[][] {
+    const constraintSet = new Set(constraints.map(con => `${con.left}->${con.right}`));
+    let improved = true;
+    let bestCC = crossCount(graph, layering);
+
+    while (improved) {
+        improved = false;
+        for (let rank = 0; rank < layering.length; rank++) {
+            const layer = layering[rank]!;
+            for (let i = 0; i < layer.length - 1; i++) {
+                const left = layer[i]!;
+                const right = layer[i + 1]!;
+                if (constraintSet.has(`${left}->${right}`)) {
+                    continue;
+                }
+
+                [layer[i], layer[i + 1]] = [right, left];
+                const cc = crossCount(graph, layering);
+                if (cc < bestCC) {
+                    bestCC = cc;
+                    improved = true;
+                } else {
+                    [layer[i], layer[i + 1]] = [left, right];
+                }
+            }
+        }
+    }
+
+    return layering;
 }

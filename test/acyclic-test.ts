@@ -52,6 +52,28 @@ describe("acyclic", () => {
                     }
                     expect(g.edgeCount()).toBe(2);
                 });
+
+                it("swaps headport and tailport on reversed edges", () => {
+                    g.setPath(["a", "b", "a"]);
+                    g.setEdge("b", "a", {
+                        minlen: 1,
+                        weight: 1,
+                        tailport: 20,
+                        headport: -30
+                    });
+
+                    acyclic.run(g);
+
+                    const reversedEdge = g.edges().find(e => {
+                        const label = g.edge(e);
+                        return Boolean(label && label.reversed);
+                    });
+
+                    expect(reversedEdge).toBeDefined();
+                    const reversedLabel = g.edge(reversedEdge!);
+                    expect(reversedLabel.tailport).toBe(-30);
+                    expect(reversedLabel.headport).toBe(20);
+                });
             });
 
             describe("undo", () => {
