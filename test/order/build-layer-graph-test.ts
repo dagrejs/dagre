@@ -60,10 +60,10 @@ describe("order/buildLayerGraph", () => {
 
         expect(buildLayerGraph(g, 1, "inEdges").edgeCount()).toBe(0);
         expect(buildLayerGraph(g, 2, "inEdges").edgeCount()).toBe(2);
-        expect(buildLayerGraph(g, 2, "inEdges").edge("a", "c")).toEqual({weight: 2});
-        expect(buildLayerGraph(g, 2, "inEdges").edge("b", "c")).toEqual({weight: 3});
+        expect(buildLayerGraph(g, 2, "inEdges").edge("a", "c")).toEqual({weight: 2, headport: 0});
+        expect(buildLayerGraph(g, 2, "inEdges").edge("b", "c")).toEqual({weight: 3, headport: 0});
         expect(buildLayerGraph(g, 3, "inEdges").edgeCount()).toBe(1);
-        expect(buildLayerGraph(g, 3, "inEdges").edge("c", "d")).toEqual({weight: 4});
+        expect(buildLayerGraph(g, 3, "inEdges").edge("c", "d")).toEqual({weight: 4, headport: 0});
     });
 
     it("copies edges incident on rank nodes to the graph (outEdges)", () => {
@@ -76,10 +76,10 @@ describe("order/buildLayerGraph", () => {
         g.setEdge("c", "d", {weight: 4});
 
         expect(buildLayerGraph(g, 1, "outEdges").edgeCount()).toBe(2);
-        expect(buildLayerGraph(g, 1, "outEdges").edge("c", "a")).toEqual({weight: 2});
-        expect(buildLayerGraph(g, 1, "outEdges").edge("c", "b")).toEqual({weight: 3});
+        expect(buildLayerGraph(g, 1, "outEdges").edge("c", "a")).toEqual({weight: 2, headport: 0});
+        expect(buildLayerGraph(g, 1, "outEdges").edge("c", "b")).toEqual({weight: 3, headport: 0});
         expect(buildLayerGraph(g, 2, "outEdges").edgeCount()).toBe(1);
-        expect(buildLayerGraph(g, 2, "outEdges").edge("d", "c")).toEqual({weight: 4});
+        expect(buildLayerGraph(g, 2, "outEdges").edge("d", "c")).toEqual({weight: 4, headport: 0});
         expect(buildLayerGraph(g, 3, "outEdges").edgeCount()).toBe(0);
     });
 
@@ -89,7 +89,7 @@ describe("order/buildLayerGraph", () => {
         g.setEdge("a", "b", {weight: 2});
         g.setEdge("a", "b", {weight: 3}, "multi");
 
-        expect(buildLayerGraph(g, 2, "inEdges").edge("a", "b")).toEqual({weight: 5});
+        expect(buildLayerGraph(g, 2, "inEdges").edge("a", "b")).toEqual({weight: 5, headport: 0});
     });
 
     it("preserves hierarchy for the movable layer", () => {

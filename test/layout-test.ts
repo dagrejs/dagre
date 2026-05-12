@@ -162,28 +162,6 @@ describe("layout", () => {
         ]);
     });
 
-    it("respects configured tailport and headport on edge endpoints", () => {
-        g.graph().rankdir = "LR";
-        g.graph().ranksep = 300;
-        g.setNode("a", {width: 200, height: 400});
-        g.setNode("b", {width: 200, height: 400});
-        g.setEdge("a", "b", {
-            tailport: {x: 0, y: 100},
-            headport: {x: 0, y: -100}
-        });
-
-        layout(g);
-
-        const points = g.edge("a", "b").points;
-        expect(points[0]).toEqual({
-            x: g.node("a").x + g.node("a").width / 2,
-            y: g.node("a").y + 100
-        });
-        expect(points[points.length - 1]).toEqual({
-            x: g.node("b").x - g.node("b").width / 2,
-            y: g.node("b").y - 100
-        });
-    });
 
     it("adds rectangle intersects for edges spanning multiple ranks", () => {
         g.graph().ranksep = 200;

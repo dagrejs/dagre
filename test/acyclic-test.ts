@@ -58,8 +58,8 @@ describe("acyclic", () => {
                     g.setEdge("b", "a", {
                         minlen: 1,
                         weight: 1,
-                        tailport: {x: 0, y: 20},
-                        headport: {x: 0, y: -30}
+                        tailport: 20,
+                        headport: -30
                     });
 
                     acyclic.run(g);
@@ -71,8 +71,8 @@ describe("acyclic", () => {
 
                     expect(reversedEdge).toBeDefined();
                     const reversedLabel = g.edge(reversedEdge!);
-                    expect(reversedLabel.tailport).toEqual({x: 0, y: -30});
-                    expect(reversedLabel.headport).toEqual({x: 0, y: 20});
+                    expect(reversedLabel.tailport).toBe(-30);
+                    expect(reversedLabel.headport).toBe(20);
                 });
             });
 

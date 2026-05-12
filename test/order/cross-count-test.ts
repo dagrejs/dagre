@@ -37,20 +37,38 @@ describe("crossCount", () => {
         expect(crossCount(g, [["a1", "a2"], ["b2", "b1"], ["c1", "c2"]])).toBe(2);
     });
 
-    it("counts crossings for edges leaving the same node from different offsets", () => {
-        g.setEdge("a", "b", {weight: 1, tailport: {x: -10, y: 0}});
-        g.setEdge("a", "c", {weight: 1, tailport: {x: 10, y: 0}});
+    it("counts crossings for edges leaving the same node based on tail offsets", () => {
+        g.setEdge("a", "b", {weight: 1, tailport: -10});
+        g.setEdge("a", "c", {weight: 1, tailport: 10});
 
         expect(crossCount(g, [["a"], ["b", "c"]])).toBe(0);
         expect(crossCount(g, [["a"], ["c", "b"]])).toBe(1);
     });
 
-    it("counts crossings for edges entering the same node from different offsets", () => {
-        g.setEdge("a", "c", {weight: 1, headport: {x: 10, y: 0}});
-        g.setEdge("b", "c", {weight: 1, headport: {x: -10, y: 0}});
+    it("counts crossings for edges entering the same node based on head offsets", () => {
+        g.setEdge("a", "c", {weight: 1, headport: 10});
+        g.setEdge("b", "c", {weight: 1, headport: -10});
 
         expect(crossCount(g, [["a", "b"], ["c"]])).toBe(1);
         expect(crossCount(g, [["b", "a"], ["c"]])).toBe(0);
+    });
+
+    it("ignores edges outside the active bilayer when computing head-offset crossings", () => {
+        g.setEdge("a", "c", {weight: 1, headport: 10});
+        g.setEdge("b", "c", {weight: 1, headport: -10});
+        g.setEdge("a", "d", {weight: 1});
+
+        expect(crossCount(g, [["a", "b"], ["c"], ["d"]])).toBe(1);
+        expect(crossCount(g, [["b", "a"], ["c"], ["d"]])).toBe(0);
+    });
+
+    it("honors head offsets when ordering distinct head nodes", () => {
+        g.setEdge("a", "c", {weight: 1, headport: 10});
+        g.setEdge("a", "d", {weight: 1, headport: -10});
+        g.setEdge("b", "c", {weight: 1, headport: -10});
+        g.setEdge("b", "d", {weight: 1, headport: 10});
+
+        expect(crossCount(g, [["a", "b"], ["c", "d"]])).toBe(2);
     });
 
     it("works for graph #1", () => {
