@@ -1,0 +1,25 @@
+{
+    "name": "@dagrejs/dagre-demo",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --host 127.0.0.1",
+        "build": "tsc -p tsconfig.json && vite build",
+        "preview": "vite preview --host 127.0.0.1"
+    },
+    "dependencies": {
+        "d3": "^7.9.0",
+        "lucide-react": "^0.468.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "@types/d3": "^7.4.3",
+        "@types/react": "^18.3.28",
+        "@types/react-dom": "^18.3.7",
+        "@vitejs/plugin-react": "^4.7.0",
+        "typescript": "^5.9.3",
+        "vite": "^5.4.21"
+    }
+}

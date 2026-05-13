@@ -1,0 +1,16 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "allowImportingTsExtensions": true,
+        "declaration": false,
+        "declarationMap": false,
+        "jsx": "react-jsx",
+        "noEmit": true,
+        "types": ["vite/client"],
+        "baseUrl": ".",
+        "paths": {
+            "@dagrejs/dagre": ["../index.ts"]
+        }
+    },
+    "include": ["src/**/*", "vite.config.ts"]
+}
