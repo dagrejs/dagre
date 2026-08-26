@@ -92,6 +92,11 @@ function findType1Conflicts(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, laye
 function findType2Conflicts(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, layering: string[][]): Conflicts {
     const conflicts: Conflicts = {};
 
+    const hasBorderDummy = graph.nodes().some(v => graph.node(v)?.dummy === "border");
+    if (!hasBorderDummy) {
+        return conflicts;
+    }
+
     function scan(south: string[], southPos: number, southEnd: number, prevNorthBorder: number, nextNorthBorder: number): void {
         util.range(southPos, southEnd).forEach(i => {
             const v = south[i];

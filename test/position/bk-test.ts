@@ -130,6 +130,13 @@ describe("position/bk", () => {
             findType1Conflicts(g, layering);
         });
 
+        it("returns no conflicts when there are no border dummies", () => {
+            ["a", "b", "c", "d"].forEach(v => g.node(v).dummy = true);
+
+            const conflicts = findType2Conflicts(g, layering);
+            expect(conflicts).toEqual({});
+        });
+
     });
 
     describe("hasConflict", () => {
