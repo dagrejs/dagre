@@ -77,6 +77,10 @@ export default function sortSubgraph(
                         entries.splice(i, 1);
                         i--;
                         break;
+                    } else if (reversedPairs[nameI]) {
+                        // Already paired: overwriting would drop the earlier partner,
+                        // which has been spliced out and would never be placed.
+                        usedBias = true;
                     } else {
                         reversedPairs[nameI] = entries[j]!;
                         entries.splice(j, 1);
