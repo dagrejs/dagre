@@ -127,7 +127,7 @@ function intersectRect(rect: NodeLabel, point: Point): Point {
     }
 
     let sx: number, sy: number;
-    if (Math.abs(dy) * w > Math.abs(dx) * h) {
+    if (dx === 0 || Math.abs(dy) * w > Math.abs(dx) * h) {
         // Intersection is top or bottom of rect.
         if (dy < 0) {
             h = -h;

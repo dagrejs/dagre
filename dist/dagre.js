@@ -635,7 +635,7 @@ var dagre = (() => {
       throw new Error("Not possible to find intersection inside of the rectangle");
     }
     let sx, sy;
-    if (Math.abs(dy) * w2 > Math.abs(dx) * h) {
+    if (dx === 0 || Math.abs(dy) * w2 > Math.abs(dx) * h) {
       if (dy < 0) {
         h = -h;
       }
@@ -837,7 +837,7 @@ var dagre = (() => {
   }
 
   // lib/version.ts
-  var version = "3.1.1";
+  var version = "3.1.2-pre";
 
   // lib/data/list.ts
   var List = class {
