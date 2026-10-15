@@ -837,7 +837,7 @@ var dagre = (() => {
   }
 
   // lib/version.ts
-  var version = "3.1.1";
+  var version = "3.1.2-pre";
 
   // lib/data/list.ts
   var List = class {
@@ -2614,7 +2614,9 @@ var dagre = (() => {
         g.edges().forEach((e) => {
           const srcChild = topLevelChildOf(g, e.v, v2);
           const tgtChild = topLevelChildOf(g, e.w, v2);
-          if (srcChild && tgtChild && srcChild !== tgtChild) {
+          if (srcChild === e.v && tgtChild === e.w) {
+            subgraph.setEdge(e, { ...g.edge(e) });
+          } else if (srcChild && tgtChild && srcChild !== tgtChild) {
             const key = `${srcChild}\0${tgtChild}`;
             if (!proxiedEdges.has(key)) {
               proxiedEdges.add(key);
@@ -2771,6 +2773,7 @@ var dagre = (() => {
           mainNode.y = clusterY + (subNode.y - subgraphCenterY);
         }
       });
+      updateClusterEdges(g, subgraph, clusterX - subgraphCenterX, clusterY - subgraphCenterY);
       delete clusterNode._dagreClusterSubgraph;
     });
     clusterNodes.forEach((v2) => {
@@ -2794,7 +2797,20 @@ var dagre = (() => {
             mainNode.y = parentY + dy;
           }
         });
+        updateClusterEdges(g, subgraph, parentX - subgraphCenterX, parentY - subgraphCenterY);
         delete node._dagreClusterSubgraph;
+      }
+    });
+  }
+  function updateClusterEdges(g, subgraph, offsetX, offsetY) {
+    subgraph.edges().forEach((e) => {
+      if (!g.hasEdge(e)) return;
+      const source = subgraph.edge(e);
+      const target = g.edge(e);
+      target.points = source.points.map((p2) => ({ x: p2.x + offsetX, y: p2.y + offsetY }));
+      if (Object.hasOwn(source, "x")) {
+        target.x = source.x + offsetX;
+        target.y = source.y + offsetY;
       }
     });
   }

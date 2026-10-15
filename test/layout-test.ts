@@ -248,6 +248,66 @@ describe("layout", () => {
         });
     });
 
+    describe("edge routes inside a cluster with its own direction", () => {
+        ["TB", "BT", "LR", "RL"].forEach(rankdir => {
+            it.each([undefined, "internal"])(rankdir + " with edge name %s", name => {
+                g.setNode("sg", {rankdir});
+                g.setNode("a", {width: 100, height: 40});
+                g.setNode("b", {width: 100, height: 40});
+                g.setParent("a", "sg");
+                g.setParent("b", "sg");
+                g.setEdge("a", "b", {width: 30, height: 10, labelpos: "c"}, name);
+                g.setNode("outside", {width: 200, height: 80});
+                layout(g);
+
+                const edge = g.edge("a", "b", name);
+                expect(edge.points).toHaveLength(3);
+                for (const point of edge.points) {
+                    expect(Number.isFinite(point.x)).toBe(true);
+                    expect(Number.isFinite(point.y)).toBe(true);
+                }
+                const first = edge.points[0];
+                const last = edge.points[edge.points.length - 1];
+                const a = g.node("a");
+                const b = g.node("b");
+                if (rankdir === "LR" || rankdir === "RL") {
+                    const sign = rankdir === "LR" ? 1 : -1;
+                    expect(first).toEqual({x: a.x + sign * a.width / 2, y: a.y});
+                    expect(last).toEqual({x: b.x - sign * b.width / 2, y: b.y});
+                } else {
+                    const sign = rankdir === "TB" ? 1 : -1;
+                    expect(first).toEqual({x: a.x, y: a.y + sign * a.height / 2});
+                    expect(last).toEqual({x: b.x, y: b.y - sign * b.height / 2});
+                }
+                expect(edge.x).toBe((a.x + b.x) / 2);
+                expect(edge.y).toBe((a.y + b.y) / 2);
+            });
+        });
+    });
+
+    it("preserves parallel and self-loop routes in a directed cluster", () => {
+        g.setNode("sg", {rankdir: "LR"});
+        for (const v of ["a", "b"]) {
+            g.setNode(v, {width: 100, height: 40});
+            g.setParent(v, "sg");
+        }
+        g.setEdge("a", "b", {}, "first");
+        g.setEdge("a", "b", {}, "second");
+        g.setEdge("a", "a", {}, "loop");
+        layout(g);
+
+        expect(g.edgeCount()).toBe(3);
+        for (const e of g.edges()) {
+            const points = g.edge(e).points;
+            expect(points.length).toBeGreaterThanOrEqual(3);
+            for (const point of points) {
+                expect(Number.isFinite(point.x)).toBe(true);
+                expect(Number.isFinite(point.y)).toBe(true);
+            }
+        }
+        expect(g.edge("a", "b", "first").points).not.toEqual(g.edge("a", "b", "second").points);
+    });
+
     it("adds dimensions to the graph", () => {
         g.setNode("a", {width: 100, height: 50});
         layout(g);
