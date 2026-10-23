@@ -92,7 +92,9 @@ function recursiveClusterLayout(g: Graph<GraphLabel, NodeLabel, EdgeLabel>, time
             g.edges().forEach(e => {
                 const srcChild = topLevelChildOf(g, e.v, v);
                 const tgtChild = topLevelChildOf(g, e.w, v);
-                if (srcChild && tgtChild && srcChild !== tgtChild) {
+                if (srcChild === e.v && tgtChild === e.w) {
+                    subgraph.setEdge(e, { ...g.edge(e) });
+                } else if (srcChild && tgtChild && srcChild !== tgtChild) {
                     const key = `${srcChild}\x00${tgtChild}`;
                     if (!proxiedEdges.has(key)) {
                         proxiedEdges.add(key);
@@ -286,6 +288,7 @@ function recursiveClusterLayout(g: Graph<GraphLabel, NodeLabel, EdgeLabel>, time
                 mainNode.y = clusterY + (subNode.y - subgraphCenterY);
             }
         });
+        updateClusterEdges(g, subgraph, clusterX - subgraphCenterX, clusterY - subgraphCenterY);
         delete (clusterNode as ClusterNodeLabel)._dagreClusterSubgraph;
     });
 
@@ -316,8 +319,28 @@ function recursiveClusterLayout(g: Graph<GraphLabel, NodeLabel, EdgeLabel>, time
                     mainNode.y = parentY + dy;
                 }
             });
+            updateClusterEdges(g, subgraph, parentX - subgraphCenterX, parentY - subgraphCenterY);
             // Optionally, clean up
             delete (node as ClusterNodeLabel)._dagreClusterSubgraph;
+        }
+    });
+}
+
+// Copy routes for original internal edges, excluding proxy edges between sub-clusters.
+function updateClusterEdges(
+    g: Graph<GraphLabel, NodeLabel, EdgeLabel>,
+    subgraph: Graph<GraphLabel, NodeLabel, EdgeLabel>,
+    offsetX: number,
+    offsetY: number
+): void {
+    subgraph.edges().forEach(e => {
+        if (!g.hasEdge(e)) return;
+        const source = subgraph.edge(e);
+        const target = g.edge(e);
+        target.points = source.points!.map(p => ({x: p.x + offsetX, y: p.y + offsetY}));
+        if (Object.hasOwn(source, "x")) {
+            target.x = source.x! + offsetX;
+            target.y = source.y! + offsetY;
         }
     });
 }
