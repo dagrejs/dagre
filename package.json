@@ -1,6 +1,6 @@
 {
   "name": "@dagrejs/dagre",
-  "version": "3.1.2-pre",
+  "version": "3.1.2",
   "description": "Graph layout for JavaScript",
   "author": "Chris Pettitt <cpettitt@gmail.com>",
   "contributors": [
@@ -40,7 +40,7 @@
     "layout"
   ],
   "dependencies": {
-    "@dagrejs/graphlib": "4.0.5"
+    "@dagrejs/graphlib": "4.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

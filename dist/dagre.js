@@ -635,7 +635,7 @@ var dagre = (() => {
       throw new Error("Not possible to find intersection inside of the rectangle");
     }
     let sx, sy;
-    if (Math.abs(dy) * w2 > Math.abs(dx) * h) {
+    if (dx === 0 || Math.abs(dy) * w2 > Math.abs(dx) * h) {
       if (dy < 0) {
         h = -h;
       }
@@ -837,7 +837,7 @@ var dagre = (() => {
   }
 
   // lib/version.ts
-  var version = "3.1.1";
+  var version = "3.1.2";
 
   // lib/data/list.ts
   var List = class {
@@ -1946,7 +1946,7 @@ var dagre = (() => {
               entries.splice(i, 1);
               i--;
               break;
-            } else {
+            } else if (!reversedPairs[nameI]) {
               reversedPairs[nameI] = entries[j2];
               entries.splice(j2, 1);
               j2--;
@@ -2170,6 +2170,14 @@ var dagre = (() => {
   }
   function findType2Conflicts(graph, layering) {
     const conflicts = {};
+    function isBorderDummy(v2) {
+      var _a;
+      return ((_a = graph.node(v2)) == null ? void 0 : _a.dummy) === "border";
+    }
+    const hasBorderDummy = graph.nodes().some(isBorderDummy);
+    if (!hasBorderDummy) {
+      return conflicts;
+    }
     function scan(south, southPos, southEnd, prevNorthBorder, nextNorthBorder) {
       range(southPos, southEnd).forEach((i) => {
         const v2 = south[i];
@@ -2193,7 +2201,7 @@ var dagre = (() => {
       let nextNorthPos = -1;
       let southPos = 0;
       south.forEach((v2, southLookahead) => {
-        if (graph.node(v2).dummy === "border") {
+        if (isBorderDummy(v2)) {
           const predecessors = graph.predecessors(v2);
           if (predecessors && predecessors.length) {
             const firstPred = predecessors[0];
@@ -2614,7 +2622,9 @@ var dagre = (() => {
         g.edges().forEach((e) => {
           const srcChild = topLevelChildOf(g, e.v, v2);
           const tgtChild = topLevelChildOf(g, e.w, v2);
-          if (srcChild && tgtChild && srcChild !== tgtChild) {
+          if (srcChild === e.v && tgtChild === e.w) {
+            subgraph.setEdge(e, { ...g.edge(e) });
+          } else if (srcChild && tgtChild && srcChild !== tgtChild) {
             const key = `${srcChild}\0${tgtChild}`;
             if (!proxiedEdges.has(key)) {
               proxiedEdges.add(key);
@@ -2771,6 +2781,7 @@ var dagre = (() => {
           mainNode.y = clusterY + (subNode.y - subgraphCenterY);
         }
       });
+      updateClusterEdges(g, subgraph, clusterX - subgraphCenterX, clusterY - subgraphCenterY);
       delete clusterNode._dagreClusterSubgraph;
     });
     clusterNodes.forEach((v2) => {
@@ -2794,7 +2805,20 @@ var dagre = (() => {
             mainNode.y = parentY + dy;
           }
         });
+        updateClusterEdges(g, subgraph, parentX - subgraphCenterX, parentY - subgraphCenterY);
         delete node._dagreClusterSubgraph;
+      }
+    });
+  }
+  function updateClusterEdges(g, subgraph, offsetX, offsetY) {
+    subgraph.edges().forEach((e) => {
+      if (!g.hasEdge(e)) return;
+      const source = subgraph.edge(e);
+      const target = g.edge(e);
+      target.points = source.points.map((p2) => ({ x: p2.x + offsetX, y: p2.y + offsetY }));
+      if (Object.hasOwn(source, "x")) {
+        target.x = source.x + offsetX;
+        target.y = source.y + offsetY;
       }
     });
   }
