@@ -131,7 +131,7 @@ describe("position/bk", () => {
         });
 
         it("returns no conflicts when there are no border dummies", () => {
-            ["a", "b", "c", "d"].forEach(v => g.node(v).dummy = true);
+            ["a", "b", "c", "d"].forEach(v => g.node(v).dummy = "edge");
 
             const conflicts = findType2Conflicts(g, layering);
             expect(conflicts).toEqual({});
