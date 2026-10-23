@@ -77,7 +77,7 @@ export default function sortSubgraph(
                         entries.splice(i, 1);
                         i--;
                         break;
-                    } else {
+                    } else if (!reversedPairs[nameI]) {
                         reversedPairs[nameI] = entries[j]!;
                         entries.splice(j, 1);
                         j--;

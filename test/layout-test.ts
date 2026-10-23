@@ -169,6 +169,34 @@ describe("layout", () => {
         ]);
     });
 
+    describe("can layout three parallel edges between two nodes", () => {
+        ["TB", "LR"].forEach(rankdir => {
+            it("in rankdir = " + rankdir, () => {
+                g.graph().rankdir = rankdir;
+                ["a", "b", "c", "d"].forEach(v => g.setNode(v, {width: 100, height: 40}));
+                g.setEdge("a", "b", {}, "ab0");
+                g.setEdge("a", "b", {}, "ab1");
+                g.setEdge("a", "b", {}, "ab2");
+                g.setEdge("a", "c");
+                g.setEdge("b", "d");
+                g.setEdge("c", "d");
+
+                layout(g);
+
+                g.nodes().forEach(v => {
+                    expect(Number.isFinite(g.node(v).x)).toBe(true);
+                    expect(Number.isFinite(g.node(v).y)).toBe(true);
+                });
+                g.edges().forEach(e => {
+                    g.edge(e).points.forEach((point: { x: number, y: number }) => {
+                        expect(Number.isFinite(point.x)).toBe(true);
+                        expect(Number.isFinite(point.y)).toBe(true);
+                    });
+                });
+            });
+        });
+    });
+
     describe("can layout a self loop", () => {
         ["TB", "BT", "LR", "RL"].forEach(rankdir => {
             it("in rankdir = " + rankdir, () => {
