@@ -837,7 +837,7 @@ var dagre = (() => {
   }
 
   // lib/version.ts
-  var version = "3.1.2";
+  var version = "3.1.3";
 
   // lib/data/list.ts
   var List = class {

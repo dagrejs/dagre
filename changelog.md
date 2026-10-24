@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semandtic-versioning.org/).
 
+## v3.1.3
+
+### Fixes & Improvements
+* **ESM & Package Exports (PR #516):** Added `"type": "module"` to `package.json` and renamed the CommonJS bundle to `dist/dagre.cjs` so both ESM `import` and CommonJS `require()` resolve properly. Re-exported `Graph` with default generic parameters for backward compatibility.
+* **Dynamic Layout State Isolation (PR #515):** Scoped remembered dynamic layout state to the input graph rather than module-level state to prevent state leaks across layouts.
+* **Cluster Edge Routing (PR #523):** Restored internal edge routes inside clusters with custom `rankdir` directions.
+* **Zero-Width Node Intersections (PR #524):** Fixed vertical edge route intersection calculations with zero-width nodes.
+* **Parallel Edge Subgraph Sorting (PR #522):** Fixed `sortSubgraph` so each parallel-edge dummy node is paired at most once when laying out three or more parallel edges.
+* **Flat Graph Conflict Scan Optimization (PR #520):** Skipped `findType2Conflicts` scan when no border dummy nodes are present in flat graphs.
+* **Release & Tooling (PR #526, PR #527):** Added a preflight release check to ensure `changelog.md` is updated before releasing, and added `.pre-commit-config.yaml` to run tests.
+* **Dependency Updates:** Updated `@dagrejs/graphlib` to `4.0.6`.
+
+---
+
 ## [3.1.0] - 2026
 
 ### New Features
