@@ -19,6 +19,7 @@
     "test": "jest",
     "version:make": "tsx src/release/make-version.ts > lib/version.ts",
     "version:check": "tsx src/release/check-version.ts",
+    "release:check-notes": "tsx src/release/check-release-notes.ts",
     "version:bump": "tsx src/release/bump-version.ts",
     "bench": "tsx src/bench.ts",
     "prepublishOnly": "npm run typecheck && npm run lint && npm test && npm run build"
