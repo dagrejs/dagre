@@ -15,6 +15,8 @@ PROJECT_ROOT=`pwd`
 PAGES_DIR=/tmp/$PROJECT-pages
 DIST_DIR=$2
 
+npm run release:check-notes --silent
+
 # Check version. Is this a release? If not abort
 VERSION=$(npm run version:check --silent)
 SHORT_VERSION=$(echo $VERSION | cut -f1 -d-)
