@@ -459,6 +459,16 @@ describe("network simplex", () => {
 
             expect(calcCutValue(t, g, "c")).toBe(-8);
         });
+
+        it("counts a self loop on the child once", () => {
+            g
+                .setPath(["c", "p"])
+                .setEdge("c", "c", {weight: 5});
+            t.setPath(["p", "c"]);
+            initLowLimValues(t, "p");
+
+            expect(calcCutValue(t, g, "c")).toBe(6);
+        });
     });
 
     describe("initCutValues", () => {

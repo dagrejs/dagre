@@ -93,7 +93,7 @@ function calcCutValue(tree: Graph<object, TreeNodeLabel, TreeEdgeLabel>, graph: 
     // The graph's view of the tree edge we're inspecting
     let graphEdge: EdgeLabel | undefined = graph.edge(child, parent);
     // The accumulated cut value for the edge between this node and its parent
-    let cutValue: number = 0;
+    let cutValue: number;
 
     if (!graphEdge) {
         childIsTail = false;
@@ -102,24 +102,32 @@ function calcCutValue(tree: Graph<object, TreeNodeLabel, TreeEdgeLabel>, graph: 
 
     cutValue = graphEdge.weight!;
 
-    const nodeEdges = graph.nodeEdges(child);
-    if (nodeEdges) {
-        nodeEdges.forEach(edge => {
-            const isOutEdge: boolean = edge.v === child;
-            const other: string = isOutEdge ? edge.w : edge.v;
+    // In-edges then out-edges, matching the order of graph.nodeEdges(child)
+    // without building the merged edge map.
+    const inEdges = graph.inEdges(child) || [];
+    const outEdges = graph.outEdges(child) || [];
+    const inCount = inEdges.length;
+    const total = inCount + outEdges.length;
+    for (let i = 0; i < total; i++) {
+        const edge = i < inCount ? inEdges[i]! : outEdges[i - inCount]!;
+        const isOutEdge: boolean = edge.v === child;
+        // A self loop is in both lists; nodeEdges lists it once.
+        if (i >= inCount && edge.w === child) {
+            continue;
+        }
+        const other: string = isOutEdge ? edge.w : edge.v;
 
-            if (other !== parent) {
-                const pointsToHead: boolean = isOutEdge === childIsTail;
-                const otherWeight: number = graph.edge(edge).weight!;
+        if (other !== parent) {
+            const pointsToHead: boolean = isOutEdge === childIsTail;
+            const otherWeight: number = graph.edge(edge).weight!;
 
-                cutValue += pointsToHead ? otherWeight : -otherWeight;
-                if (isTreeEdge(tree, child, other)) {
-                    const treeEdge = tree.edge(child, other);
-                    const otherCutValue: number = treeEdge.cutvalue!;
-                    cutValue += pointsToHead ? -otherCutValue : otherCutValue;
-                }
+            cutValue += pointsToHead ? otherWeight : -otherWeight;
+            const treeEdge: TreeEdgeLabel | undefined = tree.edge(child, other);
+            if (treeEdge) {
+                const otherCutValue: number = treeEdge.cutvalue!;
+                cutValue += pointsToHead ? -otherCutValue : otherCutValue;
             }
-        });
+        }
     }
 
     return cutValue;
@@ -237,13 +245,6 @@ function updateRanks(t: Graph<object, TreeNodeLabel, TreeEdgeLabel>, g: Graph<Gr
 
         g.node(v).rank = g.node(parent).rank! + (flipped ? edge!.minlen! : -edge!.minlen!);
     });
-}
-
-/*
- * Returns true if the edge is in the tree.
- */
-function isTreeEdge(tree: Graph<object, TreeNodeLabel, TreeEdgeLabel>, u: string, v: string): boolean {
-    return tree.hasEdge(u, v);
 }
 
 /*
