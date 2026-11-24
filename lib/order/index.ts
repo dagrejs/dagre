@@ -32,7 +32,8 @@ export default function order(graph: GraphType, opts: OrderOptions = {}, oldNode
 
     const maxRank = util.maxRank(graph);
     const downLayerGraphs = buildLayerGraphs(graph, util.range(1, maxRank + 1), "inEdges");
-    const upLayerGraphs = buildLayerGraphs(graph, util.range(maxRank - 1, -1, -1), "outEdges");
+    // Sort the last layer too: its initial order may split compound subgraphs.
+    const upLayerGraphs = buildLayerGraphs(graph, util.range(maxRank, -1, -1), "outEdges");
 
     let layering = initOrder(graph, oldNodes);
     assignOrder(graph, layering);
