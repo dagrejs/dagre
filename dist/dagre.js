@@ -837,7 +837,7 @@ var dagre = (() => {
   }
 
   // lib/version.ts
-  var version = "3.1.3";
+  var version = "3.1.4";
 
   // lib/data/list.ts
   var List = class {
@@ -1268,28 +1268,33 @@ var dagre = (() => {
     const parent = childLab.parent;
     let childIsTail = true;
     let graphEdge = graph.edge(child, parent);
-    let cutValue = 0;
+    let cutValue;
     if (!graphEdge) {
       childIsTail = false;
       graphEdge = graph.edge(parent, child);
     }
     cutValue = graphEdge.weight;
-    const nodeEdges = graph.nodeEdges(child);
-    if (nodeEdges) {
-      nodeEdges.forEach((edge) => {
-        const isOutEdge = edge.v === child;
-        const other = isOutEdge ? edge.w : edge.v;
-        if (other !== parent) {
-          const pointsToHead = isOutEdge === childIsTail;
-          const otherWeight = graph.edge(edge).weight;
-          cutValue += pointsToHead ? otherWeight : -otherWeight;
-          if (isTreeEdge(tree, child, other)) {
-            const treeEdge = tree.edge(child, other);
-            const otherCutValue = treeEdge.cutvalue;
-            cutValue += pointsToHead ? -otherCutValue : otherCutValue;
-          }
+    const inEdges = graph.inEdges(child) || [];
+    const outEdges = graph.outEdges(child) || [];
+    const inCount = inEdges.length;
+    const total = inCount + outEdges.length;
+    for (let i = 0; i < total; i++) {
+      const edge = i < inCount ? inEdges[i] : outEdges[i - inCount];
+      const isOutEdge = edge.v === child;
+      if (i >= inCount && edge.w === child) {
+        continue;
+      }
+      const other = isOutEdge ? edge.w : edge.v;
+      if (other !== parent) {
+        const pointsToHead = isOutEdge === childIsTail;
+        const otherWeight = graph.edge(edge).weight;
+        cutValue += pointsToHead ? otherWeight : -otherWeight;
+        const treeEdge = tree.edge(child, other);
+        if (treeEdge) {
+          const otherCutValue = treeEdge.cutvalue;
+          cutValue += pointsToHead ? -otherCutValue : otherCutValue;
         }
-      });
+      }
     }
     return cutValue;
   }
@@ -1379,9 +1384,6 @@ var dagre = (() => {
       }
       g.node(v2).rank = g.node(parent).rank + (flipped ? edge.minlen : -edge.minlen);
     });
-  }
-  function isTreeEdge(tree, u, v2) {
-    return tree.hasEdge(u, v2);
   }
   function isDescendant(tree, vLabel, rootLabel) {
     return rootLabel.low <= vLabel.lim && vLabel.lim <= rootLabel.lim;
@@ -2069,7 +2071,7 @@ var dagre = (() => {
     }
     const maxRank2 = maxRank(graph);
     const downLayerGraphs = buildLayerGraphs(graph, range(1, maxRank2 + 1), "inEdges");
-    const upLayerGraphs = buildLayerGraphs(graph, range(maxRank2 - 1, -1, -1), "outEdges");
+    const upLayerGraphs = buildLayerGraphs(graph, range(maxRank2, -1, -1), "outEdges");
     let layering = initOrder(graph, oldNodes);
     assignOrder(graph, layering);
     if (opts.disableOptimalOrderHeuristic) {

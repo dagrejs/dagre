@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](https://semandtic-versioning.org/).
 
+## v3.1.4
+
+### Fixes & Improvements
+* **Compound Bottom-Rank Ordering (PR #529):** Included the bottom rank in upward ordering sweeps so compound subgraphs on the last layer stay grouped instead of being split by initial ordering.
+* **Network Simplex Cut-Value Performance (PR #531):** Read `inEdges` and `outEdges` directly in `calcCutValue` (and avoided redundant tree-edge lookups) instead of allocating a merged edge list via `nodeEdges`.
+
+---
+
 ## v3.1.3
 
 ### Fixes & Improvements
