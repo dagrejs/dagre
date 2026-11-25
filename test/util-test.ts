@@ -1,7 +1,31 @@
 import {Graph} from "../lib/graph-lib";
 import * as util from "../lib/util";
+import type {NodeLabel} from "../lib/types";
 
 describe("util", () => {
+    describe("compareByOldOrder", () => {
+        it.each(["forward", "backward"])("uses the adjacent old rank in a %s sweep", direction => {
+            const forward = direction === "forward";
+            const edgeA = {v: "a", w: forward ? "b" : "c"};
+            const edgeB = {v: forward ? "a" : "b", w: "c"};
+            const nodeA: NodeLabel = {width: 0, height: 0, dummy: "edge", edgeObj: edgeA};
+            const nodeB: NodeLabel = {width: 0, height: 0, dummy: "edge", edgeObj: edgeB};
+            const rank = forward ? 1 : 3;
+            const oldNodes = {
+                a: {width: 0, height: 0, rank: 0},
+                b: {width: 0, height: 0, rank: forward ? 4 : 0},
+                c: {width: 0, height: 0, rank: 4},
+                oldA: {...nodeA, rank, order: 2},
+                oldB: {...nodeB, rank, order: 0}
+            };
+
+            expect(util.compareByOldOrder(oldNodes, nodeA, nodeB)).toBe(2);
+            expect(util.compareByOldOrder(oldNodes, nodeB, nodeA)).toBe(-2);
+            expect(util.compareByOldOrder({...oldNodes, oldB: {...nodeB, rank}}, nodeA, nodeB)).toBe(0);
+            expect(util.compareByOldOrder({...oldNodes, oldB: {...nodeB, rank: rank + 1, order: 0}}, nodeA, nodeB)).toBe(0);
+        });
+    });
+
     describe("simplify", () => {
         let g: Graph;
 

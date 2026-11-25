@@ -374,7 +374,9 @@ function compareByOldOrder(oldNodes: NodeCollection, nodeA: NodeLabel, nodeB: No
     if (nodeA.edgeObj.w === nodeB.edgeObj.w) {
         isForward = false;
     }
-    const targetRank = isForward? oldNodes[nodeA.edgeObj.v]?.rank ?? NaN + 1 : oldNodes[nodeA.edgeObj.w]?.rank ?? NaN - 1;
+    const targetRank = isForward
+        ? (oldNodes[nodeA.edgeObj.v]?.rank ?? NaN) + 1
+        : (oldNodes[nodeA.edgeObj.w]?.rank ?? NaN) - 1;
 
     const oldA = Object.entries(oldNodes).find(n => n[1].edgeObj?.v === nodeA.edgeObj!.v && n[1].edgeObj?.w === nodeA.edgeObj!.w && n[1].rank === targetRank);
     const oldB = Object.entries(oldNodes).find(n => n[1].edgeObj?.v === nodeB.edgeObj!.v && n[1].edgeObj?.w === nodeB.edgeObj!.w && n[1].rank === targetRank);
