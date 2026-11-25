@@ -99,17 +99,13 @@ function buildLayerGraphs(graph: GraphType, ranks: number[], relationship: "inEd
     });
 }
 
-function sweepLayerGraphs(layerGraphs: GraphType[], switchBias: boolean, constraints: OrderConstraint[], oldNodes: NodeCollection): void {
-    let biasRight: boolean = true;
+function sweepLayerGraphs(layerGraphs: GraphType[], biasRight: boolean, constraints: OrderConstraint[], oldNodes: NodeCollection): void {
     const cg = new Graph() as GraphType;
     layerGraphs.forEach(function (lg) {
         constraints.forEach(con => cg.setEdge(con.left, con.right));
 
         const root = (lg.graph() as { root: string }).root;
-        const {result: sorted, usedBias} = sortSubgraph(lg, root, cg, oldNodes, biasRight);
-        if (switchBias && usedBias) {
-            biasRight = !biasRight;
-        }
+        const {result: sorted} = sortSubgraph(lg, root, cg, oldNodes, biasRight);
         sorted.vs.forEach((v, i) => lg.node(v).order = i);
         addSubgraphConstraints(lg, cg, sorted.vs);
     });
