@@ -235,7 +235,8 @@ function recursiveClusterLayout(g: Graph<GraphLabel, NodeLabel, EdgeLabel>, time
         const effW = topLevelNode(edge.w);
         if (effV !== effW && g.hasNode(effV) && g.hasNode(effW)) {
             const key = `${effV}\x00${effW}`;
-            if (!proxyEdgeKeys.has(key)) {
+            // An existing edge already constrains order and must survive proxy cleanup.
+            if (!proxyEdgeKeys.has(key) && !g.hasEdge(effV, effW)) {
                 proxyEdgeKeys.add(key);
                 g.setEdge(effV, effW, {...label, width: 0, height: 0});
             }

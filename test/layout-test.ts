@@ -343,6 +343,25 @@ describe("layout", () => {
         });
     });
 
+    it.each(["incoming", "outgoing"])("preserves an existing %s edge beside a cluster's proxy", direction => {
+        g.setNode("sg", {rankdir: "LR"});
+        g.setNode("child", {width: 50, height: 50});
+        g.setNode("outside", {width: 50, height: 50});
+        g.setParent("child", "sg");
+        const directLabel = {width: 30, height: 20, label: "direct"};
+        const direct = direction === "outgoing" ? {v: "sg", w: "outside"} : {v: "outside", w: "sg"};
+        const child = direction === "outgoing" ? {v: "child", w: "outside"} : {v: "outside", w: "child"};
+        g.setEdge(direct, directLabel);
+        g.setEdge(child, {label: "child"});
+
+        layout(g);
+
+        expect(g.edgeCount()).toBe(2);
+        expect(g.edge(direct)).toBe(directLabel);
+        expect(g.edge(direct).points.length).toBeGreaterThanOrEqual(2);
+        expect(g.edge(child).label).toBe("child");
+    });
+
     it("preserves parallel and self-loop routes in a directed cluster", () => {
         g.setNode("sg", {rankdir: "LR"});
         for (const v of ["a", "b"]) {
