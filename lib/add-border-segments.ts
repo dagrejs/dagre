@@ -1,4 +1,4 @@
-import {addDummyNode, GRAPH_NODE} from "./util";
+import {addDummyNode, GRAPH_NODE, hasOwn} from "./util";
 import type {EdgeLabel, Graph, GraphLabel, NodeLabel} from "./types";
 
 export default addBorderSegments;
@@ -13,7 +13,7 @@ function addBorderSegments(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void
             children.forEach(dfs);
         }
 
-        if (node && Object.hasOwn(node, "minRank")) {
+        if (node && hasOwn(node, "minRank")) {
             node.borderLeft = [];
             node.borderRight = [];
             for (let rank: number = node.minRank!, maxRank: number = node.maxRank! + 1;

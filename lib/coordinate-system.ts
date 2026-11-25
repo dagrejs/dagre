@@ -1,3 +1,4 @@
+import {hasOwn} from "./util";
 /**
  * Transforms a point from subgraph-local coordinates to parent context coordinates.
  * @param x X in subgraph
@@ -63,7 +64,7 @@ function reverseY(graph: Graph): void {
     graph.edges().forEach(edge => {
         const edgeLabel = graph.edge(edge) as EdgeLabel;
         edgeLabel.points?.forEach(reverseYOne);
-        if (Object.hasOwn(edgeLabel, 'y')) {
+        if (hasOwn(edgeLabel, 'y')) {
             reverseYOne(edgeLabel);
         }
     });
@@ -79,7 +80,7 @@ function swapXY(graph: Graph): void {
     graph.edges().forEach(edge => {
         const edgeLabel = graph.edge(edge) as EdgeLabel;
         edgeLabel.points?.forEach(swapXYOne);
-        if (Object.hasOwn(edgeLabel, 'x')) {
+        if (hasOwn(edgeLabel, 'x')) {
             swapXYOne(edgeLabel);
         }
     });

@@ -1,5 +1,6 @@
 import {Graph} from "../graph-lib";
 import * as util from "../util";
+import {hasOwn} from "../util";
 import type {EdgeLabel, GraphLabel, NodeLabel} from "../types";
 
 /*
@@ -183,7 +184,7 @@ function hasConflict(conflicts: Conflicts, v: string, w: string): boolean {
         w = tmp;
     }
     const conflictsV = conflicts[v];
-    return conflictsV !== undefined && Object.hasOwn(conflictsV, w);
+    return conflictsV !== undefined && hasOwn(conflictsV, w);
 }
 
 /*
@@ -518,7 +519,7 @@ function sep(nodeSep: number, edgeSep: number, reverseSep: boolean): (g: Graph<G
         let delta: number | undefined;
 
         sum += vLabel.width / 2;
-        if (Object.hasOwn(vLabel, "labelpos")) {
+        if (hasOwn(vLabel, "labelpos")) {
             switch ((vLabel.labelpos as string).toLowerCase()) {
             case "l":
                 delta = -vLabel.width / 2;
@@ -537,7 +538,7 @@ function sep(nodeSep: number, edgeSep: number, reverseSep: boolean): (g: Graph<G
         sum += (wLabel.dummy ? edgeSep : nodeSep) / 2;
 
         sum += wLabel.width / 2;
-        if (Object.hasOwn(wLabel, "labelpos")) {
+        if (hasOwn(wLabel, "labelpos")) {
             switch ((wLabel.labelpos as string).toLowerCase()) {
             case "l":
                 delta = wLabel.width / 2;

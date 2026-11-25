@@ -1,4 +1,5 @@
 import * as util from "../util";
+import {hasOwn} from "../util";
 import type {Graph, NodeCollection} from '../types';
 import {ResolvedEntry} from "./resolve-conflicts";
 
@@ -37,7 +38,7 @@ export default function sort(
     }
 
     const parts = util.partition(entries, entry => {
-        return Object.hasOwn(entry, "barycenter");
+        return hasOwn(entry, "barycenter");
     });
     const sortable = parts.lhs;
     const unsortable = parts.rhs.sort((a, b) => b.i - a.i);

@@ -300,4 +300,25 @@ describe("util", () => {
             expect(ages.pebbles).toBe(1);
         });
     });
+
+    describe("hasOwn", () => {
+        it("detects own properties", () => {
+            const obj = {a: 1};
+            expect(util.hasOwn(obj, "a")).toBe(true);
+            expect(util.hasOwn(obj, "b")).toBe(false);
+        });
+
+        it("does not find inherited properties", () => {
+            const obj = Object.create({inherited: true}) as {own?: number};
+            obj.own = 1;
+            expect(util.hasOwn(obj, "own")).toBe(true);
+            expect(util.hasOwn(obj, "inherited")).toBe(false);
+        });
+
+        it("works when hasOwnProperty is shadowed", () => {
+            const obj = {hasOwnProperty: "shadowed", a: 1};
+            expect(util.hasOwn(obj, "a")).toBe(true);
+            expect(util.hasOwn(obj, "b")).toBe(false);
+        });
+    });
 });
