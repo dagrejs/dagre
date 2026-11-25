@@ -15,13 +15,14 @@ import {execFileSync} from 'child_process';
 import {existsSync, mkdtempSync, rmSync, writeFileSync} from 'fs';
 import {tmpdir} from 'os';
 import {join, resolve} from 'path';
+import {pathToFileURL} from 'url';
 
 const repoRoot = process.cwd();
 const esmPath = resolve(repoRoot, 'dist', 'dagre.esm.js');
 const cjsPath = resolve(repoRoot, 'dist', 'dagre.cjs');
 
 // ESM smoke check run under tsx
-const esmCheck = `import dagre, {Graph, layout, version} from ${JSON.stringify(esmPath)};
+const esmCheck = `import dagre, {Graph, layout, version} from ${JSON.stringify(pathToFileURL(esmPath).href)};
 
 const problems = [];
 if (typeof Graph !== 'function') problems.push('Graph is ' + typeof Graph + ', expected function');
