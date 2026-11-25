@@ -1,4 +1,4 @@
-import {applyWithChunking} from "../util";
+import {applyWithChunking, hasOwn} from "../util";
 import type {Edge, EdgeLabel, Graph, GraphLabel, NodeLabel} from "../types";
 
 export {longestPath, slack};
@@ -29,7 +29,7 @@ function longestPath(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
 
     function dfs(v: string): number {
         const label: NodeLabel = graph.node(v);
-        if (Object.hasOwn(visited, v)) {
+        if (hasOwn(visited, v)) {
             return label.rank!;
         }
         visited[v] = true;

@@ -1,5 +1,6 @@
 import {Graph} from "../graph-lib";
 import * as util from "../util";
+import {hasOwn} from "../util";
 import type {Graph as GraphType} from '../types';
 
 interface LayerGraphLabel {
@@ -71,7 +72,7 @@ export default function buildLayerGraph(
                 });
             }
 
-            if (Object.hasOwn(node, "minRank")) {
+            if (hasOwn(node, "minRank")) {
                 result.setNode(v, {
                     borderLeft: node.borderLeft![rank],
                     borderRight: node.borderRight![rank]

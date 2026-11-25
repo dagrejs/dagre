@@ -25,6 +25,14 @@ export {
     zipObject,
 };
 
+/**
+ * Safe, ES5-compatible replacement for Object.hasOwn.
+ * Object.hasOwn is not available in older Safari versions.
+ */
+export function hasOwn(obj: object, key: PropertyKey): boolean {
+    return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
 /*
  * Adds a dummy node to the graph and return v.
  */
@@ -181,7 +189,7 @@ function normalizeRanks(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
     const min: number = applyWithChunking(Math.min, nodeRanks);
     graph.nodes().forEach(v => {
         const node = graph.node(v) as NodeLabel;
-        if (Object.hasOwn(node, "rank")) {
+        if (hasOwn(node, "rank")) {
             (node as NodeLabel).rank! -= min;
         }
     });

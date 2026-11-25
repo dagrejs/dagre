@@ -2,7 +2,7 @@ import * as acyclic from "./acyclic";
 import * as normalize from "./normalize";
 import rank from "./rank";
 import * as util from "./util";
-import {normalizeRanks, removeEmptyRanks} from "./util";
+import {hasOwn, normalizeRanks, removeEmptyRanks} from "./util";
 import parentDummyChains from "./parent-dummy-chains";
 import * as nestingGraph from "./nesting-graph";
 import addBorderSegments from "./add-border-segments";
@@ -338,7 +338,7 @@ function updateClusterEdges(
         const source = subgraph.edge(e);
         const target = g.edge(e);
         target.points = source.points!.map(p => ({x: p.x + offsetX, y: p.y + offsetY}));
-        if (Object.hasOwn(source, "x")) {
+        if (hasOwn(source, "x")) {
             target.x = source.x! + offsetX;
             target.y = source.y! + offsetY;
         }
@@ -418,7 +418,7 @@ function updateInputGraph(
         const layoutLabel = layoutGraph.edge(e);
 
         inputLabel.points = layoutLabel.points;
-        if (Object.hasOwn(layoutLabel, "x")) {
+        if (hasOwn(layoutLabel, "x")) {
             inputLabel.x = layoutLabel.x;
             inputLabel.y = layoutLabel.y;
         }
@@ -571,7 +571,7 @@ function translateGraph(g: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
     g.nodes().forEach(v => getExtremes(g.node(v)));
     g.edges().forEach(e => {
         const edge = g.edge(e);
-        if (Object.hasOwn(edge, "x")) {
+        if (hasOwn(edge, "x")) {
             getExtremes(edge);
         }
     });
@@ -591,10 +591,10 @@ function translateGraph(g: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
             p.x -= minX;
             p.y -= minY;
         });
-        if (Object.hasOwn(edge, "x")) {
+        if (hasOwn(edge, "x")) {
             edge.x! -= minX;
         }
-        if (Object.hasOwn(edge, "y")) {
+        if (hasOwn(edge, "y")) {
             edge.y! -= minY;
         }
     });
@@ -626,7 +626,7 @@ function assignNodeIntersects(g: Graph<GraphLabel, NodeLabel, EdgeLabel>): void 
 function fixupEdgeLabelCoords(g: Graph<GraphLabel, NodeLabel, EdgeLabel>): void {
     g.edges().forEach(e => {
         const edge = g.edge(e);
-        if (Object.hasOwn(edge, "x")) {
+        if (hasOwn(edge, "x")) {
             if (edge.labelpos === "l" || edge.labelpos === "r") {
                 edge.width! -= edge.labeloffset!;
             }

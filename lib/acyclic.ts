@@ -1,6 +1,6 @@
 import {Graph} from "./graph-lib";
 import greedyFAS from "./greedy-fas";
-import {uniqueId} from "./util";
+import {hasOwn, uniqueId} from "./util";
 import type {Edge, EdgeLabel, GraphLabel, NodeLabel, WeightFunction} from "./types";
 
 export {run, undo};
@@ -30,13 +30,13 @@ function dfsFAS(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, oldGraph: Graph|
     const visited: { [key: string]: boolean } = {};
 
     function dfs(v: string): void {
-        if (Object.hasOwn(visited, v)) {
+        if (hasOwn(visited, v)) {
             return;
         }
         visited[v] = true;
         stack[v] = true;
         graph.outEdges(v)!.forEach(e => {
-            if (Object.hasOwn(stack, e.w)) {
+            if (hasOwn(stack, e.w)) {
                 fas.push(e);
             } else {
                 dfs(e.w);
@@ -46,13 +46,13 @@ function dfsFAS(graph: Graph<GraphLabel, NodeLabel, EdgeLabel>, oldGraph: Graph|
     }
 
     function dfsDynamic(v: string) {
-        if (Object.hasOwn(visited, v)) {
+        if (hasOwn(visited, v)) {
             return;
         }
         visited[v] = true;
         stack[v] = true;
         graph.outEdges(v)?.forEach(e => {
-            if (Object.hasOwn(stack, e.w) ||
+            if (hasOwn(stack, e.w) ||
                 (oldGraph!.node(v)?.rank > oldGraph!.node(e.w)?.rank) && isReachedFromStartWithoutEdge(graph, e.w, e)) {
                 fas.push(e);
             } else {

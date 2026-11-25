@@ -1,7 +1,7 @@
 import feasibleTree, {type TreeEdgeLabel, type TreeNodeLabel} from "./feasible-tree";
 import {longestPath as initRank, slack} from "./util";
 import {alg} from "../graph-lib";
-import {simplify} from "../util";
+import {hasOwn, simplify} from "../util";
 import type {Edge, EdgeLabel, Graph, GraphLabel, NodeLabel} from "../types";
 
 const {preorder, postorder} = alg;
@@ -150,7 +150,7 @@ function dfsAssignLowLim(tree: Graph<object, TreeNodeLabel, TreeEdgeLabel>, visi
     const neighbors = tree.neighbors(v);
     if (neighbors) {
         neighbors.forEach(w => {
-            if (!Object.hasOwn(visited, w)) {
+            if (!hasOwn(visited, w)) {
                 nextLim = dfsAssignLowLim(tree, visited, nextLim, w, v);
             }
         });

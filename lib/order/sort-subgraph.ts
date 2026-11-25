@@ -1,3 +1,4 @@
+import {hasOwn} from "../util";
 import barycenter from "./barycenter";
 import resolveConflicts, {ResolvedEntry} from "./resolve-conflicts";
 import sort from "./sort";
@@ -47,7 +48,7 @@ export default function sortSubgraph(
         if (graph.children(entry.v).length) {
             const {result: subgraphResult} = sortSubgraph(graph, entry.v, constraintGraph, resolvedOldNodes, resolvedBiasRight);
             subgraphs[entry.v] = subgraphResult;
-            if (Object.hasOwn(subgraphResult, "barycenter")) {
+            if (hasOwn(subgraphResult, "barycenter")) {
                 mergeBarycenters(entry, subgraphResult);
             }
         }
@@ -99,7 +100,7 @@ export default function sortSubgraph(
             const blPred = graph.node(blPredecessors[0]!);
             const brPredecessors = graph.predecessors(br);
             const brPred = graph.node(brPredecessors![0]!);
-            if (!Object.hasOwn(result, "barycenter")) {
+            if (!hasOwn(result, "barycenter")) {
                 result.barycenter = 0;
                 result.weight = 0;
             }
