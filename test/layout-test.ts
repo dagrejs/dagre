@@ -10,6 +10,24 @@ describe("layout", () => {
             .setDefaultEdgeLabel(() => ({}));
     });
 
+    it("preserves outgoing edge order after reinserting an edge in a dynamic layout", () => {
+        for (const v of ["a", "b", "c"]) {
+            g.setNode(v, {width: 30, height: 30});
+        }
+        g.setEdge("a", "b").setEdge("a", "c");
+        layout(g, {disableOptimalOrderHeuristic: true});
+        const before = extractCoordinates(g);
+
+        g.removeEdge("a", "b");
+        g.setEdge("a", "b");
+        layout(g, {disableOptimalOrderHeuristic: true});
+        expect(extractCoordinates(g)).toEqual(before);
+
+        layout(g, {disableOptimalOrderHeuristic: true, useDynamic: false});
+        expect(g.node("b").x).toBe(before.c!.x);
+        expect(g.node("c").x).toBe(before.b!.x);
+    });
+
     it("can layout a single node", () => {
         g.setNode("a", {width: 50, height: 100});
         layout(g);

@@ -44,4 +44,25 @@ describe("order/initOrder", () => {
         const layering = initOrder(g);
         expect(layering).toEqual([["a"]]);
     });
+
+    it("keeps the previous order of normalized outgoing edges", () => {
+        const a = {width: 0, height: 0, rank: 0};
+        const target = {width: 0, height: 0, rank: 2};
+        const edgeA = {width: 0, height: 0, rank: 1, dummy: "edge" as const, edgeObj: {v: "a", w: "b"}};
+        const edgeB = {width: 0, height: 0, rank: 1, dummy: "edge" as const, edgeObj: {v: "a", w: "c"}};
+        g.setNode("a", a).setNode("b", target).setNode("c", target);
+        g.setNode("edgeB", edgeB).setNode("edgeA", edgeA);
+        g.setPath(["a", "edgeB", "c"]);
+        g.setPath(["a", "edgeA", "b"]);
+
+        const layering = initOrder(g, {
+            a,
+            b: target,
+            c: target,
+            previousA: {...edgeA, order: 0},
+            previousB: {...edgeB, order: 1}
+        });
+
+        expect(layering[1]).toEqual(["edgeA", "edgeB"]);
+    });
 });
